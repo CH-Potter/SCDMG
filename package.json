@@ -12,7 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "sim": "node -e \"process.env.VITEST_SIM=1;require('child_process').execSync('npx vitest run --reporter=verbose',{stdio:'inherit',env:process.env})\""
   },
   "dependencies": {
     "pixi.js": "^8.23.0"

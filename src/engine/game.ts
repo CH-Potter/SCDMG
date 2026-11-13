@@ -1,233 +1,570 @@
 // The game reducer: createGame() and applyCommand(). Pure and deterministic given the seed.
+//
+// A round has four phases. In the first three, players alternate activating one unit at a time
+// (starting with the player who has initiative); a player with nothing left to do is skipped.
+//   movement: deploy from reserves, move, disengage, hunker, hold, movement abilities
+//   assault:  shoot, charge, advance, hunker, hold, assault abilities
+//   combat:   engaged units fight (units that charged fight first)
+//   scoring:  mission scoring and clean-up, then the next round begins
 
-import { FACTIONS, profileOf } from "./data/factions";
-import { DUSTBOWL, type MapDef } from "./data/maps";
+import { ABILITIES } from "./data/abilities";
+import { FACTIONS } from "./data/factions";
+import { MAPS } from "./data/maps";
+import { MISSIONS } from "./data/missions";
+import { applyDamage, planMelee, planShooting, resolveAttack, saveNeeded } from "./combat";
+import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
+import { dist } from "./geometry";
+import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
 import { rollD6 } from "./rng";
 import {
-  ACTIONS_PER_ACTIVATION,
-  canEntrench,
-  checkAttack,
-  checkMove,
-  friendsOf,
-  healTargets,
-  objectiveControl,
-  saveTarget,
-  attackDice,
-  targetInCover,
+  aliveModels,
+  canAffordDeploy,
+  effectiveMove,
+  eligibleUnits,
+  ENGAGE_RANGE,
+  isEngaged,
+  meleeCanHit,
+  onBoard,
+  playerHasOptions,
+  reserves,
   unitById,
+  unitGap,
+  unitsEngage,
 } from "./rules";
-import type { Command, CommandResult, FactionId, GameEvent, GameState, PlayerId, Unit } from "./types";
+import { cleanupRound, scoreRound, updateFlags } from "./scoring";
+import { elevationFor } from "./terrain";
+import type {
+  AbilityId,
+  Command,
+  CommandResult,
+  FactionId,
+  GameEvent,
+  GameState,
+  ListEntry,
+  Phase,
+  PlayerId,
+  Unit,
+  Vec,
+} from "./types";
 
 export interface GameSetup {
   factions: [FactionId, FactionId];
-  lists?: [string[], string[]];
+  lists?: [ListEntry[], ListEntry[]];
   seed?: number;
-  map?: MapDef;
-  maxRounds?: number;
+  mapId?: string;
+  missionId?: string;
 }
 
+const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
+
 export function createGame(setup: GameSetup): GameState {
-  const map = setup.map ?? DUSTBOWL;
+  const map = MAPS[setup.mapId ?? "dustbowl"];
+  const mission = MISSIONS[setup.missionId ?? "hold"];
+  if (!map || !mission) throw new Error("Unknown map or mission");
   const lists = setup.lists ?? [FACTIONS[setup.factions[0]].defaultList, FACTIONS[setup.factions[1]].defaultList];
+  const units: Unit[] = [];
+  for (const owner of [0, 1] as const) {
+    lists[owner].forEach((entry, i) => {
+      const p = profileFor(entry.profileId, entry.upgrades);
+      units.push({
+        uid: `p${owner}-${i}`,
+        profileId: entry.profileId,
+        upgrades: [...entry.upgrades],
+        owner,
+        models: Array.from({ length: p.models }, (_, id) => ({
+          id,
+          pos: { x: 0, y: 0 },
+          elevation: 0,
+          hp: p.hp,
+          shield: p.shield,
+          alive: true,
+        })),
+        onBoard: false,
+        destroyed: false,
+        status: {
+          acted: false,
+          moved: false,
+          disengaged: false,
+          hunkered: false,
+          charged: false,
+          fought: false,
+          hurt: false,
+          slowedRounds: 0,
+          deployedRound: 0,
+        },
+        abilityUses: {},
+        reactionsUsed: [],
+      });
+    });
+  }
+  const objectives = map.objectives.map((o) => ({ ...o, pos: { ...o.pos }, controller: null }));
+  const hasFlags = mission.scoring.some((r) => r.kind === "flag");
   const state: GameState = {
     board: { width: map.width, height: map.height },
+    mapId: map.id,
+    missionId: mission.id,
     round: 1,
-    maxRounds: setup.maxRounds ?? 5,
+    maxRounds: mission.rounds,
+    phase: "movement",
+    initiative: 0,
     activePlayer: 0,
     factions: setup.factions,
-    units: [],
-    terrain: map.terrain.map((t) => ({ ...t, poly: t.poly.map((p) => ({ ...p })) })),
-    objectives: map.objectives.map((o) => ({ ...o, pos: { ...o.pos } })),
-    score: [0, 0],
+    players: [0, 1].map(() => ({
+      resources: mission.startResources,
+      supplyCap: mission.startSupply,
+      vp: 0,
+      passed: false,
+    })) as GameState["players"],
+    units,
+    terrain: structuredClone(map.terrain),
+    access: structuredClone(map.access),
+    spawn: structuredClone(map.spawn),
+    objectives,
+    flags: hasFlags
+      ? objectives
+          .filter((o) => o.team !== null)
+          .map((o) => ({ team: o.team!, home: { ...o.pos }, pos: { ...o.pos }, carrier: null }))
+      : [],
     rng: (setup.seed ?? Date.now()) >>> 0,
-    activation: null,
     over: false,
     winner: null,
   };
-  for (const owner of [0, 1] as const) deploy(state, owner, lists[owner], map.deploy[owner]);
+  state.initiative = rollD6(state) % 2 === 0 ? 0 : 1;
+  state.activePlayer = state.initiative;
   return state;
 }
 
-/** Spread a list evenly across the deployment band, nudging units off terrain. */
-function deploy(state: GameState, owner: PlayerId, list: string[], band: [number, number]): void {
-  const midY = (band[0] + band[1]) / 2;
-  list.forEach((profileId, i) => {
-    const p = profileOf(profileId);
-    const unit: Unit = {
-      uid: `p${owner}-${i}`,
-      profileId,
-      owner,
-      pos: { x: 0, y: midY },
-      hp: p.hp,
-      shield: p.shield,
-      activated: false,
-      dugIn: false,
-      hurtThisRound: false,
-      alive: true,
-    };
-    const baseX = ((i + 0.5) / list.length) * state.board.width;
-    const offsets = [0, 1.5, -1.5, 3, -3, 4.5, -4.5, 6, -6];
-    for (const dx of offsets) {
-      for (const dy of [0, -1.5, 1.5]) {
-        unit.pos = { x: baseX + dx, y: Math.min(band[1], Math.max(band[0], midY + dy)) };
-        // A zero-length move reuses the move checker's placement rules (board edge, terrain, overlap).
-        if (checkMove(state, unit, unit.pos) === null) {
-          state.units.push(unit);
-          return;
-        }
-      }
-    }
-    throw new Error(`Could not deploy ${profileId}`);
-  });
-}
-
-const clone = (s: GameState): GameState => structuredClone(s);
+const fail = (error: string): CommandResult => ({ ok: false, error });
 
 export function applyCommand(prev: GameState, cmd: Command): CommandResult {
-  if (prev.over) return { ok: false, error: "The game is over" };
-  const s = clone(prev);
+  if (prev.over) return fail("The game is over");
+  const s = structuredClone(prev);
   const events: GameEvent[] = [];
-  const unit = unitById(s, cmd.uid);
-  if (!unit || !unit.alive) return { ok: false, error: "No such unit" };
-  if (unit.owner !== s.activePlayer) return { ok: false, error: "Not your turn" };
-  if (s.activation && s.activation.uid !== unit.uid) return { ok: false, error: "Finish the current activation first" };
-  if (!s.activation && unit.activated) return { ok: false, error: "That unit has already activated this round" };
 
-  if (cmd.type === "end") {
-    // Ending without having activated is a "hold": the unit passes this round.
-    endActivation(s, unit, events);
+  if (cmd.type === "pass") {
+    if (cmd.player !== s.activePlayer) return fail("Not your turn");
+    s.players[cmd.player].passed = true;
+    events.push({ type: "passed", player: cmd.player });
+    advanceTurn(s, events);
     return { ok: true, state: s, events };
   }
 
-  if (!s.activation) {
-    s.activation = { uid: unit.uid, actionsLeft: ACTIONS_PER_ACTIVATION, attacked: false, usedSpecial: false };
-    unit.dugIn = false; // Entrenchment lasts until the unit's next activation.
-  }
-  const act = s.activation;
+  const unit = unitById(s, cmd.uid);
+  if (!unit || unit.destroyed) return fail("No such unit");
+  if (unit.owner !== s.activePlayer) return fail("Not your turn");
+  if (s.players[unit.owner].passed) return fail("You've passed this phase");
 
-  switch (cmd.type) {
-    case "move": {
-      const err = checkMove(s, unit, cmd.to);
-      if (err) return { ok: false, error: err };
-      events.push({ type: "moved", uid: unit.uid, from: { ...unit.pos }, to: { ...cmd.to } });
-      unit.pos = { ...cmd.to };
-      break;
-    }
-    case "attack": {
-      if (act.attacked) return { ok: false, error: "Only one attack per activation" };
-      const target = unitById(s, cmd.target);
-      const weapon = profileOf(unit.profileId).weapons[cmd.weapon];
-      if (!target || !weapon) return { ok: false, error: "Bad attack" };
-      const err = checkAttack(s, unit, target, weapon);
-      if (err) return { ok: false, error: err };
+  const err = perform(s, unit, cmd, events);
+  if (err) return fail(err);
 
-      const dice = attackDice(s, unit, target, weapon);
-      const st = saveTarget(s, unit, target, weapon);
-      const cover = !weapon.melee && targetInCover(s, unit, target);
-      const hitRolls = Array.from({ length: dice }, () => rollD6(s));
-      const hits = hitRolls.filter((r) => r >= weapon.hit).length;
-      const saveRolls = st === null ? [] : Array.from({ length: hits }, () => rollD6(s));
-      const fails = st === null ? hits : saveRolls.filter((r) => r < st).length;
-      let damage = fails * weapon.damage;
-      const dealt = Math.min(damage, target.hp + target.shield);
-      const toShield = Math.min(target.shield, dealt);
-      target.shield -= toShield;
-      target.hp -= dealt - toShield;
-      damage = dealt;
-      if (damage > 0) target.hurtThisRound = true;
-      const killed = target.hp <= 0;
-      if (killed) target.alive = false;
-      act.attacked = true;
-      events.push({
-        type: "attacked",
-        uid: unit.uid,
-        target: target.uid,
-        weapon: weapon.name,
-        hitRolls,
-        hits,
-        saveTarget: st,
-        saveRolls,
-        damage,
-        cover,
-        killed,
-      });
-      break;
-    }
-    case "entrench": {
-      if (!canEntrench(s, unit)) return { ok: false, error: "This unit can't entrench now" };
-      unit.dugIn = true;
-      act.usedSpecial = true;
-      events.push({ type: "entrenched", uid: unit.uid });
-      break;
-    }
-    case "heal": {
-      const target = healTargets(s, unit).find((t) => t.uid === cmd.target);
-      if (!target) return { ok: false, error: "Can't heal that unit" };
-      target.hp += 1;
-      act.usedSpecial = true;
-      events.push({ type: "healed", uid: unit.uid, target: target.uid, amount: 1 });
-      break;
-    }
-  }
-
-  act.actionsLeft -= 1;
-  if (checkElimination(s, events)) return { ok: true, state: s, events };
-  if (act.actionsLeft <= 0) endActivation(s, unit, events);
+  updateFlags(s, events);
+  checkWipeout(s, events);
+  if (!s.over) advanceTurn(s, events);
   return { ok: true, state: s, events };
 }
 
-function checkElimination(s: GameState, events: GameEvent[]): boolean {
-  for (const p of [0, 1] as const) {
-    if (friendsOf(s, p).length === 0) {
-      const winner = (1 - p) as PlayerId;
-      s.over = true;
-      s.winner = winner;
-      s.activation = null;
-      events.push({ type: "gameOver", winner, reason: "Wiped out the opposition" });
-      return true;
+/** Apply one unit activation. Returns an error string, or null on success. Mutates `s`. */
+function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" }>, events: GameEvent[]): string | null {
+  const phase = s.phase;
+  const allowed: Record<Phase, Command["type"][]> = {
+    movement: ["deploy", "move", "disengage", "hunker", "hold", "ability"],
+    assault: ["shoot", "charge", "advance", "hunker", "hold", "ability"],
+    combat: ["fight", "hold"],
+    scoring: [],
+  };
+  if (!allowed[phase].includes(cmd.type)) return `You can't ${cmd.type} in the ${phase} phase`;
+
+  if (cmd.type === "deploy") return deploy(s, unit, cmd.to, events);
+  if (!unit.onBoard) return "That unit is still in reserve";
+  if (!eligibleUnits(s, unit.owner).includes(unit)) {
+    if (unit.status.acted) return "That unit has already acted this phase";
+    if (phase === "assault" && isEngaged(s, unit)) return "Engaged units wait for the combat phase";
+    if (phase === "assault" && unit.status.hunkered) return "Hunkered units stay put this round";
+    if (phase === "assault" && unit.status.disengaged) return "Units that disengaged can't act again this round";
+    if (phase === "combat") return "That unit can't fight right now";
+    return "That unit can't act right now";
+  }
+
+  switch (cmd.type) {
+    case "move":
+    case "advance": {
+      if (isEngaged(s, unit)) return "Engaged units must disengage instead";
+      const e = moveUnit(s, unit, cmd.leader, cmd.to, effectiveMove(s, unit), false);
+      if (e) return e;
+      if (endsEngaged(s, unit)) return "Only a charge can move into base contact";
+      events.push({ type: "moved", uid: unit.uid, kind: cmd.type });
+      break;
+    }
+    case "disengage": {
+      if (!isEngaged(s, unit)) return "That unit isn't engaged";
+      const e = moveUnit(s, unit, cmd.leader, cmd.to, effectiveMove(s, unit), false);
+      if (e) return e;
+      if (endsEngaged(s, unit)) return "Must end the move out of base contact";
+      unit.status.disengaged = true;
+      events.push({ type: "moved", uid: unit.uid, kind: "disengage" });
+      break;
+    }
+    case "hunker":
+      unit.status.hunkered = true;
+      events.push({ type: "hunkered", uid: unit.uid });
+      break;
+    case "hold":
+      if (phase === "combat") unit.status.fought = true;
+      events.push({ type: "held", uid: unit.uid });
+      break;
+    case "charge": {
+      const e = charge(s, unit, cmd.target);
+      if (e) return e;
+      events.push({ type: "moved", uid: unit.uid, kind: "charge" });
+      break;
+    }
+    case "shoot": {
+      const target = unitById(s, cmd.target);
+      const w = profileOf(unit).weapons[cmd.weapon];
+      if (!target || !target.onBoard || target.owner === unit.owner) return "Pick an enemy unit";
+      if (!w) return "No such weapon";
+      if (unit.status.disengaged && !hasKeyword(unit, "light")) return "Only light units can shoot after disengaging";
+      const plan = planShooting(s, unit, target, w);
+      if (typeof plan === "string") return plan;
+      events.push({ type: "attack", report: resolveAttack(s, unit, target, w.name, plan, "shoot", events) });
+      break;
+    }
+    case "fight": {
+      const target = unitById(s, cmd.target);
+      const w = profileOf(unit).weapons[cmd.weapon];
+      if (!target || !target.onBoard || !unitsEngage(unit, target)) return "Not engaged with that unit";
+      if (!w) return "No such weapon";
+      const plan = planMelee(unit, target, w);
+      if (typeof plan === "string") return plan;
+      unit.status.fought = true;
+      events.push({ type: "attack", report: resolveAttack(s, unit, target, w.name, plan, "fight", events) });
+      break;
+    }
+    case "ability": {
+      const e = useAbility(s, unit, cmd.ability, cmd.target, cmd.point, events);
+      if (e) return e;
+      break;
     }
   }
-  return false;
-}
-
-function endActivation(s: GameState, unit: Unit, events: GameEvent[]): void {
-  unit.activated = true;
-  s.activation = null;
-  events.push({ type: "activationEnded", uid: unit.uid });
-  const ready = (p: PlayerId) => friendsOf(s, p).some((u) => !u.activated);
-  const other = (1 - s.activePlayer) as PlayerId;
-  if (ready(other)) s.activePlayer = other;
-  else if (!ready(s.activePlayer)) endRound(s, events);
-}
-
-function endRound(s: GameState, events: GameEvent[]): void {
-  const scored: [number, number] = [0, 0];
-  for (const c of objectiveControl(s)) if (c !== null) scored[c] += 1;
-  s.score[0] += scored[0];
-  s.score[1] += scored[1];
-
-  const healed: string[] = [];
-  for (const u of s.units) {
-    if (!u.alive) continue;
-    const p = profileOf(u.profileId);
-    if (p.abilities.includes("regen") && !u.hurtThisRound && u.hp < p.hp) {
-      u.hp += 1;
-      healed.push(u.uid);
-    }
-    if (u.shield < p.shield) u.shield += 1;
-    u.activated = false;
-    u.hurtThisRound = false;
+  unit.status.acted = true;
+  if (cmd.type === "move" || cmd.type === "advance" || cmd.type === "charge" || cmd.type === "disengage") {
+    react(s, unit, events);
   }
-  events.push({ type: "roundEnded", round: s.round, scored, healed });
+  return null;
+}
 
+function applyPlan(unit: Unit, plan: UnitMovePlan): void {
+  for (const p of plan.placements) {
+    const m = unit.models.find((x) => x.id === p.modelId)!;
+    m.pos = { ...p.pos };
+    m.elevation = p.elevation;
+  }
+  unit.status.moved = true;
+}
+
+function moveUnit(s: GameState, unit: Unit, leader: number, to: Vec, allowance: number, teleport: boolean): string | null {
+  const plan = planUnitMove(s, unit, leader, to, { allowance, teleport });
+  if (typeof plan === "string") return plan;
+  applyPlan(unit, plan);
+  return null;
+}
+
+const endsEngaged = (s: GameState, unit: Unit): boolean => isEngaged(s, unit);
+
+function deploy(s: GameState, unit: Unit, to: Vec, events: GameEvent[]): string | null {
+  if (unit.onBoard) return "That unit is already deployed";
+  const cant = canAffordDeploy(s, unit);
+  if (cant) return cant;
+  const leader = unit.models[0]!;
+  const plan = planUnitMove(s, unit, leader.id, to, { allowance: 0, teleport: true, zone: s.spawn[unit.owner] });
+  if (typeof plan === "string") return plan;
+  unit.onBoard = true;
+  applyPlan(unit, plan);
+  if (endsEngaged(s, unit)) return "Can't deploy into base contact";
+  s.players[unit.owner].resources -= profileOf(unit).cost;
+  unit.status.acted = true;
+  unit.status.deployedRound = s.round;
+  events.push({ type: "deployed", uid: unit.uid });
+  react(s, unit, events);
+  return null;
+}
+
+/** Charge: auto-route the closest model into base contact with the target; the rest pile in. */
+function charge(s: GameState, unit: Unit, targetUid: string): string | null {
+  const target = unitById(s, targetUid);
+  if (!target || !target.onBoard || target.owner === unit.owner) return "Pick an enemy unit to charge";
+  if (unit.status.disengaged) return "Units that disengaged can't charge";
+  const melee = profileOf(unit).weapons.filter((w) => w.melee);
+  if (!melee.some((w) => meleeCanHit(unit, target, w.targets))) {
+    return isFlying(target) ? "Nothing in this unit can reach flyers" : "This unit has no melee weapon";
+  }
+  const plan = planCharge(s, unit, target);
+  if (typeof plan === "string") return plan;
+  applyPlan(unit, plan);
+  if (!unitsEngage(unit, target)) return "Couldn't reach base contact";
+  unit.status.charged = true;
+  return null;
+}
+
+export function planCharge(s: GameState, unit: Unit, target: Unit): UnitMovePlan | string {
+  const ra = profileOf(unit).baseRadius;
+  const rt = profileOf(target).baseRadius;
+  const allowance = effectiveMove(s, unit);
+  const flying = isFlying(unit);
+  const pairs = aliveModels(unit)
+    .flatMap((am) => aliveModels(target).map((tm) => ({ am, tm, d: dist(am.pos, tm.pos) })))
+    .filter((p) => flying || isFlying(target) || p.tm.elevation !== 2)
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 4);
+  if (pairs.length && pairs[0]!.d - ra - rt > allowance + ENGAGE_RANGE + 0.01) return `Out of charge range (${allowance}")`;
+  const contact = ra + rt + 0.4;
+  const pileIn = [{ points: aliveModels(target).map((m) => m.pos), radius: ra + rt + ENGAGE_RANGE - 0.05 }];
+  let best: UnitMovePlan | null = null;
+  let lastErr = "Can't find a path into base contact";
+  for (const { am, tm } of pairs) {
+    const base = Math.atan2(am.pos.y - tm.pos.y, am.pos.x - tm.pos.x);
+    for (let i = 0; i < 12; i++) {
+      const a = base + (i % 2 ? 1 : -1) * Math.ceil(i / 2) * (Math.PI / 6);
+      const dest = { x: tm.pos.x + Math.cos(a) * contact, y: tm.pos.y + Math.sin(a) * contact };
+      if (!flying && !isFlying(target) && elevationFor(s, unit, dest) !== tm.elevation) continue;
+      const plan = planUnitMove(s, unit, am.id, dest, { allowance, pileIn });
+      if (typeof plan === "string") {
+        lastErr = plan;
+        continue;
+      }
+      if (!best || plan.leaderDistance < best.leaderDistance) best = plan;
+      break;
+    }
+  }
+  return best ?? lastErr;
+}
+
+// ---------- abilities ----------
+
+function useAbility(
+  s: GameState,
+  unit: Unit,
+  id: AbilityId,
+  targetUid: string | undefined,
+  point: Vec | undefined,
+  events: GameEvent[],
+): string | null {
+  const def = ABILITIES[id];
+  if (!hasAbility(unit, id) || def.kind !== "active") return "This unit doesn't have that ability";
+  if (def.phase !== s.phase) return `${def.name} is used in the ${def.phase} phase`;
+  const used = unit.abilityUses[id] ?? 0;
+  if (def.usesPerGame !== undefined && used >= def.usesPerGame) return `${def.name} is used up`;
+  if (isEngaged(s, unit) && id !== "patch-up") return "Can't do that while engaged";
+  const name = profileOf(unit).name;
+  const say = (text: string) => events.push({ type: "ability", uid: unit.uid, ability: id, text });
+
+  switch (id) {
+    case "patch-up": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner !== unit.owner) return "Pick a friendly unit";
+      if (t.uid !== unit.uid && unitGap(unit, t) > (def.range ?? 3)) return `Must be within ${def.range}"`;
+      const prof = profileOf(t);
+      let heal = 2;
+      const dead = t.models.find((m) => !m.alive);
+      const spot = dead && reviveSpot(s, t);
+      if (dead && spot) {
+        Object.assign(dead, { alive: true, hp: 1, shield: 0, pos: spot.pos, elevation: spot.elevation });
+        heal -= 1;
+      }
+      let healed = 2 - heal;
+      for (; heal > 0; heal--) {
+        const m = aliveModels(t).filter((x) => x.hp < prof.hp).sort((a, b) => a.hp - b.hp)[0];
+        if (!m) break;
+        m.hp += 1;
+        healed += 1;
+      }
+      if (healed === 0) return "Nothing to patch up";
+      say(`${name} patches up ${prof.name}${dead && spot ? " and gets someone back on their feet" : ""}.`);
+      break;
+    }
+    case "barrage": {
+      if (!point) return "Pick a point";
+      const reach = aliveModels(unit).some((m) => dist(m.pos, point) <= (def.range ?? 24));
+      if (!reach) return `Out of range (${def.range}")`;
+      say(`${name} lobs a barrage!`);
+      for (const t of onBoard(s)) {
+        if (isFlying(t)) continue;
+        const r = profileOf(t).baseRadius;
+        const caught = aliveModels(t).filter((m) => dist(m.pos, point) <= 2 + r);
+        if (!caught.length) continue;
+        const hitRolls: number[] = [];
+        const saveRolls: number[] = [];
+        const saveOn: (number | null)[] = [];
+        let damage = 0;
+        let killed = 0;
+        for (const m of caught) {
+          const roll = rollD6(s);
+          hitRolls.push(roll);
+          if (roll < 4) continue;
+          const st = saveNeeded(s, unit, t, m, 1, false);
+          saveOn.push(st);
+          const sv = st === null ? 0 : rollD6(s);
+          saveRolls.push(sv);
+          if (st !== null && sv >= st) continue;
+          damage += applyDamage(s, t, m, 1, events);
+          if (!m.alive) killed += 1;
+        }
+        events.push({
+          type: "attack",
+          report: {
+            uid: unit.uid,
+            target: t.uid,
+            weapon: "Barrage",
+            kind: "barrage",
+            attackers: 1,
+            hitRolls,
+            hitOn: 4,
+            saveRolls,
+            saveOn,
+            damage,
+            modelsKilled: killed,
+            unitDestroyed: t.destroyed,
+          },
+        });
+      }
+      break;
+    }
+    case "tunnel": {
+      if (!point) return "Pick a point";
+      if (elevationFor(s, unit, point) !== 0) return "Must pop up on the ground";
+      const e = moveUnit(s, unit, aliveModels(unit)[0]!.id, point, 0, true);
+      if (e) return e;
+      const tooClose = onBoard(s).some((en) => en.owner !== unit.owner && unitGap(unit, en) < 6);
+      if (tooClose) return 'Must pop up at least 6" from enemies';
+      say(`${name} burrows away and bursts out of the ground!`);
+      events.push({ type: "moved", uid: unit.uid, kind: "teleport" });
+      react(s, unit, events);
+      break;
+    }
+    case "blink": {
+      if (!point) return "Pick a point";
+      const leader = aliveModels(unit)[0]!;
+      if (dist(leader.pos, point) > (def.range ?? 10)) return `Too far (${def.range}")`;
+      const e = moveUnit(s, unit, leader.id, point, 0, true);
+      if (e) return e;
+      if (isEngaged(s, unit)) return "Can't blink into base contact";
+      say(`${name} blinks across the field!`);
+      events.push({ type: "moved", uid: unit.uid, kind: "teleport" });
+      react(s, unit, events);
+      break;
+    }
+    case "recall": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner !== unit.owner || t.uid === unit.uid) return "Pick another friendly unit";
+      if (unitGap(unit, t) > (def.range ?? 12)) return `Must be within ${def.range}"`;
+      if (isEngaged(s, t)) return "Can't recall an engaged unit";
+      if (!point) return "Pick where to bring them";
+      const near = aliveModels(unit).some((m) => dist(m.pos, point) <= 4 + profileOf(unit).baseRadius);
+      if (!near) return 'Must be within 4" of the Warden';
+      const e = moveUnit(s, t, aliveModels(t)[0]!.id, point, 0, true);
+      if (e) return e;
+      if (isEngaged(s, t)) return "Can't recall into base contact";
+      say(`${name} beams ${profileOf(t).name} over!`);
+      events.push({ type: "moved", uid: t.uid, kind: "teleport" });
+      react(s, t, events);
+      break;
+    }
+    default:
+      return "That ability can't be activated";
+  }
+  unit.abilityUses[id] = used + 1;
+  return null;
+}
+
+// ---------- reactions ----------
+
+/** Enemy overwatch against a unit that just moved/charged/deployed/teleported. */
+function react(s: GameState, mover: Unit, events: GameEvent[]): void {
+  if (mover.destroyed) return;
+  for (const w of onBoard(s, other(mover.owner))) {
+    if (!hasAbility(w, "overwatch") || w.reactionsUsed.includes("overwatch")) continue;
+    if (isEngaged(s, w) || unitGap(w, mover) > 10) continue;
+    const idx = profileOf(w).weapons.findIndex((x) => !x.melee);
+    const weapon = profileOf(w).weapons[idx];
+    if (!weapon) continue;
+    const plan = planShooting(s, w, mover, weapon, "overwatch");
+    if (typeof plan === "string") continue;
+    w.reactionsUsed.push("overwatch");
+    events.push({ type: "ability", uid: w.uid, ability: "overwatch", text: `${profileOf(w).name} opens fire on overwatch!` });
+    events.push({ type: "attack", report: resolveAttack(s, w, mover, weapon.name, plan, "overwatch", events) });
+    if (mover.destroyed) return;
+  }
+}
+
+// ---------- turn & phase flow ----------
+
+function checkWipeout(s: GameState, events: GameEvent[]): void {
+  const out = (p: PlayerId) => onBoard(s, p).length === 0 && reserves(s, p).length === 0;
+  const a = out(0);
+  const b = out(1);
+  if (!a && !b) return;
+  s.over = true;
+  s.winner = a && b ? "draw" : a ? 1 : 0;
+  events.push({ type: "gameOver", winner: s.winner, reason: "An army was wiped out" });
+}
+
+function advanceTurn(s: GameState, events: GameEvent[]): void {
+  const o = other(s.activePlayer);
+  if (playerHasOptions(s, o)) {
+    s.activePlayer = o;
+    return;
+  }
+  if (playerHasOptions(s, s.activePlayer)) return;
+  endPhase(s, events);
+}
+
+const NEXT: Record<Phase, Phase> = { movement: "assault", assault: "combat", combat: "scoring", scoring: "movement" };
+
+function endPhase(s: GameState, events: GameEvent[]): void {
+  for (let guard = 0; guard < 8 && !s.over; guard++) {
+    for (const u of s.units) u.status.acted = false;
+    s.players.forEach((p) => (p.passed = false));
+    s.phase = NEXT[s.phase];
+    if (s.phase === "scoring") {
+      runScoring(s, events);
+      if (s.over) return;
+      continue;
+    }
+    s.activePlayer = s.initiative;
+    events.push({ type: "phase", phase: s.phase, round: s.round });
+    if (playerHasOptions(s, 0) || playerHasOptions(s, 1)) {
+      if (!playerHasOptions(s, s.activePlayer)) s.activePlayer = other(s.activePlayer);
+      return;
+    }
+  }
+}
+
+function runScoring(s: GameState, events: GameEvent[]): void {
+  events.push({ type: "phase", phase: "scoring", round: s.round });
+  scoreRound(s, events);
+  cleanupRound(s, events);
+  events.push({ type: "roundEnded", round: s.round });
   if (s.round >= s.maxRounds) {
     s.over = true;
-    s.winner = s.score[0] === s.score[1] ? "draw" : s.score[0] > s.score[1] ? 0 : 1;
+    const [a, b] = [s.players[0].vp, s.players[1].vp];
+    s.winner = a === b ? "draw" : a > b ? 0 : 1;
     events.push({ type: "gameOver", winner: s.winner, reason: "Final round complete" });
     return;
   }
+  const mission = MISSIONS[s.missionId]!;
   s.round += 1;
-  // The player trailing on points goes first next round; ties alternate.
-  s.activePlayer =
-    s.score[0] < s.score[1] ? 0 : s.score[1] < s.score[0] ? 1 : (((s.round - 1) % 2) as PlayerId);
+  for (const p of s.players) {
+    p.resources += mission.income;
+    p.supplyCap = Math.min(mission.maxSupply, p.supplyCap + mission.supplyPerRound);
+  }
+  const [a, b] = [s.players[0].vp, s.players[1].vp];
+  s.initiative = a < b ? 0 : b < a ? 1 : other(s.initiative);
+}
+
+/** Is the given model in a spot where it would be engaged with any enemy? (UI helper) */
+export function wouldEngage(s: GameState, unit: Unit, pos: Vec): boolean {
+  const r = profileOf(unit).baseRadius;
+  return onBoard(s).some(
+    (e) => e.owner !== unit.owner && aliveModels(e).some((m) => dist(m.pos, pos) - r - profileOf(e).baseRadius <= ENGAGE_RANGE),
+  );
 }

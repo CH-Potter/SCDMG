@@ -361,3 +361,104 @@ button:focus-visible {
     overflow: auto;
   }
 }
+
+/* ---------- v0.2 additions ---------- */
+#topbar {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.phases {
+  display: inline-flex;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+  background: white;
+}
+
+.phase {
+  padding: 1px 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-right: 2px solid var(--ink);
+}
+
+.phase:last-child {
+  border-right: 0;
+}
+
+.phase.current {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.status {
+  font-size: 0.95rem;
+}
+
+#sidebar {
+  overflow-y: auto;
+}
+
+.army-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.reserve {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 3px 0;
+  border-bottom: 2px dashed #e6d9c2;
+  font-size: 0.88rem;
+}
+
+.reserve.on {
+  background: #fff1c2;
+}
+
+.reserve small {
+  color: var(--muted);
+  display: block;
+  line-height: 1.1;
+}
+
+button.mini {
+  padding: 1px 10px;
+  font-size: 0.85rem;
+  border-width: 2px;
+  box-shadow: 0 2px 0 var(--ink);
+  flex-shrink: 0;
+}
+
+.ability {
+  font-size: 0.82rem;
+  margin: 3px 0;
+  line-height: 1.25;
+}
+
+.tag.kw {
+  background: #d9f2ff;
+}
+
+#log {
+  min-height: 160px;
+  max-height: 40vh;
+}
+
+select {
+  font: inherit;
+  font-weight: 600;
+  border: 3px solid var(--ink);
+  border-radius: 10px;
+  padding: 4px 8px;
+  background: white;
+  margin: 4px 0;
+  width: 100%;
+}
