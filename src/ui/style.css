@@ -365,6 +365,30 @@ a:focus-visible,
   box-shadow: var(--focus);
 }
 
+/* A button that reads like an inline link (e.g. "Read their story ›"). */
+button.linkish {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: none;
+  background: none;
+  font: inherit;
+  font-weight: 800;
+  color: var(--fc-ink, var(--ink));
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+button.linkish:hover:not(:disabled),
+button.linkish:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+  color: var(--rust);
+}
+
 #log {
   flex: 1;
   min-height: 120px;

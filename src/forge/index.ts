@@ -5,6 +5,7 @@
 import "./forge.css";
 import { ABILITIES } from "../engine/data/abilities";
 import { BUILT_IN_FACTION_IDS, FACTIONS } from "../engine/data/factions";
+import { showLore } from "../ui/loreLinks";
 import { EFFECT_KINDS, entryCostIn, factionProblems, KEYWORDS, LIMITS, TRAITS, starterStats, type StarterStats, EVADE_CONDITIONS } from "../engine/data/factionValidation";
 import type { ModeId } from "../engine/data/modes";
 import type { Faction, Keyword, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, UpgradeDef, Weapon } from "../engine/types";
@@ -210,7 +211,7 @@ class FactionForge {
                 .map((f) =>
                   card(
                     f,
-                    `<button class="mini secondary" data-act="view" data-id="${esc(f.id)}">View</button><button class="mini" data-act="copy" data-id="${esc(f.id)}">Copy</button>`,
+                    `<button class="mini secondary" data-act="view" data-id="${esc(f.id)}">View</button><button class="mini" data-act="copy" data-id="${esc(f.id)}">Copy</button><button class="mini secondary" data-act="lore" data-id="${esc(f.id)}" title="Read this faction's story">📖 Lore</button>`,
                   ),
                 )
                 .join("")}
@@ -262,6 +263,8 @@ class FactionForge {
         return this.close();
       case "import":
         return void this.importFile();
+      case "lore":
+        return showLore(id);
       case "view": {
         const f = FACTIONS[id];
         if (f) this.open(structuredClone(f), true, true);

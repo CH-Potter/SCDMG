@@ -2,7 +2,7 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Main menu: game mode, mission and battlefield (with previews), armies and lists, plus entry
 // points to the list builder and map builder.
 
-import { FACTIONS, listCost, factionOf, supportsCost } from "../engine/data/factions";
+import { FACTIONS, isBuiltInFaction, listCost, factionOf, supportsCost } from "../engine/data/factions";
 import type { MapDef } from "../engine/data/maps";
 import { economyOf, missionMapProblem, MISSIONS, swapMapSides, swapMissionSides, type MissionDef } from "../engine/data/missions";
 import { MODES, type ModeId } from "../engine/data/modes";
@@ -13,6 +13,7 @@ import { loadJson, saveJson } from "./files";
 import { findList, listsFor } from "./lists";
 import { recruitableProfiles, type ArmyRule } from "../engine/openRoster";
 import { drawMapPreview, drawMissionPreview } from "./previews";
+import { maybeFactionIntro, playIntro, showLore } from "./loreLinks";
 import { audio } from "../audio"; // [audio]
 
 export interface MenuChoice {
@@ -105,12 +106,13 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
         <header class="menu-head">
           <div>
             <h1 aria-label="Super Cool Desktop Miniatures Game">${wordmarkSvg()}</h1>
-            <p class="tagline"><b>SCDMG</b>: a cartoon sci-fi skirmish on the tabletop. Pick a mode, a mission, a battlefield and your armies.</p>
+            <p class="tagline"><b>SCDMG</b>: a cartoon sci-fi skirmish on the tabletop. Pick a mode, a mission, a battlefield and your armies. <button type="button" class="linkish" id="m-intro">▶ Watch the intro</button></p>
           </div>
           <div class="row">
             <button class="secondary" id="m-lists">📜 List builder</button>
             <button class="secondary" id="m-maps">🗺 Map builder</button>
             <button class="secondary" id="m-forge">🧬 Faction forge</button>
+            <button class="secondary" id="m-lore">📖 Lore</button>
             <button class="secondary" id="m-rules">❓ How to play</button>
             <span id="m-audio"></span>
           </div>
@@ -219,7 +221,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
               ${factionEmblemSvg(f.id, 28)}${esc(f.name)}</button>`,
           )
           .join("")}</div>
-        <p class="hint">${esc(factionOf(fid).blurb)}</p>
+        <p class="hint">${esc(factionOf(fid).blurb)}${isBuiltInFaction(fid) ? ` <button type="button" class="linkish" data-lore="${esc(fid)}">Read their story ›</button>` : ""}</p>
         ${
           prefs.army === "open"
             ? `<p class="hint"><b>Open roster:</b> all ${recruitableProfiles(fid).length} units of the faction, plus its starter supports.</p>`
@@ -237,6 +239,9 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
     $("#m-maps").addEventListener("click", () => opts.onMapBuilder());
     $("#m-forge").addEventListener("click", () => opts.onFactionForge());
     $("#m-rules").addEventListener("click", () => opts.onRules());
+    $("#m-lore").addEventListener("click", () => showLore("world"));
+    $("#m-intro").addEventListener("click", () => playIntro("game"));
+    host.querySelectorAll<HTMLButtonElement>("[data-lore]").forEach((b) => b.addEventListener("click", () => showLore(b.dataset.lore!)));
     audio.mountButton(host.querySelector("#m-audio")); // [audio]
     host.querySelectorAll<HTMLButtonElement>("[data-mode]").forEach((b) =>
       b.addEventListener("click", () => {
@@ -281,6 +286,10 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
         prefs.list[Number(p) as 0 | 1] = "";
         save();
         render();
+        // Keep keyboard focus on the chip that was picked (the page was just re-rendered).
+        host.querySelector<HTMLElement>(`[data-faction-pick="${p}:${CSS.escape(fid)}"]`)?.focus({ preventScroll: true });
+        // The first time a built-in faction is picked, its intro plays.
+        maybeFactionIntro(fid);
       }),
     );
     host.querySelectorAll<HTMLSelectElement>("[data-list]").forEach((sel) =>

@@ -5,6 +5,7 @@ import { openFactionForge } from "./forge/index";
 import { listCustomFactions } from "./ui/customFactions";
 import { Controller, showRules } from "./ui/controller";
 import { openListBuilder } from "./ui/listbuilder";
+import { maybeGameIntro } from "./ui/loreLinks";
 import { openMenu, type MenuChoice } from "./ui/menu";
 import "./ui/menu.css";
 import { BoardRenderer } from "./ui/renderer";
@@ -72,3 +73,5 @@ registerCustomFactions(listCustomFactions());
 
 await renderer.init(els.stage);
 showMenu();
+// First launch: the game intro plays over the menu (skippable, and replayable from the menu).
+maybeGameIntro();
