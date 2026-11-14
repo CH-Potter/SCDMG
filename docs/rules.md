@@ -1,4 +1,4 @@
-# Super Cool Desktop Miniatures Game: rules (v0.4)
+# Super Cool Desktop Miniatures Game: rules (v0.5)
 
 This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
@@ -182,7 +182,15 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - Field Repairs (Militia) heals 3 HP but no longer revives: bringing models back is the Munch's trick (Regrow, Hatchlings, Cough Up) and the Patch Medic's.
 - Unit changes: Big Bertha has Steady Aim instead of Provoke (Provoke is the Grand Strider's); the Ray Lancer trades Steady Aim and Spotter for precision 2 (and no longer hits worse after moving); the Sunray Tower rolls 2 dice instead of having Steady Aim; the Beam Warden loses Steadying Presence; the Tumbleweed Riders lose their impact dice; Rivet Grunts' shovels hit on 5+; the Stink Mortar's range is 20"; the Brood Scorpion has Hatchlings instead of Patch Up. To keep the Militia competitive, Rivet Grunts come 5 to a squad (was 4) and the drop-ship's Bumpy Landing costs 1 CP (was 2).
 
-**Bigger squads pass:**
+**Added in v0.5:**
+- A unit's **supply** now follows its surviving models (see *Objectives and missions*); it decides objective control, disengaging and kill VP.
+- **Disengaging:** a unit worth more supply than the enemies it's engaged with breaks away cleanly; otherwise it's exhausted for the next phase (light units can still shoot).
+- **Instant win:** a lead of more than 8 VP (10 or 12 in big-swing missions) wins on the spot.
+- **Kill VP** is paid as a unit's supply drops, not only when its last model dies.
+- **Blast** weapons get their extra die against units with 7+ models left (was 5+).
+- New setting: the Munch are Dr. Graft's grafted critter army and the Lumen Concord are alien invaders; their units were renamed.
+
+**Bigger squads:**
 - Every squad grew, priced per model at about its old rate: Rivet Grunts 5→7 (cost 4, supply 3; Extra Hands +2 models), Chrome-Jaw Beetles 6→9 (cost 3, supply 3; Bigger Litter +3), Piston Foxes 5→8 (cost 4, supply 3; Kick-Bite 1 die), Bomb Wasps 3→6 (cost 4, supply 3; Stinger 1 die; Extra Buzz +2), Web-Gunner Spiders 3→4, Front Porch Grannies 3→4 (cost 5), Tumbleweed Riders 2→3 (Scattergun 1 die), Phase Guard 2→3 (cost 5, supply 3), Blink Dancers 2→3 (cost 5).
 - Two flying creatures became pairs: the Steel-Jaw Crows (2 × 3 HP, 2 bite dice each, and it no longer has tracking, which is a Concord trait) and the Jetwing Scouts (2 models with 1 shield each, cost 6).
 - Starter lists were rebuilt to fit the roster limits with the new costs (see `src/engine/data/factions.ts`), and were balanced by AI-vs-AI simulation. The Militia field three Grunt squads and two Squinters (the Sky Rustler moves to the Assault extras), the Munch swap the Stink Mortar for the Brood Scorpion, and the Concord field a second Ray Lancer (and a third in Assault in place of a Phase Guard). In Assault the Concord bring the Light Gate instead of the Star Lens: against the bigger packs the Sunbeam ran away with the Munch match-up, and Gate Step gets a few elites to the long board's objectives.
