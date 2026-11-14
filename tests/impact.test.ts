@@ -31,7 +31,7 @@ function chargeEvents(attacker: string, attackerFaction: "munch" | "militia" | "
 }
 
 describe("impact on charge", () => {
-  it("Big Mama Chomp slams into the target as the charge lands", () => {
+  it("Dr. Graft and Big Mama slams into the target as the charge lands", () => {
     const events = chargeEvents("munch-mama", "munch");
     const impact = events.find((e) => e.type === "attack" && e.report.kind === "impact");
     expect(impact).toBeDefined();

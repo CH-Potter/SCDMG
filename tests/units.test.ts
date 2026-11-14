@@ -117,7 +117,7 @@ describe("new unit mechanics", () => {
     expect(typeof planShooting(s, b, flap, drop)).toBe("string");
   });
 
-  it("a Warren Mound lets Munch reserves deploy next to it", () => {
+  it("the Sett Lab lets Munch reserves deploy next to it", () => {
     const s = createGame({ factions: ["munch", "militia"], seed: 3, lists: [[entry("munch-warren"), entry("munch-hoppers")], [entry("mil-grunts")]] });
     const mound = place(s, uidOf(s, 0, "munch-warren"), { x: 17.5, y: 17.5 });
     const hoppers = unitById(s, uidOf(s, 0, "munch-hoppers"))!;

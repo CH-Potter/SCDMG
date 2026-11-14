@@ -25,6 +25,7 @@ import { hasKeyword, isFlying, profileOf } from "./profile";
 import {
   aliveModels,
   controlWeight,
+  supplyFor,
   deployable,
   effectiveMove,
   eligibleUnits,
@@ -357,15 +358,16 @@ export function evaluate(s: GameState, me: PlayerId): number {
 const HOLDER = 0.7;
 
 /**
- * Eval points gained if `e` damage on `t` costs it enough supply (a kill, or dropping to half
- * strength) to lose an objective it's holding: to contested, or to us. A sticky objective only
+ * Eval points gained if `e` damage on `t` costs it enough supply (a kill, or losing models) to lose an objective it's holding: to contested, or to us. A sticky objective only
  * changes hands if we have supply on it too (with nobody on it, it stays with its owner).
  */
 export function holderValue(s: GameState, t: Unit, e: number): number {
   const p = profileOf(t);
   if (isFlying(t) || p.structure || t.status.shaken) return 0;
   const rem = wounds(t) - e;
-  const after = rem <= 0.5 ? 0 : rem * 2 <= maxWounds(t) ? p.supply / 2 : p.supply;
+  // models left after the damage (wounds come off whole models), and the supply they're worth
+  const left = rem <= 0.5 ? 0 : Math.min(aliveModels(t).length, Math.ceil(rem / Math.max(1, p.hp + p.shield) - 1e-9));
+  const after = supplyFor(p, left);
   const lost = controlWeight(t) - after;
   if (lost <= 0) return 0;
   const me = other(t.owner);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { playAiTurn } from "../src/engine/ai";
 import { planMelee, planShooting } from "../src/engine/combat";
-import { FACTIONS } from "../src/engine/data/factions";
+import { entryCost, FACTIONS } from "../src/engine/data/factions";
 import { COHERENCY, planUnitMove } from "../src/engine/formation";
 import { applyCommand, createGame, type GameSetup } from "../src/engine/game";
 import { dist, pointInPolygon, rect, segmentsIntersect } from "../src/engine/geometry";
@@ -142,15 +142,17 @@ describe("deployment, supply and phases", () => {
     const uid = uidOf(s, 0, "mil-grunts");
     const bad = applyCommand(s, { type: "deploy", uid, to: { x: 18, y: 18 } });
     expect(bad.ok).toBe(false);
+    const u = unitById(s, uid)!;
+    const cost = entryCost({ profileId: u.profileId, upgrades: u.upgrades });
     s = ok(applyCommand(s, { type: "deploy", uid, to: { x: 10, y: 33.5 } }));
-    expect(s.players[0].resources).toBe(10 - 4);
-    expect(supplyUsed(s, 0)).toBe(2);
+    expect(s.players[0].resources).toBe(10 - cost);
+    expect(supplyUsed(s, 0)).toBe(profileOf(u).supply);
     expect(s.activePlayer).toBe(1);
   });
 
   it("enforces the supply cap", () => {
     const s = game();
-    s.players[0].supplyCap = 2;
+    s.players[0].supplyCap = profileOf(unitById(s, uidOf(s, 0, "mil-grunts"))!).supply; // room for the grunts only
     s.players[0].resources = 99;
     const s2 = ok(applyCommand(s, { type: "deploy", uid: uidOf(s, 0, "mil-grunts"), to: { x: 10, y: 33.5 } }));
     s2.activePlayer = 0;
@@ -207,7 +209,9 @@ describe("combat and keywords", () => {
     const grunts = uidOf(s, 0, "mil-grunts", 2);
     expect(s.phase).toBe("assault");
     expect(eligibleUnits(s, 0).map((u) => u.uid)).toContain(grunts);
-    s = ok(applyCommand(s, { type: "shoot", uid: grunts, target: nib.uid, weapon: 0 }));
+    // The shot is legal. (Played on a copy: with big squads it can kill every Nibbler still in contact,
+    // which would end the melee before the combat phase this test is about.)
+    expect(applyCommand(s, { type: "shoot", uid: grunts, target: nib.uid, weapon: 0 }).ok).toBe(true);
     // With nothing left to do in the assault phase, it rolls on to combat, chargers first.
     while (s.phase === "assault") s = ok(applyCommand(s, { type: "pass", player: s.activePlayer }));
     expect(s.phase).toBe("combat");

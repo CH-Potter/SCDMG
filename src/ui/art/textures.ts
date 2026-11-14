@@ -3,7 +3,7 @@
 // Bases: one per radius + player colour + shape. Icons: hourglass, shaken, DONE tag, muzzle flash.
 
 import { CanvasSource, Rectangle, Texture } from "pixi.js";
-import { type BaseShape, type FigureMeta, type FigureSpec, figurePending, figureReady, paintBase, paintMuzzle, paintSheet, specKey } from "./figures";
+import { type BaseShape, type FigureMeta, type FigureSpec, type Look, figurePending, figureReady, paintBase, paintMuzzle, paintSheet, specKey } from "./figures";
 import { glow, INK_CSS, makeCanvas, P, part, stroke, type Pen } from "./ink";
 import { ACCENT, css } from "./palette";
 
@@ -74,8 +74,8 @@ export interface BaseTex {
 
 const bases = new Map<string, BaseTex>();
 
-export function baseTex(r: number, team: number, shape: BaseShape): BaseTex {
-  const key = `${r}|${team}|${shape}`;
+export function baseTex(r: number, team: number, shape: BaseShape, look?: Look): BaseTex {
+  const key = `${r}|${team}|${shape}|${look ?? ""}`;
   let t = bases.get(key);
   if (t) return t;
   const ppi = figurePpi();
@@ -85,7 +85,7 @@ export function baseTex(r: number, team: number, shape: BaseShape): BaseTex {
   const c = makeCanvas(w, h);
   const ctx = c.getContext("2d")!;
   ctx.setTransform(ppi, 0, 0, ppi, ext * ppi, ext * ppi);
-  paintBase(ctx, r, team, shape);
+  paintBase(ctx, r, team, shape, look);
   t = { tex: textureFrom(c), ax: 0.5, ay: (ext * ppi) / c.height, scale: 1 / ppi };
   bases.set(key, t);
   return t;

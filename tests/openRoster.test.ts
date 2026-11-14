@@ -276,7 +276,7 @@ describe("AI in open roster games", () => {
         const total = counts.reduce((x, y) => x + y, 0);
         expect(total).toBeGreaterThanOrEqual(4);
         expect(counts.length).toBeGreaterThanOrEqual(3); // at least three different units
-        expect(Math.max(...counts) / total).toBeLessThanOrEqual(0.5); // no one-unit spam
+        expect(Math.max(...counts)).toBeLessThanOrEqual(Math.ceil(total / 2)); // no one-unit spam (games can end early on a big lead)
       }
     }, 120_000);
   }

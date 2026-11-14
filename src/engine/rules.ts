@@ -2,7 +2,7 @@
 
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
-import type { GameState, Model, Objective, PlayerId, Unit, Vec } from "./types";
+import type { GameState, Model, Objective, PlayerId, Unit, UnitProfile, Vec } from "./types";
 
 export const ENGAGE_RANGE = 1;
 export const AURA_RANGE = 6;
@@ -77,17 +77,33 @@ export function effectiveMove(s: GameState, u: Unit): number {
 // ---------- objectives ----------
 
 /**
- * How much a unit counts towards holding an objective: its supply, halved once it's down to half
- * strength or less (so battered squads can't hold ground like fresh ones).
+ * A unit's supply for `alive` surviving models: its full supply shared out across its models and
+ * rounded down, so a 3-supply squad of 6 is worth 2 at four models, 1 at two and 0 down to its last
+ * one. A single-model unit keeps its full supply until it dies.
  */
-export function controlWeight(u: Unit): number {
-  const p = profileOf(u);
-  const max = p.models * (p.hp + p.shield);
-  const now = aliveModels(u).reduce((n, m) => n + m.hp + m.shield, 0);
-  return now * 2 <= max ? p.supply / 2 : p.supply;
+export function supplyFor(p: UnitProfile, alive: number): number {
+  if (alive <= 0) return 0;
+  if (p.models <= 1) return p.supply;
+  return Math.floor((p.supply * Math.min(alive, p.models)) / p.models + 1e-9);
 }
 
-/** Forward-deploy tricks (Tunnel, Burrow Holes) can't land this close to the enemy's home objective. */
+/** A unit's supply right now, from its surviving models (see `supplyFor`). */
+export const currentSupply = (u: Unit): number => supplyFor(profileOf(u), aliveModels(u).length);
+
+/** How much a unit counts towards holding an objective: its current supply. */
+export const controlWeight = currentSupply;
+
+/**
+ * Disengaging: a unit worth more supply than all the enemies it's engaged with breaks away cleanly;
+ * otherwise it's exhausted and sits out the next (assault) phase.
+ */
+export function disengageOdds(s: GameState, u: Unit): { mine: number; theirs: number; clean: boolean } {
+  const mine = currentSupply(u);
+  const theirs = engagedWith(s, u).reduce((n, e) => n + currentSupply(e), 0);
+  return { mine, theirs, clean: mine > theirs };
+}
+
+/** Forward-deploy tricks (Tunnel, Gopher Holes) can't land this close to the enemy's home objective. */
 export const HOME_EXCLUSION = 6;
 
 export function nearEnemyHome(s: GameState, owner: PlayerId, p: Vec): boolean {

@@ -8,9 +8,11 @@
 
 import type { Faction, MiniatureRecipe, UnitProfile } from "../../engine/types";
 import { artImage, coinDesign, paintCoin, whenArtImage } from "./coin";
+import type { Painter as FactionPainter } from "./factions/types";
 import { hash, makeCanvas } from "./ink";
 import { BODY_DESIGN, paintRecipe } from "./miniBuilder";
 import { luma, mix, rgba, shade } from "./palette";
+import { FACTION_ART, factionFigure } from "./factions";
 import { contact, ellipse, fill, flat, glowAt, ink, mat, type Mat, outlined, rrect, teethRow, type Toon, tube } from "./toon";
 
 export type Look = Faction["look"];
@@ -48,6 +50,8 @@ export interface FigureSpec {
   jump: boolean;
   armoured: boolean;
   heavy: boolean;
+  /** The unit's profile id, so a faction's art module can paint each built-in unit its own way. */
+  unit?: string;
   /** Custom art from the profile: replaces the archetype painter (kind still drives animation). */
   art?: SpecArt;
 }
@@ -118,6 +122,7 @@ export function archetypeSpec(p: UnitProfile, look: Look, color: number): Figure
     jump: kw.has("jump"),
     armoured: kw.has("armoured"),
     heavy: kw.has("heavy"),
+    unit: p.id,
   };
 }
 
@@ -129,7 +134,7 @@ const artKey = (a: SpecArt | undefined): string => {
 };
 
 export const specKey = (s: FigureSpec): string =>
-  [s.kind, s.look, s.color, s.r, +s.ranged, +s.melee, +s.long, +s.medic, +s.caster, +s.spitter, +s.jump, +s.armoured, +s.heavy, artKey(s.art)].join("|");
+  [s.kind, s.look, s.color, s.r, +s.ranged, +s.melee, +s.long, +s.medic, +s.caster, +s.spitter, +s.jump, +s.armoured, +s.heavy, s.unit ?? "", artKey(s.art)].join("|");
 
 /** Idle breathing (amplitude, period in seconds) per archetype: shared by the board and the forge. */
 export const IDLE_BREATH: Record<FigureKind, [number, number]> = {
@@ -331,7 +336,7 @@ function peek(t: Toon, x: number, y: number, r: number, lid: number, look: numbe
 
 // ---------- archetypes ----------
 
-type Painter = (t: Toon, s: FigureSpec, f: number) => [number, number];
+type Painter = FactionPainter;
 
 /** Dustline settler (look "cap"), generic armoured trooper ("plain"), or toothy biped ("teeth"). */
 const trooper: Painter = (t, s, f) => {
@@ -502,7 +507,7 @@ const trooper: Painter = (t, s, f) => {
   return muzzle;
 };
 
-/** Lumen Concord: haughty crystal aristocrat. */
+/** Lumen Concord: haughty alien noble (fallback for custom units). */
 const aristocrat: Painter = (t, s, f) => {
   const { ctx } = t;
   const A = s.color;
@@ -1139,7 +1144,7 @@ const bike: Painter = (t, s, f) => {
   return [pivot[0] + (mx - pivot[0]) * c - (my - pivot[1]) * sn, pivot[1] + (mx - pivot[0]) * sn + (my - pivot[1]) * c];
 };
 
-/** Lumen Concord: The Grand Facet, a walking cathedral of cut crystal with a glowing heart and impeccable manners. */
+/** Lumen Concord: The Grand Strider, a walking cathedral of cut crystal with a glowing heart and impeccable manners. */
 const golem: Painter = (t, s, f) => {
   const { ctx } = t;
   const A = s.color;
@@ -1322,13 +1327,19 @@ const PAINTERS: Record<FigureKind, Painter> = { trooper, critter, brute, walker,
 export const figureScale = (s: FigureSpec): number => {
   if (s.art?.kind === "image") return 0.01;
   if (s.art?.kind === "parts") return (s.r / BODY_DESIGN[s.art.recipe.body].ref) * 0.01 * s.art.recipe.scale;
-  return (s.r / DESIGN[s.kind].ref) * 0.01;
+  return (s.r / archetypeDesign(s).ref) * 0.01;
 };
+
+/** The faction art module's painter for this spec, if it has one (custom art always wins). */
+const factionArt = (s: FigureSpec) => (s.art ? undefined : factionFigure(s.look, s.unit, s.kind));
+
+/** Design bounds of the built-in painter this spec uses: the faction module's, else the shared archetype's. */
+const archetypeDesign = (s: FigureSpec) => factionArt(s)?.design ?? DESIGN[s.kind];
 
 function design(s: FigureSpec): { b: [number, number, number, number]; top: number } {
   if (s.art?.kind === "image") return coinDesign(s.r);
   if (s.art?.kind === "parts") return BODY_DESIGN[s.art.recipe.body];
-  return DESIGN[s.kind];
+  return archetypeDesign(s);
 }
 
 export function figureMeta(s: FigureSpec): Omit<FigureMeta, "muzzle"> {
@@ -1355,7 +1366,7 @@ export function paintFigure(ctx: CanvasRenderingContext2D, s: FigureSpec, frame:
       ? paintRecipe(t, s.art.recipe, s.color, frame)
       : s.art?.kind === "image"
         ? paintCoin(t, s.r, s.color, artImage(s.art.src), frame)
-        : PAINTERS[s.kind](t, s, frame);
+        : (factionArt(s)?.paint ?? PAINTERS[s.kind])(t, s, frame);
   ctx.restore();
   return { ...figureMeta(s), muzzle: { x: m[0] * k, y: m[1] * k } };
 }
@@ -1407,7 +1418,7 @@ export function paintSheet(s: FigureSpec, ppi: number): FigureSheet {
 export type BaseShape = "round" | "plate" | "holo";
 
 /** A miniature's base: bevelled ring in the player's colour, earthy flocked top, visible thickness. */
-export function paintBase(ctx: CanvasRenderingContext2D, r: number, team: number, shape: BaseShape): void {
+export function paintBase(ctx: CanvasRenderingContext2D, r: number, team: number, shape: BaseShape, look?: Look): void {
   const t: Toon = { ctx, line: 1.4 };
   ctx.save();
   ctx.scale(0.01, 0.01);
@@ -1432,6 +1443,17 @@ export function paintBase(ctx: CanvasRenderingContext2D, r: number, team: number
   fill(t, outer(0, 5), mat(team, 0.5), { s: 6, line: 4.5, spec: [-R * 0.5, -RY * 0.75, R * 0.22, 2.4, -0.15] });
   // flocked earth top
   const top = plate ? rrect(-R + 6, -RY * 0.82 + 6, R * 2 - 12, RY * 1.64 - 12, 14) : ellipse(0, 0, R - 7, RY - 7);
+  const baseTop = look ? FACTION_ART[look]?.baseTop : undefined;
+  if (baseTop) {
+    // the faction's own ground, clipped to the top, then the top's rim line over it
+    ctx.save();
+    ctx.clip(new Path2D(top));
+    baseTop(t, R - 7, RY - 7, Math.round(r * 997 + team));
+    ctx.restore();
+    ink(t, top, 1.6);
+    ctx.restore();
+    return;
+  }
   fill(t, top, mat(0x6a5440), { s: 8, line: 1.6, hi: 0.4 });
   ctx.save();
   ctx.clip(new Path2D(top));
@@ -1491,7 +1513,7 @@ export function figureDataUrl(s: FigureSpec, team: number | null, px: number, la
   const oy = (size - bottom) * ppi;
   if (team !== null && layer !== "figure") {
     ctx.setTransform(ppi, 0, 0, ppi, ox, oy);
-    paintBase(ctx, s.r, team, "round");
+    paintBase(ctx, s.r, team, "round", s.art ? undefined : s.look);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
   if (layer !== "base") {

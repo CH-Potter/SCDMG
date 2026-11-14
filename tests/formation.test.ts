@@ -9,6 +9,7 @@ import {
   isStraggler,
   planUnitMove,
   reviveSpot,
+  SNAP_RADIUS,
   type UnitMovePlan,
 } from "../src/engine/formation";
 import { applyCommand, createGame, planCharge } from "../src/engine/game";
@@ -33,13 +34,13 @@ function game(): GameState {
 const uidOf = (s: GameState, owner: 0 | 1, profileId: string, nth = 0): string =>
   s.units.filter((u) => u.owner === owner && u.profileId === profileId)[nth]!.uid;
 
-/** A block of rows of three, `gap` apart edge to edge. */
-function block(s: GameState, uid: string, at: Vec, gap = 0.2, elevation: Elevation = 0): Unit {
+/** A block of rows of `perRow` (three by default), `gap` apart edge to edge. */
+function block(s: GameState, uid: string, at: Vec, gap = 0.2, elevation: Elevation = 0, perRow = 3): Unit {
   const u = unitById(s, uid)!;
   const r = profileOf(u).baseRadius;
   u.onBoard = true;
   u.models.forEach((m, i) => {
-    m.pos = { x: at.x + (i % 3) * (2 * r + gap), y: at.y + Math.floor(i / 3) * (2 * r + gap) };
+    m.pos = { x: at.x + (i % perRow) * (2 * r + gap), y: at.y + Math.floor(i / perRow) * (2 * r + gap) };
     m.elevation = elevation;
   });
   return u;
@@ -113,13 +114,20 @@ describe("squads spread out and take cover", () => {
 
   it("followers snap into nearby area cover", () => {
     const s = game();
-    const u = block(s, uidOf(s, 0, "mil-grunts", 2), { x: 7, y: 32 });
+    const u = block(s, uidOf(s, 0, "mil-grunts", 2), { x: 7, y: 32 }, 0.2, 0, 4); // two rows: on the table
     const crater = s.terrain.find((t) => t.id === "crater-a")!;
     // The leader stops just south of the crater; the enemy is to the north.
     const p = plan(planUnitMove(s, u, 0, { x: 9, y: 28.6 }, { allowance: 6 }));
     expectLegal(u, p);
-    // Every follower ends in cover: in the crater, or behind it from the enemy's side.
-    for (const q of p.placements) expect(coverRating(s, u, q.pos, 0)).toBe(2);
+    // Followers end in cover: in the crater, or behind it from the enemy's side. One crater holds six
+    // Grunts within the snap radius; a seventh has no room left, so it may stand in the open, but only
+    // once the cover is full (it is further from the leader's spot than every model in cover).
+    const covered = p.placements.filter((q) => coverRating(s, u, q.pos, 0) === 2);
+    const open = p.placements.filter((q) => coverRating(s, u, q.pos, 0) !== 2);
+    expect(covered.length).toBeGreaterThanOrEqual(Math.min(6, p.placements.length));
+    const to = { x: 9, y: 28.6 };
+    for (const q of open) for (const c of covered) expect(dist(q.pos, to)).toBeGreaterThan(dist(c.pos, to));
+    for (const q of open) expect(dist(q.pos, to)).toBeGreaterThan(SNAP_RADIUS);
     expect(p.placements.some((q) => q.modelId !== 0 && pointInPolygon(q.pos, crater.poly))).toBe(true);
   });
 
@@ -137,7 +145,7 @@ describe("squads spread out and take cover", () => {
 
   it("the squad stays on the side of a fence the player sent it to", () => {
     const s = game();
-    const u = block(s, uidOf(s, 1, "munch-nibblers", 1), { x: 16.5, y: 22.8 });
+    const u = block(s, uidOf(s, 1, "munch-nibblers", 1), { x: 16.5, y: 22.8 }, 0.2, 0, 5); // two rows: clear of the fence
     const p = plan(planUnitMove(s, u, 0, { x: 13, y: 28 }, { allowance: 8 }));
     expectLegal(u, p);
     // Nobody is left on the far side of the fence (x 14-21, y 25.2-26) from the leader.
@@ -159,7 +167,7 @@ describe("squads spread out and take cover", () => {
 
   it("a squad going up a ramp ends together on the platform", () => {
     const s = game();
-    const u = block(s, uidOf(s, 1, "munch-nibblers", 1), { x: 16.5, y: 22.8 });
+    const u = block(s, uidOf(s, 1, "munch-nibblers", 1), { x: 16.5, y: 22.8 }, 0.2, 0, 5); // two rows: clear of the fence
     const p = plan(planUnitMove(s, u, 0, { x: 18.5, y: 19.2 }, { allowance: 8 }));
     expectLegal(u, p);
     expect(p.via).toBe("ramp-a");
@@ -226,7 +234,7 @@ describe("chain coherency", () => {
 
   it("every legal move across the deck area leaves the squad chained, unoverlapped and on one level", () => {
     const s = game();
-    const u = block(s, uidOf(s, 1, "munch-nibblers", 1), { x: 16.5, y: 22.8 });
+    const u = block(s, uidOf(s, 1, "munch-nibblers", 1), { x: 16.5, y: 22.8 }, 0.2, 0, 5); // two rows: clear of the fence
     let legal = 0;
     for (let dx = -8; dx <= 8; dx += 2) {
       for (let dy = -8; dy <= 8; dy += 2) {

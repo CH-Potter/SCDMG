@@ -43,12 +43,20 @@ export function roleLine(p: UnitProfile): string {
   return parts.join(" · ");
 }
 
-/** The army panel's list: reserves, or the open roster with costs, role lines and copies fielded. */
-export function reserveRowsHtml(s: GameState, p: PlayerId, canDeploy: boolean, placing: string | null): string {
+/**
+ * The army panel's list: reserves, or the open roster with costs, role lines and copies fielded.
+ * `whyNot` says why a unit can't be deployed right now (null if it can); by default, only cost and supply.
+ */
+export function reserveRowsHtml(
+  s: GameState,
+  p: PlayerId,
+  whyNot: (u: Unit) => string | null = (u) => canAffordDeploy(s, u),
+  placing: string | null = null,
+): string {
   return deployChoices(s, p)
     .map((u) => {
       const prof = profileOf(u);
-      const why = canAffordDeploy(s, u);
+      const why = whyNot(u);
       const on = placing === u.uid;
       const ups = u.upgrades.length ? " · " + u.upgrades.map((id) => esc(prof.upgrades.find((x) => x.id === id)?.name ?? id)).join(", ") : "";
       const fielded = s.openRoster ? fieldedCopies(s, p, u.profileId) : 0;
@@ -56,9 +64,9 @@ export function reserveRowsHtml(s: GameState, p: PlayerId, canDeploy: boolean, p
         ? `${fielded ? ` · ${fielded} on the table` : ""}</small><small class="role">${esc(roleLine(prof))}`
         : "";
       const verb = s.openRoster ? "Recruit" : "Deploy";
-      return `<div class="reserve ${on ? "on" : ""}" title="${esc(prof.blurb)}">
-          <span><b>${esc(prof.name)}</b> <small>⚙${prof.cost} · ◆${prof.supply}${ups}${extra}</small></span>
-          <button class="mini" data-deploy="${u.uid}" ${canDeploy && !why ? "" : "disabled"} title="${esc(why ?? "Place it in your zone")}">${on ? "Placing…" : verb}</button>
+      return `<div class="reserve ${on ? "on" : ""} ${why ? "cant" : ""}" title="${esc(prof.blurb)}">
+          <span><b>${esc(prof.name)}</b> <small>⚙${prof.cost} · ◆${prof.supply}${ups}${extra}</small>${why ? `<small class="why">⛔ ${esc(why)}</small>` : ""}</span>
+          <button class="mini" data-deploy="${u.uid}" ${why ? `disabled aria-disabled="true"` : ""} title="${esc(why ?? "Place it in your zone")}">${on ? "Placing…" : verb}</button>
         </div>`;
     })
     .join("");
@@ -77,6 +85,6 @@ export const deployMenuTitle = (s: GameState): string => (s.openRoster ? "Recrui
 /** The small text on a deploy-menu button: cost and supply, plus the role line in open roster games. */
 export function deployMenuDetail(s: GameState, u: Unit, why: string | null): string {
   const prof = profileOf(u);
-  const base = `⚙${prof.cost} · ◆${prof.supply}${why ? " · can't" : ""}`;
+  const base = `⚙${prof.cost} · ◆${prof.supply}${why ? ` · ⛔ ${why}` : ""}`;
   return s.openRoster ? `${base} · ${roleLine(prof)}` : base;
 }

@@ -153,10 +153,10 @@ describe("factionProblems", () => {
     const mama = f.profiles.find((p) => p.id === "munch-mama")!;
     mama.impact = { dice: 0, hit: 7, damage: 0, ap: -1 };
     const p = factionProblems(f);
-    for (const t of ["impact dice", "impact hit", "impact damage", "impact AP"]) expect(has(p, `Big Mama Chomp: ${t}`), t).toBe(true);
+    for (const t of ["impact dice", "impact hit", "impact damage", "impact AP"]) expect(has(p, `Dr. Graft and Big Mama: ${t}`), t).toBe(true);
     const pod = f.profiles.find((x) => x.id === "munch-pod")!;
     pod.impact = { dice: 1, hit: 4, damage: 1, ap: 0 };
-    expect(has(factionProblems(f), "Spore Pod: structures can't charge")).toBe(true);
+    expect(has(factionProblems(f), "Mutagen Vat: structures can't charge")).toBe(true);
   });
 
   it("checks effect parameters", () => {

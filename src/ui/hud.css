@@ -314,3 +314,162 @@
 .order-choice .row {
   justify-content: center;
 }
+
+/* ---------- "can I do this?" cues (see src/ui/cues.ts) ----------
+   ok = green with a tick, bad = red with a cross: shape and colour both carry the meaning. */
+.tooltip.cue-ok,
+.tooltip.cue-bad {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.tooltip.cue-ok {
+  border-color: var(--good);
+  box-shadow: 3px 3px 0 var(--ink), inset 4px 0 0 var(--good);
+}
+
+.tooltip.cue-bad {
+  border-color: var(--bad);
+  background: var(--hatch), var(--panel);
+  box-shadow: 3px 3px 0 var(--ink), inset 4px 0 0 var(--bad);
+}
+
+.tooltip .cue-glyph {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 1.25em;
+  height: 1.25em;
+  margin-top: 1px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  color: white;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.tooltip.cue-ok .cue-glyph {
+  background: var(--good);
+}
+
+.tooltip.cue-bad .cue-glyph {
+  background: var(--bad);
+}
+
+/* The reason line inside a disabled button. */
+button .why,
+.reserve .why {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--bad);
+  white-space: normal;
+}
+
+button:disabled .why {
+  color: #8a2a22;
+}
+
+button .odds {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.reserve.cant > span b {
+  opacity: 0.75;
+}
+
+.deploy-menu button {
+  flex-wrap: wrap;
+}
+
+.deploy-menu button .why {
+  flex-basis: 100%;
+}
+
+/* Engaged / exhausted notice in the actions panel. */
+.engaged-note {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--hatch), #f7d7cf;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.engaged-note.exhausted {
+  background: var(--hatch), #f1e0bf;
+}
+
+.unit-callout .co-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #f7d7cf;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.unit-callout .co-tag.exhausted {
+  background: #f1e0bf;
+}
+
+.unit-callout button .why {
+  display: inline;
+}
+
+.topbar .mercy,
+.score .mercy {
+  font-size: 0.72rem;
+  opacity: 0.8;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+/* ---------- attack declaration label (see src/ui/attackMark.ts) ---------- */
+.attack-label {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 10px;
+  border: 3px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: 3px 3px 0 var(--ink);
+  background: var(--panel);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.attack-label[hidden] {
+  display: none;
+}
+
+.attack-label b {
+  font-family: var(--font-display, inherit);
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.attack-label span {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.attack-label.p0 {
+  border-top: 6px solid var(--p0);
+}
+
+.attack-label.p1 {
+  border-top: 6px solid var(--p1);
+}

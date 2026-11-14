@@ -118,6 +118,30 @@ function roleTable(games: GameResult[]): string[] {
   return rows;
 }
 
+/**
+ * Games ended early by the instant-win lead, per mission: how many, in which round, and the comebacks
+ * that did happen (the eventual winner once trailed by N VP), so a limit can be judged against them.
+ */
+function mercyTable(games: GameResult[]): string[] {
+  const m = games.filter((g) => g.mercy);
+  const rows = [`lead-rule endings: ${m.length} of ${games.length} (${pct(m.length, games.length).trim()}%)`];
+  rows.push("mission      limit  games  early   early%  by round              biggest comeback  comebacks from 5+");
+  const by: Record<string, GameResult[]> = {};
+  for (const g of games) (by[g.job.missionId] ??= []).push(g);
+  for (const [id, gs] of Object.entries(by).sort()) {
+    const early = gs.filter((g) => g.mercy);
+    const rounds: Record<number, number> = {};
+    for (const g of early) rounds[g.round] = (rounds[g.round] ?? 0) + 1;
+    // A comeback: the winner once trailed by this much (the loser's peak lead).
+    const deficits = gs.filter((g) => typeof g.winner === "number").map((g) => g.peakLead?.[g.winner === 0 ? 1 : 0] ?? 0);
+    const big = deficits.filter((d) => d >= 5).length;
+    rows.push(
+      `${id.padEnd(12)} ${String(gs[0]?.mercyLimit ?? "-").padStart(5)} ${String(gs.length).padStart(6)} ${String(early.length).padStart(6)}   ${pct(early.length, gs.length)}   ${Object.entries(rounds).map(([r, n]) => `R${r}:${n}`).join(" ").padEnd(20)}  ${String(Math.max(0, ...deficits)).padStart(16)}  ${String(big).padStart(17)}`,
+    );
+  }
+  return rows;
+}
+
 export function report(title: string, games: GameResult[]): string {
   const ok = games.filter((g) => !g.error);
   const errors = games.filter((g) => g.error);
@@ -149,6 +173,8 @@ export function report(title: string, games: GameResult[]): string {
     `command mix: hunker ${share("hunker")}% hold ${share("hold")}% shoot ${share("shoot")}% charge ${share("charge")}% fight ${share("fight")}% · avg AI ms ${fix(ms / Math.max(1, cmds))} · worst ms ${fix(Math.max(0, ...ok.map((g) => g.maxMs)), 0)}`,
     "",
     ...unitTable(ok),
+    "",
+    ...mercyTable(ok),
   ];
   for (const e of errors.slice(0, 5)) rows.push(`ERROR ${JSON.stringify(e.job)}: ${e.error}`);
   return rows.join("\n");

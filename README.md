@@ -38,8 +38,8 @@ The full rules are in [docs/rules.md](docs/rules.md), and each faction's design 
 ## Factions
 
 - **Dustline Militia:** scrappy frontier settlers. Rifle gunlines, artillery, overwatch and digging in, with drop-ship and airstrip arrivals.
-- **The Munch:** a goofy, ravenous critter swarm. Cheap bodies, impact on the charge, regrowth, and tunnels to pop up where you least want them.
-- **Lumen Concord:** smug crystal aristocrats. Few elite models with shields, precision shooting, and blinks, gates and portals to be in the right place.
+- **The Munch:** farmland critters grafted with weapons and wired to the overmind of the evil bioengineer Dr. Graft. Cheap bodies, impact on the charge, regrowth, and tunnels to pop up where you least want them.
+- **Lumen Concord:** smug alien invaders with saucers, ray guns and shields. Few elite models with precision shooting, and blinks, gates and portals to be in the right place.
 
 ## Project layout
 

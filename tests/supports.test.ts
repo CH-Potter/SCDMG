@@ -75,7 +75,7 @@ describe("off-board supports", () => {
     expect(unitById(s, junk.uid)!.onBoard).toBe(false);
   });
 
-  it("a Glimmer Ward makes enemy shots at nearby friends hit one worse", () => {
+  it("a Glimmer Dome makes enemy shots at nearby friends hit one worse", () => {
     let s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["concord", "militia"], seed: 4 });
     s.initiative = 0;
     s.activePlayer = 0;
@@ -84,7 +84,7 @@ describe("off-board supports", () => {
     const rifle = profileOf(grunts).weapons[0]!;
     const before = planShooting(s, grunts, guard, rifle);
     s.players[0].cp = 8; // don't depend on tuned CP numbers
-    s = ok(applyCommand(s, { type: "support", player: 0, support: "con-spire", ability: "glimmer-ward", point: { x: 13, y: 27 } }));
+    s = ok(applyCommand(s, { type: "support", player: 0, support: "con-spire", ability: "glimmer-ward", point: { x: 11, y: 28.5 } })); // clear of the guard, whatever its size
     const after = planShooting(s, unitById(s, grunts.uid)!, unitById(s, guard.uid)!, rifle);
     if (typeof before === "string" || typeof after === "string") throw new Error("expected a valid shot");
     expect(after.hitOn).toBe(before.hitOn + 1);
@@ -135,7 +135,7 @@ describe("structures", () => {
     expect(presenceController(s, o)).toBeNull();
   });
 
-  it("a Burrow Hole lets reserves deploy beside it (the temporary tunnel; the Warren Mound is the permanent one)", () => {
+  it("a Gopher Hole lets reserves deploy beside it (the temporary tunnel; the Sett Lab is the permanent one)", () => {
     let s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["munch", "militia"], seed: 9 });
     s.initiative = 0;
     s.activePlayer = 0;

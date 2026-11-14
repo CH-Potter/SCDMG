@@ -30,6 +30,7 @@ import { backOut, Banner, type BannerOpts, easeInOut, easeOut, FONT, FxLayer, Po
 import { DropShipFx, drawNoGo, type NoGoRing } from "./fx/dropship";
 
 export { INK, PLAYER_COLORS } from "./boardArt";
+import { drawAttackMark, drawExhausted, type AttackMarkView } from "./attackMark";
 export type { BannerTone } from "./fx";
 
 const MARGIN = 1.2;
@@ -71,6 +72,10 @@ export interface RenderView {
   blast: { center: Vec; radius: number } | null;
   /** Optional: red no-go rings (where a support airdrop can't land). */
   noGo?: NoGoRing[];
+  /** Optional: the attack being declared or resolved (attacker ring, arrow, target crosshair). See attackMark.ts. */
+  attack?: AttackMarkView | null;
+  /** Optional: uids of units exhausted from disengaging (an hourglass marker). */
+  exhausted?: string[];
   /**
    * Optional: the events produced by the command that created `state`. Only read when `state`
    * changes, so passing the same list on later refreshes is harmless. With it, attack tracers,
@@ -256,6 +261,13 @@ export class BoardRenderer {
   onPointerLeave: () => void = () => {};
   /** Called whenever the camera pans or zooms (to reposition DOM popups placed with `toScreen`). */
   onViewChange?: () => void;
+
+  /** Set the board's mouse cursor (a CSS cursor value; see cues.ts). */
+  setCursor(css: string): void {
+    if (this.app.stage) this.app.stage.cursor = css;
+    const c = this.app.canvas as HTMLCanvasElement | undefined;
+    if (c && c.style.cursor !== css) c.style.cursor = css;
+  }
 
   async init(host: HTMLElement): Promise<void> {
     await this.app.init({
@@ -955,7 +967,7 @@ export class BoardRenderer {
     const mini = new Container();
     const under = new Graphics();
     const readyRing = new Graphics();
-    const bt = baseTex(prof.baseRadius, PLAYER_COLORS[u.owner], temp ? "holo" : structure ? "plate" : "round");
+    const bt = baseTex(prof.baseRadius, PLAYER_COLORS[u.owner], temp ? "holo" : structure ? "plate" : "round", prof.art ? undefined : look);
     const base = new Sprite(bt.tex);
     base.anchor.set(bt.ax, bt.ay);
     base.scale.set(bt.scale);
@@ -1469,6 +1481,12 @@ export class BoardRenderer {
         }
       }
     }
+    for (const uid of v.exhausted ?? []) {
+      const u = this.units.get(uid);
+      const m = u?.onBoard ? u.models.find((x) => x.alive) : undefined;
+      if (u && m) drawExhausted(top, ringPos(u, m), profileOf(u).baseRadius);
+    }
+    if (v.attack) drawAttackMark(top, v.attack);
     for (const uid of v.friendlyMarks) {
       const u = this.units.get(uid);
       if (!u || !u.onBoard) continue;

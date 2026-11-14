@@ -241,7 +241,7 @@ describe("new support effects", () => {
     const r = applyCommand(s, { type: "support", player: 0, support: "munch-stink", ability: "awful-whiff", target: "p1-0" });
     if (!r.ok) throw new Error(r.error);
     const test = r.events.find((e) => e.type === "morale");
-    expect(test && test.type === "morale" && test.nerve).toBe(6); // Prism Guard nerve 8, -2
+    expect(test && test.type === "morale" && test.nerve).toBe(6); // Phase Guard nerve 8, -2
     expect(applyCommand(s, { type: "support", player: 0, support: "munch-stink", ability: "awful-whiff", target: "p1-1" }).ok).toBe(false);
   });
 

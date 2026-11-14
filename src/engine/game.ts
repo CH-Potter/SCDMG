@@ -9,6 +9,7 @@
 
 import { ABILITIES } from "./data/abilities";
 import { defaultListFor, defaultSupportsFor } from "./data/factions";
+import { MERCY_LEAD } from "./constants";
 import { consumeReaction } from "./reactions";
 import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type ArmyRule } from "./openRoster";
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
@@ -26,6 +27,7 @@ import {
   eligibleUnits,
   engagedWith,
   ENGAGE_RANGE,
+  disengageOdds,
   isEngaged,
   meleeCanHit,
   modelGap,
@@ -293,7 +295,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
     if (unit.status.acted) return "That unit has already acted this phase";
     if (phase === "assault" && isEngaged(s, unit)) return "Engaged units wait for the combat phase";
     if (phase === "assault" && unit.status.hunkered) return "Hunkered units stay put this round";
-    if (phase === "assault" && unit.status.disengaged) return "Units that disengaged can't act again this round";
+    if (phase === "assault" && unit.status.disengaged) return "Exhausted from disengaging: it sits out this phase";
     if (phase === "combat") return "That unit can't fight right now";
     return "That unit can't act right now";
   }
@@ -314,11 +316,13 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
     }
     case "disengage": {
       if (!isEngaged(s, unit)) return "That unit isn't engaged";
+      // Outnumbering the enemies in supply means a clean break; otherwise the unit is exhausted.
+      const { clean } = disengageOdds(s, unit);
       const e = moveUnit(s, unit, cmd.leader, cmd.to, effectiveMove(s, unit), false);
       if (e) return e;
       if (endsEngaged(s, unit)) return "Must end the move out of base contact";
-      unit.status.disengaged = true;
-      events.push({ type: "moved", uid: unit.uid, kind: "disengage" });
+      unit.status.disengaged = !clean;
+      events.push({ type: "moved", uid: unit.uid, kind: "disengage", exhausted: !clean });
       break;
     }
     case "hunker":
@@ -340,7 +344,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const w = profileOf(unit).weapons[cmd.weapon];
       if (!target || !target.onBoard || target.owner === unit.owner) return "Pick an enemy unit";
       if (!w) return "No such weapon";
-      if (unit.status.disengaged && !hasKeyword(unit, "light")) return "Only light units can shoot after disengaging";
+      if (unit.status.disengaged && !hasKeyword(unit, "light")) return "Exhausted from disengaging: only light units can still shoot";
       const plan = planShooting(s, unit, target, w);
       if (typeof plan === "string") return plan;
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
@@ -413,7 +417,7 @@ function deploy(s: GameState, unit: Unit, to: Vec, events: GameEvent[]): string 
 function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]): string | null {
   const target = unitById(s, targetUid);
   if (!target || !target.onBoard || target.owner === unit.owner) return "Pick an enemy unit to charge";
-  if (unit.status.disengaged) return "Units that disengaged can't charge";
+  if (unit.status.disengaged) return "Exhausted from disengaging: it can't charge";
   if (unit.status.shaken) return "Shaken units won't charge";
   if (isEngaged(s, unit)) return "Already engaged";
   const melee = profileOf(unit).weapons.filter((w) => w.melee);
@@ -835,7 +839,23 @@ function dragToward(s: GameState, t: Unit, toward: Unit, max: number): number {
 
 // ---------- turn & phase flow ----------
 
+/** The lead (in VP) this game's mission ends on: more than this wins at once. */
+export const mercyLead = (s: GameState): number => MISSIONS[s.missionId]?.mercyLead ?? MERCY_LEAD;
+
+/** A lead of more than the mission's limit ends the game at once, whenever it happens. */
+function checkLead(s: GameState, events: GameEvent[]): void {
+  if (s.over) return;
+  const limit = mercyLead(s);
+  const lead = s.players[0].vp - s.players[1].vp;
+  if (Math.abs(lead) <= limit) return;
+  s.over = true;
+  s.winner = lead > 0 ? 0 : 1;
+  events.push({ type: "gameOver", winner: s.winner, reason: `A lead of more than ${limit} VP` });
+}
+
 function checkWipeout(s: GameState, events: GameEvent[]): void {
+  checkLead(s, events);
+  if (s.over) return;
   // Open roster: reserves never run out, so a side is only out if it also can't pay for anyone (now or next round).
   const out = (p: PlayerId) => onBoard(s, p).length === 0 && (s.openRoster ? !canStillRecruit(s, p) : reserves(s, p).length === 0);
   const a = out(0);
@@ -896,6 +916,8 @@ function endPhase(s: GameState, events: GameEvent[]): void {
 function runScoring(s: GameState, events: GameEvent[], combatClaim: PlayerId | null = null): void {
   events.push({ type: "phase", phase: "scoring", round: s.round });
   scoreRound(s, events);
+  checkLead(s, events);
+  if (s.over) return;
   cleanupRound(s, events);
   const cpBefore = [s.players[0].cp, s.players[1].cp];
   refreshSupports(s, events);

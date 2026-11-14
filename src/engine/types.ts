@@ -17,7 +17,7 @@ export type FactionId = string;
 
 export type Keyword =
   | "infantry" // can climb ladders, benefits from cover
-  | "light" // may still shoot after disengaging
+  | "light" // may still shoot when exhausted from disengaging
   | "armoured" // reduces incoming AP by 1 unless the weapon is built to crack armour
   | "heavy" // can't use ladders, never gets cover from area terrain
   | "flying" // ignores terrain, can't hold objectives, only hit by anti-air or other flyers
@@ -302,6 +302,7 @@ export interface Model {
 export interface UnitStatus {
   acted: boolean; // has activated in the current phase
   moved: boolean; // moved, advanced, charged, deployed or teleported this round
+  /** Exhausted from a disengage that didn't outnumber the enemy in supply: sits out the assault phase (light units may still shoot) and can't charge. */
   disengaged: boolean;
   hunkered: boolean;
   charged: boolean;
@@ -515,7 +516,7 @@ export interface AttackReport {
 
 export type GameEvent =
   | { type: "deployed"; uid: string }
-  | { type: "moved"; uid: string; kind: "move" | "disengage" | "advance" | "charge" | "teleport" }
+  | { type: "moved"; uid: string; kind: "move" | "disengage" | "advance" | "charge" | "teleport"; /** Disengage only: it didn't outnumber the enemy in supply. */ exhausted?: boolean }
   | { type: "attack"; report: AttackReport }
   | { type: "hunkered"; uid: string }
   | { type: "held"; uid: string }

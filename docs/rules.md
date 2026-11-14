@@ -24,11 +24,20 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 - A player with nothing left to do is skipped. **Pass** ends your part of the current phase.
 - **Who goes first:** both players roll off at the start, and the winner **chooses** who goes first in round 1. Before each later round, the player with fewer VP chooses; on a VP tie, roll off again and the winner chooses.
 - **Passing early:** in the movement or combat phase, the first player to pass while they still had units to act claims the initiative: they go first in the next phase (the assault phase, or the next round).
-- In the **assault** phase, hunkered units and non-light units that disengaged sit out. Engaged units can only shoot the unit they're fighting (see *Engagement and shooting*).
+- In the **assault** phase, hunkered units and non-light units exhausted from disengaging sit out. Engaged units can only shoot the unit they're fighting (see *Engagement and shooting*).
 - In the **combat** phase, units that **charged** fight first. After that, everyone else alternates.
 
 ## Multi-model units
 
+- **Squad sizes:** line infantry and swarms come in big squads, and only leaders, specialists and true elites fight alone. Each faction's sizes follow its style: the Munch field the most bodies per unit, the Lumen Concord the fewest.
+
+| | Squads (models) | Single models |
+| --- | --- | --- |
+| Dustline Militia | Rivet Grunts 7, Front Porch Grannies 4, Tumbleweed Riders 3 | Patch Medic (support leader), Ridgeline Squinter (sniper), Big Bertha and the Hay Bomber (big machines), Sky Rustler (aircraft), turret, mortar, barricade |
+| The Munch | Chrome-Jaw Beetles 9, Piston Foxes 8, Bomb Wasps 6, Web-Gunner Spiders 4, Steel-Jaw Crows 2 | Dr. Graft and Big Mama and the Stink Mortar (monsters), Brood Scorpion (support leader), Mutagen Vat, The Sett Lab, holes and pits |
+| Lumen Concord | Phase Guard 3, Blink Dancers 3, Jetwing Scouts 2 | Ray Lancer (sniper), Beam Warden (support leader), Grand Strider (monster), Shimmer Saucer (vehicle), pylon, obelisk, ward |
+
+- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Rivet Grunts, Chrome-Jaw Beetles, Piston Foxes and Bomb Wasps are worth 3 supply (a squad of Chrome-Jaw Beetles loses 1 for every 3 beetles), the Phase Guard 3 (every lost duellist costs 1), and the other squads 2.
 - To move a unit, pick a **leader** model and move it up to the unit's Move along a legal path.
 - The rest of the squad follows and **spreads out like a real squad**, not a block. Each follower travels at most Move + 2".
   - **Snap to cover:** within about 3" of the leader's spot, followers take free spots in cover: inside scrub, craters or rubble, or tucked behind a barricade on the side away from the enemy. "The enemy" means the nearest few enemy units, or their deployment zone if none are on the table yet.
@@ -92,7 +101,7 @@ Every attack, ranged or melee, runs the same sequence:
   - Charging models get +1 die each in that round's combat.
   - Only a charge can end in base contact. Normal moves, deploys and teleports can't.
 - **Engaged** units can't move (only disengage) and fight in the combat phase.
-- **Disengage:** move out of contact. Afterwards the unit can't charge. Only **light** units may still shoot.
+- **Disengage:** move out of contact. Compare the unit's current **supply** with the total supply of the enemies it was engaged with. If it's worth **more**, it breaks away cleanly with no penalty. If it's worth the **same or less**, it's **exhausted** for the next phase: it sits out the assault phase and can't charge, though **light** units may still shoot.
 
 ### Engagement and shooting
 - **Shooting into a melee:** an unengaged unit can't shoot at an enemy unit that is engaged with anyone, unless the weapon has **precision 1+** (from the weapon or a buff).
@@ -104,7 +113,7 @@ Every attack, ranged or melee, runs the same sequence:
 | Keyword | Effect |
 | --- | --- |
 | infantry | Can climb ladders. Gets cover. |
-| light | Can still shoot after disengaging. |
+| light | Can still shoot when exhausted from disengaging. |
 | armoured | Ignores 1 AP, unless the weapon has a bonus against armoured targets. |
 | heavy | No ladders. Never gets cover. |
 | flying | Ignores terrain. Can't hold objectives. Ground melee can't reach it. Ranged weapons need `targets: all/air`. |
@@ -120,7 +129,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 
 **Forward-deploy limits:**
 - **Tunnel** can't be used in round 1.
-- Neither a Tunnel nor a **Burrow Hole** can land within 6" of the enemy's home objective.
+- Neither a Tunnel nor a **Gopher Hole** can land within 6" of the enemy's home objective.
 
 **Unit abilities and timing:**
 - Active unit abilities are **free actions within the unit's activation**. In the movement or assault phase a ready unit can use one active ability, then still take its normal action: for example, Blink and then move, or Recall a squad and then shoot.
@@ -129,7 +138,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 
 - **Active abilities** use the unit's activation in their phase:
   - Patch Up (heal or revive)
-  - Hatchlings (Snot Nanny: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
+  - Hatchlings (Brood Scorpion: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
   - Barrage (indirect blast; friendly fire happens)
   - Tunnel (pop up anywhere on the ground ≥6" from enemies)
   - Blink (teleport 10", can land on platforms)
@@ -171,7 +180,12 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
   - Aim buff (Concord, Point Out Flaws): a friendly unit's attacks get precision +1 and tracking +1 this round. With precision it can also shoot into a melee.
   - Teleport (Concord, Gate Step): one of your unengaged units on the table moves up to 8", ignoring terrain and not into base contact. It can still move and act afterwards. Enemy Overwatch and Lurk react to where it lands.
 - Field Repairs (Militia) heals 3 HP but no longer revives: bringing models back is the Munch's trick (Regrow, Hatchlings, Cough Up) and the Patch Medic's.
-- Unit changes: Big Bertha has Steady Aim instead of Provoke (Provoke is the Grand Facet's); the Glimmer Lancer trades Steady Aim and Spotter for precision 2 (and no longer hits worse after moving); the Sunstone Obelisk rolls 2 dice instead of having Steady Aim; the Lumen Warden loses Steadying Presence; the Tumbleweed Riders lose their impact dice; Rivet Grunts' shovels hit on 5+; the Gloop Lobber's range is 20"; the Snot Nanny has Hatchlings instead of Patch Up. To keep the Militia competitive, Rivet Grunts come 5 to a squad (was 4) and the drop-ship's Bumpy Landing costs 1 CP (was 2).
+- Unit changes: Big Bertha has Steady Aim instead of Provoke (Provoke is the Grand Strider's); the Ray Lancer trades Steady Aim and Spotter for precision 2 (and no longer hits worse after moving); the Sunray Tower rolls 2 dice instead of having Steady Aim; the Beam Warden loses Steadying Presence; the Tumbleweed Riders lose their impact dice; Rivet Grunts' shovels hit on 5+; the Stink Mortar's range is 20"; the Brood Scorpion has Hatchlings instead of Patch Up. To keep the Militia competitive, Rivet Grunts come 5 to a squad (was 4) and the drop-ship's Bumpy Landing costs 1 CP (was 2).
+
+**Bigger squads pass:**
+- Every squad grew, priced per model at about its old rate: Rivet Grunts 5→7 (cost 4, supply 3; Extra Hands +2 models), Chrome-Jaw Beetles 6→9 (cost 3, supply 3; Bigger Litter +3), Piston Foxes 5→8 (cost 4, supply 3; Kick-Bite 1 die), Bomb Wasps 3→6 (cost 4, supply 3; Stinger 1 die; Extra Buzz +2), Web-Gunner Spiders 3→4, Front Porch Grannies 3→4 (cost 5), Tumbleweed Riders 2→3 (Scattergun 1 die), Phase Guard 2→3 (cost 5, supply 3), Blink Dancers 2→3 (cost 5).
+- Two flying creatures became pairs: the Steel-Jaw Crows (2 × 3 HP, 2 bite dice each, and it no longer has tracking, which is a Concord trait) and the Jetwing Scouts (2 models with 1 shield each, cost 6).
+- Starter lists were rebuilt to fit the roster limits with the new costs (see `src/engine/data/factions.ts`), and were balanced by AI-vs-AI simulation. The Militia field three Grunt squads and two Squinters (the Sky Rustler moves to the Assault extras), the Munch swap the Stink Mortar for the Brood Scorpion, and the Concord field a second Ray Lancer (and a third in Assault in place of a Phase Guard). In Assault the Concord bring the Light Gate instead of the Star Lens: against the bigger packs the Sunbeam ran away with the Munch match-up, and Gate Step gets a few elites to the long board's objectives.
 
 ## Tabletop staples
 
@@ -191,7 +205,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
   - Shaken units hit one worse, won't charge and can't hold objectives.
   - At the end of each round, each Shaken unit recovers on a 4+.
   - Any army can **Rally** a unit for 1 CP. This is a free action.
-  - Structures and `fearless` units (Big Mama Chomp, Big Bertha) never test.
+  - Structures and `fearless` units (Dr. Graft and Big Mama, Big Bertha) never test.
 - **Difficult terrain:** area cover (scrub, craters, rubble, tarps) costs double movement for ground models. Pathfinding weighs going round against going through. Flyers and jumpers ignore it.
 - **Obscured:** other units' models standing in the line of fire, at the target's level, give the target cover. Shooting down from higher ground still ignores cover.
 - **Measuring tape and line-of-sight checker:** press **M**, then click a model or spot and point anywhere. You get the distance, the edge-to-edge distance between models, and whether sight is clear. It works even during the AI's turn.
@@ -211,12 +225,12 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
 | --- | --- | --- | --- |
 | Scrap Turret | Militia | permanent | Rifle turret with Overwatch |
 | Junk Barricade | Militia | temporary | Big base that blocks enemy paths, e.g. a ramp |
-| Spore Pod | Munch | permanent | Short-range spores; Regen and Brood Call |
-| Burrow Hole | Munch | temporary | Your reserves can deploy within 3" of it |
-| Warren Mound | Munch | permanent | A Burrow Exit that stays, with Lurk and Regen |
-| Gobble Pit | Munch | temporary | Lurks: bites the first enemy ground unit to end a move within 3" |
-| Prism Pylon | Concord | permanent | Shielded beam emplacement with Radiance |
-| Glimmer Ward | Concord | temporary | Enemy shots at friendly units within 4" of it hit one worse |
+| Mutagen Vat | Munch | permanent | Short-range spores; Regen and Brood Call |
+| Gopher Hole | Munch | temporary | Your reserves can deploy within 3" of it |
+| The Sett Lab | Munch | permanent | A Burrow Exit that stays, with Lurk and Regen |
+| Trapdoor Pit | Munch | temporary | Lurks: bites the first enemy ground unit to end a move within 3" |
+| Shield Pylon | Concord | permanent | Shielded beam emplacement with Radiance |
+| Glimmer Dome | Concord | temporary | Enemy shots at friendly units within 4" of it hit one worse |
 
 ## Off-board supports, Fizz and CP
 
@@ -229,14 +243,14 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
   - **Dirt Airstrip** (Militia, 3 ✦, +1 CP): *Hay Bale Drop* (3 CP, movement phase, exhausts) lands the unit within 12" of one of your models and at least 6" from enemies. It's in the Militia's Assault starter supports.
   - **Rust Bucket Drop-Ship** (Militia, 3 ✦, +1 CP): *Bumpy Landing* (1 CP, movement phase, exhausts, from round 2) lands the unit **anywhere on the table**, at least 8" from enemy models. While you aim it, red rings show where it can't land, and clicking a spot it can't use says why. It's in the Militia's Skirmish starter supports.
   - **Grand Portal** (Concord, 3 ✦, +1 CP): *Step Through* (2 CP, movement phase, exhausts, from round 2) lands the unit within 4" of one of your units and at least 3" from enemies, with +1 shield per model (even above its maximum) until the end of the round. It's in the Concord's Skirmish and Assault starter supports.
-  - The Munch don't airdrop: they tunnel. *Dig Through* (Tunnel Network) opens a Burrow Hole for the round, and the Warren Mound is a permanent one.
+  - The Munch don't airdrop: they tunnel. *Dig Through* (Tunnel Network) opens a Gopher Hole for the round, and the Sett Lab is a permanent one.
 - **Teleports:** *Gate Step* (Light Gate, Concord, 3 CP, movement phase, exhausts) moves one of your unengaged units on the table up to 8". Click the unit, then where it goes.
 - Effects are data-driven, so custom factions can combine them: gain resources, heal or revive, recharge shields, blast a point, summon a structure, give melee or ranged buffs, give precision and tracking, regrow lost models, dig a unit in, teleport a unit, slow an enemy, airdrop a reserve unit (near your models or anywhere, optionally from a later round), rattle an enemy's nerve, and the ward, brace and retaliate reactions.
 
 ## Objectives and missions
 
 - Objectives are **numbered**. Each is either **neutral** or a team's **home** objective.
-- An objective is controlled by the side with more **supply** of non-flying, non-structure, non-Shaken units touching it, at the objective's elevation. A unit at **half strength or less** (counting wounds) only counts **half** its supply, so battered squads can't hold ground like fresh ones.
+- An objective is controlled by the side with more **supply** of non-flying, non-structure, non-Shaken units touching it, at the objective's elevation. A unit counts its **current supply**: its supply shared out across its models and rounded down, so losses shrink it. A 3-supply squad of 6 is worth 2 at four or five models, 1 at two or three, and 0 at its last model. A single-model unit keeps its full supply until it dies. Current supply also decides how cleanly a unit disengages.
 
 | Mission | Rounds | Scoring |
 | --- | --- | --- |
@@ -277,7 +291,7 @@ A faction with no buyable permanent structure gets 3 resources instead of each f
 
 **Stragglers:** a model left more than 2" from its squad (for example after casualties) moves as far as it can toward the leader. It catches up rather than blocking the whole move.
 
-The game ends after the last round (most VP wins), or immediately if an army has no units left on the board or in reserve.
+The game ends after the last round (most VP wins), or immediately if an army has no units left on the board or in reserve, or the moment one side leads by **more than 8 VP**, which wins at once. Missions with big late swings raise that limit so a real comeback stays possible: **10 VP** for Scrapyard Brawl, Swipe the Snack, Top of the Heap, Claim-Jump Siege, Frontline and Most Wanted, and **12 VP** for The Great Snack Heist, Scrapheap Showdown, Shifting Ground and Strongbox Run.
 
 ## Maps
 

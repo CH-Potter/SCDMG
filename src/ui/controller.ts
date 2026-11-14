@@ -6,7 +6,22 @@ import { expectedDamage, planMelee, planShooting, type AttackPlan } from "../eng
 import { ABILITIES } from "../engine/data/abilities";
 import { factionOf, supportOf } from "../engine/data/factions";
 import { abilityOf } from "../engine/reactions";
-import { CP_CAP, airdropSpotProblem, canPlaySupport, cpPerRound, deployZones, supportTarget, teleportProblem } from "../engine/supports";
+import { CP_CAP, airdropSpotProblem, canPlaySupport, cpPerRound, deployZones, supportTarget } from "../engine/supports";
+import {
+  abilityUnitProblem,
+  actionProblem,
+  actionTargets,
+  checkTargets,
+  commandProblem,
+  deploySpotProblem,
+  droppableReserves,
+  snapPoint,
+  supportProblem,
+  supportUnitProblem,
+  type UnitAction,
+} from "../engine/legality";
+import { bad, buttonAttrs, cursorCss, cursorKindFor, info, ok, toneGlyph, whyLine, type Cue } from "./cues";
+import { arrowEnds, attackLabel, centroid, markFor, markSide, type AttackKind, type AttackMarkView } from "./attackMark";
 import { airdropNoGo } from "./fx/dropship";
 import { MAPS } from "../engine/data/maps";
 import { MISSIONS } from "../engine/data/missions";
@@ -15,15 +30,17 @@ import {
   applyCommand,
   createGame,
   planCharge,
-  wouldEngage,
+  mercyLead,
   type GameSetup,
   RALLY_CP,
 } from "../engine/game";
 import { dist, pointInZone } from "../engine/geometry";
-import { profileOf } from "../engine/profile";
+import { profileFor, profileOf } from "../engine/profile";
 import {
   aliveModels,
   canAffordDeploy,
+  currentSupply,
+  disengageOdds,
   effectiveMove,
   eligibleUnits,
   engagedWith,
@@ -32,7 +49,6 @@ import {
   reserves,
   supplyUsed,
   unitById,
-  unitGap,
 } from "../engine/rules";
 import { lineOfSight, platformAt, planRoute } from "../engine/terrain";
 import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec } from "../engine/types";
@@ -45,6 +61,12 @@ import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserv
 
 const HUMAN = 0;
 const AI = 1;
+
+/** The disengage odds in words: a clean break, or exhausted for the assault phase. */
+function disengageText(s: GameState, u: Unit): string {
+  const o = disengageOdds(s, u);
+  return o.clean ? `Clean break: ${o.mine} vs ${o.theirs} supply` : `Exhausted next phase: ${o.mine} vs ${o.theirs} supply`;
+}
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Replace an element's HTML only when it actually changed (keeps buttons alive mid-click). */
@@ -105,6 +127,9 @@ export class Controller {
   private lastEvents: GameEvent[] = [];
   private generation = 0;
   private tooltip: HTMLDivElement;
+  /** The attack being declared or resolved: drawn on the board until its dice and outcome have played. */
+  private mark: { uid: string; target: string; kind: AttackKind; weapon: string; states: GameState[]; owner?: number; at: number } | null = null;
+  private markEl: HTMLDivElement;
 
   constructor(
     private renderer: BoardRenderer,
@@ -113,10 +138,16 @@ export class Controller {
     setup: GameSetup,
   ) {
     this.state = createGame(setup);
+    // Dev server only: a console handle (window.__scdmg) for poking at the game while testing the UI.
+    if (import.meta.env.DEV) (window as unknown as { __scdmg?: unknown }).__scdmg = this;
     this.tooltip = document.createElement("div");
     this.tooltip.className = "tooltip";
     this.tooltip.style.display = "none";
     els.stage.appendChild(this.tooltip);
+    this.markEl = document.createElement("div");
+    this.markEl.className = "attack-label";
+    this.markEl.hidden = true;
+    els.stage.appendChild(this.markEl);
     this.tray = new DiceTray(els.stage);
     renderer.autoPhaseBanners = false;
     renderer.onViewChange = () => {
@@ -277,11 +308,9 @@ export class Controller {
     return out;
   }
 
-  /** Queue the dice for some events; resolves when they've been shown. */
-  private playDice(events: GameEvent[]): Promise<void> {
-    let last: Promise<void> = Promise.resolve();
-    for (const roll of this.diceFor(events)) last = this.tray.show({ ...roll, onSettled: audio.takeOutcome() }); // [audio] hit/KO sounds on settle
-    return last;
+  /** Show the dice for some events, one roll after another; resolves when they've been shown. */
+  private async playDice(events: GameEvent[]): Promise<void> {
+    for (const roll of this.diceFor(events)) await this.tray.show({ ...roll, onSettled: audio.takeOutcome() }); // [audio] hit/KO sounds on settle
   }
 
   private cycleDice(): void {
@@ -293,6 +322,8 @@ export class Controller {
   destroy(): void {
     this.generation++;
     this.tooltip.remove();
+    this.markEl.remove();
+    this.renderer.setCursor("default");
     this.tray.destroy();
     this.alerts.destroy();
     this.logDrawer.remove();
@@ -349,7 +380,9 @@ export class Controller {
         const weapons = profileOf(sel).weapons;
         if (enemy) {
           if (typeof this.bestWeapon(sel, enemy, false) !== "string") return { kind: "shoot", weapon: null };
-          if (weapons.some((w) => w.melee) && !sel.status.disengaged) return { kind: "charge" };
+          // Neither works: explain the shot unless a charge would (or there's no gun to explain).
+          const canCharge = commandProblem(s, { type: "charge", uid: sel.uid, target: enemy.uid }) === null;
+          if (canCharge || !weapons.some((w) => !w.melee)) return { kind: "charge" };
           return { kind: "shoot", weapon: null };
         }
         return sel.status.disengaged || isEngaged(s, sel) ? { kind: "none" } : { kind: "advance" };
@@ -391,6 +424,12 @@ export class Controller {
     let err = melee ? "No melee weapon" : "No ranged weapon";
     weapons.forEach((w, i) => {
       if (w.melee !== melee || (chosen !== null && chosen !== i)) return;
+      // The reducer decides (range, sight, melee rules, provoke, exhaustion); the plan is only for the odds.
+      const why = commandProblem(this.state, { type: melee ? "fight" : "shoot", uid: a.uid, target: t.uid, weapon: i });
+      if (why) {
+        err = why;
+        return;
+      }
       const plan = melee ? planMelee(a, t, w) : planShooting(this.state, a, t, w);
       if (typeof plan === "string") {
         err = plan;
@@ -404,9 +443,9 @@ export class Controller {
 
   // ---------- input ----------
 
-  private click(p: Vec): void {
+  private click(raw: Vec): void {
     if (this.mode.kind === "measure") {
-      const hit = this.modelAt(p);
+      const hit = this.modelAt(raw);
       this.mode = hit
         ? {
             kind: "measure",
@@ -414,22 +453,28 @@ export class Controller {
             fromElev: hit.model.elevation,
             fromUnit: hit.unit.uid,
           }
-        : { kind: "measure", from: p, fromElev: platformAt(this.state, p) ? 1 : 0 };
+        : { kind: "measure", from: raw, fromElev: platformAt(this.state, raw) ? 1 : 0 };
       this.refresh();
       return;
     }
     this.closeDeployMenu();
     if (!this.humanTurn()) return;
-    if (this.state.phase === "movement" && this.mode.kind === "none" && !this.sel() && !this.modelAt(p)) {
-      const res = deployChoices(this.state, HUMAN);
-      if (res.some((u) => deployZones(this.state, u).some((poly) => pointInZone(p, poly)))) {
-        this.openDeployMenu(p, res);
+    // Spots snap to the same 0.1" grid the hover preview checks, so what it showed is what happens.
+    const p = snapPoint(raw);
+    const s = this.state;
+    const hit = this.modelAt(raw);
+    const sel = this.sel();
+    if (s.phase === "movement" && this.mode.kind === "none" && !sel && !hit) {
+      const q = snapPoint(raw, 0.25);
+      const here = this.deployableHere(q);
+      if (here.length) {
+        // A spot nothing can deploy to says why instead of opening an empty menu.
+        const why = deploySpotProblem(s, here, q, here.length);
+        if (why) this.reject(why);
+        else this.openDeployMenu(q, deployChoices(s, HUMAN));
         return;
       }
     }
-    const s = this.state;
-    const hit = this.modelAt(p);
-    const sel = this.sel();
 
     if (this.mode.kind === "support") {
       const a = abilityOf(this.mode.support, this.mode.ability)!;
@@ -440,24 +485,28 @@ export class Controller {
         support: this.mode.support,
         ability: this.mode.ability,
       };
-      if (need === "friendlyUnit" && hit && hit.unit.owner === HUMAN)
-        this.issue({ ...base, target: hit.unit.uid });
-      else if (need === "enemyUnit" && hit && hit.unit.owner !== HUMAN)
-        this.issue({ ...base, target: hit.unit.uid });
-      else if (need === "point") this.issue({ ...base, point: p });
+      if (need === "friendlyUnit" && hit && hit.unit.owner === HUMAN) this.issue({ ...base, target: hit.unit.uid });
+      else if (need === "enemyUnit" && hit && hit.unit.owner !== HUMAN) this.issue({ ...base, target: hit.unit.uid });
+      else if (need === "point" && !hit) this.issue({ ...base, point: p });
       else if (need === "reservePoint" && !hit) {
         // A spot it can't land on says why straight away, instead of opening the unit menu.
-        const bad = a.effect.kind === "airdrop" ? airdropSpotProblem(s, HUMAN, a.effect, p) : null;
-        if (bad) this.flash(bad);
+        const bad = (a.effect.kind === "airdrop" ? airdropSpotProblem(s, HUMAN, a.effect, p) : null) ?? this.dropProblem(base, p);
+        if (bad) this.reject(bad);
         else {
-          const droppable = deployChoices(s, HUMAN).filter((u) => !profileOf(u).structure);
-          this.openDeployMenu(p, droppable, { title: `${a.name}: drop which unit?`, pick: (u) => this.issue({ ...base, target: u.uid, point: p }) });
+          this.openDeployMenu(p, droppableReserves(s, HUMAN), {
+            title: `${a.name}: drop which unit?`,
+            cmd: (u) => ({ ...base, target: u.uid, point: p }),
+          });
         }
       } else if (need === "unitPoint") {
         // Two clicks: one of your units, then where it goes.
-        if (hit && hit.unit.owner === HUMAN) {
-          this.mode = { ...this.mode, unit: hit.unit.uid };
-          this.refresh();
+        if (hit && hit.unit.owner === HUMAN && !this.mode.unit) {
+          const why = supportUnitProblem(s, HUMAN, base.support, base.ability, hit.unit);
+          if (why) this.reject(why);
+          else {
+            this.mode = { ...this.mode, unit: hit.unit.uid };
+            this.refresh();
+          }
         } else if (this.mode.unit && !hit) this.issue({ ...base, target: this.mode.unit, point: p });
       }
       return;
@@ -485,8 +534,12 @@ export class Controller {
       }
       if (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget) {
         if (hit && hit.unit.owner === HUMAN && hit.unit.uid !== sel.uid) {
-          this.abilityTarget = hit.unit.uid;
-          this.refresh();
+          const why = abilityUnitProblem(s, sel, this.mode.id, hit.unit);
+          if (why) this.reject(why);
+          else {
+            this.abilityTarget = hit.unit.uid;
+            this.refresh();
+          }
         }
         return;
       }
@@ -507,6 +560,8 @@ export class Controller {
         this.refresh();
       } else if (eligibleUnits(s, HUMAN).includes(hit.unit)) {
         this.select(hit.unit, hit.model.id);
+      } else {
+        this.reject(actionProblem(s, hit.unit.uid, { kind: "hold" }) ?? "That unit can't act right now");
       }
       return;
     }
@@ -514,13 +569,13 @@ export class Controller {
     if (hit && sel) {
       if (order.kind === "shoot") {
         const b = this.bestWeapon(sel, hit.unit, false);
-        if (typeof b === "string") this.flash(b);
+        if (typeof b === "string") this.reject(b);
         else this.issue({ type: "shoot", uid: sel.uid, target: hit.unit.uid, weapon: b.index });
       } else if (order.kind === "charge") {
         this.issue({ type: "charge", uid: sel.uid, target: hit.unit.uid });
       } else if (order.kind === "fight") {
         const b = this.bestWeapon(sel, hit.unit, true);
-        if (typeof b === "string") this.flash(b);
+        if (typeof b === "string") this.reject(b);
         else this.issue({ type: "fight", uid: sel.uid, target: hit.unit.uid, weapon: b.index });
       }
       return;
@@ -533,6 +588,12 @@ export class Controller {
     ) {
       this.issue({ type: order.kind, uid: sel.uid, leader: this.leader, to: p });
     }
+  }
+
+  /** A click that can't be carried out: a soft buzz and the reason, and nothing else changes. */
+  private reject(why: string): void {
+    audio.ui("error"); // [audio]
+    this.flash(why);
   }
 
   private key(e: KeyboardEvent): void {
@@ -570,13 +631,18 @@ export class Controller {
   // ---------- commands ----------
 
   private issue(cmd: Command): boolean {
+    const why = commandProblem(this.state, cmd);
+    if (why) {
+      this.reject(why);
+      return false;
+    }
     const r = applyCommand(this.state, cmd);
     if (!r.ok) {
-      audio.ui("error"); // [audio]
-      this.flash(r.error);
+      this.reject(r.error);
       return false;
     }
     const before = this.state;
+    this.declareCommand(before, r.state, cmd);
     this.history.push(before);
     if (this.history.length > 60) this.history.shift();
     const keepUid = cmd.type === "ability" ? cmd.uid : undefined;
@@ -676,13 +742,17 @@ export class Controller {
       const action = cut < 0 ? events : events.slice(0, cut);
       const later = cut < 0 ? [] : events.slice(cut);
       audio.onGameEvents(action, after); // [audio] SFX, battle intensity, victory/defeat stinger
-      await this.playDice(action);
+      await this.playAction(before, after, action, gen);
       if (gen !== this.generation) return;
       this.state = after;
       this.lastEvents = events;
       this.handleEvents(before, action);
       this.refresh();
       await this.alerts.idle();
+      // The attack marker stays up through the dice and the outcome, then goes.
+      if (this.mark) await sleep(350);
+      if (gen !== this.generation) return;
+      this.clearMark();
       // 2. What follows, one step at a time: phase banners, then the scoring walkthrough (each score,
       // healing, recharges, upkeep) with its own sound and call-out as it happens.
       for (const e of later) {
@@ -710,9 +780,50 @@ export class Controller {
     } finally {
       if (gen === this.generation) {
         this.busy = false;
+        this.mark = null;
         this.refresh();
       }
     }
+  }
+
+  /**
+   * An action's dice, one roll at a time. Before each attack's dice, the board shows who is attacking
+   * whom and with what (see attackMark.ts), and holds it a moment so it can be read.
+   */
+  private async playAction(before: GameState, after: GameState, events: GameEvent[], gen: number): Promise<void> {
+    const states = [before, after];
+    // A blast from a support card comes from off the table: mark only what it hits.
+    const card = events.find((e): e is Extract<GameEvent, { type: "support" }> => e.type === "support");
+    if (this.mark) await this.holdDeclared();
+    for (const e of events) {
+      if (gen !== this.generation) return;
+      if (e.type === "attack") {
+        const r = e.report;
+        const m = this.mark;
+        const fromCard = r.kind === "barrage" && !!card;
+        const uid = fromCard ? "" : r.uid;
+        const same = !!m && m.uid === uid && m.target === r.target && m.kind === r.kind;
+        if (!same) this.declare(uid, r.target, r.kind, r.weapon, states, fromCard ? card!.player : undefined);
+        await this.holdDeclared();
+      }
+      await this.playDice([e]);
+    }
+  }
+
+  /** Wait until the current marker has been on screen for the declare time. */
+  private async holdDeclared(): Promise<void> {
+    const m = this.mark;
+    if (!m) return;
+    const left = this.declareMs() - (performance.now() - m.at);
+    if (left > 0) await sleep(left);
+  }
+
+  /** Shooting, fighting and charging commands put their marker up straight away (before any dice). */
+  private declareCommand(before: GameState, after: GameState, cmd: Command): void {
+    if (cmd.type !== "shoot" && cmd.type !== "fight" && cmd.type !== "charge") return;
+    const u = unitById(before, cmd.uid);
+    const weapon = cmd.type === "charge" || !u ? "" : (profileOf(u).weapons[cmd.weapon]?.name ?? "");
+    this.declare(cmd.uid, cmd.target, cmd.type, weapon, [before, after]);
   }
 
   /** Call-outs for the end-of-round steps (scores have theirs in `narrate`). */
@@ -750,15 +861,15 @@ export class Controller {
         if (gen !== this.generation) return;
         const cmd = aiCommand(this.state);
         if ("uid" in cmd) this.selected = cmd.uid;
-        this.refresh();
-        await sleep(200);
-        if (gen !== this.generation) return;
         let r = applyCommand(this.state, cmd);
         if (!r.ok) {
           console.error("AI command rejected", cmd, r.error);
           r = applyCommand(this.state, { type: "pass", player: AI });
           if (!r.ok) break;
-        }
+        } else this.declareCommand(this.state, r.state, cmd);
+        this.refresh();
+        await sleep(200);
+        if (gen !== this.generation) return;
         await this.present(this.state, r.state, r.events);
         if (gen !== this.generation) return;
         this.selected = null;
@@ -794,41 +905,32 @@ export class Controller {
       blast: null,
       events: this.lastEvents,
       ready: eligibleUnits(s, s.activePlayer).map((u) => u.uid),
+      attack: this.currentMark(),
+      exhausted: s.phase === "movement" || s.phase === "assault" ? onBoard(s).filter((u) => u.status.disengaged).map((u) => u.uid) : [],
     };
-    let tip: string | null = null;
+    let cue: Cue | null = null;
 
     if (this.mode.kind === "measure") {
-      tip = this.previewMeasure(hit, view);
+      cue = this.previewMeasure(hit, view);
     } else if (this.humanTurn()) {
       if (this.mode.kind === "deploy" && this.deployUid) {
-        const u = unitById(s, this.deployUid)!;
-        view.zone = deployZones(s, u);
-        if (this.hover && !hit) {
-          const plan = planUnitMove(s, u, u.models[0]!.id, this.hover, {
-            allowance: 0,
-            teleport: true,
-            zone: deployZones(s, u),
-          });
-          const r = profileOf(u).baseRadius;
-          if (typeof plan === "string") {
-            view.ghosts = [{ pos: this.hover, radius: r }];
-            view.ghostOk = false;
-            tip = plan;
-          } else {
-            view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r, cover: coverRating(s, u, p.pos, p.elevation) }));
-            tip = `Deploy ${profileOf(u).name}`;
-          }
-        }
+        const u = unitById(s, this.deployUid);
+        if (u) cue = this.previewDeploy(u, hit, view);
       } else if (this.mode.kind === "support") {
-        tip = this.previewForSupport(this.mode.support, this.mode.ability, hit, view);
+        cue = this.previewForSupport(this.mode.support, this.mode.ability, hit, view);
       } else if (sel) {
-        tip = this.previewForSelected(sel, hit, view);
+        cue = this.previewForSelected(sel, hit, view);
+      } else {
+        cue = this.previewIdle(hit);
       }
     }
     this.renderer.render(view);
-    this.renderTooltip(tip);
+    // While an attack is on screen, its label does the talking: no hover brief on top of it.
+    if (!cue && hit && !this.deployMenu && !this.mark) cue = info(this.unitBrief(hit.unit));
+    this.renderTooltip(this.deployMenu ? null : cue);
+    this.renderer.setCursor(cursorCss(this.deployMenu || !this.hover ? "default" : cursorKindFor(cue)));
+    this.renderAttackLabel();
     this.renderTopbar();
-    if (!tip && hit && !this.deployMenu) tip = this.unitBrief(hit.unit);
     this.renderCallout(sel);
     this.passBtn.hidden = !this.humanTurn();
     const canClaim =
@@ -850,11 +952,11 @@ export class Controller {
     this.renderActions(sel);
   }
 
-  private previewMeasure(hit: { unit: Unit; model: Model } | undefined, view: RenderView): string {
+  private previewMeasure(hit: { unit: Unit; model: Model } | undefined, view: RenderView): Cue {
     const m = this.mode;
-    if (m.kind !== "measure") return "";
-    if (!m.from) return "📏 Measuring: click a model or a spot to measure from. M or Esc to stop.";
-    if (!this.hover) return "📏 Move the pointer to measure.";
+    if (m.kind !== "measure") return info("");
+    if (!m.from) return info("📏 Measuring: click a model or a spot to measure from. M or Esc to stop.", "pointer");
+    if (!this.hover) return info("📏 Move the pointer to measure.");
     const s = this.state;
     const to = hit ? hit.model.pos : this.hover;
     const toElev = hit ? hit.model.elevation : platformAt(s, to) ? 1 : 0;
@@ -868,7 +970,51 @@ export class Controller {
     const parts = [`📏 ${d.toFixed(1)}"`];
     if (edge > 0) parts.push(`edge to edge ${Math.max(0, d - edge).toFixed(1)}"`);
     parts.push(sight ? "sight: clear" : "sight: blocked");
-    return parts.join(" · ");
+    return info(parts.join(" · "), "pointer");
+  }
+
+  /** Nothing selected: say what a click on this spot or unit would do. */
+  private previewIdle(hit: { unit: Unit; model: Model } | undefined): Cue | null {
+    const s = this.state;
+    if (hit) {
+      const name = profileOf(hit.unit).name;
+      if (hit.unit.owner !== HUMAN) return null; // the unit brief
+      const why = actionProblem(s, hit.unit.uid, { kind: "hold" });
+      return why ? bad(`${name}: ${why}`) : info(`${name}: click to activate`, "pointer");
+    }
+    if (!this.hover || s.phase !== "movement") return null;
+    // Empty ground in the movement phase: can something deploy here?
+    const p = snapPoint(this.hover, 0.25);
+    const here = this.deployableHere(p);
+    if (!here.length) return null;
+    const why = deploySpotProblem(s, here, p, here.length);
+    return why ? bad(why) : ok(`${s.openRoster ? "Recruit" : "Deploy"} here: click to pick a unit`, "place");
+  }
+
+  /** Units that could deploy at `p` going by zone and cost (cheapest and smallest first). */
+  private deployableHere(p: Vec): Unit[] {
+    const s = this.state;
+    return deployChoices(s, HUMAN)
+      .filter((u) => deployZones(s, u).some((poly) => pointInZone(p, poly)))
+      .sort((a, b) => profileOf(a).models - profileOf(b).models || profileOf(a).cost - profileOf(b).cost);
+  }
+
+  private previewDeploy(u: Unit, hit: { unit: Unit; model: Model } | undefined, view: RenderView): Cue | null {
+    const s = this.state;
+    view.zone = deployZones(s, u);
+    if (!this.hover) return null;
+    if (hit) return bad("That spot is taken: pick open ground");
+    const p = snapPoint(this.hover);
+    const why = commandProblem(s, { type: "deploy", uid: u.uid, to: p });
+    const r = profileOf(u).baseRadius;
+    const plan = planUnitMove(s, u, u.models[0]!.id, p, { allowance: 0, teleport: true, zone: view.zone });
+    if (why) {
+      view.ghosts = typeof plan === "string" ? [{ pos: p, radius: r }] : plan.placements.map((at) => ({ pos: at.pos, radius: r }));
+      view.ghostOk = false;
+      return bad(why);
+    }
+    if (typeof plan !== "string") view.ghosts = plan.placements.map((at) => ({ pos: at.pos, radius: r, cover: coverRating(s, u, at.pos, at.elevation) }));
+    return ok(`Deploy ${profileOf(u).name} here`, "place");
   }
 
   private previewForSupport(
@@ -876,63 +1022,103 @@ export class Controller {
     abilityId: string,
     hit: { unit: Unit; model: Model } | undefined,
     view: RenderView,
-  ): string {
+  ): Cue | null {
     const s = this.state;
     const a = abilityOf(supportId, abilityId)!;
     const need = supportTarget(a);
-    if (need === "friendlyUnit") view.friendlyMarks = onBoard(s, HUMAN).map((u) => u.uid);
-    if (need === "reservePoint" && this.hover) view.blast = { center: this.hover, radius: 1 };
+    const base = { type: "support" as const, player: HUMAN as 0, support: supportId, ability: abilityId };
     const picked = need === "unitPoint" && this.mode.kind === "support" && this.mode.unit ? unitById(s, this.mode.unit) : undefined;
-    if (need === "unitPoint" && !picked) view.friendlyMarks = onBoard(s, HUMAN).filter((u) => !profileOf(u).structure).map((u) => u.uid);
-    if (need === "enemyUnit") view.targets = onBoard(s, AI).map((u) => ({ uid: u.uid, ok: true }));
-    if (need === "point" && this.hover) {
+    const hp = this.hover ? snapPoint(this.hover) : null;
+    const why = picked ? canPlaySupport(s, HUMAN, supportId, abilityId) : supportProblem(s, HUMAN, supportId, abilityId);
+    if (why) return bad(`${a.name}: ${why}`);
+
+    if (need === "friendlyUnit" || need === "enemyUnit") {
+      const pool = need === "friendlyUnit" ? onBoard(s, HUMAN) : onBoard(s, AI);
+      const checks = checkTargets(s, pool, (t) => ({ ...base, target: t.uid }));
+      if (need === "friendlyUnit") view.friendlyMarks = checks.filter((c) => !c.problem).map((c) => c.uid);
+      else view.targets = checks.map((c) => ({ uid: c.uid, ok: !c.problem }));
+      if (hit) {
+        const mine = hit.unit.owner === HUMAN;
+        if (mine !== (need === "friendlyUnit")) return bad(`${a.name}: pick ${need === "friendlyUnit" ? "one of your units" : "an enemy unit"}`);
+        const p = checks.find((c) => c.uid === hit.unit.uid)?.problem ?? null;
+        return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: ${profileOf(hit.unit).name}`, need === "enemyUnit" ? "target" : "go");
+      }
+      return info(`${a.name} (${a.cp} CP): click ${need === "friendlyUnit" ? "one of your marked units" : "an enemy unit"}. Esc cancels.`);
+    }
+
+    if (need === "point") {
       const e = a.effect;
       const radius =
-        e.kind === "blast"
-          ? e.radius
-          : e.kind === "summon"
-            ? profileOf({ profileId: e.profileId, upgrades: [] } as unknown as Unit).baseRadius
-            : 1;
-      view.blast = { center: this.hover, radius };
+        e.kind === "blast" ? e.radius : e.kind === "summon" ? profileFor(e.profileId, []).baseRadius : 1;
+      if (hp && !hit) {
+        const p = commandProblem(s, { ...base, point: hp });
+        // A blast shows its area; a summoned structure shows its base, green or red.
+        if (e.kind === "summon") {
+          view.ghosts = [{ pos: hp, radius }];
+          view.ghostOk = !p;
+        } else view.blast = { center: hp, radius };
+        return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: here`, e.kind === "blast" ? "target" : "place");
+      }
+      if (hit) return bad(`${a.name}: pick a spot on open ground`);
+      return info(`${a.name} (${a.cp} CP): click a spot on the board. Esc cancels.`);
     }
-    const why = canPlaySupport(s, HUMAN, supportId, abilityId);
-    if (why) return why;
-    if (picked && a.effect.kind === "teleport") {
-      // Show the reach and where the squad would land.
+
+    if (need === "reservePoint" && a.effect.kind === "airdrop") {
+      // Red rings where it can't land; the spot under the pointer is checked against the real drop.
+      view.noGo = airdropNoGo(s, HUMAN, a.effect);
+      if (!hp) return info(`${a.name} (${a.cp} CP): click a spot, then pick a reserve unit to drop there. Esc cancels.`);
+      if (hit) return bad(`${a.name}: that spot is taken`);
+      const spot = airdropSpotProblem(s, HUMAN, a.effect, hp);
+      const r = 1;
+      if (spot) {
+        view.ghosts = [{ pos: hp, radius: r }];
+        view.ghostOk = false;
+        return bad(`${a.name}: ${spot}`);
+      }
+      const p = this.dropProblem(base, hp);
+      view.ghosts = [{ pos: hp, radius: r }];
+      view.ghostOk = !p;
+      return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: drop here (click, then pick a unit)`, "place");
+    }
+
+    if (need === "unitPoint" && a.effect.kind === "teleport") {
+      if (!picked) {
+        view.friendlyMarks = onBoard(s, HUMAN).filter((u) => !supportUnitProblem(s, HUMAN, supportId, abilityId, u)).map((u) => u.uid);
+        if (hit) {
+          if (hit.unit.owner !== HUMAN) return bad(`${a.name}: pick one of your units`);
+          const p = supportUnitProblem(s, HUMAN, supportId, abilityId, hit.unit);
+          return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: move ${profileOf(hit.unit).name}`, "pointer");
+        }
+        return info(`${a.name} (${a.cp} CP): click one of your units, then where it goes. Esc cancels.`);
+      }
       const lead = aliveModels(picked)[0];
       if (lead) view.moveRing = { center: lead.pos, radius: a.effect.range };
-      if (this.hover && !hit && lead) {
-        const bad = teleportProblem(s, HUMAN, a.effect, picked, this.hover);
-        const plan = bad ?? planUnitMove(s, picked, lead.id, this.hover, { allowance: 0, teleport: true });
+      if (hp && !hit && lead) {
+        const p = commandProblem(s, { ...base, target: picked.uid, point: hp });
+        const plan = planUnitMove(s, picked, lead.id, hp, { allowance: 0, teleport: true });
         const r = profileOf(picked).baseRadius;
-        if (typeof plan === "string") {
-          view.ghosts = [{ pos: this.hover, radius: r }];
-          view.ghostOk = false;
-          return `${a.name}: ${plan}`;
-        }
-        view.ghosts = plan.placements.map((at) => ({ pos: at.pos, radius: r, cover: coverRating(s, picked, at.pos, at.elevation) }));
-        return `${a.name}: move ${profileOf(picked).name} here`;
+        view.ghosts = typeof plan === "string" ? [{ pos: hp, radius: r }] : plan.placements.map((at) => ({ pos: at.pos, radius: r, cover: p ? undefined : coverRating(s, picked, at.pos, at.elevation) }));
+        view.ghostOk = !p;
+        return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: move ${profileOf(picked).name} here`);
       }
-      return `${a.name}: click where ${profileOf(picked).name} goes. Esc cancels.`;
+      return info(`${a.name}: click where ${profileOf(picked).name} goes. Esc cancels.`);
     }
-    if (a.effect.kind === "airdrop") {
-      // Show where it can't land, and say why when the pointer is on such a spot.
-      view.noGo = airdropNoGo(s, HUMAN, a.effect);
-      const bad = this.hover && !hit ? airdropSpotProblem(s, HUMAN, a.effect, this.hover) : null;
-      if (bad) return `${a.name}: ${bad}`;
+    return info(`${a.name} (${a.cp} CP). Esc cancels.`);
+  }
+
+  /** Can any reserve unit be dropped at `p` by this support? Null if so, else the first reason. Cached per state. */
+  private dropProblem(base: { type: "support"; player: 0; support: string; ability: string }, p: Vec): string | null {
+    const s = this.state;
+    const units = droppableReserves(s, HUMAN)
+      .filter((u) => canAffordDeploy(s, u) === null)
+      .sort((a, b) => profileOf(a).models - profileOf(b).models || profileOf(a).baseRadius - profileOf(b).baseRadius);
+    let first: string | null = null;
+    for (const u of units.slice(0, 4)) {
+      const why = commandProblem(s, { ...base, target: u.uid, point: p });
+      if (!why) return null;
+      first ??= why;
     }
-    const hint =
-      need === "friendlyUnit"
-        ? "Click one of your units."
-        : need === "enemyUnit"
-          ? "Click an enemy unit."
-          : need === "reservePoint"
-            ? "Click a spot, then pick a reserve unit to drop there."
-            : need === "unitPoint"
-              ? "Click one of your units, then where it goes."
-              : "Click a spot on the board.";
-    if (hit && need !== "point") return `${a.name}: ${profileOf(hit.unit).name}`;
-    return `${a.name} (${a.cp} CP): ${hint} Esc cancels.`;
+    return first ?? "No reserve unit you can afford";
   }
 
   private renderSupports(): void {
@@ -946,16 +1132,14 @@ export class Controller {
         const def = supportOf(c.id);
         const buttons = def.abilities
           .map((a) => {
-            const why = this.humanTurn()
-              ? canPlaySupport(s, HUMAN, c.id, a.id)
-              : "Wait for your turn";
+            const why = this.humanTurn() ? supportProblem(s, HUMAN, c.id, a.id) : "Wait for your turn";
             const on =
               this.mode.kind === "support" &&
               this.mode.support === c.id &&
               this.mode.ability === a.id;
             const when = a.timing === "any" ? "any phase" : `${PHASE_NAMES[a.timing]}`;
-            return `<button class="mini support-btn ${on ? "selected" : ""}" data-support="${esc(c.id)}" data-sab="${esc(a.id)}" ${why ? "disabled" : ""} title="${esc(a.text + (why ? ` (${why})` : ""))}">
-              ${esc(a.name)} <small>${a.cp} CP · ${esc(when)}${a.exhaust ? " · exhausts" : ""}</small></button>`;
+            return `<button class="mini support-btn ${on ? "selected" : ""}" data-support="${esc(c.id)}" data-sab="${esc(a.id)}" ${buttonAttrs(why ? `${why}. ${a.text}` : null, a.text)}>
+              ${esc(a.name)} <small>${a.cp} CP · ${esc(when)}${a.exhaust ? " · exhausts" : ""}</small>${whyLine(why)}</button>`;
           })
           .join("");
         return `<div class="support-card ${c.exhausted ? "exhausted" : ""}">
@@ -999,65 +1183,72 @@ export class Controller {
     sel: Unit,
     hit: { unit: Unit; model: Model } | undefined,
     view: RenderView,
-  ): string | null {
+  ): Cue | null {
     const s = this.state;
     const r = profileOf(sel).baseRadius;
     const leader = sel.models.find((m) => m.id === this.leader && m.alive) ?? aliveModels(sel)[0];
     const mode = this.contextMode(sel, hit);
     if (!leader) return null;
+    const hp = this.hover ? snapPoint(this.hover) : null;
+    // Pointing at your own units: pick a leader, or switch to another unit.
+    const own = hit && hit.unit.owner === HUMAN ? hit.unit : undefined;
+    const ownCue = (): Cue | null => {
+      if (!own) return null;
+      if (own.uid === sel.uid) return info("Click to make this model the leader (★)", "pointer");
+      const why = actionProblem(s, own.uid, { kind: "hold" });
+      return why ? bad(`${profileOf(own).name}: ${why}`) : info(`Switch to ${profileOf(own).name}`, "pointer");
+    };
 
     if (mode.kind === "move" || mode.kind === "advance" || mode.kind === "disengage") {
       const mv = effectiveMove(s, sel);
       view.moveRing = { center: leader.pos, radius: mv };
-      if (!this.hover || hit)
-        return hit && hit.unit.uid === sel.uid ? "Click to make this model the leader" : null;
-      const plan = planUnitMove(s, sel, leader.id, this.hover, { allowance: mv });
+      if (hit) return ownCue() ?? bad(s.phase === "movement" ? "Enemies are attacked in the assault phase" : "Pick open ground to move to");
+      if (!hp) return null;
+      const pre = actionProblem(s, sel.uid, { kind: mode.kind });
+      if (pre) return bad(pre);
+      const why = commandProblem(s, { type: mode.kind, uid: sel.uid, leader: leader.id, to: hp });
+      const plan = planUnitMove(s, sel, leader.id, hp, { allowance: mv });
       if (typeof plan === "string") {
-        view.ghosts = [{ pos: this.hover, radius: r }];
+        view.ghosts = [{ pos: hp, radius: r }];
         view.ghostOk = false;
-        return plan;
+        return bad(why ?? plan);
       }
-      view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r, cover: coverRating(s, sel, p.pos, p.elevation) }));
-      const route = planRoute(s, sel, leader.pos, leader.elevation, this.hover);
-      if (typeof route !== "string")
-        view.path = [route.legs[0]!.from, ...route.legs.map((l) => l.to)];
-      const engages =
-        mode.kind !== "disengage" && plan.placements.some((p) => wouldEngage(s, sel, p.pos));
-      const stillEngaged =
-        mode.kind === "disengage" && plan.placements.some((p) => wouldEngage(s, sel, p.pos));
-      if (engages) {
+      view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r, cover: why ? undefined : coverRating(s, sel, p.pos, p.elevation) }));
+      const route = planRoute(s, sel, leader.pos, leader.elevation, hp);
+      if (typeof route !== "string") view.path = [route.legs[0]!.from, ...route.legs.map((l) => l.to)];
+      if (why) {
         view.ghostOk = false;
-        return "Only a charge can move into base contact";
+        return bad(why);
       }
-      if (stillEngaged) {
-        view.ghostOk = false;
-        return "Must end out of base contact";
-      }
-      return `${mode.kind === "advance" ? "Advance" : mode.kind === "disengage" ? "Disengage" : "Move"} ${plan.leaderDistance.toFixed(1)}" of ${mv}"${plan.via ? " via " + (plan.via.includes("ladder") ? "ladder" : "ramp") : ""}`;
+      const verb = mode.kind === "advance" ? "Advance" : mode.kind === "disengage" ? "Disengage" : "Move";
+      const via = plan.via ? " via " + (plan.via.includes("ladder") ? "ladder" : "ramp") : "";
+      const odds = mode.kind === "disengage" ? ` · ${disengageText(s, sel)}` : "";
+      return ok(`${verb} ${plan.leaderDistance.toFixed(1)}" of ${mv}"${via}${odds}`);
     }
 
     if (mode.kind === "shoot" || mode.kind === "fight") {
       const melee = mode.kind === "fight";
       const pool = melee ? engagedWith(s, sel) : onBoard(s, AI);
-      for (const e of pool)
-        view.targets.push({ uid: e.uid, ok: typeof this.bestWeapon(sel, e, melee) !== "string" });
+      for (const e of pool) view.targets.push({ uid: e.uid, ok: typeof this.bestWeapon(sel, e, melee) !== "string" });
+      if (own) return ownCue();
       if (hit && hit.unit.owner !== HUMAN) {
         const b = this.bestWeapon(sel, hit.unit, melee);
-        if (typeof b === "string") return b;
+        if (typeof b === "string") return bad(b);
         const w = profileOf(sel).weapons[b.index]!;
         for (const a of b.plan.attackers) {
-          const near = b.plan.targets.reduce((x, y) =>
-            dist(x.pos, a.model.pos) < dist(y.pos, a.model.pos) ? x : y,
-          );
-          view.sightLines.push({
-            from: drawPos(sel, a.model),
-            to: drawPos(hit.unit, near),
-            ok: true,
-          });
+          const near = b.plan.targets.reduce((x, y) => (dist(x.pos, a.model.pos) < dist(y.pos, a.model.pos) ? x : y));
+          view.sightLines.push({ from: drawPos(sel, a.model), to: drawPos(hit.unit, near), ok: true });
         }
         const dice = b.plan.attackers.reduce((n, a) => n + a.dice, 0);
         const exp = expectedDamage(s, sel, hit.unit, b.plan, melee);
-        return `${w.name}: ${b.plan.attackers.length} model${b.plan.attackers.length > 1 ? "s" : ""}, ${dice} dice hitting on ${b.plan.hitOn}+ · AP${b.plan.ap} · ≈${exp.toFixed(1)} damage`;
+        return ok(
+          `${melee ? "⚔ Fight" : "🎯 Shoot"} with ${w.name}: ${b.plan.attackers.length} model${b.plan.attackers.length > 1 ? "s" : ""}, ${dice} dice hitting on ${b.plan.hitOn}+ · AP${b.plan.ap} · ≈${exp.toFixed(1)} damage`,
+          "target",
+        );
+      }
+      if (hp && !hit && !melee && s.phase === "assault") {
+        const adv = actionProblem(s, sel.uid, { kind: "advance" });
+        if (this.mode.kind === "auto") return adv ? bad(adv) : null;
       }
       return null;
     }
@@ -1065,79 +1256,149 @@ export class Controller {
     if (mode.kind === "charge") {
       const mv = effectiveMove(s, sel);
       view.moveRing = { center: leader.pos, radius: mv + r };
-      for (const e of onBoard(s, AI))
-        view.targets.push({ uid: e.uid, ok: unitGap(sel, e) <= mv + 1 });
+      for (const c of actionTargets(s, sel.uid, { kind: "charge" })) view.targets.push({ uid: c.uid, ok: !c.problem });
+      if (own) return ownCue();
       if (hit && hit.unit.owner !== HUMAN) {
+        const why = commandProblem(s, { type: "charge", uid: sel.uid, target: hit.unit.uid });
+        // In auto mode, a target nobody can shoot or charge: say why it can't be shot as well.
+        if (why) return bad(this.mode.kind === "auto" ? `${why} (and ${this.shootReason(sel, hit.unit)})` : why);
         const plan = planCharge(s, sel, hit.unit);
-        if (typeof plan === "string") return plan;
-        view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r }));
-        return `Charge ${profileOf(hit.unit).name} (${plan.leaderDistance.toFixed(1)}"). Chargers get +1 die per model in combat.`;
+        if (typeof plan !== "string") view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r }));
+        return ok(
+          `💥 Charge ${profileOf(hit.unit).name}${typeof plan === "string" ? "" : ` (${plan.leaderDistance.toFixed(1)}")`}. Chargers get +1 die per model in combat.`,
+          "target",
+        );
       }
-      return `Click an enemy within ${mv}" to charge`;
+      const pre = actionProblem(s, sel.uid, { kind: "charge" });
+      return pre ? bad(pre) : info(`Click a marked enemy within ${mv}" to charge`);
     }
 
     if (mode.kind === "ability") {
       const def = ABILITIES[mode.id];
-      if (def.needs === "enemyUnit") {
-        const range = def.range ?? 0;
-        view.moveRing = { center: leader.pos, radius: range + r };
-        for (const e of onBoard(s, AI)) view.targets.push({ uid: e.uid, ok: unitGap(sel, e) <= range });
-        return hit && hit.unit.owner !== HUMAN ? `${def.name}: ${profileOf(hit.unit).name}` : `${def.name}: click an enemy unit within ${range}"`;
+      const pre = actionProblem(s, sel.uid, { kind: "ability", id: mode.id });
+      if (pre) return bad(`${def.name}: ${pre}`);
+      if (def.needs === "enemyUnit" || def.needs === "friendlyUnit") {
+        const checks = actionTargets(s, sel.uid, { kind: "ability", id: mode.id });
+        if (def.needs === "enemyUnit") {
+          view.moveRing = { center: leader.pos, radius: (def.range ?? 0) + r };
+          view.targets = checks.map((c) => ({ uid: c.uid, ok: !c.problem }));
+        } else view.friendlyMarks = checks.filter((c) => !c.problem).map((c) => c.uid);
+        if (hit) {
+          const wantEnemy = def.needs === "enemyUnit";
+          if ((hit.unit.owner !== HUMAN) !== wantEnemy) return bad(`${def.name}: pick ${wantEnemy ? "an enemy unit" : "a friendly unit"}`);
+          const p = checks.find((c) => c.uid === hit.unit.uid)?.problem ?? null;
+          return p ? bad(`${def.name}: ${p}`) : ok(`${def.name}: ${profileOf(hit.unit).name}`, wantEnemy ? "target" : "go");
+        }
+        return info(`${def.name}: click ${def.needs === "enemyUnit" ? "a marked enemy" : "a marked friendly unit"}${def.range ? ` within ${def.range}"` : ""}`);
       }
-      if (
-        def.needs === "friendlyUnit" ||
-        (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget)
-      ) {
-        view.friendlyMarks = onBoard(s, HUMAN)
-          .filter((f) =>
-            mode.id === "recall"
-              ? f.uid !== sel.uid && unitGap(sel, f) <= (def.range ?? 12)
-              : f.uid === sel.uid || unitGap(sel, f) <= (def.range ?? 3),
-          )
-          .map((f) => f.uid);
-        return def.needs === "friendlyUnit"
-          ? `${def.name}: click a friendly unit`
-          : `${def.name}: click a friendly unit to bring over`;
+      if (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget) {
+        const friends = onBoard(s, HUMAN).filter((f) => f.uid !== sel.uid);
+        view.friendlyMarks = friends.filter((f) => !abilityUnitProblem(s, sel, mode.id, f)).map((f) => f.uid);
+        if (hit) {
+          if (hit.unit.owner !== HUMAN) return bad(`${def.name}: pick a friendly unit`);
+          if (hit.unit.uid === sel.uid) return bad(`${def.name}: pick another friendly unit`);
+          const p = abilityUnitProblem(s, sel, mode.id, hit.unit);
+          return p ? bad(`${def.name}: ${p}`) : ok(`${def.name}: bring ${profileOf(hit.unit).name} over`, "pointer");
+        }
+        return info(`${def.name}: click a marked friendly unit to bring over`);
       }
-      if (mode.id === "barrage") {
-        if (this.hover) view.blast = { center: this.hover, radius: 2 };
-        view.moveRing = { center: leader.pos, radius: def.range ?? 24 };
-        return "Barrage: hits every ground model under the blast, yours too";
-      }
-      const mover =
-        mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget)! : sel;
+      // Spot-picking abilities: Barrage, Blink, Tunnel, Rocket Hop, and Recall's second click.
+      const mover = mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget) ?? sel : sel;
+      if (mode.id === "barrage") view.moveRing = { center: leader.pos, radius: def.range ?? 24 };
       if (mode.id === "blink" || mode.id === "rocket-hop") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
       if (mode.id === "recall") view.moveRing = { center: leader.pos, radius: 4 + r };
-      if (this.hover && !hit) {
-        const mr = profileOf(mover).baseRadius;
-        const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, this.hover, {
-          allowance: 0,
-          teleport: true,
-        });
-        if (typeof plan === "string") {
-          view.ghosts = [{ pos: this.hover, radius: mr }];
-          view.ghostOk = false;
-          return plan;
-        }
-        view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: mr, cover: coverRating(s, mover, p.pos, p.elevation) }));
-        return `${def.name}: click to teleport here`;
+      if (!hp) return info(def.text);
+      if (hit && mode.id !== "barrage") return bad(`${def.name}: pick open ground`);
+      const why = commandProblem(s, { type: "ability", uid: sel.uid, ability: mode.id, point: hp, target: this.abilityTarget ?? undefined });
+      if (mode.id === "barrage") {
+        view.blast = { center: hp, radius: 2 };
+        return why ? bad(`${def.name}: ${why}`) : ok("Barrage: hits every ground model under the blast, yours too", "target");
       }
-      return def.text;
+      const mr = profileOf(mover).baseRadius;
+      const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, hp, { allowance: 0, teleport: true });
+      view.ghosts = typeof plan === "string" ? [{ pos: hp, radius: mr }] : plan.placements.map((p) => ({ pos: p.pos, radius: mr, cover: why ? undefined : coverRating(s, mover, p.pos, p.elevation) }));
+      view.ghostOk = !why;
+      return why ? bad(`${def.name}: ${why}`) : ok(`${def.name}: click to go here`);
+    }
+    if (mode.kind === "none") {
+      if (own) return ownCue();
+      if (hit && s.phase === "movement") return bad("Enemies are attacked in the assault phase");
+      if (hp && !hit && s.phase === "assault") {
+        const adv = actionProblem(s, sel.uid, { kind: "advance" });
+        if (adv) return bad(adv);
+      }
     }
     return null;
   }
 
-  private renderTooltip(text: string | null): void {
-    if (!text || !this.hover) {
+  /** Why `a` can't shoot `t` with any ranged weapon (for the auto-order tip). */
+  private shootReason(a: Unit, t: Unit): string {
+    const b = this.bestWeapon(a, t, false);
+    return typeof b === "string" ? b.charAt(0).toLowerCase() + b.slice(1) : "it can be shot";
+  }
+
+  private renderTooltip(cue: Cue | null): void {
+    if (!cue || !cue.text || !this.hover) {
       this.tooltip.style.display = "none";
       return;
     }
     const sp = this.renderer.toScreen(this.hover);
     this.tooltip.style.display = "block";
-    this.tooltip.innerText = text;
+    this.tooltip.className = `tooltip cue-${cue.tone}`;
+    const glyph = toneGlyph(cue.tone);
+    this.tooltip.innerHTML = `${glyph ? `<b class="cue-glyph" aria-hidden="true">${glyph}</b>` : ""}<span>${esc(cue.text)}</span>`;
     const maxX = this.els.stage.clientWidth - 270;
-    this.tooltip.style.left = `${Math.max(4, Math.min(maxX, sp.x + 18))}px`;
-    this.tooltip.style.top = `${sp.y + 18}px`;
+    this.tooltip.style.left = `${Math.max(4, Math.min(maxX, sp.x + 20))}px`;
+    this.tooltip.style.top = `${sp.y + 20}px`;
+  }
+
+  // ---------- attack markers ----------
+
+  /** The attack marker to draw now, from the current state (falling back to the states around the action). */
+  private currentMark(): AttackMarkView | null {
+    const m = this.mark;
+    if (!m) return null;
+    return markFor([this.state, ...m.states], m.uid, m.target, m.kind, m.owner);
+  }
+
+  /** Show who is attacking whom (and with what) until `clearMark`. */
+  private declare(uid: string, target: string, kind: AttackKind, weapon: string, states: GameState[], owner?: number): void {
+    this.mark = { uid, target, kind, weapon, states, owner, at: performance.now() };
+    this.refresh();
+  }
+
+  private clearMark(): void {
+    if (!this.mark) return;
+    this.mark = null;
+    this.refresh();
+  }
+
+  /** How long a declared attack sits on screen before its dice roll. */
+  private declareMs(): number {
+    return this.tray.speed === "quick" ? 450 : 750;
+  }
+
+  private renderAttackLabel(): void {
+    const m = this.mark;
+    const view = m ? this.currentMark() : null;
+    if (!m || !view) {
+      this.markEl.hidden = true;
+      return;
+    }
+    const ends = arrowEnds(view.from, view.to);
+    const at = ends ? { x: (ends.a.x + ends.b.x) / 2, y: (ends.a.y + ends.b.y) / 2 } : centroid(view.to);
+    const sp = this.renderer.toScreen(at);
+    const side = (m.owner ?? markSide([this.state, ...m.states], m.uid)) === HUMAN ? "p0" : "p1";
+    const names = m.uid ? `${unitName(this.state, m.uid)} → ${unitName(this.state, m.target)}` : `→ ${unitName(this.state, m.target)}`;
+    const html = `<b>${esc(attackLabel(m.kind, m.weapon))}</b><span>${esc(names)}</span>`;
+    setHTML(this.markEl, html);
+    this.markEl.className = `attack-label ${side}`;
+    this.markEl.hidden = false;
+    const w = this.markEl.offsetWidth;
+    const h = this.markEl.offsetHeight;
+    const stage = this.els.stage;
+    this.markEl.style.left = `${Math.max(6, Math.min(stage.clientWidth - w - 6, sp.x - w / 2))}px`;
+    this.markEl.style.top = `${Math.max(6, Math.min(stage.clientHeight - h - 6, sp.y - h - 14))}px`;
   }
 
   private renderTopbar(): void {
@@ -1171,6 +1432,7 @@ export class Controller {
       <span class="score">
         <span class="chip p0 ${s.activePlayer === HUMAN && !s.over ? "active" : ""}">You ${s.players[0].vp}</span>
         <span class="chip p1 ${s.activePlayer === AI && !s.over ? "active" : ""}">AI ${s.players[1].vp}</span>
+        <small class="mercy" title="A lead of more than ${mercyLead(s)} VP wins the game on the spot">lead by ${mercyLead(s) + 1}+ VP wins</small>
       </span>
       <span class="status">${esc(status)}</span>
       <span class="spacer"></span>
@@ -1199,8 +1461,9 @@ export class Controller {
     const el = this.els.sidebar.querySelector("#army")!;
     const me = s.players[HUMAN];
     const ai = s.players[AI];
-    const canDeploy = this.humanTurn() && s.phase === "movement";
-    const rows = reserveRowsHtml(s, HUMAN, canDeploy, this.deployUid);
+    const why = (u: Unit): string | null =>
+      this.humanTurn() ? actionProblem(s, u.uid, { kind: "deploy" }) : s.over ? "The game is over" : "Wait for your turn";
+    const rows = reserveRowsHtml(s, HUMAN, why, this.deployUid);
     const changed = setHTML(
       el,
       `
@@ -1236,19 +1499,19 @@ export class Controller {
       u.onBoard && isEngaged(s, u) && "engaged",
       u.status.hunkered && "hunkered",
       u.status.charged && "charged",
-      u.status.disengaged && "disengaged",
+      u.status.disengaged && "😮‍💨 exhausted (disengaged)",
       u.status.slowedRounds > 0 && "slowed",
       u.status.shaken && "😱 shaken",
       !u.onBoard && "in reserve",
     ].filter(Boolean);
-    const canRally =
-      u.status.shaken && u.owner === HUMAN && this.humanTurn() && s.players[HUMAN].cp >= RALLY_CP;
+    const rallyWhy = u.status.shaken && u.owner === HUMAN && this.humanTurn() ? commandProblem(s, { type: "rally", player: HUMAN as 0, target: u.uid }) : "no";
+    const canRally = rallyWhy === null;
     const fearless = !!p.structure || p.keywords.includes("fearless");
     const changed = setHTML(
       el,
       `
       <h3>${esc(p.name)} <span class="chip ${u.owner === HUMAN ? "p0" : "p1"}" style="font-size:.75rem">${u.owner === HUMAN ? "You" : "AI"}</span></h3>
-      <p class="sub">${esc(factionOf(p.faction).name)} · ⚙${p.cost} · ◆${p.supply} · ${alive}/${p.models} models · ${fearless ? "fearless" : `nerve ${p.nerve ?? 7}`} · ${esc(p.blurb)}</p>
+      <p class="sub">${esc(factionOf(p.faction).name)} · ⚙${p.cost} · <span title="Supply: what it counts for on objectives and when disengaging">◆${u.onBoard && currentSupply(u) !== p.supply ? `${currentSupply(u)}/${p.supply}` : p.supply}</span> · ${alive}/${p.models} models · ${fearless ? "fearless" : `nerve ${p.nerve ?? 7}`} · ${esc(p.blurb)}</p>
       <div class="stats">
         <div>${u.onBoard ? effectiveMove(s, u) : p.move}"<small>Move</small></div>
         <div>${p.hp}<small>HP/model</small></div>
@@ -1277,104 +1540,83 @@ export class Controller {
       setHTML(el, `<p class="hint">${s.over ? "The battle is over." : "Waiting for the AI…"}</p>`);
       return;
     }
-    const passBtn = "";
     if (!sel) {
       const n = eligibleUnits(s, HUMAN).length;
       const hint =
         this.mode.kind === "deploy"
-          ? "Click inside your shaded zone to place the unit. The rest of the squad forms up around that spot."
+          ? "Move over your shaded zone: a green ✓ shows where the unit fits, a red ✕ says why not. Click to place it."
           : n
             ? `${n} unit${n > 1 ? "s" : ""} can still act this phase. Click one to activate it.`
             : s.phase === "movement" && reserves(s, HUMAN).some((u) => !canAffordDeploy(s, u))
               ? "Deploy from your reserves, or pass."
               : "Nothing left to activate. Pass to move on.";
-      if (setHTML(el, `<p class="hint" style="margin:0">${hint}</p>${passBtn}`))
-        this.bindActions(el, undefined);
+      if (setHTML(el, `<p class="hint" style="margin:0">${hint}</p>`)) this.bindActions(el, undefined);
       return;
     }
     const p = profileOf(sel);
-    const btn = (act: string, label: string, on: boolean, extra = "", disabled = false) =>
-      `<button data-act="${act}" ${extra} class="${on ? "selected" : ""}" ${disabled ? "disabled" : ""}>${label}</button>`;
-    const out: string[] = [];
     const m = this.mode;
+    const why = (a: UnitAction) => actionProblem(s, sel.uid, a);
+    const btn = (act: string, label: string, on: boolean, extra: string, problem: string | null, title = "") =>
+      `<button data-act="${act}" ${extra} class="${on ? "selected" : ""}" ${buttonAttrs(problem, title)}>${label}${whyLine(problem)}</button>`;
+    const out: string[] = [];
+    // Engaged in melee: say so up front, and what that leaves.
+    const foes = engagedWith(s, sel);
+    if (foes.length) {
+      const names = foes.map((f) => esc(profileOf(f).name)).join(", ");
+      const left =
+        s.phase === "movement"
+          ? `It can only disengage (${esc(disengageText(s, sel))}) or hunker.`
+          : s.phase === "assault"
+            ? "It can only shoot the unit it's fighting, or wait for combat."
+            : "It fights this phase.";
+      out.push(`<div class="engaged-note" role="status">⚔ <b>Engaged</b> with ${names}. ${left}</div>`);
+    } else if (sel.status.disengaged && s.phase !== "combat") {
+      out.push(
+        `<div class="engaged-note exhausted" role="status">😮‍💨 <b>Exhausted</b> from disengaging: it sits out the assault phase${p.keywords.includes("light") ? " (light: it may still shoot)" : ""} and can't charge.</div>`,
+      );
+    }
     const abilityButtons = () =>
       p.abilities
         .filter((a) => ABILITIES[a].kind === "active" && ABILITIES[a].phase === s.phase)
         .map((a) => {
           const def = ABILITIES[a];
-          const left =
-            def.usesPerGame === undefined ? null : def.usesPerGame - (sel.abilityUses[a] ?? 0);
+          const left = def.usesPerGame === undefined ? null : def.usesPerGame - (sel.abilityUses[a] ?? 0);
           return btn(
             "ability",
             `✨ ${def.name}${left !== null ? ` (${left} left)` : ""}${def.cp ? ` · ${def.cp} CP` : ""}`,
             m.kind === "ability" && m.id === a,
             `data-ab="${a}"`,
-            left === 0 || (def.cp ?? 0) > s.players[HUMAN].cp,
+            why({ kind: "ability", id: a }),
+            def.text,
           );
         });
+    const mv = effectiveMove(s, sel);
     if (s.phase === "movement") {
-      out.push(
-        `<p class="hint" style="margin:0">Click a model to make it the leader (★), then click where it should go. The rest follow within 2".</p>`,
-      );
-      if (isEngaged(s, sel))
-        out.push(
-          btn(
-            "disengage",
-            `🏃 Disengage (up to ${effectiveMove(s, sel)}")`,
-            m.kind === "disengage",
-          ),
-        );
-      else out.push(btn("move", `🏃 Move (up to ${effectiveMove(s, sel)}")`, m.kind === "move"));
+      out.push(`<p class="hint" style="margin:0">Click a model to make it the leader (★), then click where it should go. The rest follow within 2".</p>`);
+      out.push(btn("move", `🏃 Move (up to ${mv}")`, m.kind === "move", "", why({ kind: "move" })));
+      const dis = why({ kind: "disengage" });
+      out.push(btn("disengage", `🏃 Disengage (up to ${mv}")${dis ? "" : `<small class="odds">${esc(disengageText(s, sel))}</small>`}`, m.kind === "disengage", "", dis));
       out.push(...abilityButtons());
-      out.push(btn("hunker", "🧱 Hunker down (+1 save vs shots) [H]", false));
-      out.push(btn("hold", "✋ Hold position", false));
+      out.push(btn("hunker", "🧱 Hunker down (+1 save vs shots) [H]", false, "", why({ kind: "hunker" })));
+      out.push(btn("hold", "✋ Hold position", false, "", why({ kind: "hold" })));
     } else if (s.phase === "assault") {
       p.weapons.forEach((w, i) => {
         if (w.melee) return;
-        const blocked = sel.status.disengaged && !p.keywords.includes("light");
-        out.push(
-          btn(
-            "shoot",
-            `🎯 ${esc(w.name)} (${w.range}")`,
-            m.kind === "shoot" && m.weapon === i,
-            `data-w="${i}"`,
-            blocked,
-          ),
-        );
+        out.push(btn("shoot", `🎯 ${esc(w.name)} (${w.range}")`, m.kind === "shoot" && m.weapon === i, `data-w="${i}"`, why({ kind: "shoot", weapon: i })));
       });
-      if (p.weapons.some((w) => w.melee))
-        out.push(
-          btn(
-            "charge",
-            `💥 Charge (up to ${effectiveMove(s, sel)}")`,
-            m.kind === "charge",
-            "",
-            sel.status.disengaged,
-          ),
-        );
-      out.push(
-        btn(
-          "advance",
-          `🏃 Advance (up to ${effectiveMove(s, sel)}")`,
-          m.kind === "advance",
-          "",
-          sel.status.disengaged,
-        ),
-      );
+      if (p.weapons.some((w) => w.melee)) out.push(btn("charge", `💥 Charge (up to ${mv}")`, m.kind === "charge", "", why({ kind: "charge" })));
+      out.push(btn("advance", `🏃 Advance (up to ${mv}")`, m.kind === "advance", "", why({ kind: "advance" })));
       out.push(...abilityButtons());
-      out.push(btn("hunker", "🧱 Hunker down [H]", false));
-      out.push(btn("hold", "✋ Hold", false));
+      out.push(btn("hunker", "🧱 Hunker down [H]", false, "", why({ kind: "hunker" })));
+      out.push(btn("hold", "✋ Hold", false, "", why({ kind: "hold" })));
     } else if (s.phase === "combat") {
       p.weapons.forEach((w, i) => {
-        if (w.melee)
-          out.push(
-            btn("fight", `⚔ ${esc(w.name)}`, m.kind === "fight" && m.weapon === i, `data-w="${i}"`),
-          );
+        if (w.melee) out.push(btn("fight", `⚔ ${esc(w.name)}`, m.kind === "fight" && m.weapon === i, `data-w="${i}"`, why({ kind: "fight", weapon: i })));
       });
       out.push(`<p class="hint" style="margin:0">Click an engaged enemy to fight it.</p>`);
-      out.push(btn("hold", "✋ Don't fight", false));
+      out.push(btn("hold", "✋ Don't fight", false, "", why({ kind: "hold" })));
     }
-    out.push(`<button data-act="cancel" class="secondary">Cancel [Esc]</button>`, passBtn);
+    out.push(`<button data-act="cancel" class="secondary">Cancel [Esc]</button>`);
     if (setHTML(el, out.join("") + `<!--${sel.uid}-->`)) this.bindActions(el, sel);
   }
 
@@ -1415,6 +1657,7 @@ export class Controller {
     if (u.status.shaken) bits.push("😱 Shaken");
     if (u.onBoard && isEngaged(s, u)) bits.push("⚔ engaged");
     if (u.status.hunkered) bits.push("🧱 hunkered");
+    if (u.onBoard && u.status.disengaged && s.phase !== "combat") bits.push("😮‍💨 exhausted: sits out the assault phase");
     if (u.status.slowedRounds > 0) bits.push("🐌 slowed");
     bits.push(...abilityStatusTags(u));
     for (const a of p.abilities) {
@@ -1442,24 +1685,30 @@ export class Controller {
       this.els.stage.appendChild(el);
     }
     const p = profileOf(sel);
-    const cp = s.players[HUMAN].cp;
     const chips: string[] = [];
+    const engaged = isEngaged(s, sel);
+    if (engaged) chips.push(`<span class="co-tag" title="Engaged in melee: ${esc(engagedWith(s, sel).map((f) => profileOf(f).name).join(", "))}">⚔ Engaged</span>`);
+    else if (sel.status.disengaged && s.phase !== "combat") chips.push(`<span class="co-tag exhausted" title="Exhausted from disengaging">😮‍💨 Exhausted</span>`);
     for (const a of p.abilities) {
       const def = ABILITIES[a];
       if (def.kind !== "active" || def.phase !== s.phase) continue;
-      const left = def.usesPerGame === undefined ? null : def.usesPerGame - (sel.abilityUses[a] ?? 0);
       const cost = def.cp ?? 0;
-      const why = left === 0 ? "used up" : cost > cp ? `needs ${cost} CP` : "";
+      const why = actionProblem(s, sel.uid, { kind: "ability", id: a });
       chips.push(
-        `<button data-co="ability" data-ab="${a}" ${why ? "disabled" : ""} title="${esc(def.text)}">✨ ${esc(def.name)}${cost ? ` <small>${cost} CP</small>` : ""}${why ? ` <small>(${why})</small>` : ""}</button>`,
+        `<button data-co="ability" data-ab="${a}" ${buttonAttrs(why, def.text)}>✨ ${esc(def.name)}${cost ? ` <small>${cost} CP</small>` : ""}${why ? ` <small class="why">⛔ ${esc(why)}</small>` : ""}</button>`,
       );
     }
-    if (sel.status.shaken) chips.push(`<button data-co="rally" ${cp >= RALLY_CP ? "" : "disabled"}>📣 Rally <small>${RALLY_CP} CP</small></button>`);
-    if (s.phase !== "combat") chips.push(`<button data-co="hunker" class="secondary">🧱 Hunker</button>`);
-    chips.push(`<button data-co="hold" class="secondary">✋ ${s.phase === "combat" ? "Don't fight" : "Hold"}</button>`);
+    if (sel.status.shaken) {
+      const why = commandProblem(s, { type: "rally", player: HUMAN as 0, target: sel.uid });
+      chips.push(`<button data-co="rally" ${buttonAttrs(why)}>📣 Rally <small>${RALLY_CP} CP</small></button>`);
+    }
+    if (s.phase !== "combat") chips.push(`<button data-co="hunker" class="secondary" ${buttonAttrs(actionProblem(s, sel.uid, { kind: "hunker" }))}>🧱 Hunker</button>`);
+    chips.push(`<button data-co="hold" class="secondary" ${buttonAttrs(actionProblem(s, sel.uid, { kind: "hold" }))}>✋ ${s.phase === "combat" ? "Don't fight" : "Hold"}</button>`);
     const hint =
       s.phase === "movement"
-        ? "Point at ground to move"
+        ? engaged
+          ? "Point at open ground to disengage"
+          : "Point at ground to move"
         : s.phase === "assault"
           ? "Point at an enemy to shoot or charge, or at ground to advance"
           : "Point at an engaged enemy to fight";
@@ -1537,35 +1786,51 @@ export class Controller {
     (row.firstElementChild as HTMLButtonElement | null)?.focus({ preventScroll: true });
   }
 
-  /** Pop-up menu of reserves at a spot in your deployment zone. */
-  private openDeployMenu(p: Vec, units: Unit[], drop?: { title: string; pick: (u: Unit) => void }): void {
+  /**
+   * Pop-up menu of units to deploy (or drop in) at a spot. Each choice is checked with the reducer
+   * at that exact spot: the ones that would work are enabled, the rest are greyed out with the reason.
+   */
+  private openDeployMenu(p: Vec, units: Unit[], drop?: { title: string; cmd: (u: Unit) => Command }): void {
     const s = this.state;
     const menu = document.createElement("div");
     menu.className = units.length > 5 ? "deploy-menu wide" : "deploy-menu";
     const title = document.createElement("h4");
     title.textContent = drop?.title ?? deployMenuTitle(s);
     menu.appendChild(title);
-    for (const u of units) {
+    const rows = units.map((u) => {
+      const cmd: Command = drop ? drop.cmd(u) : { type: "deploy", uid: u.uid, to: p };
+      return { u, cmd, why: commandProblem(s, cmd) };
+    });
+    for (const { u, cmd, why } of rows) {
       const prof = profileOf(u);
-      const why =
-        canAffordDeploy(s, u) ??
-        (drop ? null : deployZones(s, u).some((poly) => pointInZone(p, poly)) ? null : "Not in this unit's deployment area");
       const b = document.createElement("button");
       b.type = "button";
       b.className = "secondary";
       b.disabled = !!why;
-      b.title = why ?? prof.blurb;
+      if (why) b.setAttribute("aria-disabled", "true");
+      b.title = why ? `Can't: ${why}` : prof.blurb;
       const name = document.createElement("span");
-      name.textContent = prof.name;
+      name.textContent = `${why ? "" : "✓ "}${prof.name}`;
       const cost = document.createElement("small");
-      cost.textContent = deployMenuDetail(s, u, why);
+      cost.textContent = deployMenuDetail(s, u, null);
       b.append(name, cost);
+      if (why) {
+        const line = document.createElement("small");
+        line.className = "why";
+        line.textContent = `⛔ ${why}`;
+        b.append(line);
+      }
       b.addEventListener("click", () => {
         this.closeDeployMenu();
-        if (drop) drop.pick(u);
-        else this.issue({ type: "deploy", uid: u.uid, to: p });
+        this.issue(cmd);
       });
       menu.appendChild(b);
+    }
+    if (!rows.some((r) => !r.why)) {
+      const none = document.createElement("p");
+      none.className = "hint";
+      none.textContent = "Nothing can go here right now.";
+      menu.appendChild(none);
     }
     const sp = this.renderer.toScreen(p);
     const stage = this.els.stage;
@@ -1576,6 +1841,7 @@ export class Controller {
     menu.style.left = `${Math.max(6, Math.min(stage.clientWidth - w - 6, sp.x + 10))}px`;
     menu.style.top = `${Math.max(6, Math.min(stage.clientHeight - h - 6, sp.y - h / 2))}px`;
     this.deployMenu = menu;
+    this.refresh();
     (menu.querySelector("button:not([disabled])") as HTMLButtonElement | null)?.focus({ preventScroll: true });
   }
 
@@ -1735,6 +2001,7 @@ export function showRules(): void {
         <li><b>Unit abilities</b> are free actions during that unit's activation (one per phase): Blink then move, Recall then shoot. Some cost CP from the same pool as supports.</li>
       </ul>
       <p class="hint">Keys: Esc cancels, H hunkers, P passes the rest of the phase, M measures, Ctrl+Z undoes. Hover enemies with a unit selected to see the odds.</p>
+      <p class="hint">The pointer tells you what a click will do: a green ✓, crosshair or + means it works, a red no-entry sign means it won't, and the tip next to it says why. Greyed-out buttons say why they're off. Before any attack's dice, the board marks the attacker, the target and the weapon.</p>
       <button id="rules-close">Got it</button>
     </div>`;
   overlay.classList.add("show");

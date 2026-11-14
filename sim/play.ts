@@ -6,6 +6,7 @@ import { aiCommand } from "../src/engine/ai";
 import { defaultListFor } from "../src/engine/data/factions";
 import { applyCommand, createGame } from "../src/engine/game";
 import { MISSIONS } from "../src/engine/data/missions";
+import { MERCY_LEAD } from "../src/engine/constants";
 import { isFlying, profileOf } from "../src/engine/profile";
 import { aliveModels, presenceController } from "../src/engine/rules";
 import type { FactionId, GameState, ListEntry } from "../src/engine/types";
@@ -40,6 +41,12 @@ export interface GameResult {
   totalMs: number;
   stalled: boolean;
   wipeout: boolean;
+  /** The game ended early on the instant-win lead (more than the mission's `mercyLead` VP ahead). */
+  mercy: boolean;
+  /** The mission's instant-win lead limit. */
+  mercyLimit: number;
+  /** The biggest VP lead each side held at any point (to see what comebacks happen). */
+  peakLead: [number, number];
   round: number;
   /** VP by scoring reason, per player. */
   vpBy: [Record<string, number>, Record<string, number>];
@@ -119,6 +126,8 @@ export function playGame(job: Job): GameResult {
   let maxMs = 0;
   let totalMs = 0;
   let wipeout = false;
+  let mercy = false;
+  const peakLead: [number, number] = [0, 0];
   let error: string | undefined;
   while (!s.over && n++ < MAX_CMDS) {
     const t0 = performance.now();
@@ -149,8 +158,12 @@ export function playGame(job: Job): GameResult {
       } else if (e.type === "roundEnded") {
         creditHolders(s, stat);
       } else if (e.type === "gameOver" && e.reason.includes("wiped")) wipeout = true;
+      else if (e.type === "gameOver" && e.reason.includes("lead")) mercy = true;
     }
     s = r.state;
+    const lead = s.players[0].vp - s.players[1].vp;
+    peakLead[0] = Math.max(peakLead[0], lead);
+    peakLead[1] = Math.max(peakLead[1], -lead);
   }
   const destroyedSupply: [number, number] = [0, 0];
   for (const u of s.units) {
@@ -172,6 +185,9 @@ export function playGame(job: Job): GameResult {
     totalMs,
     stalled: !s.over && !error,
     wipeout,
+    mercy,
+    mercyLimit: MISSIONS[missionId]?.mercyLead ?? MERCY_LEAD,
+    peakLead,
     round: s.round,
     vpBy,
     profiles,

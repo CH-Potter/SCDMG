@@ -96,6 +96,12 @@ export interface MissionDef extends Economy {
   roles?: [RoleDef, RoleDef];
   /** Map tags this mission needs: a map fits only if its `tags` include every one. */
   mapTags?: string[];
+  /**
+   * A side leading by more than this many VP wins on the spot (default `MERCY_LEAD`, 8). Missions with
+   * big late swings (deliveries, escalating crowns, kill points on the big board) set it higher so a
+   * real comeback stays possible; the point is only to spare both players a one-sided slog.
+   */
+  mercyLead?: number;
 }
 
 /** Resources a side gets per garrison structure its faction can't field. */
@@ -137,6 +143,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Scrapyard Brawl",
     blurb: "A short, bloody one. Score 1 VP per enemy supply destroyed, plus 1 VP per neutral objective held each round.",
     rounds: 4,
+    mercyLead: 10,
     startResources: 14,
     income: 5,
     startSupply: 8,
@@ -153,6 +160,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Swipe the Snack",
     blurb: "Each side has a snack on its home objective. Grab theirs: +1 VP each round you hold it, and 4 VP when you get it back to your deployment zone or home objective. Neutral objectives score 1 VP each from round 3.",
     rounds: 6,
+    mercyLead: 10,
     startResources: 10,
     income: 4,
     startSupply: 6,
@@ -169,6 +177,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Top of the Heap",
     blurb: "The middle objective is the heap. Hold it at the end of a round for 1 VP, then 2, 3 and 4 VP for each round in a row you keep it. Lose it and the count starts again. Other neutral objectives score 1 VP each from round 1.",
     rounds: 5,
+    mercyLead: 10,
     startResources: 10,
     income: 5,
     startSupply: 6,
@@ -195,6 +204,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Frontline",
     blurb: "Hold the line across a long battlefield. Objectives stay yours until taken: 1 VP per neutral objective each round, 4 VP for their home objective.",
     rounds: 6,
+    mercyLead: 10,
     startResources: 16,
     income: 8,
     startSupply: 10,
@@ -208,6 +218,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "The Great Snack Heist",
     blurb: "Their snack is a long way off. Steal it: +1 VP each round you hold it, and 5 VP when you get it back to your deployment zone or home objective. Neutral objectives score 1 VP each from round 3.",
     rounds: 7,
+    mercyLead: 12,
     startResources: 16,
     income: 7,
     startSupply: 10,
@@ -224,6 +235,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Scrapheap Showdown",
     blurb: "Everyone arrives fast and angry. 1 VP per enemy supply destroyed, plus 1 VP per neutral objective held each round.",
     rounds: 5,
+    mercyLead: 12,
     startResources: 24,
     income: 8,
     startSupply: 14,
@@ -240,6 +252,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Shifting Ground",
     blurb: "One neutral objective is live each round and scores 3 VP for whoever holds it; the next one is rolled and announced a round ahead. Every other neutral objective scores 1 VP.",
     rounds: 6,
+    mercyLead: 12,
     startResources: 16,
     income: 8,
     startSupply: 10,
@@ -253,6 +266,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Most Wanted",
     blurb: "From the end of round 1, each side's priciest unit on the board is marked each round. Destroy theirs before the next scoring phase for 3 VP. Neutral objectives score 1 VP each round.",
     rounds: 6,
+    mercyLead: 10,
     startResources: 18,
     income: 8,
     startSupply: 12,
@@ -269,6 +283,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Claim-Jump Siege",
     blurb: "Side A digs in around its stronghold with a free emplacement and fewer resources; side B brings a bigger war chest to break them. Both sides score 1 VP per neutral objective held from round 2.",
     rounds: 5,
+    mercyLead: 10,
     startResources: 10,
     income: 5,
     startSupply: 6,
@@ -330,6 +345,7 @@ export const MISSIONS: Record<string, MissionDef> = {
     name: "Strongbox Run",
     blurb: "Side A must haul a strongbox off the furthest neutral objective back to its home objective or deployment zone. Side B raids the objectives along the way.",
     rounds: 6,
+    mercyLead: 12,
     startResources: 16,
     income: 8,
     startSupply: 10,

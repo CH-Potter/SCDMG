@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { canReach, holderValue } from "../src/engine/ai";
 import { createGame } from "../src/engine/game";
 import { profileOf } from "../src/engine/profile";
-import { unitById } from "../src/engine/rules";
+import { currentSupply, supplyFor, unitById } from "../src/engine/rules";
 import type { GameState, ListEntry, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
 
@@ -50,6 +50,11 @@ describe("AI objective sense", () => {
     expect(holderValue(s, holder, 100)).toBe(0); // nobody of ours there: it stays theirs
     place(s, "p0-0", { x: o.pos.x + 1.5, y: o.pos.y });
     expect(grunts.onBoard).toBe(true);
+    // Our grunts match the holder's supply (a tie: the objective stays theirs) until the holder goes.
+    const gp = profileOf(grunts);
+    const keep = Array.from({ length: gp.models }, (_, i) => gp.models - i).find((k) => supplyFor(gp, k) === currentSupply(holder))!;
+    grunts.models.slice(keep).forEach((m) => (m.alive = false));
+    expect(currentSupply(grunts)).toBe(currentSupply(holder));
     expect(holderValue(s, holder, 100)).toBeGreaterThan(0); // our grunts would take it
   });
 

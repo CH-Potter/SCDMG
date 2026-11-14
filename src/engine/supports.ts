@@ -351,7 +351,7 @@ export function playSupport(s: GameState, cmd: Extract<Command, { type: "support
       }
       const sp = profileFor(e.profileId, []);
       if (sp.abilities.includes("burrow-exit") && nearEnemyHome(s, cmd.player, p)) {
-        return `Can't open a Burrow Hole within ${HOME_EXCLUSION}" of the enemy's home objective`;
+        return `Can't open a Gopher Hole within ${HOME_EXCLUSION}" of the enemy's home objective`;
       }
       const made = summon(s, cmd.player, e.profileId, p);
       if (typeof made === "string") return made;

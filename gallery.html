@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SCDMG miniature gallery (dev)</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        font: 14px/1.4 system-ui, sans-serif;
+        background: #2b2620;
+        color: #eee6d8;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 10px 16px;
+        background: #1d1915;
+      }
+      header a,
+      header button {
+        color: inherit;
+        background: #3a332b;
+        border: 1px solid #5a4f42;
+        border-radius: 6px;
+        padding: 4px 10px;
+        text-decoration: none;
+        cursor: pointer;
+        font: inherit;
+      }
+      header a[aria-current="true"] {
+        background: #6b5a3c;
+      }
+      section {
+        padding: 8px 16px 24px;
+      }
+      h2 {
+        margin: 16px 0 4px;
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+        padding: 10px 0;
+        border-bottom: 1px solid #3a332b;
+        overflow-x: auto;
+      }
+      .row .name {
+        width: 190px;
+        flex: none;
+      }
+      .row .name small {
+        display: block;
+        opacity: 0.6;
+      }
+      .ground {
+        background: var(--ground, #7a6a4e);
+        border-radius: 8px;
+        padding: 4px;
+        flex: none;
+      }
+      .ground canvas,
+      .ground img {
+        display: block;
+      }
+      .mirror {
+        transform: scaleX(-1);
+      }
+      .board {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+        align-items: flex-end;
+      }
+    </style>
+  </head>
+  <body>
+    <header id="bar"></header>
+    <main id="out"></main>
+    <script type="module" src="/src/gallery.ts"></script>
+  </body>
+</html>

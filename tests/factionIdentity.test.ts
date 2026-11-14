@@ -141,7 +141,7 @@ describe("faction pillars in the data", () => {
     const hole = supportOf("munch-tunnels").abilities[0]!.effect;
     expect(hole.kind).toBe("summon");
     if (hole.kind !== "summon") return;
-    // Temporary: the Burrow Hole. Permanent: the Warren Mound, bought in the list.
+    // Temporary: the Gopher Hole. Permanent: the Sett Lab, bought in the list.
     expect(profileFor(hole.profileId, []).structure?.lifetime).toBe("round");
     const warren = profileFor("munch-warren", []);
     expect(warren.structure?.lifetime).toBe("permanent");
@@ -200,7 +200,7 @@ describe("faction buffs", () => {
     const nibs = place(s, "p0-0", { x: 10, y: 26 });
     place(s, "p0-1", { x: 10, y: 29.5 });
     place(s, "p1-0", { x: 28, y: 4 });
-    for (const m of nibs.models.slice(0, 4)) m.alive = false;
+    for (const m of nibs.models.slice(2)) m.alive = false; // two left, whatever the pack size
     s = ok(applyCommand(s, { type: "support", player: 0, support: "munch-burrows", ability: "cough-up", target: nibs.uid }));
     expect(aliveModels(unitById(s, nibs.uid)!).length).toBe(4);
     Object.assign(s, { phase: "movement" });
@@ -209,7 +209,7 @@ describe("faction buffs", () => {
     expect(aliveModels(unitById(s, nibs.uid)!).every((m) => m.hp === 1)).toBe(true);
   });
 
-  it("Munch Gobble Pit lurks for the round and bites whoever walks up to it", () => {
+  it("Munch Trapdoor Pit lurks for the round and bites whoever walks up to it", () => {
     let s = game([L("munch-nibblers"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-burrows"], []] });
     place(s, "p0-0", { x: 4, y: 26 });
     place(s, "p1-0", { x: 10, y: 8 });

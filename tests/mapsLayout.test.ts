@@ -121,7 +121,7 @@ describe("map access points", () => {
 });
 
 /**
- * Channels and choke points must not seal anyone in: the biggest heavy base (Big Mama Chomp, 1.4",
+ * Channels and choke points must not seal anyone in: the biggest heavy base (Dr. Graft and Big Mama, 1.4",
  * can't climb ladders) can walk from every spawn zone to every objective, up a ramp where needed.
  */
 describe("main routes fit the biggest base", () => {
