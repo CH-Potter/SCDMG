@@ -1,5 +1,6 @@
 // Human-readable text for units, weapons and events.
 
+import { BLAST_SQUAD } from "../engine/constants";
 import { ABILITIES } from "../engine/data/abilities";
 import { profileOf } from "../engine/profile";
 import { unitById } from "../engine/rules";
@@ -23,7 +24,7 @@ export const KEYWORD_TEXT: Record<Keyword, string> = {
 };
 
 export const TRAIT_TEXT: Record<WeaponTrait, string> = {
-  blast: "blast (+1 die/model vs 5+ models)",
+  blast: `blast (+1 die/model vs ${BLAST_SQUAD}+ models)`,
   torrent: "torrent (auto-hits)",
   heavy: "heavy (hits worse after moving)",
   rending: "rending (6s get +1 AP)",

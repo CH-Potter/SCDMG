@@ -90,6 +90,9 @@ export function supplyFor(p: UnitProfile, alive: number): number {
 /** A unit's supply right now, from its surviving models (see `supplyFor`). */
 export const currentSupply = (u: Unit): number => supplyFor(profileOf(u), aliveModels(u).length);
 
+/** Supply a unit has lost so far: its full supply minus what its survivors are worth. */
+export const supplyLost = (u: Unit): number => profileOf(u).supply - currentSupply(u);
+
 /** How much a unit counts towards holding an objective: its current supply. */
 export const controlWeight = currentSupply;
 

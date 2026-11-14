@@ -12,7 +12,7 @@ export type ScoringRule =
   | { kind: "raidHome"; vp: number; target?: ObjectiveTarget }
   /** Objectives stay yours once taken; VP per owned objective each round. */
   | { kind: "sticky"; vpNeutral: number; vpEnemyHome: number }
-  /** VP equal to destroyed enemy supply times this (scored the moment a unit dies; shared rules only). */
+  /** VP equal to enemy supply lost times this, paid the moment a unit's current supply drops (shared rules only). */
   | { kind: "eliminate"; vpPerSupply: number }
   /** Carry the enemy flag back to your home objective or deployment zone; `carryVp` per round while you hold it. */
   | { kind: "flag"; vp: number; carryVp?: number }
@@ -43,7 +43,7 @@ export type ScoringRule =
    * (or, with `target: "forward"`, your forward objective: the neutral objective nearest your home).
    */
   | { kind: "guard"; vp: number; fromRound: number; target?: ObjectiveTarget }
-  /** VP per enemy supply destroyed, paid at the end of each round (works in role scoring). */
+  /** VP per enemy supply lost (squads pay as they shrink), paid at the end of each round (works in role scoring). */
   | { kind: "cull"; vpPerSupply: number }
   /**
    * Convoy: your own cargo. `from: "far"` puts it on the neutral objective furthest from your home

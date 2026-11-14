@@ -1,10 +1,11 @@
 // Attack resolution: per-model range/sight, keyword bonuses, wound allocation, saves, reactions.
 
+import { BLAST_SQUAD } from "./constants";
 import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
 import { rollD6 } from "./rng";
-import { aliveModels, AURA_RANGE, ENGAGE_RANGE, isEngaged, meleeCanHit, modelGap, modelsEngage, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
+import { aliveModels, AURA_RANGE, ENGAGE_RANGE, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
 import { consumeReaction } from "./reactions";
 import { hasCover, lineOfSight } from "./terrain";
 import type { AttackReport, EvadeCondition, GameEvent, GameState, Model, Unit, Weapon } from "./types";
@@ -155,7 +156,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     }
     if (any) {
       let dice = w.dice + bonus.dice + a.status.rangedBonus;
-      if (hasTrait(w, "blast") && aliveModels(t).length >= 5) dice += 1;
+      if (hasTrait(w, "blast") && aliveModels(t).length >= BLAST_SQUAD) dice += 1;
       if (hasAbility(a, "steady-aim") && !a.status.moved) dice += 1;
       attackers.push({ model: am, dice: Math.max(1, dice) });
     }
@@ -371,6 +372,7 @@ function killModel(s: GameState, t: Unit, tm: Model, events: GameEvent[], fromPo
   tm.alive = false;
   tm.hp = 0;
   tm.shield = 0;
+  concedeSupply(s, t, events);
   if (hasAbility(t, "pop") && !fromPop) {
     for (const e of onBoard(s)) {
       if (e.owner === t.owner) continue;
@@ -406,13 +408,23 @@ function destroyUnit(s: GameState, t: Unit, last: Model, events: GameEvent[]): v
       events.push({ type: "flag", team: f.team, text: `${profileOf(t).name} drops the snack!` });
     }
   }
-  const mission = MISSIONS[s.missionId]!;
-  for (const rule of mission.scoring) {
-    if (rule.kind === "eliminate") {
-      const enemy = t.owner === 0 ? 1 : 0;
-      const vp = profileOf(t).supply * rule.vpPerSupply;
-      s.players[enemy].vp += vp;
-      events.push({ type: "scored", player: enemy, vp, reason: `destroying ${profileOf(t).name}` });
-    }
+}
+
+/**
+ * Record the supply a unit has just lost and, in missions that pay for kills, give the enemy its VP
+ * at once: a squad pays out bit by bit as its supply drops, not only when its last model dies.
+ */
+function concedeSupply(s: GameState, t: Unit, events: GameEvent[]): void {
+  const lost = supplyLost(t);
+  const paid = t.supplyPaid ?? 0;
+  if (lost <= paid) return;
+  t.supplyPaid = lost;
+  const enemy = t.owner === 0 ? 1 : 0;
+  const gone = !aliveModels(t).length;
+  for (const rule of MISSIONS[s.missionId]!.scoring) {
+    if (rule.kind !== "eliminate") continue;
+    const vp = (lost - paid) * rule.vpPerSupply;
+    s.players[enemy].vp += vp;
+    events.push({ type: "scored", player: enemy, vp, reason: `${gone ? "destroying" : "cutting down"} ${profileOf(t).name}` });
   }
 }

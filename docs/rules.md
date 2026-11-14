@@ -194,7 +194,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 
 | Trait | Effect |
 | --- | --- |
-| blast | +1 die per attacking model against units with 5+ models left |
+| blast | +1 die per attacking model against units with 7+ models left |
 | torrent | hits automatically |
 | heavy | hits one worse if the unit moved this round |
 | rending | natural 6s to hit get +1 AP |
@@ -250,7 +250,7 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
 ## Objectives and missions
 
 - Objectives are **numbered**. Each is either **neutral** or a team's **home** objective.
-- An objective is controlled by the side with more **supply** of non-flying, non-structure, non-Shaken units touching it, at the objective's elevation. A unit counts its **current supply**: its supply shared out across its models and rounded down, so losses shrink it. A 3-supply squad of 6 is worth 2 at four or five models, 1 at two or three, and 0 at its last model. A single-model unit keeps its full supply until it dies. Current supply also decides how cleanly a unit disengages.
+- An objective is controlled by the side with more **supply** of non-flying, non-structure, non-Shaken units touching it, at the objective's elevation. A unit counts its **current supply**: its supply shared out across its models and rounded down, so losses shrink it. A 3-supply squad of 6 is worth 2 at four or five models, 1 at two or three, and 0 at its last model. A single-model unit keeps its full supply until it dies. Current supply also decides how cleanly a unit disengages and what its losses are worth: in missions that score "VP per enemy supply destroyed", each drop in a unit's current supply pays out as it happens (or, for the Raiders, at the next scoring phase), not only when the last model dies. Regrown models don't pay twice.
 
 | Mission | Rounds | Scoring |
 | --- | --- | --- |

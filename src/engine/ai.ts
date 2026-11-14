@@ -354,6 +354,19 @@ export function evaluate(s: GameState, me: PlayerId): number {
 
 // ---------- attack values ----------
 
+/** Models `t` has left after `e` damage (wounds come off whole models). */
+function modelsLeft(t: Unit, e: number): number {
+  const p = profileOf(t);
+  const rem = wounds(t) - e;
+  return rem <= 0.5 ? 0 : Math.min(aliveModels(t).length, Math.ceil(rem / Math.max(1, p.hp + p.shield) - 1e-9));
+}
+
+/** Supply `e` damage would make `t` concede for the first time (the VP it pays in kill missions). */
+function supplyConceded(t: Unit, e: number): number {
+  const p = profileOf(t);
+  return Math.max(0, p.supply - supplyFor(p, modelsLeft(t, e)) - (t.supplyPaid ?? 0));
+}
+
 /** Share of an objective swing credited to the attack that causes it (the enemy can still answer it). */
 const HOLDER = 0.7;
 
@@ -364,10 +377,7 @@ const HOLDER = 0.7;
 export function holderValue(s: GameState, t: Unit, e: number): number {
   const p = profileOf(t);
   if (isFlying(t) || p.structure || t.status.shaken) return 0;
-  const rem = wounds(t) - e;
-  // models left after the damage (wounds come off whole models), and the supply they're worth
-  const left = rem <= 0.5 ? 0 : Math.min(aliveModels(t).length, Math.ceil(rem / Math.max(1, p.hp + p.shield) - 1e-9));
-  const after = supplyFor(p, left);
+  const after = supplyFor(p, modelsLeft(t, e));
   const lost = controlWeight(t) - after;
   if (lost <= 0) return 0;
   const me = other(t.owner);
@@ -398,7 +408,7 @@ function attackValue(s: GameState, t: Unit, exp: number): number {
   if (frac >= 0.85) v += 2;
   const elim = eliminateVp(s, other(t.owner));
   const kill = Math.max(0, Math.min(1, (frac - 0.5) * 2));
-  if (elim) v += prof.supply * elim * VP * kill;
+  if (elim) v += supplyConceded(t, e) * elim * VP;
   const bounty = bountyVp(s, other(t.owner), t);
   if (bounty) v += bounty * VP * (kill * 0.8 + frac * 0.2); // chip damage sets up the kill
   if (onObjective(s, t)) v += 2 * frac + holderValue(s, t, e) * HOLDER;

@@ -67,7 +67,7 @@ export type AbilityId =
 
 /**
  * Weapon traits:
- * - blast: +1 die per attacking model against units with 5+ models left
+ * - blast: +1 die per attacking model against units with 7+ models left (BLAST_SQUAD)
  * - torrent: hits automatically (no hit roll needed)
  * - heavy: hits one worse if the unit has moved this round
  * - rending: natural 6s to hit get +1 AP
@@ -349,6 +349,8 @@ export interface Unit {
   expiresRound?: number;
   /** Created by a summon rather than bought in the list. */
   summoned?: boolean;
+  /** Supply this unit has conceded to the enemy through its losses. It never goes down, so regrown models don't pay out twice. */
+  supplyPaid?: number;
 }
 
 export type TerrainKind =

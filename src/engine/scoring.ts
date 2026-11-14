@@ -64,10 +64,10 @@ export function economyState(s: GameState, p: PlayerId): EconomyState {
   return { income: m.income, supplyPerRound: m.supplyPerRound, maxSupply: m.maxSupply };
 }
 
-/** Supply of `p`'s units destroyed so far (summoned, round-only structures don't count). */
+/** Supply `p`'s units have conceded so far, squads paying as they shrink (summoned, round-only structures don't count). */
 function destroyedSupply(s: GameState, p: PlayerId): number {
   let n = 0;
-  for (const u of s.units) if (u.owner === p && u.destroyed && !u.summoned && profileOf(u).structure?.lifetime !== "round") n += profileOf(u).supply;
+  for (const u of s.units) if (u.owner === p && !u.summoned && profileOf(u).structure?.lifetime !== "round") n += u.destroyed ? profileOf(u).supply : (u.supplyPaid ?? 0);
   return n;
 }
 
