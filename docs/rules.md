@@ -1,6 +1,6 @@
-# SCDMG rules (v0.2)
+# Super Cool Desktop Miniatures Game: rules (v0.4)
 
-This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches, on a 36"×36" table.
+This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
 ## Armies, resources and supply
 
@@ -19,16 +19,26 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 | 3. Combat | Engaged units **Fight** (or decline) |
 | 4. Scoring | Mission VP, then clean-up: shields recharge, Regen/Regrow, income and supply growth |
 
+- **Deploying:** the deploying model must stand in your spawn zone; a spot exactly on the zone's edge counts as inside.
 - In phases 1–3, players **alternate activations**, one unit at a time, starting with the player who has **initiative**.
 - A player with nothing left to do is skipped. **Pass** ends your part of the current phase.
-- Initiative starts on a die roll. After that it goes to the player with fewer VP, and alternates on ties.
-- In the **assault** phase, engaged units, hunkered units and non-light units that disengaged sit out.
+- **Who goes first:** both players roll off at the start, and the winner **chooses** who goes first in round 1. Before each later round, the player with fewer VP chooses; on a VP tie, roll off again and the winner chooses.
+- **Passing early:** in the movement or combat phase, the first player to pass while they still had units to act claims the initiative: they go first in the next phase (the assault phase, or the next round).
+- In the **assault** phase, hunkered units and non-light units that disengaged sit out. Engaged units can only shoot the unit they're fighting (see *Engagement and shooting*).
 - In the **combat** phase, units that **charged** fight first. After that, everyone else alternates.
 
 ## Multi-model units
 
 - To move a unit, pick a **leader** model and move it up to the unit's Move along a legal path.
-- Every other model is placed within **2" coherency** (edge to edge) of the leader, travelling at most Move + 2".
+- The rest of the squad follows and **spreads out like a real squad**, not a block. Each follower travels at most Move + 2".
+  - **Snap to cover:** within about 3" of the leader's spot, followers take free spots in cover: inside scrub, craters or rubble, or tucked behind a barricade on the side away from the enemy. "The enemy" means the nearest few enemy units, or their deployment zone if none are on the table yet.
+  - **In the open**, followers form a loose, slightly staggered skirmish line about 1" apart, facing the enemy.
+  - Followers stay on the leader's side of fences, walls and buildings.
+  - The move preview marks each model's spot with a **green shield** (in cover from every nearby enemy) or a **yellow shield** (from some).
+  - **Charges** don't spread out: chargers pile in around the target.
+  - **Heavy** units and **flyers** never get cover, so they just form the loose line.
+- **Coherency is a chain:** every model must end within **2"** (edge to edge) of at least one other model in the unit, and the whole unit must form one group. Models don't have to be within 2" of the leader.
+- A model cut off by casualties that can't rejoin this move catches up as far as it can.
 - All models in a unit always end on the same elevation.
 - **Range, line of sight, cover and engagement are all checked per model:**
   - Only models with a valid target add their dice.
@@ -57,7 +67,22 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 
 ## Combat
 
-- **Shooting:** each contributing model rolls the weapon's dice. Each die at or above the hit number is a hit.
+Every attack, ranged or melee, runs the same sequence:
+
+1. **Attack dice:** each contributing model rolls the weapon's dice, plus any keyword bonus dice against this target.
+2. **To hit:** each die at or above the hit number (X+) is a hit.
+3. **Precision Y:** move up to Y missed dice into the hits. It comes from the weapon (`precision`) and from buffs.
+4. **Evade:** if the attack matches one of the target's evade situations, the defender rolls one die per hit against its evade number. Each success dodges a hit completely. **Tracking Z** on the attacker's weapon cancels up to Z successful evades.
+5. **Armour:** every hit that wasn't evaded gets a save, as below.
+6. **Damage and morale.**
+
+- **Evade is conditional.** A unit's evade stat lists the situations it works in:
+  - **point-blank:** shots from a unit that is engaged with it;
+  - **ranged:** any shooting;
+  - **melee:** close combat and impact hits;
+  - **blast:** blast weapons and barrages.
+  - Nimble infantry tend to dodge point-blank shots, flyers dodge shooting, and small swarms dodge blasts.
+  - Evade numbers are 2+ to 6+. Buffs and debuffs move it by one for the round.
 - **Saves:** the defender saves on armour + AP, adjusted as follows, with a minimum of 2+. A save worse than 6+ means no save.
   - −1 for cover.
   - −1 for hunkering (−2 with Entrenched).
@@ -66,8 +91,13 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 - **Charge:** the engine routes the closest model into base contact (within 1"), and the rest pile in.
   - Charging models get +1 die each in that round's combat.
   - Only a charge can end in base contact. Normal moves, deploys and teleports can't.
-- **Engaged** units can't move (only disengage), can't shoot, and fight in the combat phase.
+- **Engaged** units can't move (only disengage) and fight in the combat phase.
 - **Disengage:** move out of contact. Afterwards the unit can't charge. Only **light** units may still shoot.
+
+### Engagement and shooting
+- **Shooting into a melee:** an unengaged unit can't shoot at an enemy unit that is engaged with anyone, unless the weapon has **precision 1+** (from the weapon or a buff).
+- **Shooting out of a melee:** an engaged unit can only shoot at a unit it is directly engaged with. It may do so in the assault phase with any ranged weapon.
+- **Point-blank shots** let the target use its point-blank (or ranged) evade. **Pistols** are built for this: point-blank pistol shots can't be evaded.
 
 ## Keywords (rock–paper–scissors, but soft)
 
@@ -82,10 +112,24 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 
 Weapons can carry **bonuses vs keywords** (extra dice, damage or AP). Examples: Chain Popper vs light, Thumper Cannon vs armoured, Flicker Cannon vs flying.
 
+## Factions
+
+Each faction has its own play style: the **Dustline Militia** shoot, the **Munch** swarm into melee, and the **Lumen Concord** field a few elite specialists. Abilities and support effects belong to one faction's style (Overwatch and digging in for the Militia, regrowth and lurking for the Munch, shields, precision and teleporting for the Concord), with a little overlap. See `docs/factions.md` for the pillars.
+
 ## Abilities
+
+**Forward-deploy limits:**
+- **Tunnel** can't be used in round 1.
+- Neither a Tunnel nor a **Burrow Hole** can land within 6" of the enemy's home objective.
+
+**Unit abilities and timing:**
+- Active unit abilities are **free actions within the unit's activation**. In the movement or assault phase a ready unit can use one active ability, then still take its normal action: for example, Blink and then move, or Recall a squad and then shoot.
+- The limit is one ability per unit per phase, within its uses per game.
+- Some abilities burn **CP** from the same pool as supports: Barrage, Blink, Tunnel, Recall Beam. Patch Up is free. So you budget CP between unit abilities and faction supports.
 
 - **Active abilities** use the unit's activation in their phase:
   - Patch Up (heal or revive)
+  - Hatchlings (Snot Nanny: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
   - Barrage (indirect blast; friendly fire happens)
   - Tunnel (pop up anywhere on the ground ≥6" from enemies)
   - Blink (teleport 10", can land on platforms)
@@ -101,23 +145,162 @@ Weapons can carry **bonuses vs keywords** (extra dice, damage or AP). Examples: 
   - Sticky Goo (slows the target)
   - Pop! (bursting critters)
   - Refraction (soaks 1 damage once per round)
+  - Lurk (once per round, lashes out at an enemy ground unit that ends a move, charge, deployment or teleport within 3")
+
+**Added in v0.4:**
+- **Active:**
+  - Reel In (drag an enemy 4" closer)
+  - Rocket Hop (leap 6" over terrain, then still shoot or charge)
+  - Rampage (+1 melee die per model, saves one worse this round)
+  - Spotter (your shots at the target hit one better this round)
+  - Bubble Shield (+1 shield per model on a nearby friend)
+  - Sugar Rush (+2 move this round; the unit takes 1 damage)
+  - Provoke (enemies within 18" must shoot this unit if they can)
+  - Demo Charge (3 dice at 3+ against a ground enemy within 4", extra damage against structures and mechs)
+- **Passive auras:**
+  - Steadying Presence (+1 nerve to friends within 6")
+  - Mending Spores (unhurt friends within 6" heal 1 at the end of the round)
+- **New support effects:**
+  - Airdrop (deploy a reserve unit near your models, away from enemies; a drop-ship version can land anywhere)
+  - Rattle (force a nerve test on an enemy unit, with a penalty)
+
+**Added in the faction identity pass:**
+- Each faction's support buffs now follow its style:
+  - Dig in (Militia, Sandbag Social): a friendly unit gets +1 to saves against shooting and barrages this round, on top of cover and hunkering.
+  - Regrow (Munch, Cough Up): a friendly unit regrows up to 2 lost models at 1 HP.
+  - Aim buff (Concord, Point Out Flaws): a friendly unit's attacks get precision +1 and tracking +1 this round. With precision it can also shoot into a melee.
+  - Teleport (Concord, Gate Step): one of your unengaged units on the table moves up to 8", ignoring terrain and not into base contact. It can still move and act afterwards. Enemy Overwatch and Lurk react to where it lands.
+- Field Repairs (Militia) heals 3 HP but no longer revives: bringing models back is the Munch's trick (Regrow, Hatchlings, Cough Up) and the Patch Medic's.
+- Unit changes: Big Bertha has Steady Aim instead of Provoke (Provoke is the Grand Facet's); the Glimmer Lancer trades Steady Aim and Spotter for precision 2 (and no longer hits worse after moving); the Sunstone Obelisk rolls 2 dice instead of having Steady Aim; the Lumen Warden loses Steadying Presence; the Tumbleweed Riders lose their impact dice; Rivet Grunts' shovels hit on 5+; the Gloop Lobber's range is 20"; the Snot Nanny has Hatchlings instead of Patch Up. To keep the Militia competitive, Rivet Grunts come 5 to a squad (was 4) and the drop-ship's Bumpy Landing costs 1 CP (was 2).
+
+## Tabletop staples
+
+- **Impact on charge:** some units (Munch melee critters, Big Bertha's ram) roll impact dice when a charge lands. Each model in base contact rolls the unit's `impact` dice at the charged unit. Hits get normal saves, and the damage happens before the combat phase.
+- **Weapon traits:**
+
+| Trait | Effect |
+| --- | --- |
+| blast | +1 die per attacking model against units with 5+ models left |
+| torrent | hits automatically |
+| heavy | hits one worse if the unit moved this round |
+| rending | natural 6s to hit get +1 AP |
+| pistol | point-blank shots (at a unit you're engaged with) can't be evaded |
+
+- **Morale:**
+  - When a unit at half strength or less (counting wounds) takes damage, it rolls 2d6 against its **nerve** (default 7; Munch critters 6, Concord 8–9). If the roll is above its nerve, the unit is **Shaken**.
+  - Shaken units hit one worse, won't charge and can't hold objectives.
+  - At the end of each round, each Shaken unit recovers on a 4+.
+  - Any army can **Rally** a unit for 1 CP. This is a free action.
+  - Structures and `fearless` units (Big Mama Chomp, Big Bertha) never test.
+- **Difficult terrain:** area cover (scrub, craters, rubble, tarps) costs double movement for ground models. Pathfinding weighs going round against going through. Flyers and jumpers ignore it.
+- **Obscured:** other units' models standing in the line of fire, at the target's level, give the target cover. Shooting down from higher ground still ignores cover.
+- **Measuring tape and line-of-sight checker:** press **M**, then click a model or spot and point anywhere. You get the distance, the edge-to-edge distance between models, and whether sight is clear. It works even during the AI's turn.
+- **Undo:** press **Ctrl+Z** to take back your last action, and anything the AI did after it. The dice are seeded, so doing the same thing again rolls the same.
+
+## Structures
+
+Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods, and temporary pieces summoned by supports.
+
+- **Movement:** they can't move, advance, charge or disengage, so they sit out the movement phase.
+- **Fighting:** they can shoot, if they have a ranged weapon, and fight back in melee if they have a melee weapon.
+- **Objectives:** they can't hold objectives.
+- **Permanent structures** are bought in the list and deployed from reserve. They can deploy in your spawn zone, or within their `fieldDeploy` distance (6" for the built-ins) of a friendly non-structure unit.
+- **Temporary structures** are created by support summons and vanish at the end of the round. They use no supply.
+
+| Structure | Faction | Kind | What it does |
+| --- | --- | --- | --- |
+| Scrap Turret | Militia | permanent | Rifle turret with Overwatch |
+| Junk Barricade | Militia | temporary | Big base that blocks enemy paths, e.g. a ramp |
+| Spore Pod | Munch | permanent | Short-range spores; Regen and Brood Call |
+| Burrow Hole | Munch | temporary | Your reserves can deploy within 3" of it |
+| Warren Mound | Munch | permanent | A Burrow Exit that stays, with Lurk and Regen |
+| Gobble Pit | Munch | temporary | Lurks: bites the first enemy ground unit to end a move within 3" |
+| Prism Pylon | Concord | permanent | Shielded beam emplacement with Radiance |
+| Glimmer Ward | Concord | temporary | Enemy shots at friendly units within 4" of it hit one worse |
+
+## Off-board supports, Fizz and CP
+
+- **Fizz ✦** is a second list currency, used to buy **supports**: off-board backing such as a radio, a depot or a light-choir. The Fizz budget is 6 in Skirmish and 10 in Assault.
+- Each support adds **command points (CP)** to your pool at the start of each round. The pool starts with one round's worth and is capped at 8.
+- **Support abilities** cost CP and are **free actions** on your turn, in their listed phase or any phase. Playing one doesn't use an activation or pass the turn.
+- Many abilities **exhaust** their card until the next round.
+- **Reactions** (Dust Devil, Hold Fast, Last Bite) are **armed** on your turn and fire automatically the next time their trigger happens. If they don't fire, they expire at the end of the round.
+- **Airdrops** deploy a unit from your reserves straight onto the table, paying its resources and supply as normal. The unit counts as having moved and acted this phase, and enemy Overwatch and Lurk react to it like any other arrival. An airdrop can never land within 6" of the enemy's home objective, inside impassable terrain or off the table. It can land on a platform.
+  - **Dirt Airstrip** (Militia, 3 ✦, +1 CP): *Hay Bale Drop* (3 CP, movement phase, exhausts) lands the unit within 12" of one of your models and at least 6" from enemies. It's in the Militia's Assault starter supports.
+  - **Rust Bucket Drop-Ship** (Militia, 3 ✦, +1 CP): *Bumpy Landing* (1 CP, movement phase, exhausts, from round 2) lands the unit **anywhere on the table**, at least 8" from enemy models. While you aim it, red rings show where it can't land, and clicking a spot it can't use says why. It's in the Militia's Skirmish starter supports.
+  - **Grand Portal** (Concord, 3 ✦, +1 CP): *Step Through* (2 CP, movement phase, exhausts, from round 2) lands the unit within 4" of one of your units and at least 3" from enemies, with +1 shield per model (even above its maximum) until the end of the round. It's in the Concord's Skirmish and Assault starter supports.
+  - The Munch don't airdrop: they tunnel. *Dig Through* (Tunnel Network) opens a Burrow Hole for the round, and the Warren Mound is a permanent one.
+- **Teleports:** *Gate Step* (Light Gate, Concord, 3 CP, movement phase, exhausts) moves one of your unengaged units on the table up to 8". Click the unit, then where it goes.
+- Effects are data-driven, so custom factions can combine them: gain resources, heal or revive, recharge shields, blast a point, summon a structure, give melee or ranged buffs, give precision and tracking, regrow lost models, dig a unit in, teleport a unit, slow an enemy, airdrop a reserve unit (near your models or anywhere, optionally from a later round), rattle an enemy's nerve, and the ward, brace and retaliate reactions.
 
 ## Objectives and missions
 
 - Objectives are **numbered**. Each is either **neutral** or a team's **home** objective.
-- An objective is controlled by the side with more **supply** of non-flying units touching it, at the objective's elevation.
+- An objective is controlled by the side with more **supply** of non-flying, non-structure, non-Shaken units touching it, at the objective's elevation. A unit at **half strength or less** (counting wounds) only counts **half** its supply, so battered squads can't hold ground like fresh ones.
 
 | Mission | Rounds | Scoring |
 | --- | --- | --- |
 | Hold the Line | 5 | 1 VP per neutral objective held each round from round 2; 2 VP for holding the enemy's home objective |
 | Smash and Grab | 5 | Sticky control. 1 VP per owned neutral objective each round; 3 VP for owning the enemy's home objective |
 | Scrapyard Brawl | 4 | 1 VP per enemy supply destroyed; 1 VP per neutral objective held each round |
-| Swipe the Snack | 6 | Carry the enemy's snack from their home objective to yours for 4 VP. If the carrier dies, the snack drops; touching your own dropped snack sends it home. Neutral objectives score 1 VP each from round 3 |
+| Swipe the Snack | 6 | Grab the enemy's snack from their home objective: +1 VP each round you hold it, and 4 VP when you carry it into your own deployment zone or home objective. If the carrier dies, the snack drops; touching your own dropped snack sends it home. Neutral objectives score 1 VP each from round 3 |
+| *Assault:* Frontline | 6 | Sticky control. 1 VP per owned neutral objective each round; 4 VP for owning the enemy's home objective |
+| *Assault:* The Great Snack Heist | 7 | +1 VP each round you hold their snack; 5 VP for carrying it into your deployment zone or home objective; neutral objectives score 1 VP each from round 3 |
+| *Assault:* Scrapheap Showdown | 5 | 1 VP per enemy supply destroyed; 1 VP per neutral objective held each round |
+| Top of the Heap | 5 | The **heap** is the neutral objective nearest the centre. Holding it scores 1 VP, then 2, 3 and 4 VP (the cap) for each round in a row you keep it; losing it, or nobody holding it, resets the count. Other neutral objectives score 1 VP each round |
+| Scrap Rush | 5 | Each neutral objective holds 3 loads of scrap. Holding one at the end of a round hauls a load: 1 VP and 2 resources. Empty piles score nothing |
+| *Assault:* Shifting Ground | 6 | One neutral objective is **live** each round and scores 3 VP; the others score 1 VP. The next live objective is rolled at the start (and after each scoring phase) and announced a round ahead |
+| *Assault:* Most Wanted | 6 | From the end of round 1, each side's priciest non-structure unit on the board is **marked** for the coming round. Destroying the enemy's mark before the next scoring phase scores 3 VP. Neutral objectives score 1 VP each round |
+| *Role:* Claim-Jump Siege | 5 | See role missions below |
+| *Role:* Salvage Rights | 5 | See role missions below |
+| *Role, Assault:* Strongbox Run | 6 | See role missions below |
+
+**Snack details:**
+- Snacks sit on the level they're on, so only models on that level can grab, return or deliver them.
+- A delivery scores the moment the carrier reaches home.
+- If a defender and a thief both touch a dropped snack, the defender wins.
+- A carrier that teleports (Blink, Tunnel, Recall) drops the snack where it stood.
+
+### Role missions
+
+Role missions are lopsided on purpose: each side has its own economy and its own scoring, and they're played on battlefields built for them (maps tagged `siege`, `salvage` or `convoy`). **Side A is player 1 and side B is player 2.** A side's **stronghold** is the neutral objective nearest its home objective.
+
+| Mission | Side A | Side B | Both |
+| --- | --- | --- | --- |
+| Claim-Jump Siege (Skirmish, `siege`) | **Holdouts:** a free emplacement (the faction's cheapest buyable permanent structure; its supply is added on top of the cap) next to the stronghold, 8 resources, income 5. 1 VP each round from round 2 that B doesn't hold A's stronghold | **Claim-Jumpers:** 13 resources, income 6. 3 VP each round they hold A's stronghold | 1 VP per neutral objective held each round from round 2 |
+| Salvage Rights (Skirmish, `salvage`) | **Site Crew:** 8 supply from the start, income 4 | **Rival Outfit:** 5 supply from the start, +3 supply per round | Each neutral objective holds 3 loads; holding one at the end of a round hauls a load for 1 VP and 1 resource |
+| Strongbox Run (Assault, `convoy`) | **Escorts:** the strongbox starts on the neutral objective furthest from A's home. A carries it to A's home objective or deployment zone: 5 VP per delivery (it then reappears at the start), +1 VP each round it's carried. 1 VP per neutral objective held each round | **Raiders:** each neutral objective holds 2 loads; holding one hauls a load for 2 VP. 1 VP per enemy supply destroyed (paid at scoring). Touching the dropped strongbox away from its start sends it back there | — |
+
+**Strongbox details:** it works like a snack, the other way round. Only side A picks it up; if the carrier dies or teleports it drops; side B can't carry it, but touching it while it's away from its start kicks it back. If an escort and a raider both touch it while it's away from its start, the raider wins.
+
+A faction with no buyable permanent structure gets 3 resources instead of each free emplacement.
+
+**Stragglers:** a model left more than 2" from its squad (for example after casualties) moves as far as it can toward the leader. It catches up rather than blocking the whole move.
 
 The game ends after the last round (most VP wins), or immediately if an army has no units left on the board or in reserve.
 
 ## Maps
 
-- **Dustbowl Crossing:** a central silo deck (2 ramps, 2 ladders); deployment on opposite edges.
-- **Mesa Ridge:** twin flanking mesas (1 ramp + 1 ladder each); diagonal corner deployment.
-- **Old Refinery:** two catwalks, a cluttered yard; deployment on the left and right edges.
+Every built-in map has a tactical shape, not just scattered cover. Sight-blocking walls, buildings and platforms split the board into **lanes or channels**, so nobody can shoot across the whole table. The lanes meet at **choke points** (gaps, gates, bridges, ramps) where a few units can hold against many, usually with cover nearby. Longer routes round the outside are safer than the short, exposed ones through the middle, and raised positions overlook a lane but are reached through one narrow ramp or ladder.
+
+- Main routes are at least 3" wide, so the biggest bases (up to 1.4" radius) fit. Some 2" squeezes are infantry-only.
+- Ramp and ladder feet stand clear of walls, and every raised objective has a ramp, since heavy units can't use ladders.
+- Symmetric maps are point-symmetric (rotated 180°), so neither side gets a better board. Dustbowl Crossing, Old Refinery, Fizzwater Ford and Lady Prismwick's Lawn are mirror-symmetric as well, so when both sides pick the same lane or bridge, neither gets the better one.
+
+**Skirmish (35" × 35")**
+
+- **Dustbowl Crossing (three lanes):** two long fence walls make a left, centre and right lane. The only crossing is the middle row, where the silo deck (2 ramps, 2 ladders) sits in the centre lane with a 3" alley down each side; from the deck you can see over the fence walls into the side lanes. A fence line across the centre lane has a 3" gate, and each side lane has a sandbagged objective with hay bales at each end. Deploy on opposite edges.
+- **Mesa Ridge (canyon maze):** two broken rock ridges carve a middle canyon and two side canyons. The middle canyon zig-zags through the Narrows, a boulder pinch either side of the centre. The side canyons loop past twin mesas, whose ramps come down at the windows in the ridges. Diagonal corner deployment.
+- **Old Refinery (two lanes and a catwalk):** a pipe rack splits the yard into a north and a south lane, with a raised catwalk over the middle that sees into both. Each side owns one 3.5" gap in the pipes, with the catwalk ramp's foot right in it. The two lanes are mirror images, so neither side gets the better lane. Deploy on the left and right edges.
+- **Rattlevane Junction (central fortress):** a walled windpump yard in the middle with one 3.6" gate in each wall, two facing each army. Signal towers on the flanks have a ramp facing the yard and a ladder round the back. Staggered lines: each side holds half of its own edge.
+- **Fizzwater Ford (river and two bridges):** a deep creek splits the board. It is impassable; you can see over its outer stretches, but sluice houses block the middle ones. Cross at one of two 3.5" bridges or wade the slow ford in the middle. Mill towers on both banks overlook each bridge. Twin deployment pockets per side.
+- **Lady Prismwick's Lawn (open centre, hedged flanks):** a wide-open croquet lawn, deliberately a shooting gallery, boxed in by tall hedges with a wide gap at each army's corner. Screened hedge walks run round the outside to the glass gazebos in the other corners, each reached by a back ramp at the end of the walk or the grand stair from the lawn. Topiary gives a little cover on the way in. L-shaped corner deployment.
+
+**Assault (70" × 35")**
+
+- **Long Ridge Highway (two lanes and a broken bridge):** a raised highway in two spans splits the field into north and south lanes that can't see each other. They meet only at the ends and at the broken span in the middle, where both spans ramp down. Garages in each lane give a choice between the exposed road under the highway and the sheltered verge. Deploy on the short edges.
+- **Scrapyard Sprawl (street grid):** junk stacks stand in city blocks round a central smelter. 4" avenues give long sight lines along the board and none across the blocks. A scrap heap and a crane deck on each side look down the streets. Deploy on the short edges.
+- **Brinejaw Flats (maze and open wings):** a junk-stack maze round a crane deck in the middle, open salt flats on the wings. Long-edge deployment, only 25" apart.
+- **Gutterbend Derailment (wall of wrecks):** a derailed ore train lies across the middle. Squeeze through the 3.6" gaps between the cars, climb over the ore car or a boxcar, or go round the open ends, each next to one side's forward pocket. Main line on the short edge plus a forward pocket.
+
+**Role-mission maps (asymmetric):** Grubstake Redoubt (siege), Wreck of the Velvet Comet (salvage) and Gemhaul Ambush (convoy) are built for their missions and balanced by simulation rather than by mirroring. Each blurb says which side is A and which is B.

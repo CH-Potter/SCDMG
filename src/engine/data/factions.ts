@@ -1,8 +1,24 @@
-import type { Faction, FactionId, ListEntry, UnitProfile, Weapon, WeaponBonus } from "../types";
+import type { Faction, FactionId, ListEntry, SupportDef, UnitProfile, Weapon, WeaponBonus } from "../types";
+import { clearProfileCache } from "../profile";
+import type { ModeId } from "./modes";
 
 // Original factions for SCDMG. Stats are first-pass and meant to be tuned through playtesting.
 
-type WeaponOpts = { damage?: number; ap?: number; targets?: Weapon["targets"]; bonuses?: WeaponBonus[] };
+type WeaponOpts = {
+  damage?: number;
+  ap?: number;
+  targets?: Weapon["targets"];
+  bonuses?: WeaponBonus[];
+  traits?: Weapon["traits"];
+  precision?: number;
+  tracking?: number;
+};
+
+/** Precision and tracking, only when set (keeps exported faction JSON tidy). */
+const aim = (o: WeaponOpts): Partial<Weapon> => ({
+  ...(o.precision ? { precision: o.precision } : {}),
+  ...(o.tracking ? { tracking: o.tracking } : {}),
+});
 
 const ranged = (name: string, range: number, dice: number, hit: number, o: WeaponOpts = {}): Weapon => ({
   name,
@@ -14,6 +30,8 @@ const ranged = (name: string, range: number, dice: number, hit: number, o: Weapo
   ap: o.ap ?? 0,
   targets: o.targets ?? "all",
   bonuses: o.bonuses,
+  traits: o.traits,
+  ...aim(o),
 });
 
 const melee = (name: string, dice: number, hit: number, o: WeaponOpts = {}): Weapon => ({
@@ -26,6 +44,8 @@ const melee = (name: string, dice: number, hit: number, o: WeaponOpts = {}): Wea
   ap: o.ap ?? 0,
   targets: o.targets ?? "ground",
   bonuses: o.bonuses,
+  traits: o.traits,
+  ...aim(o),
 });
 
 const militia: Faction = {
@@ -34,6 +54,138 @@ const militia: Faction = {
   blurb:
     "Scrappy frontier settlers in patched-up work suits. Nothing matches, everything is held on with rivets, and they will not leave their farm.",
   color: 0xf28c28,
+  look: "cap",
+  // The drop-ship balances in Skirmish but runs away with the long Assault board (sims: ~84% Militia),
+  // so Assault keeps the old starter set.
+  defaultSupports: ["mil-depot", "mil-dropship"],
+  assaultSupports: ["mil-vane"],
+  assaultStarter: ["mil-radio", "mil-depot", "mil-airstrip"],
+  supports: [
+    {
+      id: "mil-radio",
+      name: "Grange Hall Radio",
+      faction: "militia",
+      fizz: 2,
+      cp: 1,
+      blurb: "Somebody's aunt runs logistics from the community hall. She is terrifying.",
+      abilities: [
+        { id: "supply-run", name: "Supply Run", cp: 1, exhaust: true, timing: "any", effect: { kind: "resources", amount: 3 }, text: "Gain 3 resources." },
+      ],
+    },
+    {
+      id: "mil-depot",
+      name: "Tractor Depot",
+      faction: "militia",
+      fizz: 3,
+      cp: 1,
+      blurb: "Spare parts, spare tractors, spare everything.",
+      abilities: [
+        {
+          id: "junk-wall",
+          name: "Junk Barricade",
+          cp: 2,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "summon", profileId: "mil-junk", range: 8, minEnemyDistance: 2 },
+          text: 'Drop a Junk Barricade within 8" of one of your models (at least 2" from enemies). It blocks enemy paths until the end of the round.',
+        },
+        {
+          id: "field-repairs",
+          name: "Field Repairs",
+          cp: 1,
+          exhaust: false,
+          timing: "any",
+          effect: { kind: "heal", amount: 3, revive: false },
+          text: "A friendly unit heals 3 HP. Duct tape fixes tractors, turrets and people. It does not fix being dead.",
+        },
+      ],
+    },
+    {
+      id: "mil-vane",
+      name: "Weather Vane",
+      faction: "militia",
+      fizz: 2,
+      cp: 2,
+      blurb: "It always points at trouble.",
+      abilities: [
+        {
+          id: "dust-devil",
+          name: "Dust Devil",
+          cp: 2,
+          exhaust: true,
+          timing: "any",
+          effect: { kind: "ward" },
+          text: "Reaction: the next enemy ranged attack on one of your units this round hits one worse.",
+        },
+      ],
+    },
+    {
+      id: "mil-airstrip",
+      name: "Dirt Airstrip",
+      faction: "militia",
+      fizz: 3,
+      cp: 1,
+      blurb: "A cleared field, a windsock, and a pilot who swears he has done this before.",
+      abilities: [
+        {
+          id: "hay-drop",
+          name: "Hay Bale Drop",
+          cp: 3,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "airdrop", range: 12, minEnemyDistance: 6 },
+          text: 'Drop a unit from your reserves within 12" of one of your models (at least 6" from enemies), paying its resources and supply as normal.',
+        },
+      ],
+    },
+    {
+      id: "mil-dropship",
+      name: "Rust Bucket Drop-Ship",
+      faction: "militia",
+      fizz: 3,
+      cp: 1,
+      blurb: "Forty years old, three engines out of four, and a landing light that is just a lantern on a hook.",
+      abilities: [
+        {
+          id: "bumpy-landing",
+          name: "Bumpy Landing",
+          cp: 1,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "airdrop", range: 0, minEnemyDistance: 8, anywhere: true, fromRound: 2 },
+          text: 'From round 2: drop a unit from your reserves anywhere on the table, at least 8" from enemies and not within 6" of the enemy\'s home objective, paying its resources and supply as normal.',
+        },
+      ],
+    },
+    {
+      id: "mil-wagon",
+      name: "Ammo Wagon",
+      faction: "militia",
+      fizz: 2,
+      cp: 1,
+      blurb: "Rivets, buckshot, sandbags, and a jar of pickles for morale.",
+      abilities: [
+        { id: "rivet-crate", name: "Crate of Rivets", cp: 2, exhaust: true, timing: "assault", effect: { kind: "rangedBuff", dice: 1 }, text: "A friendly unit gets +1 ranged die per model this round." },
+        {
+          id: "sandbag-social",
+          name: "Sandbag Social",
+          cp: 1,
+          exhaust: true,
+          timing: "any",
+          effect: { kind: "dugIn", save: 1 },
+          text: "A friendly unit digs in: +1 to its saves against shooting and barrages this round, on top of cover and hunkering. The whole town turns up with shovels and a banjo.",
+        },
+      ],
+    },
+  ],
+  assaultExtras: [
+    { profileId: "mil-grunts", upgrades: ["extra", "jets"] },
+    { profileId: "mil-bertha", upgrades: [] },
+    { profileId: "mil-bomber", upgrades: [] },
+    { profileId: "mil-grannies", upgrades: [] },
+    { profileId: "mil-mortar", upgrades: [] },
+    { profileId: "mil-riders", upgrades: [] },
+  ],
   defaultList: [
     { profileId: "mil-grunts", upgrades: ["overwatch"] },
     { profileId: "mil-grunts", upgrades: ["jets"] },
@@ -41,6 +193,7 @@ const militia: Faction = {
     { profileId: "mil-bertha", upgrades: ["barrage"] },
     { profileId: "mil-rustler", upgrades: [] },
     { profileId: "mil-grunts", upgrades: [] },
+    { profileId: "mil-squinter", upgrades: [] },
   ],
   profiles: [
     {
@@ -49,15 +202,16 @@ const militia: Faction = {
       faction: "militia",
       cost: 3,
       supply: 2,
-      models: 4,
+      models: 5,
       move: 6,
       hp: 1,
       shield: 0,
       armor: 5,
       baseRadius: 0.55,
       keywords: ["infantry", "light"],
-      weapons: [ranged("Rivet Rifle", 18, 1, 4), melee("Shovel Swing", 1, 4)],
-      abilities: ["entrenched"],
+      evade: { target: 6, against: ["pointBlank"] },
+      weapons: [ranged("Rivet Rifle", 22, 1, 4, { bonuses: [{ vs: "armoured", ap: 1 }] }), melee("Shovel Swing", 1, 5)],
+      abilities: ["entrenched", "demo-charge"],
       upgrades: [
         { id: "extra", name: "Extra Hands", cost: 1, addModels: 1, text: "+1 model." },
         { id: "overwatch", name: "Watchtower Drill", cost: 1, addAbilities: ["overwatch"], text: "Gains Overwatch." },
@@ -85,8 +239,9 @@ const militia: Faction = {
       armor: 5,
       baseRadius: 0.6,
       keywords: ["infantry", "light"],
-      weapons: [ranged("Staple Pistol", 10, 2, 4), melee("Wrench", 1, 4)],
-      abilities: ["patch-up", "entrenched"],
+      evade: { target: 5, against: ["pointBlank"] },
+      weapons: [ranged("Staple Pistol", 10, 2, 4, { traits: ["pistol"] }), melee("Wrench", 1, 4)],
+      abilities: ["patch-up", "entrenched", "rocket-hop", "steadying"],
       upgrades: [],
       blurb: "Duct tape fixes people too, probably.",
     },
@@ -102,14 +257,15 @@ const militia: Faction = {
       shield: 0,
       armor: 3,
       baseRadius: 1.3,
-      keywords: ["armoured", "heavy", "mech"],
+      keywords: ["armoured", "heavy", "mech", "fearless"],
       weapons: [
-        ranged("Thumper Cannon", 24, 3, 4, { damage: 2, ap: 1, targets: "ground", bonuses: [{ vs: "armoured", dice: 1 }] }),
+        ranged("Thumper Cannon", 24, 3, 4, { damage: 2, ap: 1, targets: "ground", bonuses: [{ vs: "armoured", dice: 1 }], traits: ["blast", "heavy"] }),
         melee("Stomp", 2, 3, { damage: 2, bonuses: [{ vs: "infantry", dice: 1 }] }),
       ],
-      abilities: [],
+      abilities: ["steady-aim"],
+      impact: { dice: 1, hit: 4, damage: 2, ap: 1 },
       upgrades: [{ id: "barrage", name: "Barrage Shells", cost: 2, addAbilities: ["barrage"], text: "Gains Barrage." }],
-      blurb: "A combine harvester someone bolted a cannon to.",
+      blurb: "A combine harvester someone bolted a cannon to. Parks, plants its feet, and keeps firing.",
     },
     {
       id: "mil-rustler",
@@ -124,8 +280,9 @@ const militia: Faction = {
       armor: 5,
       baseRadius: 0.9,
       keywords: ["flying", "light", "mech"],
-      weapons: [ranged("Chain Popper", 16, 3, 4, { bonuses: [{ vs: "light", dice: 1 }] })],
-      abilities: [],
+      evade: { target: 5, against: ["ranged"] },
+      weapons: [ranged("Chain Popper", 16, 3, 4, { precision: 1, bonuses: [{ vs: "light", dice: 1 }] })],
+      abilities: ["spotter"],
       upgrades: [
         {
           id: "flak",
@@ -137,6 +294,170 @@ const militia: Faction = {
       ],
       blurb: "A crop duster with opinions and a machine gun.",
     },
+    {
+      id: "mil-turret",
+      name: "Scrap Turret",
+      faction: "militia",
+      cost: 3,
+      supply: 1,
+      models: 1,
+      move: 0,
+      hp: 5,
+      shield: 0,
+      armor: 4,
+      baseRadius: 0.9,
+      keywords: ["structure", "mech"],
+      weapons: [ranged("Rivet Repeater", 20, 3, 4, { tracking: 1, traits: ["blast"] })],
+      abilities: ["overwatch"],
+      upgrades: [],
+      structure: { lifetime: "permanent", fieldDeploy: 6 },
+      blurb: "Three rifles, one tractor seat, zero escape plan.",
+    },
+    {
+      id: "mil-junk",
+      name: "Junk Barricade",
+      faction: "militia",
+      cost: 0,
+      supply: 0,
+      models: 1,
+      move: 0,
+      hp: 4,
+      shield: 0,
+      armor: 5,
+      baseRadius: 1.3,
+      keywords: ["structure"],
+      weapons: [],
+      abilities: [],
+      upgrades: [],
+      structure: { lifetime: "round", summonOnly: true },
+      blurb: "Bedframes, a fridge and a very confused goat.",
+    },
+    // ----- new units (sniper, flanker, fearless defenders, bomber, mortar structure) -----
+    {
+      id: "mil-squinter",
+      name: "Ridgeline Squinter",
+      faction: "militia",
+      cost: 3,
+      supply: 1,
+      models: 1,
+      move: 5,
+      hp: 3,
+      shield: 0,
+      armor: 5,
+      baseRadius: 0.55,
+      keywords: ["infantry", "light"],
+      evade: { target: 6, against: ["ranged"] },
+      nerve: 8,
+      weapons: [ranged("Varmint Rifle", 30, 2, 3, { precision: 1, damage: 2, ap: 1, traits: ["heavy", "rending"] }), melee("Rifle Butt", 1, 5)],
+      abilities: ["steady-aim", "entrenched"],
+      upgrades: [
+        { id: "porch", name: "Porch Watch", cost: 1, addAbilities: ["overwatch"], text: "Gains Overwatch." },
+        { id: "holler", name: "Holler Out", cost: 1, addAbilities: ["spotter"], text: "Gains Spotter." },
+        {
+          id: "slugs",
+          name: "Big-Game Slugs",
+          cost: 1,
+          weapon: { index: 0, patch: { bonuses: [{ vs: "heavy", damage: 1 }] } },
+          text: "Varmint Rifle deals +1 damage to heavy targets.",
+        },
+      ],
+      blurb: "Hasn't blinked since the harvest of '09. Claims it's a medical condition.",
+    },
+    {
+      id: "mil-riders",
+      name: "Tumbleweed Riders",
+      faction: "militia",
+      cost: 3,
+      supply: 2,
+      models: 2,
+      move: 12,
+      hp: 2,
+      shield: 0,
+      armor: 5,
+      baseRadius: 0.8,
+      keywords: ["light", "mech"],
+      evade: { target: 5, against: ["ranged", "blast"] },
+      weapons: [ranged("Scattergun", 12, 2, 4, { ap: 1, traits: ["blast"] }), melee("Hubcap Swipe", 1, 4)],
+      abilities: ["demo-charge"],
+      upgrades: [
+        { id: "nitro", name: "Nitro Cans", cost: 1, move: 2, text: "+2 move." },
+        { id: "sidecar", name: "Sidecar", cost: 2, addModels: 1, text: "+1 model." },
+      ],
+      blurb: "Dirt bikes held together with baling wire and pure spite. They shoot from the saddle, because the brakes are decorative.",
+    },
+    {
+      id: "mil-grannies",
+      name: "Front Porch Grannies",
+      faction: "militia",
+      cost: 4,
+      supply: 2,
+      models: 3,
+      move: 5,
+      hp: 2,
+      shield: 0,
+      armor: 5,
+      baseRadius: 0.55,
+      keywords: ["infantry", "fearless"],
+      weapons: [
+        ranged("Rock-Salt Blunderbuss", 10, 2, 4, { traits: ["blast", "pistol"] }),
+        melee("Rolling Pin", 2, 4, { bonuses: [{ vs: "beast", dice: 1 }] }),
+      ],
+      abilities: ["entrenched", "steadying"],
+      upgrades: [
+        { id: "mabel", name: "Cousin Mabel", cost: 1, addModels: 1, text: "+1 model." },
+        { id: "eyes", name: "Eyes in the Back", cost: 1, addAbilities: ["overwatch"], text: "Gains Overwatch." },
+      ],
+      blurb: "They have seen three wars, two floods and one very bad casserole. You do not scare them.",
+    },
+    {
+      id: "mil-bomber",
+      name: "Hay Bomber",
+      faction: "militia",
+      cost: 5,
+      supply: 3,
+      models: 1,
+      move: 10,
+      hp: 6,
+      shield: 0,
+      armor: 4,
+      baseRadius: 1.1,
+      keywords: ["flying", "mech"],
+      evade: { target: 6, against: ["ranged"] },
+      weapons: [
+        ranged("Fertiliser Drop", 6, 3, 4, { targets: "ground", traits: ["torrent", "blast"] }),
+        ranged("Tail Gun", 14, 1, 4, { tracking: 1 }),
+      ],
+      abilities: [],
+      upgrades: [
+        {
+          id: "twin-tail",
+          name: "Twin Tail Guns",
+          cost: 1,
+          weapon: { index: 1, patch: { dice: 2 } },
+          text: "Tail Gun rolls 2 dice.",
+        },
+      ],
+      blurb: "A cargo biplane that drops the farm's finest on your head. It is exactly what you think it is.",
+    },
+    {
+      id: "mil-mortar",
+      name: "Spud Mortar",
+      faction: "militia",
+      cost: 3,
+      supply: 1,
+      models: 1,
+      move: 0,
+      hp: 5,
+      shield: 0,
+      armor: 4,
+      baseRadius: 0.9,
+      keywords: ["structure", "mech"],
+      weapons: [ranged("Spud Lobber", 30, 3, 4, { ap: 1, targets: "ground", traits: ["blast"] })],
+      abilities: [],
+      upgrades: [{ id: "boom-spuds", name: "Boom Spuds", cost: 2, addAbilities: ["barrage"], text: "Gains Barrage." }],
+      structure: { lifetime: "permanent", fieldDeploy: 6 },
+      blurb: "A drainpipe, a hairspray can and a sack of potatoes. Range: yes.",
+    },
   ],
 };
 
@@ -146,13 +467,125 @@ const munch: Faction = {
   blurb:
     "A ravenous tide of goofy, toothy critters. They have one plan, and the plan is lunch. You are lunch.",
   color: 0x6cc24a,
+  look: "teeth",
+  defaultSupports: ["munch-nest", "munch-tunnels"],
+  assaultSupports: ["munch-stash"],
+  supports: [
+    {
+      id: "munch-nest",
+      name: "Brood Nest",
+      faction: "munch",
+      fizz: 3,
+      cp: 1,
+      blurb: "Warm, squishy, and always hungry.",
+      abilities: [
+        { id: "frenzy", name: "Feeding Frenzy", cp: 2, exhaust: false, timing: "any", effect: { kind: "meleeBuff", dice: 1 }, text: "A friendly unit gets +1 melee die per model this round." },
+      ],
+    },
+    {
+      id: "munch-tunnels",
+      name: "Tunnel Network",
+      faction: "munch",
+      fizz: 2,
+      cp: 1,
+      blurb: "Every hole leads somewhere. Usually to lunch.",
+      abilities: [
+        {
+          id: "dig-through",
+          name: "Dig Through",
+          cp: 3,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "summon", profileId: "munch-hole", range: 12, minEnemyDistance: 6 },
+          text: 'Open a Burrow Hole within 12" of one of your models (at least 6" from enemies). Until the end of the round your reserves can deploy next to it.',
+        },
+      ],
+    },
+    {
+      id: "munch-stash",
+      name: "Snack Stash",
+      faction: "munch",
+      fizz: 2,
+      cp: 0,
+      blurb: "Emergency goo, for emergencies.",
+      abilities: [
+        {
+          id: "last-bite",
+          name: "Last Bite",
+          cp: 1,
+          exhaust: true,
+          timing: "any",
+          effect: { kind: "retaliate", hit: 4, damage: 1 },
+          text: "Reaction: when one of your units is destroyed this round, every enemy model touching it is hit on a 4+ for 1 damage.",
+        },
+        { id: "gross-glob", name: "Gross Glob", cp: 1, exhaust: true, timing: "assault", effect: { kind: "slow", range: 14 }, text: 'Slow an enemy unit within 14" of your models: -2 move next round.' },
+      ],
+    },
+    {
+      id: "munch-stink",
+      name: "Stink Gland",
+      faction: "munch",
+      fizz: 2,
+      cp: 1,
+      blurb: "Nobody volunteered to find out where it is.",
+      abilities: [
+        {
+          id: "awful-whiff",
+          name: "Awful Whiff",
+          cp: 2,
+          exhaust: true,
+          timing: "any",
+          effect: { kind: "rattle", range: 10, penalty: 2 },
+          text: 'An enemy unit within 10" of your models takes a nerve test at -2 nerve, whatever its strength.',
+        },
+      ],
+    },
+    {
+      id: "munch-burrows",
+      name: "Deep Burrows",
+      faction: "munch",
+      fizz: 3,
+      cp: 1,
+      blurb: "The ground is mostly tunnels now. The tunnels are mostly teeth.",
+      abilities: [
+        {
+          id: "gobble-pit",
+          name: "Gobble Pit",
+          cp: 2,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "summon", profileId: "munch-pit", range: 12, minEnemyDistance: 3 },
+          text: 'Open a Gobble Pit within 12" of one of your models (at least 3" from enemies). Until the end of the round it Lurks: the first enemy ground unit to end a move within 3" of it gets bitten.',
+        },
+        {
+          id: "cough-up",
+          name: "Cough Up",
+          cp: 1,
+          exhaust: true,
+          timing: "any",
+          effect: { kind: "regrow", models: 2 },
+          text: "A friendly unit regrows up to 2 lost models (1 HP each). Something down there spits them back up, slightly damp.",
+        },
+      ],
+    },
+  ],
+  assaultExtras: [
+    { profileId: "munch-nibblers", upgrades: ["litter", "legs"] },
+    { profileId: "munch-spitter", upgrades: ["acid"] },
+    { profileId: "munch-buzz", upgrades: ["extra"] },
+    { profileId: "munch-mama", upgrades: [] },
+    { profileId: "munch-hoppers", upgrades: [] },
+    { profileId: "munch-warren", upgrades: [] },
+    { profileId: "munch-nanny", upgrades: [] },
+  ],
   defaultList: [
     { profileId: "munch-nibblers", upgrades: [] },
     { profileId: "munch-nibblers", upgrades: ["legs"] },
     { profileId: "munch-spitter", upgrades: [] },
-    { profileId: "munch-buzz", upgrades: [] },
+    { profileId: "munch-flapjaw", upgrades: [] },
     { profileId: "munch-mama", upgrades: ["tunnel"] },
     { profileId: "munch-nibblers", upgrades: ["litter"] },
+    { profileId: "munch-lobber", upgrades: [] },
   ],
   profiles: [
     {
@@ -168,8 +601,11 @@ const munch: Faction = {
       armor: 6,
       baseRadius: 0.45,
       keywords: ["infantry", "light", "beast"],
+      evade: { target: 4, against: ["pointBlank", "blast"] },
+      nerve: 6,
       weapons: [melee("Chompers", 1, 4, { bonuses: [{ vs: "light", dice: 1 }] })],
-      abilities: ["regrow"],
+      abilities: ["regrow", "rampage"],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 },
       upgrades: [
         { id: "litter", name: "Bigger Litter", cost: 1, addModels: 2, text: "+2 models." },
         { id: "legs", name: "Leg Day", cost: 1, move: 2, text: "+2 move." },
@@ -189,11 +625,13 @@ const munch: Faction = {
       armor: 6,
       baseRadius: 0.55,
       keywords: ["infantry", "light", "beast"],
+      evade: { target: 5, against: ["pointBlank"] },
+      nerve: 6,
       weapons: [
         ranged("Goo Glob", 14, 1, 4, { ap: 1, targets: "ground", bonuses: [{ vs: "armoured", damage: 1 }] }),
         melee("Gummy Bite", 1, 5),
       ],
-      abilities: ["sticky-goo", "regen"],
+      abilities: ["sticky-goo", "regen", "grapple"],
       upgrades: [
         { id: "acid", name: "Acid Goo", cost: 1, weapon: { index: 0, patch: { targets: "all" } }, text: "Goo Glob can hit flyers." },
       ],
@@ -212,8 +650,11 @@ const munch: Faction = {
       armor: 6,
       baseRadius: 0.5,
       keywords: ["flying", "light", "beast"],
+      evade: { target: 5, against: ["ranged", "blast"] },
+      nerve: 6,
       weapons: [melee("Stinger", 2, 4, { targets: "all" })],
       abilities: ["pop"],
+      impact: { dice: 1, hit: 5, damage: 1, ap: 0 },
       upgrades: [{ id: "extra", name: "Extra Buzz", cost: 1, addModels: 1, text: "+1 model." }],
       blurb: "Angry, airborne, and slightly explosive.",
     },
@@ -225,15 +666,192 @@ const munch: Faction = {
       supply: 4,
       models: 1,
       move: 6,
-      hp: 10,
+      hp: 12,
       shield: 0,
       armor: 4,
       baseRadius: 1.4,
-      keywords: ["armoured", "heavy", "beast", "monster"],
+      keywords: ["armoured", "heavy", "beast", "monster", "fearless"],
       weapons: [melee("Mega Maw", 4, 3, { damage: 2, ap: 1, bonuses: [{ vs: "armoured", ap: 1 }] })],
-      abilities: ["regen", "brood-call"],
-      upgrades: [{ id: "tunnel", name: "Tunnel Claws", cost: 2, addAbilities: ["tunnel"], text: "Gains Tunnel." }],
+      abilities: ["regen", "brood-call", "sugar-rush", "lurk"],
+      impact: { dice: 2, hit: 4, damage: 1, ap: 1 },
+      upgrades: [{ id: "tunnel", name: "Tunnel Claws", cost: 4, addAbilities: ["tunnel"], text: "Gains Tunnel." }],
       blurb: "Mostly mouth. The rest is also mouth.",
+    },
+    {
+      id: "munch-pod",
+      name: "Spore Pod",
+      faction: "munch",
+      cost: 2,
+      supply: 1,
+      models: 1,
+      move: 0,
+      hp: 4,
+      shield: 0,
+      armor: 6,
+      baseRadius: 0.9,
+      keywords: ["structure", "beast"],
+      weapons: [ranged("Spore Puff", 8, 2, 5, { targets: "ground", traits: ["torrent"] })],
+      abilities: ["regen", "brood-call", "mending-aura"],
+      upgrades: [],
+      structure: { lifetime: "permanent", fieldDeploy: 6 },
+      blurb: "It breathes. Nobody likes that it breathes.",
+    },
+    {
+      id: "munch-hole",
+      name: "Burrow Hole",
+      faction: "munch",
+      cost: 0,
+      supply: 0,
+      models: 1,
+      move: 0,
+      hp: 3,
+      shield: 0,
+      armor: 6,
+      baseRadius: 1,
+      keywords: ["structure"],
+      weapons: [],
+      abilities: ["burrow-exit"],
+      upgrades: [],
+      // The quick, temporary tunnel (gone at the end of the round). The Warren Mound is the permanent one.
+      structure: { lifetime: "round", summonOnly: true },
+      blurb: "Something is coming up. Several somethings.",
+    },
+    {
+      id: "munch-pit",
+      name: "Gobble Pit",
+      faction: "munch",
+      cost: 0,
+      supply: 0,
+      models: 1,
+      move: 0,
+      hp: 3,
+      shield: 0,
+      armor: 6,
+      baseRadius: 1,
+      keywords: ["structure", "beast"],
+      weapons: [melee("Gnashers", 2, 4)],
+      abilities: ["lurk"],
+      upgrades: [],
+      // A one-round ambush; the Warren Mound is the permanent hole with teeth.
+      structure: { lifetime: "round", summonOnly: true },
+      blurb: "A hole in the ground that is, technically, also a mouth.",
+    },
+    // ----- new units (jump flankers, artillery monster, flyer, healer, burrow structure) -----
+    {
+      id: "munch-hoppers",
+      name: "Boing Hoppers",
+      faction: "munch",
+      cost: 3,
+      supply: 2,
+      models: 5,
+      move: 9,
+      hp: 1,
+      shield: 0,
+      armor: 6,
+      baseRadius: 0.45,
+      keywords: ["infantry", "light", "beast", "jump"],
+      evade: { target: 5, against: ["pointBlank", "melee", "blast"] },
+      nerve: 6,
+      weapons: [melee("Kick-Bite", 2, 4, { ap: 1 })],
+      abilities: ["regrow", "sugar-rush"],
+      impact: { dice: 1, hit: 3, damage: 1, ap: 0 },
+      upgrades: [
+        { id: "springs", name: "Bigger Springs", cost: 1, move: 2, text: "+2 move." },
+        { id: "more", name: "More Hoppers", cost: 1, addModels: 2, text: "+2 models." },
+      ],
+      blurb: "Bounce, bite, bounce, bite. They have never once looked where they were landing.",
+    },
+    {
+      id: "munch-lobber",
+      name: "Gloop Lobber",
+      faction: "munch",
+      cost: 4,
+      supply: 2,
+      models: 1,
+      move: 5,
+      hp: 6,
+      shield: 0,
+      armor: 5,
+      baseRadius: 1.15,
+      keywords: ["beast", "monster", "heavy"],
+      nerve: 7,
+      weapons: [
+        ranged("Gloop Mortar", 20, 3, 4, { ap: 1, targets: "ground", traits: ["blast"] }),
+        melee("Belly Bump", 2, 4),
+      ],
+      abilities: ["sticky-goo", "regen"],
+      upgrades: [
+        { id: "chunky", name: "Extra-Chunky Gloop", cost: 2, weapon: { index: 0, patch: { damage: 2 } }, text: "Gloop Mortar deals 2 damage." },
+      ],
+      blurb: "Swallows rocks, coughs up something much stickier. Whatever it hits stops running, which is when the others arrive.",
+    },
+    {
+      id: "munch-flapjaw",
+      name: "Flapjaw",
+      faction: "munch",
+      cost: 4,
+      supply: 2,
+      models: 1,
+      move: 12,
+      hp: 5,
+      shield: 0,
+      armor: 4,
+      baseRadius: 0.9,
+      keywords: ["flying", "beast"],
+      evade: { target: 5, against: ["ranged"] },
+      nerve: 7,
+      weapons: [melee("Divebomb Bite", 3, 4, { tracking: 1, ap: 1, targets: "all", traits: ["rending"] })],
+      abilities: ["regen"],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 },
+      upgrades: [
+        {
+          id: "opener",
+          name: "Can-Opener Beak",
+          cost: 1,
+          weapon: { index: 0, patch: { bonuses: [{ vs: "armoured", ap: 1 }] } },
+          text: "Divebomb Bite gets +1 AP against armoured targets.",
+        },
+        { id: "tongue", name: "Snag Tongue", cost: 1, addAbilities: ["grapple"], text: "Gains Reel In." },
+      ],
+      blurb: "A mouth with wings. Mostly mouth. The wings are frankly struggling.",
+    },
+    {
+      id: "munch-nanny",
+      name: "Snot Nanny",
+      faction: "munch",
+      cost: 2,
+      supply: 1,
+      models: 1,
+      move: 7,
+      hp: 3,
+      shield: 0,
+      armor: 6,
+      baseRadius: 0.6,
+      keywords: ["infantry", "beast"],
+      nerve: 6,
+      weapons: [melee("Smother Hug", 2, 4)],
+      abilities: ["hatch", "mending-aura"],
+      upgrades: [{ id: "hanky", name: "Big Hanky", cost: 1, addAbilities: ["brood-call"], text: "Gains Brood Call." }],
+      blurb: "Licks the wounded better and keeps a pouch of spare eggs for emergencies. Every day is an emergency.",
+    },
+    {
+      id: "munch-warren",
+      name: "Warren Mound",
+      faction: "munch",
+      cost: 3,
+      supply: 1,
+      models: 1,
+      move: 0,
+      hp: 6,
+      shield: 0,
+      armor: 5,
+      baseRadius: 1,
+      keywords: ["structure", "beast"],
+      weapons: [melee("Ankle Biters", 2, 4)],
+      abilities: ["burrow-exit", "lurk", "regen"],
+      upgrades: [],
+      structure: { lifetime: "permanent", fieldDeploy: 6 },
+      blurb: "A lumpy dirt pile with a door. The door has teeth. Your reserves pop out of it.",
     },
   ],
 };
@@ -244,28 +862,156 @@ const concord: Faction = {
   blurb:
     "Glowing crystal aristocrats who find everyone else faintly embarrassing. Few in number, hard to scratch, impossibly smug.",
   color: 0xb48cf2,
+  look: "crystal",
+  // Each faction starts with its way in: drop-ship, burrow hole, portal. Unlike the drop-ship, the
+  // portal also suits the long Assault board: a few elites can't hold its many objectives on foot
+  // (sims: Concord ~39% without it, ~56% with it).
+  defaultSupports: ["con-spire", "con-portal"],
+  assaultSupports: ["con-lens"],
+  assaultStarter: ["con-spire", "con-portal", "con-lens"],
+  supports: [
+    {
+      id: "con-spire",
+      name: "Mirror Spire",
+      faction: "concord",
+      fizz: 3,
+      cp: 1,
+      blurb: "A tower of polished smugness.",
+      abilities: [
+        { id: "refocus", name: "Refocus", cp: 1, exhaust: false, timing: "any", effect: { kind: "recharge" }, text: "A friendly unit's shields recharge to full." },
+        {
+          id: "glimmer-ward",
+          name: "Glimmer Ward",
+          cp: 3,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "summon", profileId: "con-ward", range: 8, minEnemyDistance: 2 },
+          text: 'Place a Glimmer Ward within 8" of one of your models. Until the end of the round, enemy shots at friendly units within 4" of it hit one worse.',
+        },
+      ],
+    },
+    {
+      id: "con-choir",
+      name: "Choir of Light",
+      faction: "concord",
+      fizz: 2,
+      cp: 1,
+      blurb: "They hum in perfect, unbearable harmony.",
+      abilities: [
+        { id: "hold-fast", name: "Hold Fast", cp: 1, exhaust: true, timing: "any", effect: { kind: "brace" }, text: "Reaction: the next friendly unit charged this round gets +1 to saves in that combat." },
+      ],
+    },
+    {
+      id: "con-lens",
+      name: "Star Lens",
+      faction: "concord",
+      fizz: 3,
+      cp: 0,
+      blurb: "Focuses sunlight. Also focuses disdain.",
+      abilities: [
+        {
+          id: "sunbeam",
+          name: "Sunbeam",
+          cp: 3,
+          exhaust: true,
+          timing: "assault",
+          effect: { kind: "blast", radius: 2, hit: 3, damage: 2, ap: 1, range: 24, needsSight: true },
+          text: 'A 2" blast at a point within 24" that one of your models can see. Each model under it is hit on a 3+ for 2 damage, AP1.',
+        },
+      ],
+    },
+    {
+      id: "con-court",
+      name: "Court of Disdain",
+      faction: "concord",
+      fizz: 2,
+      cp: 1,
+      blurb: "A jury of crystal nobles, permanently unimpressed. They will tell your gunners exactly where the enemy's armour is cheap.",
+      abilities: [
+        {
+          id: "point-out-flaws",
+          name: "Point Out Flaws",
+          cp: 1,
+          exhaust: true,
+          timing: "assault",
+          effect: { kind: "aimBuff", precision: 1, tracking: 1 },
+          text: "A friendly unit's attacks get precision +1 and tracking +1 this round. Precision also lets it pick a target out of a melee.",
+        },
+      ],
+    },
+    {
+      id: "con-gate",
+      name: "Light Gate",
+      faction: "concord",
+      fizz: 3,
+      cp: 1,
+      blurb: "A doorway of pure light for getting about the battlefield. Please wipe your feet.",
+      abilities: [
+        {
+          id: "gate-step",
+          name: "Gate Step",
+          cp: 3,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "teleport", range: 8 },
+          text: 'One of your unengaged units on the table steps through a gate and out up to 8" away, ignoring terrain (not into base contact). It can still move and act afterwards.',
+        },
+      ],
+    },
+    {
+      // Concord's way in. Not the drop-ship's "anywhere, far from trouble" or the burrow's "the whole
+      // swarm pours out": an elite reinforcement beams in right beside your own crystals, close to
+      // the fight, and arrives overcharged.
+      id: "con-portal",
+      name: "Grand Portal",
+      faction: "concord",
+      fizz: 3,
+      cp: 1,
+      blurb: "Arriving fashionably late is an art. Arriving in a blaze of light, beside one's peers, is a privilege.",
+      abilities: [
+        {
+          id: "step-through",
+          name: "Step Through",
+          cp: 2,
+          exhaust: true,
+          timing: "movement",
+          effect: { kind: "airdrop", range: 4, minEnemyDistance: 3, fromRound: 2, arrivalShield: 1 },
+          text: 'From round 2: a unit from your reserves steps out of a portal within 4" of one of your units (at least 3" from enemies), paying its resources and supply as normal. It arrives overcharged: +1 shield per model, even above its maximum, until the end of the round.',
+        },
+      ],
+    },
+  ],
+  assaultExtras: [
+    { profileId: "con-guard", upgrades: ["third"] },
+    { profileId: "con-lancer", upgrades: ["twin"] },
+    { profileId: "con-facet", upgrades: ["lustre"] },
+    { profileId: "con-sylph", upgrades: ["plumage"] },
+    { profileId: "con-obelisk", upgrades: [] },
+  ],
   defaultList: [
     { profileId: "con-guard", upgrades: [] },
     { profileId: "con-guard", upgrades: ["third"] },
     { profileId: "con-lancer", upgrades: [] },
     { profileId: "con-skiff", upgrades: [] },
     { profileId: "con-warden", upgrades: [] },
+    { profileId: "con-dancers", upgrades: [] },
   ],
   profiles: [
     {
       id: "con-guard",
       name: "Prism Guard",
       faction: "concord",
-      cost: 4,
+      cost: 3,
       supply: 2,
       models: 2,
       move: 6,
-      hp: 2,
+      hp: 1,
       shield: 1,
       armor: 4,
       baseRadius: 0.6,
       keywords: ["infantry", "armoured"],
-      weapons: [melee("Glow Blade", 2, 3, { ap: 1 }), ranged("Light Flick", 12, 1, 3)],
+      nerve: 8,
+      weapons: [melee("Glow Blade", 2, 3, { ap: 1, traits: ["rending"] }), ranged("Light Flick", 12, 1, 3, { traits: ["pistol", "blast"] })],
       abilities: ["blink"],
       upgrades: [{ id: "third", name: "Third Prism", cost: 2, addModels: 1, text: "+1 model." }],
       blurb: "Duellists who refuse to sweat.",
@@ -283,13 +1029,15 @@ const concord: Faction = {
       armor: 5,
       baseRadius: 0.55,
       keywords: ["infantry", "light"],
+      evade: { target: 6, against: ["pointBlank"] },
+      nerve: 8,
       weapons: [
-        ranged("Sunlance", 30, 2, 3, { damage: 2, ap: 1, bonuses: [{ vs: "armoured", damage: 1 }] }),
+        ranged("Sunlance", 24, 2, 3, { precision: 2, damage: 2, ap: 1, bonuses: [{ vs: "armoured", damage: 1 }], traits: ["rending"] }),
         melee("Disdainful Poke", 1, 5),
       ],
-      abilities: ["steady-aim"],
+      abilities: [],
       upgrades: [{ id: "twin", name: "Twin Lancers", cost: 3, addModels: 1, text: "+1 model." }],
-      blurb: "Shoots you from very far away, then sighs.",
+      blurb: "Shoots you from very far away, then sighs. Has never missed, and will mention it.",
     },
     {
       id: "con-skiff",
@@ -304,8 +1052,10 @@ const concord: Faction = {
       armor: 5,
       baseRadius: 1.1,
       keywords: ["flying", "mech"],
-      weapons: [ranged("Flicker Cannon", 18, 3, 4, { ap: 1, bonuses: [{ vs: "flying", dice: 1 }] })],
-      abilities: ["refraction"],
+      evade: { target: 6, against: ["ranged"] },
+      nerve: 8,
+      weapons: [ranged("Flicker Cannon", 18, 3, 4, { tracking: 1, ap: 1, bonuses: [{ vs: "flying", dice: 1 }], traits: ["blast"] })],
+      abilities: ["refraction", "bubble-shield"],
       upgrades: [],
       blurb: "Glides about looking expensive. Is expensive.",
     },
@@ -322,19 +1072,194 @@ const concord: Faction = {
       armor: 4,
       baseRadius: 0.75,
       keywords: ["infantry", "armoured"],
+      nerve: 9,
       weapons: [ranged("Glow Orb", 12, 2, 4), melee("Warden Staff", 2, 4)],
       abilities: ["radiance", "recall"],
       upgrades: [],
       blurb: "Hums softly. Summons friends. Judges you.",
     },
+    {
+      id: "con-pylon",
+      name: "Prism Pylon",
+      faction: "concord",
+      cost: 4,
+      supply: 1,
+      models: 1,
+      move: 0,
+      hp: 3,
+      shield: 3,
+      armor: 4,
+      baseRadius: 0.9,
+      keywords: ["structure"],
+      weapons: [ranged("Pylon Beam", 18, 2, 4, { tracking: 1, ap: 1, traits: ["rending"] })],
+      abilities: ["radiance"],
+      upgrades: [],
+      structure: { lifetime: "permanent", fieldDeploy: 6 },
+      blurb: "A crystal spike that charges rent.",
+    },
+    {
+      id: "con-ward",
+      name: "Glimmer Ward",
+      faction: "concord",
+      cost: 0,
+      supply: 0,
+      models: 1,
+      move: 0,
+      hp: 2,
+      shield: 2,
+      armor: 5,
+      baseRadius: 0.7,
+      keywords: ["structure"],
+      weapons: [],
+      abilities: ["ward-aura"],
+      upgrades: [],
+      structure: { lifetime: "round", summonOnly: true },
+      blurb: "A floating prism that politely declines bullets.",
+    },
+    // ----- new units (crystal monster, jump flankers, light flyer, sniper structure) -----
+    {
+      id: "con-facet",
+      name: "The Grand Facet",
+      faction: "concord",
+      cost: 7,
+      supply: 4,
+      models: 1,
+      move: 5,
+      hp: 7,
+      shield: 3,
+      armor: 3,
+      baseRadius: 1.35,
+      keywords: ["armoured", "heavy", "monster", "fearless"],
+      weapons: [
+        ranged("Prism Cannon", 24, 2, 3, { precision: 1, damage: 2, ap: 2, bonuses: [{ vs: "armoured", damage: 1 }], traits: ["heavy"] }),
+        melee("Gem Fist", 3, 3, { damage: 2, ap: 1 }),
+      ],
+      abilities: ["refraction", "provoke"],
+      impact: { dice: 1, hit: 3, damage: 2, ap: 1 },
+      upgrades: [{ id: "lustre", name: "Lustre Core", cost: 2, addAbilities: ["radiance"], text: "Gains Radiance." }],
+      blurb: "A walking cathedral of cut crystal. Believes it is the main character. Is, unfortunately, correct.",
+    },
+    {
+      id: "con-dancers",
+      name: "Mirage Dancers",
+      faction: "concord",
+      cost: 4,
+      supply: 2,
+      models: 2,
+      move: 9,
+      hp: 1,
+      shield: 1,
+      armor: 4,
+      baseRadius: 0.55,
+      keywords: ["infantry", "light", "jump"],
+      evade: { target: 4, against: ["pointBlank", "melee"] },
+      nerve: 8,
+      weapons: [
+        ranged("Glint Darts", 12, 2, 3, { tracking: 1, traits: ["pistol"] }),
+        melee("Flourish", 2, 3, { ap: 1, traits: ["rending"] }),
+      ],
+      abilities: [],
+      upgrades: [
+        { id: "encore", name: "Encore", cost: 2, addModels: 1, text: "+1 model." },
+        { id: "afterimage", name: "Afterimage", cost: 1, addAbilities: ["blink"], text: "Gains Blink." },
+      ],
+      blurb: "Pirouette onto the roof, stab you, curtsey. Applause is expected.",
+    },
+    {
+      id: "con-sylph",
+      name: "Sunwing Sylph",
+      faction: "concord",
+      cost: 4,
+      supply: 2,
+      models: 1,
+      move: 14,
+      hp: 2,
+      shield: 2,
+      armor: 5,
+      baseRadius: 0.7,
+      keywords: ["flying", "light"],
+      evade: { target: 5, against: ["ranged", "blast"] },
+      nerve: 8,
+      weapons: [ranged("Needle Glare", 16, 2, 3, { tracking: 1, ap: 1, bonuses: [{ vs: "flying", dice: 1 }], traits: ["rending"] })],
+      abilities: [],
+      upgrades: [{ id: "plumage", name: "Mirror Plumage", cost: 1, addAbilities: ["refraction"], text: "Gains Refraction." }],
+      blurb: "Glass wings, sharp opinions. Only lands for compliments.",
+    },
+    {
+      id: "con-obelisk",
+      name: "Sunstone Obelisk",
+      faction: "concord",
+      cost: 5,
+      supply: 1,
+      models: 1,
+      move: 0,
+      hp: 3,
+      shield: 3,
+      armor: 4,
+      baseRadius: 0.9,
+      keywords: ["structure"],
+      weapons: [ranged("Judgement Ray", 32, 2, 3, { precision: 1, tracking: 1, damage: 2, ap: 2, bonuses: [{ vs: "heavy", damage: 1 }], traits: ["rending"] })],
+      abilities: [],
+      upgrades: [],
+      structure: { lifetime: "permanent", fieldDeploy: 6 },
+      blurb: "A monument to good taste that fires on anyone who lacks it. So: everyone.",
+    },
   ],
 };
 
+/** All factions: the three built-ins plus any registered custom ones. Treat as read-only. */
 export const FACTIONS: Record<FactionId, Faction> = { militia, munch, concord };
+export const BUILT_IN_FACTION_IDS = ["militia", "munch", "concord"] as const;
+export const isBuiltInFaction = (id: FactionId): boolean => (BUILT_IN_FACTION_IDS as readonly string[]).includes(id);
 
-export const PROFILES: Record<string, UnitProfile> = Object.fromEntries(
-  Object.values(FACTIONS).flatMap((f) => f.profiles.map((p) => [p.id, p])),
-);
+export function factionOf(id: FactionId): Faction {
+  const f = FACTIONS[id];
+  if (!f) throw new Error(`Unknown faction: ${id}`);
+  return f;
+}
+
+export const PROFILES: Record<string, UnitProfile> = {};
+export const SUPPORTS: Record<string, SupportDef> = {};
+
+function rebuildIndexes(clearCache = true): void {
+  for (const k of Object.keys(PROFILES)) delete PROFILES[k];
+  for (const k of Object.keys(SUPPORTS)) delete SUPPORTS[k];
+  for (const f of Object.values(FACTIONS)) {
+    for (const p of f.profiles) PROFILES[p.id] = p;
+    for (const sp of f.supports) SUPPORTS[sp.id] = sp;
+  }
+  // profile.ts imports this module, so its cache doesn't exist yet during the first build.
+  if (clearCache) clearProfileCache();
+}
+rebuildIndexes(false);
+
+/**
+ * Replace the registered custom factions (built-ins are never touched). Call before creating a game.
+ * Custom factions must have ids starting with "custom-" and unique profile/support ids.
+ */
+export function registerCustomFactions(custom: Faction[]): void {
+  for (const id of Object.keys(FACTIONS)) if (!isBuiltInFaction(id)) delete FACTIONS[id];
+  for (const f of custom) {
+    if (isBuiltInFaction(f.id)) continue;
+    FACTIONS[f.id] = { ...f, custom: true };
+  }
+  rebuildIndexes();
+}
+
+export function supportOf(id: string): SupportDef {
+  const sp = SUPPORTS[id];
+  if (!sp) throw new Error(`Unknown support: ${id}`);
+  return sp;
+}
+
+export const supportsCost = (ids: string[]): number => ids.reduce((sum, id) => sum + (SUPPORTS[id]?.fizz ?? 0), 0);
+
+/** Built-in starter supports for a faction in a mode. */
+export function defaultSupportsFor(faction: FactionId, mode: ModeId): string[] {
+  const f = factionOf(faction);
+  if (mode !== "assault") return [...f.defaultSupports];
+  return f.assaultStarter ? [...f.assaultStarter] : [...f.defaultSupports, ...f.assaultSupports];
+}
 
 export function baseProfile(profileId: string): UnitProfile {
   const p = PROFILES[profileId];
@@ -348,3 +1273,9 @@ export function entryCost(e: ListEntry): number {
 }
 
 export const listCost = (list: ListEntry[]): number => list.reduce((s, e) => s + entryCost(e), 0);
+
+/** The built-in starter roster for a faction in a game mode. */
+export function defaultListFor(faction: FactionId, mode: ModeId): ListEntry[] {
+  const f = factionOf(faction);
+  return structuredClone(mode === "assault" ? [...f.defaultList, ...f.assaultExtras] : f.defaultList);
+}

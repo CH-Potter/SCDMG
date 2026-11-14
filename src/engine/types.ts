@@ -11,7 +11,9 @@ export interface Vec {
 /** 0 = ground, 1 = raised platform, 2 = flying. */
 export type Elevation = 0 | 1 | 2;
 
-export type FactionId = "militia" | "munch" | "concord";
+/** The three built-in factions. Custom factions use ids starting with "custom-". */
+export type BuiltInFactionId = "militia" | "munch" | "concord";
+export type FactionId = string;
 
 export type Keyword =
   | "infantry" // can climb ladders, benefits from cover
@@ -22,7 +24,9 @@ export type Keyword =
   | "jump" // can change elevation anywhere, without a ramp or ladder
   | "mech"
   | "beast"
-  | "monster";
+  | "monster"
+  | "structure" // can't move; can't hold objectives
+  | "fearless"; // never takes nerve tests
 
 export type Phase = "movement" | "assault" | "combat" | "scoring";
 
@@ -34,17 +38,42 @@ export type AbilityId =
   | "brood-call" // aura: friendly Beasts within 6" get +1 move
   | "radiance" // aura: friendly units within 6" recharge +1 extra shield
   | "steady-aim" // +1 ranged die per model if the unit hasn't moved this round
+  | "steadying" // aura: friendly units within 6" get +1 nerve
+  | "mending-aura" // aura: end of round, unhurt friendly units within 6" heal 1 HP
   // reactive
   | "overwatch" // once per round: shoot an enemy that ends a move within 10" in sight
   | "sticky-goo" // ranged hits that cause damage slow the target (-2 move next round)
   | "pop" // when one of its models dies, nearby enemy models may take 1 damage
   | "refraction" // once per round: reduce the damage of one ranged attack by 1
+  | "lurk" // once per round: lash out at an enemy that ends a move, charge, deploy or teleport within 3"
   // active
   | "patch-up" // heal 2 HP on a nearby friendly unit, reviving a model if needed
+  | "hatch" // a nearby friendly unit regrows lost models
   | "barrage" // indirect blast at a point, no line of sight needed
   | "tunnel" // vanish and re-emerge anywhere on the ground away from enemies
   | "blink" // teleport up to 10", even onto platforms
-  | "recall"; // teleport a friendly unit to the user
+  | "recall" // teleport a friendly unit to the user
+  | "grapple" // drag an enemy unit up to 4" toward this unit
+  | "rocket-hop" // assault phase: leap up to 6" over terrain, then still shoot or charge
+  | "rampage" // +1 melee die per model this round, saves one worse
+  | "spotter" // your shots at a spotted enemy hit one better this round
+  | "bubble-shield" // +1 shield per model on a nearby friendly unit until the end of the round
+  | "sugar-rush" // +2 move this round, one model takes 1 damage
+  | "provoke" // enemy units within 18" must shoot this unit if they can
+  | "demo-charge" // throw a charge at an enemy within 4"; extra damage vs structures and mechs
+  // structures
+  | "burrow-exit" // your reserves may deploy within 3" of this structure
+  | "ward-aura"; // enemy ranged attacks on friendly units within 4" hit one worse
+
+/**
+ * Weapon traits:
+ * - blast: +1 die per attacking model against units with 5+ models left
+ * - torrent: hits automatically (no hit roll needed)
+ * - heavy: hits one worse if the unit has moved this round
+ * - rending: natural 6s to hit get +1 AP
+ * - pistol: point-blank shots (at a unit you're engaged with) don't allow evade rolls
+ */
+export type WeaponTrait = "blast" | "torrent" | "heavy" | "rending" | "pistol";
 
 export interface WeaponBonus {
   vs: Keyword;
@@ -64,6 +93,20 @@ export interface Weapon {
   /** Which domains this weapon can hit. Melee from ground units can never hit flyers. */
   targets: "ground" | "air" | "all";
   bonuses?: WeaponBonus[];
+  traits?: WeaponTrait[];
+  /** Precision N: after rolling to hit, move up to N missed dice into the hits. Also lets the weapon shoot into a melee. */
+  precision?: number;
+  /** Tracking N: cancel up to N of the defender's successful evade rolls. */
+  tracking?: number;
+}
+
+/** Situations an evade roll applies in: point-blank shots from an engaged enemy, any shooting, close combat, or blasts. */
+export type EvadeCondition = "pointBlank" | "ranged" | "melee" | "blast";
+
+/** Evade: each hit from a matching attack is dodged on a d6 >= target (before armour). */
+export interface EvadeDef {
+  target: number;
+  against: EvadeCondition[];
 }
 
 export interface UpgradeDef {
@@ -96,6 +139,124 @@ export interface UnitProfile {
   abilities: AbilityId[];
   upgrades: UpgradeDef[];
   blurb: string;
+  /** Set for structures (turrets, pylons, pods, summoned wards...). */
+  structure?: StructureDef;
+  /** Impact on charge: each charging model in base contact rolls these dice at the charged unit. */
+  impact?: ImpactDef;
+  /** Nerve: when a unit at half strength or less takes damage it rolls 2d6; above its nerve it's Shaken. Default 7. */
+  nerve?: number;
+  /** Evade roll and the situations it applies in. Absent means no evade. */
+  evade?: EvadeDef;
+  /** Custom miniature art (custom factions only). Without it the renderer picks an archetype from the profile. */
+  art?: UnitArt;
+}
+
+/** Custom art for a unit: an uploaded image shown as a coin token, or a figure built from parts. */
+export type UnitArt =
+  | { kind: "image"; /** Circle-cropped raster image (PNG/WebP/JPEG data URL), validated in data/unitArt.ts. */ dataUrl: string }
+  | { kind: "parts"; recipe: MiniatureRecipe };
+
+export type MiniBody = "trooper" | "critter" | "brute" | "walker" | "flyer" | "structure";
+export type MiniHead = "face" | "visor" | "beast" | "gem";
+export type MiniHeadgear = "none" | "helmet" | "hat" | "goggles" | "horns" | "crown" | "antennae";
+export type MiniWeapon = "none" | "rifle" | "cannon" | "blade" | "claws" | "staff";
+export type MiniBack = "none" | "pack" | "jets" | "tank" | "banner";
+
+/** A miniature built in the forge from original parts, baked like a built-in archetype. */
+export interface MiniatureRecipe {
+  body: MiniBody;
+  head: MiniHead;
+  headgear: MiniHeadgear;
+  weapon: MiniWeapon;
+  back: MiniBack;
+  /** Main colour; leave out to use the faction colour. */
+  primary?: number;
+  /** Trim and accent colour. */
+  secondary: number;
+  /** Size relative to the base (1 = normal). */
+  scale: number;
+}
+
+export interface ImpactDef {
+  dice: number; // per charging model in base contact
+  hit: number;
+  damage: number;
+  ap: number;
+}
+
+export interface StructureDef {
+  /** Permanent structures stay until destroyed; "round" ones vanish at the end of the round. */
+  lifetime: "permanent" | "round";
+  /** Only created by summons (support effects); never bought in a list. */
+  summonOnly?: boolean;
+  /** May deploy within this many inches of a friendly non-structure unit, not just in the spawn zone. */
+  fieldDeploy?: number;
+}
+
+// ---------- off-board supports ----------
+
+export type SupportTiming = "movement" | "assault" | "combat" | "any";
+export type ReactionTrigger = "enemyShoots" | "enemyCharges" | "friendlyDestroyed";
+
+export type SupportEffect =
+  | { kind: "resources"; amount: number }
+  | { kind: "heal"; amount: number; revive?: boolean }
+  | { kind: "recharge" }
+  | { kind: "blast"; radius: number; hit: number; damage: number; ap: number; range: number; needsSight: boolean }
+  | { kind: "summon"; profileId: string; range: number; minEnemyDistance: number }
+  | { kind: "meleeBuff"; dice: number }
+  | { kind: "rangedBuff"; dice: number }
+  | { kind: "slow"; range: number }
+  /**
+   * Deploy a reserve unit (paying its cost and supply) at a point near your models. Target: a reserve unit and a point.
+   * `anywhere`: the point can be anywhere on the table (`range` is ignored). `fromRound`: can't be used before this round.
+   * Never within HOME_EXCLUSION of the enemy's home objective.
+   */
+  | {
+      kind: "airdrop";
+      range: number;
+      minEnemyDistance: number;
+      anywhere?: boolean;
+      fromRound?: number;
+      /** Shield added to each arriving model, even above its maximum, until the end of the round. */
+      arrivalShield?: number;
+    }
+  /** An enemy unit near your models takes a nerve test at -penalty nerve, at any strength. */
+  | { kind: "rattle"; range: number; penalty: number }
+  /** A friendly unit's attacks get +precision and +tracking this round. */
+  | { kind: "aimBuff"; precision: number; tracking: number }
+  /** A friendly unit regrows up to `models` lost models (1 HP each). */
+  | { kind: "regrow"; models: number }
+  /** A friendly unit digs in: +`save` to its saves against shooting and barrages this round. */
+  | { kind: "dugIn"; save: number }
+  /** A friendly, unengaged unit teleports up to `range`" (its leader), ignoring terrain; it can still act afterwards. */
+  | { kind: "teleport"; range: number }
+  // reactions: armed on your turn, fire automatically on the trigger, expire at the end of the round
+  | { kind: "ward" }
+  | { kind: "brace" }
+  | { kind: "retaliate"; hit: number; damage: number };
+
+export interface SupportAbilityDef {
+  id: string;
+  name: string;
+  text: string;
+  cp: number;
+  /** Using it exhausts the support card until the next round. */
+  exhaust: boolean;
+  timing: SupportTiming;
+  effect: SupportEffect;
+}
+
+export interface SupportDef {
+  id: string;
+  name: string;
+  faction: FactionId;
+  /** List-building cost in Fizz. */
+  fizz: number;
+  /** Command points this support adds to your pool at the start of each round. */
+  cp: number;
+  blurb: string;
+  abilities: SupportAbilityDef[];
 }
 
 export interface Faction {
@@ -104,7 +265,24 @@ export interface Faction {
   blurb: string;
   color: number;
   profiles: UnitProfile[];
+  /** Starter roster for Skirmish. */
   defaultList: ListEntry[];
+  /** Added to the Skirmish roster for Assault. */
+  assaultExtras: ListEntry[];
+  /** Off-board supports this faction can take. */
+  supports: SupportDef[];
+  /** Starter supports for Skirmish, and the extras added for Assault. */
+  defaultSupports: string[];
+  assaultSupports: string[];
+  /**
+   * The whole Assault starter set, when it shouldn't simply be the Skirmish set plus the extras
+   * (e.g. a card that's fine on the small board but too strong on the long one).
+   */
+  assaultStarter?: string[];
+  /** Token decoration the renderer uses. */
+  look: "cap" | "teeth" | "crystal" | "plain";
+  /** True for factions made in the faction tool. */
+  custom?: boolean;
 }
 
 export interface ListEntry {
@@ -131,6 +309,28 @@ export interface UnitStatus {
   hurt: boolean; // took damage this round
   slowedRounds: number; // >0: -2 move
   deployedRound: number;
+  /** Per-round buffs from supports. */
+  meleeBonus: number;
+  rangedBonus: number;
+  braced: boolean;
+  /** Used its active ability this phase (abilities are free actions within the activation). */
+  abilityUsed: boolean;
+  /** Shaken: hits one worse, won't charge, can't hold objectives. Lasts until rallied. */
+  shaken: boolean;
+  /** Rampage: saves one worse until the end of the round. */
+  reckless?: boolean;
+  /** Spotter: enemy shots at this unit hit one better until the end of the round. */
+  spotted?: boolean;
+  /** Sugar Rush: extra move until the end of the round. */
+  hasted?: number;
+  /** Provoke: enemy units within range must shoot this unit if they can, until the end of the round. */
+  provoking?: boolean;
+  /** Per-round combat buffs (negative = debuff): evade target, precision and tracking on every attack. */
+  evadeBonus?: number;
+  precisionBonus?: number;
+  trackingBonus?: number;
+  /** Dug in (support): this much better saves against shooting and barrages until the end of the round. */
+  dugIn?: number;
 }
 
 export interface Unit {
@@ -144,6 +344,10 @@ export interface Unit {
   status: UnitStatus;
   abilityUses: Partial<Record<AbilityId, number>>; // uses this game
   reactionsUsed: AbilityId[]; // reactive abilities used this round
+  /** Temporary structures: removed at the end of this round. */
+  expiresRound?: number;
+  /** Created by a summon rather than bought in the list. */
+  summoned?: boolean;
 }
 
 export type TerrainKind =
@@ -183,6 +387,38 @@ export interface Flag {
   home: Vec;
   pos: Vec;
   carrier: string | null;
+  /**
+   * Convoy cargo (role missions): `team`'s own payload, carried by `team` toward the enemy's
+   * deployment zone or home objective. Without it, the flag is a snack the enemy steals.
+   */
+  cargo?: boolean;
+}
+
+/** Per-player economy for the rest of the game (mission defaults, role overrides, garrison supply). */
+export interface EconomyState {
+  income: number;
+  supplyPerRound: number;
+  maxSupply: number;
+}
+
+/**
+ * Mission bookkeeping that lives across rounds. Treat it as immutable: replace the object (and any
+ * record inside it) rather than editing it, because cloneState copies it by reference.
+ */
+export interface MissionState {
+  /** Each player's economy (set up by createGame). */
+  economy?: [EconomyState, EconomyState];
+  /** Crown: consecutive rounds each crown objective (by id) has been held, and by whom. */
+  streaks?: Record<string, { player: PlayerId; rounds: number }>;
+  /** Shifting: the objective number that scores this round, and the one announced for next round. */
+  live?: number | null;
+  next?: number | null;
+  /** Bounty: the uid of each player's marked unit (the one the other side is hunting), or null. */
+  bounty?: [string | null, string | null];
+  /** Loot: loads of salvage left on each objective (by id). */
+  loads?: Record<string, number>;
+  /** Cull: enemy supply destroyed that each player has already been paid for. */
+  culled?: [number, number];
 }
 
 export interface PlayerState {
@@ -190,6 +426,11 @@ export interface PlayerState {
   supplyCap: number;
   vp: number;
   passed: boolean;
+  /** Command points. */
+  cp: number;
+  supports: { id: string; exhausted: boolean }[];
+  /** Reactions armed this round. */
+  armed: { support: string; ability: string; trigger: ReactionTrigger; expiresRound: number }[];
 }
 
 export interface GameState {
@@ -212,6 +453,23 @@ export interface GameState {
   rng: number;
   over: boolean;
   winner: PlayerId | "draw" | null;
+  /** The opening initiative roll-off: one d6 each, re-rolled on ties. Last pair decides. */
+  initiativeRolls?: [number, number][];
+  /** Someone must choose who goes first before anything else happens (roll-off winner, or trailing player). */
+  orderChoice?: { player: PlayerId; reason: "rolloff" | "tie" | "behind" } | null;
+  /** First player to pass early in the movement or combat phase: goes first in the next phase. */
+  initiativeClaim?: PlayerId | null;
+  /** Whether order choices are in play this game (GameSetup.orderChoice). */
+  orderChoiceRule?: boolean;
+  /** Mission bookkeeping (economy, crown streaks, live objective, bounty marks, loot). See MissionState. */
+  missionState?: MissionState;
+  /**
+   * Open roster ("RTS") game: no army lists. Each side keeps one reserve unit of every buyable
+   * profile in its faction, refilled as soon as it deploys (see openRoster.ts). `cap`: most copies
+   * of one profile on the table at once (absent = no limit). `seq` numbers new recruits' uids.
+   * Treat as immutable: replace the object rather than editing it (cloneState shares it).
+   */
+  openRoster?: { cap?: number; seq: number };
 }
 
 export type Command =
@@ -225,16 +483,29 @@ export type Command =
   | { type: "hunker"; uid: string }
   | { type: "hold"; uid: string }
   | { type: "ability"; uid: string; ability: AbilityId; target?: string; point?: Vec }
-  | { type: "pass"; player: PlayerId };
+  | { type: "pass"; player: PlayerId }
+  /** Free action every army has: spend 1 CP to steady a Shaken unit. */
+  | { type: "rally"; player: PlayerId; target: string }
+  /** The roll-off winner (or trailing player) decides who goes first this round. */
+  | { type: "chooseOrder"; player: PlayerId; goFirst: boolean }
+  /** Free action: play a support ability (doesn't use an activation or pass the turn). */
+  | { type: "support"; player: PlayerId; support: string; ability: string; target?: string; point?: Vec };
 
 export interface AttackReport {
   uid: string;
   target: string;
   weapon: string;
-  kind: "shoot" | "fight" | "overwatch" | "barrage";
+  kind: "shoot" | "fight" | "overwatch" | "barrage" | "impact";
   attackers: number; // models contributing
   hitRolls: number[];
   hitOn: number;
+  /** Missed dice moved into the hits by precision. */
+  precisionMoved?: number;
+  /** The defender's evade dice (one per hit) and the target they needed; absent when the attack allowed no evade. */
+  evadeRolls?: number[];
+  evadeOn?: number;
+  /** Successful evades cancelled by tracking. */
+  evadesCancelled?: number;
   saveRolls: number[];
   saveOn: (number | null)[];
   damage: number;
@@ -254,7 +525,19 @@ export type GameEvent =
   | { type: "scored"; player: PlayerId; vp: number; reason: string }
   | { type: "flag"; team: PlayerId; text: string }
   | { type: "roundEnded"; round: number }
-  | { type: "gameOver"; winner: PlayerId | "draw"; reason: string };
+  | { type: "gameOver"; winner: PlayerId | "draw"; reason: string }
+  | { type: "support"; player: PlayerId; support: string; ability: string; text: string }
+  | { type: "summoned"; uid: string }
+  | { type: "morale"; uid: string; roll: [number, number]; nerve: number; shaken: boolean }
+  | { type: "rallied"; uid: string; how: "cp" | "roll" }
+  | { type: "rolloff"; rolls: [number, number][]; winner: PlayerId; reason: "start" | "tie" }
+  | { type: "orderChosen"; player: PlayerId; goFirst: boolean; round: number }
+  | { type: "initiativeClaimed"; player: PlayerId; nextPhase: Phase }
+  | { type: "expired"; uid: string }
+  /** End of round: a side's shields recharge (`models` that gained shield). */
+  | { type: "recharged"; player: PlayerId; models: number }
+  /** End of round: a side's income, supply-cap growth and CP for the next round. */
+  | { type: "upkeep"; player: PlayerId; resources: number; supply: number; cp: number };
 
 export type CommandResult =
   | { ok: true; state: GameState; events: GameEvent[] }

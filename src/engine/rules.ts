@@ -2,7 +2,7 @@
 
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
-import type { GameState, Model, Objective, PlayerId, Unit } from "./types";
+import type { GameState, Model, Objective, PlayerId, Unit, Vec } from "./types";
 
 export const ENGAGE_RANGE = 1;
 export const AURA_RANGE = 6;
@@ -53,6 +53,11 @@ export function canAffordDeploy(s: GameState, u: Unit): string | null {
   if (supplyUsed(s, u.owner) + prof.supply > pl.supplyCap) {
     return `Needs ${prof.supply} supply (${supplyUsed(s, u.owner)}/${pl.supplyCap} used)`;
   }
+  // Open roster: at most `cap` copies of one unit on the table at once (openRoster.ts).
+  const cap = s.openRoster?.cap;
+  if (cap !== undefined && onBoard(s, u.owner).filter((x) => x.profileId === u.profileId).length >= cap) {
+    return `Already ${cap} × ${prof.name} on the table (the most you can field at once)`;
+  }
   return null;
 }
 
@@ -64,19 +69,38 @@ export function effectiveMove(s: GameState, u: Unit): number {
     const caller = onBoard(s, u.owner).some((f) => f.uid !== u.uid && hasAbility(f, "brood-call") && unitGap(f, u) <= AURA_RANGE);
     if (caller) mv += 1;
   }
+  mv += u.status.hasted ?? 0;
   if (u.status.slowedRounds > 0) mv -= 2;
   return Math.max(1, mv);
 }
 
 // ---------- objectives ----------
 
+/**
+ * How much a unit counts towards holding an objective: its supply, halved once it's down to half
+ * strength or less (so battered squads can't hold ground like fresh ones).
+ */
+export function controlWeight(u: Unit): number {
+  const p = profileOf(u);
+  const max = p.models * (p.hp + p.shield);
+  const now = aliveModels(u).reduce((n, m) => n + m.hp + m.shield, 0);
+  return now * 2 <= max ? p.supply / 2 : p.supply;
+}
+
+/** Forward-deploy tricks (Tunnel, Burrow Holes) can't land this close to the enemy's home objective. */
+export const HOME_EXCLUSION = 6;
+
+export function nearEnemyHome(s: GameState, owner: PlayerId, p: Vec): boolean {
+  return s.objectives.some((o) => o.team !== null && o.team !== owner && dist(o.pos, p) < o.radius + HOME_EXCLUSION);
+}
+
 export function objectivePresence(s: GameState, o: Objective): [number, number] {
   const v: [number, number] = [0, 0];
   for (const u of onBoard(s)) {
-    if (isFlying(u)) continue;
+    if (isFlying(u) || profileOf(u).structure || u.status.shaken) continue;
     const r = radiusOf(u);
     if (aliveModels(u).some((m) => m.elevation === o.elevation && dist(m.pos, o.pos) <= o.radius + r + EPS)) {
-      v[u.owner] += profileOf(u).supply;
+      v[u.owner] += controlWeight(u);
     }
   }
   return v;
@@ -98,14 +122,16 @@ export function eligibleUnits(s: GameState, p: PlayerId): Unit[] {
   const units = onBoard(s, p);
   switch (s.phase) {
     case "movement":
-      return units.filter((u) => !u.status.acted);
+      // Structures don't move, so they sit out the movement phase.
+      return units.filter((u) => !u.status.acted && !profileOf(u).structure);
     case "assault":
       return units.filter(
         (u) =>
           !u.status.acted &&
           !u.status.hunkered &&
-          !isEngaged(s, u) &&
-          (!u.status.disengaged || hasKeyword(u, "light")),
+          (!isEngaged(s, u) || profileOf(u).weapons.some((w) => !w.melee)) &&
+          (!u.status.disengaged || hasKeyword(u, "light")) &&
+          (!profileOf(u).structure || profileOf(u).weapons.some((w) => !w.melee)),
       );
     case "combat": {
       const engaged = (x: Unit) => !x.status.fought && isEngaged(s, x) && canFightAnyone(s, x);

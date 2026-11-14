@@ -1,11 +1,16 @@
-import { FACTIONS, entryCost, listCost } from "./engine/data/factions";
-import { MAPS } from "./engine/data/maps";
-import { MISSIONS } from "./engine/data/missions";
-import { profileFor } from "./engine/profile";
-import type { FactionId } from "./engine/types";
+import { missionFitsMap, MISSIONS } from "./engine/data/missions";
+import { registerCustomFactions } from "./engine/data/factions";
+import { openMapBuilder } from "./editor/index";
+import { openFactionForge } from "./forge/index";
+import { listCustomFactions } from "./ui/customFactions";
 import { Controller, showRules } from "./ui/controller";
-import { esc } from "./ui/describe";
+import { openListBuilder } from "./ui/listbuilder";
+import { openMenu, type MenuChoice } from "./ui/menu";
+import "./ui/menu.css";
 import { BoardRenderer } from "./ui/renderer";
+import { audio } from "./audio"; // [audio]
+
+audio.init(); // [audio] starts on the first click or key press (autoplay policy)
 
 const els = {
   topbar: document.getElementById("topbar")!,
@@ -16,88 +21,54 @@ const overlay = document.getElementById("overlay")!;
 const renderer = new BoardRenderer();
 let controller: Controller | null = null;
 
-const ids = Object.keys(FACTIONS) as FactionId[];
-let mine: FactionId = "militia";
-let theirs: FactionId = "munch";
-let missionId = "hold";
-let mapId = "dustbowl";
-
-function factionCards(group: "mine" | "theirs", chosen: FactionId): string {
-  return ids
-    .map((id) => {
-      const f = FACTIONS[id];
-      const roster = f.defaultList
-        .map((e) => {
-          const p = profileFor(e.profileId, e.upgrades);
-          const ups = e.upgrades.map((u) => p.upgrades.find((x) => x.id === u)?.name ?? u);
-          return `<li>${esc(p.name)} ×${p.models}${ups.length ? ` <small>(${esc(ups.join(", "))})</small>` : ""} <small>⚙${entryCost(e)}</small></li>`;
-        })
-        .join("");
-      return `
-        <button class="faction-card ${id === chosen ? "selected" : ""}" data-group="${group}" data-id="${id}">
-          <span class="row"><span class="swatch" style="background:#${f.color.toString(16).padStart(6, "0")}"></span>
-          <strong style="font-size:1.15rem">${esc(f.name)}</strong></span>
-          <p>${esc(f.blurb)}</p>
-          <ul>${roster}</ul>
-          <p class="hint">Roster: ${listCost(f.defaultList)} resources' worth</p>
-        </button>`;
-    })
-    .join("");
+function showMenu(): void {
+  audio.setMood("menu"); // [audio]
+  openMenu(overlay, {
+    onStart: startGame,
+    onListBuilder: (faction, mode, listId) => openListBuilder(overlay, { faction, mode, listId, onClose: showMenu }),
+    onMapBuilder: () =>
+      openMapBuilder(overlay, {
+        onClose: showMenu,
+        onPlay: (map) => {
+          const fits = Object.values(MISSIONS).filter((m) => missionFitsMap(m, map));
+          const mission = fits.find((m) => !m.roles) ?? fits[0] ?? Object.values(MISSIONS).find((m) => m.mode === map.mode)!;
+          startGame({ mode: map.mode, mission, map, factions: ["militia", "munch"], lists: [[], []], supports: [[], []] });
+        },
+      }),
+    onFactionForge: () =>
+      openFactionForge(overlay, {
+        onClose: () => {
+          registerCustomFactions(listCustomFactions());
+          showMenu();
+        },
+      }),
+    onRules: () => showRules(),
+  });
 }
 
-const options = (rec: Record<string, { id: string; name: string }>, chosen: string) =>
-  Object.values(rec)
-    .map((x) => `<option value="${x.id}" ${x.id === chosen ? "selected" : ""}>${esc(x.name)}</option>`)
-    .join("");
-
-function showStart(): void {
-  const mission = MISSIONS[missionId]!;
-  const map = MAPS[mapId]!;
-  overlay.innerHTML = `
-    <div class="modal">
-      <h1>SCDMG</h1>
-      <p class="tagline">A cartoon sci-fi skirmish on the tabletop. Pick your side, the AI's side, a mission and a battlefield.</p>
-      <div class="row" style="align-items:flex-start;margin-bottom:8px">
-        <label style="flex:1;min-width:220px"><b>Mission</b><br/><select id="mission">${options(MISSIONS, missionId)}</select>
-          <span class="hint" style="display:block">${esc(mission.blurb)} ${mission.rounds} rounds.</span></label>
-        <label style="flex:1;min-width:220px"><b>Battlefield</b><br/><select id="map">${options(MAPS, mapId)}</select>
-          <span class="hint" style="display:block">${esc(map.blurb)}</span></label>
-      </div>
-      <h3>Your faction</h3>
-      <div class="faction-grid">${factionCards("mine", mine)}</div>
-      <h3>AI opponent</h3>
-      <div class="faction-grid">${factionCards("theirs", theirs)}</div>
-      <div class="row">
-        <button id="start">To battle!</button>
-        <button class="secondary" id="rules">How to play</button>
-      </div>
-    </div>`;
-  overlay.classList.add("show");
-  overlay.querySelectorAll<HTMLButtonElement>(".faction-card").forEach((b) =>
-    b.addEventListener("click", () => {
-      if (b.dataset.group === "mine") mine = b.dataset.id as FactionId;
-      else theirs = b.dataset.id as FactionId;
-      showStart();
-    }),
-  );
-  overlay.querySelector<HTMLSelectElement>("#mission")!.addEventListener("change", (e) => {
-    missionId = (e.target as HTMLSelectElement).value;
-    showStart();
-  });
-  overlay.querySelector<HTMLSelectElement>("#map")!.addEventListener("change", (e) => {
-    mapId = (e.target as HTMLSelectElement).value;
-    showStart();
-  });
-  overlay.querySelector("#rules")!.addEventListener("click", () => showRules());
-  overlay.querySelector("#start")!.addEventListener("click", () => startGame());
-}
-
-function startGame(): void {
+function startGame(choice: MenuChoice): void {
   overlay.classList.remove("show");
+  overlay.innerHTML = "";
   controller?.destroy();
   renderer.reset();
-  controller = new Controller(renderer, els, showStart, { factions: [mine, theirs], seed: Date.now(), missionId, mapId });
+  const custom = choice.lists.every((l) => l.length > 0);
+  const lists = custom ? choice.lists : undefined;
+  const supports = custom ? choice.supports : undefined;
+  controller = new Controller(renderer, els, showMenu, {
+    factions: choice.factions,
+    lists,
+    supports,
+    seed: Date.now(),
+    orderChoice: true,
+    map: choice.map,
+    mapId: choice.map.id,
+    missionId: choice.mission.id,
+    armyRule: choice.armyRule,
+  });
 }
 
+// Custom factions from the Faction Forge join the built-ins.
+registerCustomFactions(listCustomFactions());
+
 await renderer.init(els.stage);
-showStart();
+showMenu();

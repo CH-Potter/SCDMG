@@ -8,12 +8,15 @@
 //   scoring:  mission scoring and clean-up, then the next round begins
 
 import { ABILITIES } from "./data/abilities";
-import { FACTIONS } from "./data/factions";
-import { MAPS } from "./data/maps";
+import { defaultListFor, defaultSupportsFor } from "./data/factions";
+import { consumeReaction } from "./reactions";
+import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type ArmyRule } from "./openRoster";
+import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
+import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
-import { applyDamage, planMelee, planShooting, resolveAttack, saveNeeded } from "./combat";
+import { applyDamage, planMelee, planShooting, resolveAttack, saveNeeded, planImpact, moraleCheck, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
-import { dist } from "./geometry";
+import { dist, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
 import { rollD6 } from "./rng";
 import {
@@ -21,30 +24,37 @@ import {
   canAffordDeploy,
   effectiveMove,
   eligibleUnits,
+  engagedWith,
   ENGAGE_RANGE,
   isEngaged,
   meleeCanHit,
+  modelGap,
   onBoard,
   playerHasOptions,
   reserves,
   unitById,
   unitGap,
   unitsEngage,
+  HOME_EXCLUSION,
+  nearEnemyHome,
 } from "./rules";
-import { cleanupRound, scoreRound, updateFlags } from "./scoring";
-import { elevationFor } from "./terrain";
+import { cleanupRound, dropCarriedFlag, economyState, scoreRound, setupMission, updateFlags } from "./scoring";
+import { allPlaced, checkPlacement, elevationFor, lineOfSight, type Placed } from "./terrain";
 import type {
   AbilityId,
   Command,
   CommandResult,
+  Elevation,
   FactionId,
   GameEvent,
   GameState,
   ListEntry,
+  Model,
   Phase,
   PlayerId,
   Unit,
   Vec,
+  Weapon,
 } from "./types";
 
 export interface GameSetup {
@@ -52,16 +62,44 @@ export interface GameSetup {
   lists?: [ListEntry[], ListEntry[]];
   seed?: number;
   mapId?: string;
+  /** Pass a full map (e.g. a custom one from the map builder) instead of a built-in id. */
+  map?: MapDef;
+  /** Off-board supports for each side (defaults to the faction's starter supports for the mode). */
+  supports?: [string[], string[]];
+  /**
+   * Let the roll-off winner (and later, the trailing player) choose who goes first. The real game
+   * and the simulator turn this on; hand-built test scenarios leave it off ("winner goes first").
+   */
+  orderChoice?: boolean;
   missionId?: string;
+  /**
+   * "open": an open roster (RTS-style) game. No lists: each side can recruit any buyable unit of
+   * its faction, again and again, paying resources and supply as usual. Lists are ignored and each
+   * side gets its faction's starter supports for the mode unless `supports` is given. See openRoster.ts.
+   */
+  armyRule?: ArmyRule;
+  /** Open roster: most copies of one unit on the table at once. Default: the mode's max copies; null = no limit. */
+  openCap?: number | null;
 }
 
 const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
 
 export function createGame(setup: GameSetup): GameState {
-  const map = MAPS[setup.mapId ?? "dustbowl"];
-  const mission = MISSIONS[setup.missionId ?? "hold"];
+  const map = setup.map ?? MAPS[setup.mapId ?? "dustbowl"];
+  const mission = MISSIONS[setup.missionId ?? (map?.mode === "assault" ? "frontline" : "hold")];
   if (!map || !mission) throw new Error("Unknown map or mission");
-  const lists = setup.lists ?? [FACTIONS[setup.factions[0]].defaultList, FACTIONS[setup.factions[1]].defaultList];
+  const open = setup.armyRule === "open";
+  const lists: [ListEntry[], ListEntry[]] = open
+    ? [[], []]
+    : (setup.lists ?? [defaultListFor(setup.factions[0], map.mode), defaultListFor(setup.factions[1], map.mode)]);
+  const supportIds = setup.supports ?? [defaultSupportsFor(setup.factions[0], map.mode), defaultSupportsFor(setup.factions[1], map.mode)];
+  const startingPlayer = (p: PlayerId): GameState["players"][number] => ({
+    ...initialSupports(supportIds[p]),
+    resources: mission.startResources,
+    supplyCap: mission.startSupply,
+    vp: 0,
+    passed: false,
+  });
   const units: Unit[] = [];
   for (const owner of [0, 1] as const) {
     lists[owner].forEach((entry, i) => {
@@ -81,17 +119,7 @@ export function createGame(setup: GameSetup): GameState {
         })),
         onBoard: false,
         destroyed: false,
-        status: {
-          acted: false,
-          moved: false,
-          disengaged: false,
-          hunkered: false,
-          charged: false,
-          fought: false,
-          hurt: false,
-          slowedRounds: 0,
-          deployedRound: 0,
-        },
+        status: freshStatus(0),
         abilityUses: {},
         reactionsUsed: [],
       });
@@ -109,12 +137,7 @@ export function createGame(setup: GameSetup): GameState {
     initiative: 0,
     activePlayer: 0,
     factions: setup.factions,
-    players: [0, 1].map(() => ({
-      resources: mission.startResources,
-      supplyCap: mission.startSupply,
-      vp: 0,
-      passed: false,
-    })) as GameState["players"],
+    players: [startingPlayer(0), startingPlayer(1)],
     units,
     terrain: structuredClone(map.terrain),
     access: structuredClone(map.access),
@@ -129,23 +152,111 @@ export function createGame(setup: GameSetup): GameState {
     over: false,
     winner: null,
   };
-  state.initiative = rollD6(state) % 2 === 0 ? 0 : 1;
-  state.activePlayer = state.initiative;
+  // Initiative roll-off: each side rolls a d6, re-rolling ties. The winner chooses who goes first.
+  const { rolls, winner } = rollOff(state);
+  state.initiative = winner;
+  state.initiativeRolls = rolls;
+  state.activePlayer = winner;
+  state.orderChoiceRule = setup.orderChoice === true;
+  state.orderChoice = setup.orderChoice === true ? { player: winner, reason: "rolloff" } : null;
+  state.initiativeClaim = null;
+  // Per-role economy, garrisons, live objectives, salvage loads and convoy cargo (scoring.ts).
+  setupMission(state);
+  if (open) setupOpenRoster(state, setup.openCap === null ? undefined : (setup.openCap ?? defaultOpenCap(map.mode)));
   return state;
 }
 
 const fail = (error: string): CommandResult => ({ ok: false, error });
 
+/** CP cost of the Rally command every army has. */
+export const RALLY_CP = 1;
+
+/**
+ * Copy a game state for the next step. Everything the reducer can change is copied; the static map
+ * (terrain, ramps, spawn zones, board size) and immutable values (positions, which are always
+ * replaced rather than edited, and upgrade lists) are shared. Much faster than structuredClone,
+ * which matters because the AI simulates hundreds of commands per decision.
+ */
+export function cloneState(s: GameState): GameState {
+  return {
+    ...s,
+    players: [{ ...s.players[0] }, { ...s.players[1] }],
+    units: s.units.map((u) => ({
+      ...u,
+      models: u.models.map((m) => ({ ...m })),
+      status: { ...u.status },
+      abilityUses: { ...u.abilityUses },
+      reactionsUsed: [...u.reactionsUsed],
+    })),
+    objectives: s.objectives.map((o) => ({ ...o })),
+    flags: s.flags.map((f) => ({ ...f })),
+  };
+}
+
 export function applyCommand(prev: GameState, cmd: Command): CommandResult {
   if (prev.over) return fail("The game is over");
-  const s = structuredClone(prev);
+  const s = cloneState(prev);
   const events: GameEvent[] = [];
+
+  if (s.orderChoice && cmd.type !== "chooseOrder") {
+    return fail(s.orderChoice.player === s.activePlayer ? "First choose whether to go first or second" : "Waiting for the order choice");
+  }
+  if (cmd.type === "chooseOrder") {
+    const c = s.orderChoice;
+    if (!c) return fail("There's no order to choose right now");
+    if (cmd.player !== c.player) return fail("It's not your choice");
+    s.initiative = cmd.goFirst ? cmd.player : other(cmd.player);
+    s.activePlayer = s.initiative;
+    s.orderChoice = null;
+    events.push({ type: "orderChosen", player: cmd.player, goFirst: cmd.goFirst, round: s.round });
+    if (!playerHasOptions(s, s.activePlayer)) advanceTurn(s, events);
+    return { ok: true, state: s, events };
+  }
 
   if (cmd.type === "pass") {
     if (cmd.player !== s.activePlayer) return fail("Not your turn");
+    // Passing early (while you could still act) in the movement or combat phase claims the
+    // initiative for the next phase, if nobody has claimed it yet.
+    if (
+      (s.phase === "movement" || s.phase === "combat") &&
+      (s.initiativeClaim ?? null) === null &&
+      playerHasOptions(s, cmd.player)
+    ) {
+      s.initiativeClaim = cmd.player;
+      events.push({ type: "initiativeClaimed", player: cmd.player, nextPhase: s.phase === "movement" ? "assault" : "movement" });
+    }
     s.players[cmd.player].passed = true;
     events.push({ type: "passed", player: cmd.player });
     advanceTurn(s, events);
+    return { ok: true, state: s, events };
+  }
+
+  if (cmd.type === "rally") {
+    if (cmd.player !== s.activePlayer) return fail("Not your turn");
+    const t = unitById(s, cmd.target);
+    if (!t || !t.onBoard || t.owner !== cmd.player) return fail("Pick one of your units");
+    if (!t.status.shaken) return fail("That unit isn't shaken");
+    if (s.players[cmd.player].cp < RALLY_CP) return fail(`Rallying costs ${RALLY_CP} CP`);
+    s.players[cmd.player].cp -= RALLY_CP;
+    t.status.shaken = false;
+    events.push({ type: "rallied", uid: t.uid, how: "cp" });
+    return { ok: true, state: s, events };
+  }
+
+  if (cmd.type === "support") {
+    const err = playSupport(s, cmd, events);
+    if (err) return fail(err);
+    // Units dropped in (or teleported) by a support arrive like any deployment: enemy overwatch and lurkers react.
+    const arrived = events.flatMap((e) => (e.type === "deployed" || (e.type === "moved" && e.kind === "teleport") ? [e.uid] : []));
+    for (const uid of arrived) {
+      const u = unitById(s, uid);
+      if (u) react(s, u, events);
+    }
+    updateFlags(s, events);
+    syncOpenRoster(s); // an airdropped recruit is replaced in reserve at once
+    checkWipeout(s, events);
+    // A free action: the turn only moves on if the player has nothing left to do.
+    if (!s.over && !playerHasOptions(s, s.activePlayer)) advanceTurn(s, events);
     return { ok: true, state: s, events };
   }
 
@@ -158,8 +269,10 @@ export function applyCommand(prev: GameState, cmd: Command): CommandResult {
   if (err) return fail(err);
 
   updateFlags(s, events);
+  syncOpenRoster(s); // open roster: a deployed recruit is replaced in reserve before the turn moves on
   checkWipeout(s, events);
-  if (!s.over) advanceTurn(s, events);
+  // Abilities are free actions inside the unit's activation: the unit still acts, and the turn stays put.
+  if (!s.over && cmd.type !== "ability") advanceTurn(s, events);
   return { ok: true, state: s, events };
 }
 
@@ -183,6 +296,10 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
     if (phase === "assault" && unit.status.disengaged) return "Units that disengaged can't act again this round";
     if (phase === "combat") return "That unit can't fight right now";
     return "That unit can't act right now";
+  }
+
+  if ((cmd.type === "move" || cmd.type === "advance" || cmd.type === "disengage" || cmd.type === "charge") && isStructure(unit)) {
+    return "Structures can't move";
   }
 
   switch (cmd.type) {
@@ -213,7 +330,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       events.push({ type: "held", uid: unit.uid });
       break;
     case "charge": {
-      const e = charge(s, unit, cmd.target);
+      const e = charge(s, unit, cmd.target, events);
       if (e) return e;
       events.push({ type: "moved", uid: unit.uid, kind: "charge" });
       break;
@@ -226,6 +343,9 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (unit.status.disengaged && !hasKeyword(unit, "light")) return "Only light units can shoot after disengaging";
       const plan = planShooting(s, unit, target, w);
       if (typeof plan === "string") return plan;
+      const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
+      if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
+      if (consumeReaction(s, target.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
       events.push({ type: "attack", report: resolveAttack(s, unit, target, w.name, plan, "shoot", events) });
       break;
     }
@@ -246,7 +366,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       break;
     }
   }
-  unit.status.acted = true;
+  if (cmd.type !== "ability") unit.status.acted = true;
   if (cmd.type === "move" || cmd.type === "advance" || cmd.type === "charge" || cmd.type === "disengage") {
     react(s, unit, events);
   }
@@ -276,7 +396,7 @@ function deploy(s: GameState, unit: Unit, to: Vec, events: GameEvent[]): string 
   const cant = canAffordDeploy(s, unit);
   if (cant) return cant;
   const leader = unit.models[0]!;
-  const plan = planUnitMove(s, unit, leader.id, to, { allowance: 0, teleport: true, zone: s.spawn[unit.owner] });
+  const plan = planUnitMove(s, unit, leader.id, to, { allowance: 0, teleport: true, zone: deployZones(s, unit) });
   if (typeof plan === "string") return plan;
   unit.onBoard = true;
   applyPlan(unit, plan);
@@ -290,10 +410,12 @@ function deploy(s: GameState, unit: Unit, to: Vec, events: GameEvent[]): string 
 }
 
 /** Charge: auto-route the closest model into base contact with the target; the rest pile in. */
-function charge(s: GameState, unit: Unit, targetUid: string): string | null {
+function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]): string | null {
   const target = unitById(s, targetUid);
   if (!target || !target.onBoard || target.owner === unit.owner) return "Pick an enemy unit to charge";
   if (unit.status.disengaged) return "Units that disengaged can't charge";
+  if (unit.status.shaken) return "Shaken units won't charge";
+  if (isEngaged(s, unit)) return "Already engaged";
   const melee = profileOf(unit).weapons.filter((w) => w.melee);
   if (!melee.some((w) => meleeCanHit(unit, target, w.targets))) {
     return isFlying(target) ? "Nothing in this unit can reach flyers" : "This unit has no melee weapon";
@@ -303,6 +425,10 @@ function charge(s: GameState, unit: Unit, targetUid: string): string | null {
   applyPlan(unit, plan);
   if (!unitsEngage(unit, target)) return "Couldn't reach base contact";
   unit.status.charged = true;
+  if (consumeReaction(s, target.owner, "enemyCharges", events)) target.status.braced = true;
+  // Impact on charge: slam into the target before the combat phase.
+  const impact = planImpact(unit, target);
+  if (impact) events.push({ type: "attack", report: resolveAttack(s, unit, target, "Impact", impact, "impact", events) });
   return null;
 }
 
@@ -354,6 +480,9 @@ function useAbility(
   if (def.phase !== s.phase) return `${def.name} is used in the ${def.phase} phase`;
   const used = unit.abilityUses[id] ?? 0;
   if (def.usesPerGame !== undefined && used >= def.usesPerGame) return `${def.name} is used up`;
+  if (unit.status.abilityUsed) return "This unit has already used an ability this phase";
+  const cpCost = def.cp ?? 0;
+  if (s.players[unit.owner].cp < cpCost) return `${def.name} needs ${cpCost} CP (you have ${s.players[unit.owner].cp})`;
   if (isEngaged(s, unit) && id !== "patch-up") return "Can't do that while engaged";
   const name = profileOf(unit).name;
   const say = (text: string) => events.push({ type: "ability", uid: unit.uid, ability: id, text });
@@ -380,6 +509,15 @@ function useAbility(
       }
       if (healed === 0) return "Nothing to patch up";
       say(`${name} patches up ${prof.name}${dead && spot ? " and gets someone back on their feet" : ""}.`);
+      break;
+    }
+    case "hatch": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner !== unit.owner) return "Pick a friendly unit";
+      if (t.uid !== unit.uid && unitGap(unit, t) > (def.range ?? 3)) return `Must be within ${def.range}"`;
+      const n = regrowModels(s, t, HATCH_MODELS);
+      if (n === 0) return "That unit has no lost models to regrow";
+      say(`${name} hatches ${n} fresh ${n === 1 ? "critter" : "critters"} into ${profileOf(t).name}.`);
       break;
     }
     case "barrage": {
@@ -409,6 +547,7 @@ function useAbility(
           damage += applyDamage(s, t, m, 1, events);
           if (!m.alive) killed += 1;
         }
+        if (damage > 0) moraleCheck(s, t, events);
         events.push({
           type: "attack",
           report: {
@@ -431,7 +570,10 @@ function useAbility(
     }
     case "tunnel": {
       if (!point) return "Pick a point";
+      if (s.round === 1) return "Tunnelling can't start until round 2";
       if (elevationFor(s, unit, point) !== 0) return "Must pop up on the ground";
+      if (nearEnemyHome(s, unit.owner, point)) return `Can't pop up within ${HOME_EXCLUSION}" of the enemy's home objective`;
+      dropCarriedFlag(s, unit, events, "burrows away");
       const e = moveUnit(s, unit, aliveModels(unit)[0]!.id, point, 0, true);
       if (e) return e;
       const tooClose = onBoard(s).some((en) => en.owner !== unit.owner && unitGap(unit, en) < 6);
@@ -445,6 +587,7 @@ function useAbility(
       if (!point) return "Pick a point";
       const leader = aliveModels(unit)[0]!;
       if (dist(leader.pos, point) > (def.range ?? 10)) return `Too far (${def.range}")`;
+      dropCarriedFlag(s, unit, events, "blinks away");
       const e = moveUnit(s, unit, leader.id, point, 0, true);
       if (e) return e;
       if (isEngaged(s, unit)) return "Can't blink into base contact";
@@ -461,6 +604,7 @@ function useAbility(
       if (!point) return "Pick where to bring them";
       const near = aliveModels(unit).some((m) => dist(m.pos, point) <= 4 + profileOf(unit).baseRadius);
       if (!near) return 'Must be within 4" of the Warden';
+      dropCarriedFlag(s, t, events, "is beamed away");
       const e = moveUnit(s, t, aliveModels(t)[0]!.id, point, 0, true);
       if (e) return e;
       if (isEngaged(s, t)) return "Can't recall into base contact";
@@ -469,10 +613,90 @@ function useAbility(
       react(s, t, events);
       break;
     }
+    case "grapple": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (isStructure(t)) return "Structures can't be reeled in";
+      if (hasKeyword(t, "heavy")) return "That unit is too heavy to reel in";
+      if (isFlying(t)) return "Can't hook a flyer";
+      if (isEngaged(s, t)) return "Can't reel in an engaged unit";
+      if (unitGap(unit, t) > (def.range ?? 10)) return `Must be within ${def.range}"`;
+      if (!canSee(s, unit, t)) return "This unit can't see that one";
+      const pulled = dragToward(s, t, unit, GRAPPLE_PULL);
+      if (pulled === 0) return "No room to drag it any closer";
+      say(`${name} reels in ${profileOf(t).name} (${pulled}").`);
+      events.push({ type: "moved", uid: t.uid, kind: "advance" });
+      break;
+    }
+    case "rocket-hop": {
+      if (!point) return "Pick a point";
+      const leader = aliveModels(unit)[0]!;
+      if (dist(leader.pos, point) > (def.range ?? 6)) return `Too far (${def.range}")`;
+      const e = moveUnit(s, unit, leader.id, point, 0, true);
+      if (e) return e;
+      if (isEngaged(s, unit)) return "Can't land in base contact";
+      say(`${name} rocket-hops across the field!`);
+      events.push({ type: "moved", uid: unit.uid, kind: "advance" });
+      react(s, unit, events);
+      break;
+    }
+    case "rampage": {
+      if (!profileOf(unit).weapons.some((w) => w.melee)) return "This unit has no melee weapon";
+      if (unit.status.reckless) return "Already rampaging";
+      unit.status.meleeBonus += 1;
+      unit.status.reckless = true;
+      say(`${name} works itself into a rampage!`);
+      break;
+    }
+    case "spotter": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (t.status.spotted) return "That unit is already spotted";
+      if (unitGap(unit, t) > (def.range ?? 18)) return `Must be within ${def.range}"`;
+      if (!canSee(s, unit, t)) return "This unit can't see that one";
+      t.status.spotted = true;
+      say(`${name} spots ${profileOf(t).name}: shots at it hit one better this round.`);
+      break;
+    }
+    case "bubble-shield": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner !== unit.owner) return "Pick a friendly unit";
+      if (t.uid !== unit.uid && unitGap(unit, t) > (def.range ?? 6)) return `Must be within ${def.range}"`;
+      for (const m of aliveModels(t)) m.shield += 1;
+      say(`${name} wraps ${profileOf(t).name} in a bubble shield.`);
+      break;
+    }
+    case "sugar-rush": {
+      const m = [...aliveModels(unit)].sort((a, b) => b.hp + b.shield - (a.hp + a.shield))[0]!;
+      if (aliveModels(unit).length === 1 && m.hp + m.shield <= 1) return "That would finish this unit off";
+      unit.status.hasted = (unit.status.hasted ?? 0) + SUGAR_RUSH_MOVE;
+      applyDamage(s, unit, m, 1, events);
+      say(`${name} gets a sugar rush: +${SUGAR_RUSH_MOVE}" move this round.`);
+      break;
+    }
+    case "provoke": {
+      if (unit.status.provoking) return "Already provoking";
+      unit.status.provoking = true;
+      say(`${name} makes a big, rude spectacle of itself!`);
+      break;
+    }
+    case "demo-charge": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (isFlying(t)) return "Can't lob a charge at a flyer";
+      if (unitGap(unit, t) > (def.range ?? 4)) return `Must be within ${def.range}"`;
+      const plan = planDemoCharge(unit, t);
+      if (!plan) return "No target in reach";
+      say(`${name} lobs a demo charge!`);
+      events.push({ type: "attack", report: resolveAttack(s, unit, t, def.name, plan, "shoot", events) });
+      break;
+    }
     default:
       return "That ability can't be activated";
   }
   unit.abilityUses[id] = used + 1;
+  unit.status.abilityUsed = true;
+  s.players[unit.owner].cp -= cpCost;
   return null;
 }
 
@@ -489,17 +713,131 @@ function react(s: GameState, mover: Unit, events: GameEvent[]): void {
     if (!weapon) continue;
     const plan = planShooting(s, w, mover, weapon, "overwatch");
     if (typeof plan === "string") continue;
+    if (consumeReaction(s, mover.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
     w.reactionsUsed.push("overwatch");
     events.push({ type: "ability", uid: w.uid, ability: "overwatch", text: `${profileOf(w).name} opens fire on overwatch!` });
     events.push({ type: "attack", report: resolveAttack(s, w, mover, weapon.name, plan, "overwatch", events) });
     if (mover.destroyed) return;
   }
+  if (isFlying(mover)) return;
+  for (const w of onBoard(s, other(mover.owner))) {
+    if (!hasAbility(w, "lurk") || w.reactionsUsed.includes("lurk")) continue;
+    if (engagedWith(s, w).some((e) => e.uid !== mover.uid)) continue;
+    const plan = planLurk(w, mover);
+    if (!plan) continue;
+    w.reactionsUsed.push("lurk");
+    events.push({ type: "ability", uid: w.uid, ability: "lurk", text: `${profileOf(w).name} lashes out from hiding!` });
+    events.push({ type: "attack", report: resolveAttack(s, w, mover, ABILITIES.lurk.name, plan, "impact", events) });
+    if (mover.destroyed) return;
+  }
+}
+
+// ---------- ability helpers ----------
+
+/** How far Reel In drags its target. */
+export const GRAPPLE_PULL = 4;
+/** Sugar Rush's extra move. */
+export const SUGAR_RUSH_MOVE = 2;
+/** Hatchlings: lost models a Hatchlings use brings back. */
+export const HATCH_MODELS = 2;
+/** Lurk: dice per model, hit, damage and AP. */
+export const LURK = { dice: 2, hit: 4, damage: 1, ap: 1 };
+/** Demo Charge: dice, hit, damage and AP, and the damage against structures and mechs. */
+export const DEMO = { dice: 3, hit: 3, damage: 2, ap: 1, vsHard: 3 };
+
+/** Can any model of `a` see any model of `t`? */
+export function canSee(s: GameState, a: Unit, t: Unit): boolean {
+  return aliveModels(a).some((am) => aliveModels(t).some((tm) => lineOfSight(s, am.pos, am.elevation, tm.pos, tm.elevation)));
+}
+
+/** A provoking unit the shooter must aim at instead of `target` with this weapon, if any. */
+export function provokedBy(s: GameState, shooter: Unit, w: Weapon, target: Unit): Unit | undefined {
+  if (target.status.provoking) return undefined;
+  const range = ABILITIES.provoke.range ?? 18;
+  for (const d of onBoard(s, target.owner)) {
+    if (d.uid === target.uid || !d.status.provoking || unitGap(shooter, d) > range) continue;
+    if (typeof planShooting(s, shooter, d, w) !== "string") return d;
+  }
+  return undefined;
+}
+
+/** Lurk's lash-out at an enemy that just arrived: models within 3" on the same level each roll the dice. */
+export function planLurk(w: Unit, mover: Unit): AttackPlan | null {
+  const reach = ABILITIES.lurk.range ?? 3;
+  const attackers: AttackPlan["attackers"] = [];
+  const targets = new Set<Model>();
+  for (const am of aliveModels(w)) {
+    const near = aliveModels(mover).filter((tm) => tm.elevation === am.elevation && modelGap(w, am, mover, tm) <= reach + 1e-6);
+    if (!near.length) continue;
+    near.forEach((tm) => targets.add(tm));
+    attackers.push({ model: am, dice: LURK.dice });
+  }
+  if (!attackers.length) return null;
+  const ap = hasKeyword(mover, "armoured") ? Math.max(0, LURK.ap - 1) : LURK.ap;
+  return { attackers, targets: [...targets], hitOn: LURK.hit, damage: LURK.damage, ap };
+}
+
+/** Demo Charge, thrown by the model nearest the target. */
+export function planDemoCharge(a: Unit, t: Unit): AttackPlan | null {
+  const tms = aliveModels(t);
+  let best: { model: Model; d: number } | null = null;
+  for (const am of aliveModels(a)) {
+    for (const tm of tms) {
+      const d = modelGap(a, am, t, tm);
+      if (!best || d < best.d) best = { model: am, d };
+    }
+  }
+  if (!best) return null;
+  const hard = isStructure(t) || hasKeyword(t, "mech");
+  const ap = hasKeyword(t, "armoured") ? Math.max(0, DEMO.ap - 1) : DEMO.ap;
+  return { attackers: [{ model: best.model, dice: DEMO.dice }], targets: tms, hitOn: DEMO.hit, damage: hard ? DEMO.vsHard : DEMO.damage, ap };
+}
+
+/**
+ * Slide every model of `t` straight toward `toward` by up to `max` inches, keeping its level and
+ * never ending in base contact. Tries shorter pulls if the full one is blocked. Returns the distance moved.
+ */
+function dragToward(s: GameState, t: Unit, toward: Unit, max: number): number {
+  const ms = aliveModels(t);
+  const c = { x: ms.reduce((n, m) => n + m.pos.x, 0) / ms.length, y: ms.reduce((n, m) => n + m.pos.y, 0) / ms.length };
+  const anchor = aliveModels(toward).reduce((a, b) => (dist(a.pos, c) < dist(b.pos, c) ? a : b));
+  const len = dist(c, anchor.pos);
+  if (len < 1e-6) return 0;
+  const dir = { x: (anchor.pos.x - c.x) / len, y: (anchor.pos.y - c.y) / len };
+  const r = profileOf(t).baseRadius;
+  const others = allPlaced(s).filter((p) => p.uid !== t.uid);
+  const blocked = (from: Vec, to: Vec, elev: Elevation): boolean =>
+    s.terrain.some((x) => {
+      const solid = x.kind === "building" || ((x.kind === "wall" || x.kind === "barricade") && x.level === elev) || (x.kind === "platform" && elev === 0);
+      return solid && segmentNearPolygon(from, to, x.poly, r - 1e-6);
+    });
+  for (let k = max; k >= 0.5; k -= 0.5) {
+    const placed: Placed[] = [...others];
+    const moves: { m: Model; to: Vec }[] = [];
+    let ok = true;
+    for (const m of ms) {
+      const to = { x: m.pos.x + dir.x * k, y: m.pos.y + dir.y * k };
+      if (elevationFor(s, t, to) !== m.elevation || blocked(m.pos, to, m.elevation) || checkPlacement(s, t, to, m.elevation, placed)) {
+        ok = false;
+        break;
+      }
+      placed.push({ key: `${t.uid}:${m.id}`, uid: t.uid, owner: t.owner, pos: to, elevation: m.elevation, radius: r });
+      moves.push({ m, to });
+    }
+    if (!ok) continue;
+    const before = ms.map((m) => m.pos);
+    for (const x of moves) x.m.pos = x.to;
+    if (!isEngaged(s, t)) return k;
+    ms.forEach((m, i) => (m.pos = before[i]!));
+  }
+  return 0;
 }
 
 // ---------- turn & phase flow ----------
 
 function checkWipeout(s: GameState, events: GameEvent[]): void {
-  const out = (p: PlayerId) => onBoard(s, p).length === 0 && reserves(s, p).length === 0;
+  // Open roster: reserves never run out, so a side is only out if it also can't pay for anyone (now or next round).
+  const out = (p: PlayerId) => onBoard(s, p).length === 0 && (s.openRoster ? !canStillRecruit(s, p) : reserves(s, p).length === 0);
   const a = out(0);
   const b = out(1);
   if (!a && !b) return;
@@ -521,28 +859,46 @@ function advanceTurn(s: GameState, events: GameEvent[]): void {
 const NEXT: Record<Phase, Phase> = { movement: "assault", assault: "combat", combat: "scoring", scoring: "movement" };
 
 function endPhase(s: GameState, events: GameEvent[]): void {
-  for (let guard = 0; guard < 8 && !s.over; guard++) {
-    for (const u of s.units) u.status.acted = false;
+  // Skip phases nobody can act in. Rounds are finite, so this always ends: either somebody has
+  // something to do, or the final scoring phase ends the game. (A fixed small guard used to leave
+  // the game parked in a phase where neither player could act.)
+  const maxSteps = (s.maxRounds - s.round + 2) * 4;
+  // An early pass in the phase that just ended decides who leads the next one.
+  let claim: PlayerId | null = s.initiativeClaim ?? null;
+  s.initiativeClaim = null;
+  for (let guard = 0; guard < maxSteps && !s.over; guard++) {
+    const from = s.phase;
+    for (const u of s.units) {
+      u.status.acted = false;
+      u.status.abilityUsed = false;
+    }
     s.players.forEach((p) => (p.passed = false));
     s.phase = NEXT[s.phase];
     if (s.phase === "scoring") {
-      runScoring(s, events);
+      runScoring(s, events, from === "combat" ? claim : null);
+      claim = null;
       if (s.over) return;
       continue;
     }
-    s.activePlayer = s.initiative;
-    events.push({ type: "phase", phase: s.phase, round: s.round });
-    if (playerHasOptions(s, 0) || playerHasOptions(s, 1)) {
-      if (!playerHasOptions(s, s.activePlayer)) s.activePlayer = other(s.activePlayer);
+    s.activePlayer = from === "movement" && claim !== null ? claim : s.initiative;
+    claim = null;
+    // While someone is choosing the order for a new round, they hold the turn.
+    if (s.orderChoice) s.activePlayer = s.orderChoice.player;
+    // Phases nobody can act in are skipped without being announced (no melee: straight to scoring).
+    if (s.orderChoice || playerHasOptions(s, 0) || playerHasOptions(s, 1)) {
+      events.push({ type: "phase", phase: s.phase, round: s.round });
+      if (!s.orderChoice && !playerHasOptions(s, s.activePlayer)) s.activePlayer = other(s.activePlayer);
       return;
     }
   }
 }
 
-function runScoring(s: GameState, events: GameEvent[]): void {
+function runScoring(s: GameState, events: GameEvent[], combatClaim: PlayerId | null = null): void {
   events.push({ type: "phase", phase: "scoring", round: s.round });
   scoreRound(s, events);
   cleanupRound(s, events);
+  const cpBefore = [s.players[0].cp, s.players[1].cp];
+  refreshSupports(s, events);
   events.push({ type: "roundEnded", round: s.round });
   if (s.round >= s.maxRounds) {
     s.over = true;
@@ -551,20 +907,67 @@ function runScoring(s: GameState, events: GameEvent[]): void {
     events.push({ type: "gameOver", winner: s.winner, reason: "Final round complete" });
     return;
   }
-  const mission = MISSIONS[s.missionId]!;
   s.round += 1;
-  for (const p of s.players) {
-    p.resources += mission.income;
-    p.supplyCap = Math.min(mission.maxSupply, p.supplyCap + mission.supplyPerRound);
+  for (const pid of [0, 1] as const) {
+    // Each side's economy (role missions give the sides different numbers).
+    const p = s.players[pid];
+    const eco = economyState(s, pid);
+    const cap = p.supplyCap;
+    p.resources += eco.income;
+    p.supplyCap = Math.min(eco.maxSupply, p.supplyCap + eco.supplyPerRound);
+    events.push({ type: "upkeep", player: pid, resources: eco.income, supply: p.supplyCap - cap, cp: p.cp - cpBefore[pid]! });
   }
+  // Who goes first next round: an early pass in combat claims it outright; otherwise the player
+  // behind on VP chooses, and a VP tie is settled by a fresh roll-off whose winner chooses.
   const [a, b] = [s.players[0].vp, s.players[1].vp];
-  s.initiative = a < b ? 0 : b < a ? 1 : other(s.initiative);
+  if (combatClaim !== null) {
+    s.initiative = combatClaim;
+    return;
+  }
+  if (!choiceEnabled(s) && a !== b) {
+    s.initiative = a < b ? 0 : 1;
+    return;
+  }
+  if (a === b) {
+    const { rolls, winner } = rollOff(s);
+    s.initiativeRolls = rolls;
+    events.push({ type: "rolloff", rolls, winner, reason: "tie" });
+    s.initiative = winner;
+    s.orderChoice = choiceEnabled(s) ? { player: winner, reason: "tie" } : null;
+    return;
+  }
+  const behind: PlayerId = a < b ? 0 : 1;
+  s.initiative = behind;
+  s.orderChoice = choiceEnabled(s) ? { player: behind, reason: "behind" } : null;
 }
 
-/** Is the given model in a spot where it would be engaged with any enemy? (UI helper) */
-export function wouldEngage(s: GameState, unit: Unit, pos: Vec): boolean {
+/** Each side rolls a d6; ties re-roll. */
+function rollOff(s: GameState): { rolls: [number, number][]; winner: PlayerId } {
+  const rolls: [number, number][] = [];
+  for (let guard = 0; guard < 20; guard++) {
+    const pair: [number, number] = [rollD6(s), rollD6(s)];
+    rolls.push(pair);
+    if (pair[0] !== pair[1]) break;
+  }
+  const last = rolls[rolls.length - 1]!;
+  return { rolls, winner: last[0] > last[1] ? 0 : 1 };
+}
+
+/** Order choices are on unless the game was created with `orderChoice: false` (kept in the state). */
+function choiceEnabled(s: GameState): boolean {
+  return s.orderChoiceRule === true;
+}
+
+/** Is the given model in a spot where it would be engaged with any enemy? (UI helper; level-aware.) */
+export function wouldEngage(s: GameState, unit: Unit, pos: Vec, elevation: Elevation = elevationFor(s, unit, pos)): boolean {
   const r = profileOf(unit).baseRadius;
   return onBoard(s).some(
-    (e) => e.owner !== unit.owner && aliveModels(e).some((m) => dist(m.pos, pos) - r - profileOf(e).baseRadius <= ENGAGE_RANGE),
+    (e) =>
+      e.owner !== unit.owner &&
+      aliveModels(e).some(
+        (m) =>
+          dist(m.pos, pos) - r - profileOf(e).baseRadius <= ENGAGE_RANGE &&
+          (m.elevation === elevation || m.elevation === 2 || elevation === 2),
+      ),
   );
 }

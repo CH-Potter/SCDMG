@@ -2,12 +2,17 @@ import type { Vec } from "./types";
 
 const EPS = 1e-9;
 
-export const dist = (a: Vec, b: Vec): number => Math.hypot(a.x - b.x, a.y - b.y);
+// Math.hypot is notably slower than a plain sqrt and this is the hottest function in the engine.
+export const dist = (a: Vec, b: Vec): number => {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.sqrt(dx * dx + dy * dy);
+};
 
 export const sub = (a: Vec, b: Vec): Vec => ({ x: a.x - b.x, y: a.y - b.y });
 export const add = (a: Vec, b: Vec): Vec => ({ x: a.x + b.x, y: a.y + b.y });
 export const scale = (a: Vec, k: number): Vec => ({ x: a.x * k, y: a.y * k });
-export const len = (a: Vec): number => Math.hypot(a.x, a.y);
+export const len = (a: Vec): number => Math.sqrt(a.x * a.x + a.y * a.y);
 
 /** Point `maxLen` along the line from `from` towards `to` (or `to` itself if closer). */
 export function towards(from: Vec, to: Vec, maxLen: number): Vec {
@@ -64,23 +69,83 @@ export function pointInPolygon(p: Vec, poly: Vec[]): boolean {
   return inside;
 }
 
-function edges(poly: Vec[]): [Vec, Vec][] {
-  return poly.map((p, i) => [p, poly[(i + 1) % poly.length]!]);
+/**
+ * Inside a zone, counting its edge as inside. Plain ray casting is inconsistent on edges (a point on
+ * an edge can be "in" for a polygon and "out" for its mirror image), which gave one side extra
+ * deployment spots on diagonal zone edges. Deployment zones use this.
+ */
+export function pointInZone(p: Vec, poly: Vec[], eps = 1e-6): boolean {
+  if (pointInPolygon(p, poly)) return true;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    if (pointSegmentDistance(p, poly[j]!, poly[i]!) <= eps) return true;
+  }
+  return false;
+}
+
+export interface Bounds {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+const boundsCache = new WeakMap<Vec[], Bounds>();
+
+/** Axis-aligned bounding box of a polygon (cached: map polygons never change). */
+export function polyBounds(poly: Vec[]): Bounds {
+  let b = boundsCache.get(poly);
+  if (!b) {
+    b = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+    for (const p of poly) {
+      if (p.x < b.x0) b.x0 = p.x;
+      if (p.y < b.y0) b.y0 = p.y;
+      if (p.x > b.x1) b.x1 = p.x;
+      if (p.y > b.y1) b.y1 = p.y;
+    }
+    boundsCache.set(poly, b);
+  }
+  return b;
+}
+
+/** Cheap reject: is the segment's bounding box further than `pad` from the polygon's? */
+function farFromBounds(a: Vec, b: Vec, poly: Vec[], pad: number): boolean {
+  const bb = polyBounds(poly);
+  return (
+    Math.max(a.x, b.x) < bb.x0 - pad ||
+    Math.min(a.x, b.x) > bb.x1 + pad ||
+    Math.max(a.y, b.y) < bb.y0 - pad ||
+    Math.min(a.y, b.y) > bb.y1 + pad
+  );
 }
 
 export function segmentIntersectsPolygon(a: Vec, b: Vec, poly: Vec[]): boolean {
+  if (farFromBounds(a, b, poly, EPS)) return false;
   if (pointInPolygon(a, poly) || pointInPolygon(b, poly)) return true;
-  return edges(poly).some(([p, q]) => segmentsIntersect(a, b, p, q));
+  for (let i = 0, n = poly.length; i < n; i++) {
+    if (segmentsIntersect(a, b, poly[i]!, poly[(i + 1) % n]!)) return true;
+  }
+  return false;
 }
 
 /** Shortest distance from a segment to a polygon (0 if they touch or overlap). */
 export function segmentPolygonDistance(a: Vec, b: Vec, poly: Vec[]): number {
   if (segmentIntersectsPolygon(a, b, poly)) return 0;
-  return Math.min(...edges(poly).map(([p, q]) => segmentSegmentDistance(a, b, p, q)));
+  let best = Infinity;
+  for (let i = 0, n = poly.length; i < n; i++) {
+    const d = segmentSegmentDistance(a, b, poly[i]!, poly[(i + 1) % n]!);
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+/** Does the segment pass within `r` of the polygon? Same as segmentPolygonDistance(...) < r, but faster. */
+export function segmentNearPolygon(a: Vec, b: Vec, poly: Vec[], r: number): boolean {
+  if (farFromBounds(a, b, poly, r)) return false;
+  return segmentPolygonDistance(a, b, poly) < r;
 }
 
 export function circleOverlapsPolygon(c: Vec, r: number, poly: Vec[]): boolean {
-  return segmentPolygonDistance(c, c, poly) < r - EPS;
+  return segmentNearPolygon(c, c, poly, r - EPS);
 }
 
 export function rect(x: number, y: number, w: number, h: number): Vec[] {

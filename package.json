@@ -2,9 +2,10 @@
   "name": "scdmg",
   "private": true,
   "version": "0.1.0",
-  "description": "Cartoon sci-fi skirmish miniatures game for the browser (working codename SCDMG).",
+  "description": "Super Cool Desktop Miniatures Game (SCDMG): a cartoon sci-fi skirmish miniatures game for the browser.",
   "license": "MIT",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -13,15 +14,70 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "sim": "node -e \"process.env.VITEST_SIM=1;require('child_process').execSync('npx vitest run --reporter=verbose',{stdio:'inherit',env:process.env})\""
+    "sim": "node -e \"process.env.VITEST_SIM=1;require('child_process').execSync('npx vitest run --reporter=verbose',{stdio:'inherit',env:process.env})\"",
+    "icons": "node scripts/make-icon.mjs",
+    "build:desktop": "tsc --noEmit && vite build --mode desktop",
+    "desktop": "npm run build:desktop && electron .",
+    "package": "node scripts/make-icon.mjs --if-missing && npm run build:desktop && electron-builder --win portable --x64 --publish never",
+    "test:desktop": "node electron/navigation.test.cjs"
   },
   "dependencies": {
     "pixi.js": "^8.23.0"
   },
   "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0",
     "prettier": "^3.10.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
     "vitest": "^5.1.0"
+  },
+  "build": {
+    "appId": "com.scdmg.desktop",
+    "productName": "Super Cool Desktop Miniatures Game",
+    "executableName": "SCDMG",
+    "copyright": "Copyright (c) SCDMG contributors. MIT licence.",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "dist-desktop/**/*",
+      "build/icon.png",
+      "package.json",
+      "!node_modules/**/*",
+      "!electron/**/*.test.cjs",
+      "!**/*.map"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "nodeGypRebuild": false,
+    "electronLanguages": [
+      "en-US"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "portable": {
+      "artifactName": "SCDMG-${version}-portable.exe"
+    },
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
+    }
   }
 }

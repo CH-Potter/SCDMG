@@ -1,0 +1,316 @@
+/* In-game HUD overlays on the board: comic alerts, the battle log drawer, the floating Pass button
+   and the click-to-deploy menu. Colours and fonts come from the theme variables in style.css. */
+
+/* ---------- comic alerts ---------- */
+.comic-alerts {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  width: min(560px, calc(100% - 24px));
+}
+
+.comic-alert {
+  background: var(--panel, #fffaf0);
+  border: 3px solid var(--ink, #2b2140);
+  box-shadow: 4px 4px 0 var(--ink, #2b2140);
+  padding: 4px 14px;
+  rotate: var(--tilt, 0deg);
+  opacity: 0;
+  scale: 0.6;
+  transition:
+    opacity 0.15s,
+    scale 0.2s cubic-bezier(0.2, 1.6, 0.4, 1);
+  text-align: center;
+  max-width: 100%;
+}
+
+.comic-alert.in {
+  opacity: 1;
+  scale: 1;
+}
+
+.comic-alert.out {
+  opacity: 0;
+  scale: 0.9;
+}
+
+.comic-alert-head {
+  font-family: var(--font-display, inherit);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.comic-alert-sub {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.comic-alert.big .comic-alert-head {
+  font-size: 1.6rem;
+}
+
+.comic-alert.tone-you {
+  background: var(--p0, #2fb5c8);
+  color: white;
+}
+
+.comic-alert.tone-ai {
+  background: var(--p1, #f0565b);
+  color: white;
+}
+
+.comic-alert.tone-good {
+  background: var(--accent, #ffc83d);
+}
+
+.comic-alert.tone-bad {
+  background: var(--ink, #2b2140);
+  color: var(--accent, #ffc83d);
+}
+
+/* ---------- battle log drawer ---------- */
+.log-drawer {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 6;
+  width: min(420px, calc(100% - 24px));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.log-drawer > * {
+  pointer-events: auto;
+}
+
+.log-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.log-tab .badge {
+  background: var(--p1, #f0565b);
+  color: white;
+  border-radius: 999px;
+  padding: 0 7px;
+  font-size: 0.75rem;
+}
+
+.log-tab .badge:empty {
+  display: none;
+}
+
+.log-drawer #log {
+  width: 100%;
+  max-height: 38vh;
+  overflow-y: auto;
+  background: var(--panel, #fffaf0);
+  border: 3px solid var(--ink, #2b2140);
+  border-radius: 12px;
+  box-shadow: 0 4px 0 var(--ink, #2b2140);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.log-drawer.collapsed #log {
+  display: none;
+}
+
+.log-drawer #log p {
+  margin: 0 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 2px dashed #e6d9c2;
+}
+
+/* ---------- floating Pass button ---------- */
+.float-pass {
+  position: absolute;
+  right: 12px;
+  bottom: 58px; /* sits just above the battle log tab, clear of the board's top edge */
+  z-index: 6;
+  font-size: 1rem;
+  padding: 8px 14px;
+}
+
+.float-pass[hidden] {
+  display: none;
+}
+
+/* ---------- click-to-deploy menu ---------- */
+.deploy-menu {
+  position: absolute;
+  z-index: 8;
+  min-width: 220px;
+  max-width: 460px;
+  /* No internal scrolling: a scrollable box over the WebGL canvas makes Chrome blank part of the
+     board. Long lists wrap into two columns instead (see .deploy-menu.wide). */
+  background: var(--panel, #fffaf0);
+  border: 3px solid var(--ink, #2b2140);
+  border-radius: 12px;
+  box-shadow: 4px 4px 0 var(--ink, #2b2140);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.deploy-menu h4 {
+  margin: 2px 4px 4px;
+  font-family: var(--font-display, inherit);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.deploy-menu button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.deploy-menu button small {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* Army panel: reserves collapse behind a summary. */
+.reserves-list[hidden] {
+  display: none;
+}
+
+/* ---------- selected-unit command bar (docked bottom-centre) ---------- */
+.unit-callout {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 12px;
+  translate: -50% 140%;
+  opacity: 0;
+  transition:
+    translate 0.18s ease-out,
+    opacity 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(46%, 520px);
+  background: color-mix(in srgb, var(--panel, #fffaf0) 92%, transparent);
+  border: 3px solid var(--ink, #2b2140);
+  border-radius: 12px;
+  box-shadow: 0 4px 0 var(--ink, #2b2140);
+  padding: 4px 6px;
+  pointer-events: auto;
+}
+
+.unit-callout.in {
+  translate: -50% 0;
+  opacity: 1;
+}
+
+.unit-callout .co-head {
+  white-space: nowrap;
+  font-size: 0.85rem;
+  padding-right: 6px;
+  border-right: 2px dashed color-mix(in srgb, var(--ink, #2b2140) 30%, transparent);
+}
+
+.unit-callout .co-head small {
+  display: none; /* the hint lives in the tooltip; keep the bar slim */
+}
+
+.unit-callout .co-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.unit-callout button {
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  border-width: 2px;
+  box-shadow: 0 2px 0 var(--ink, #2b2140);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .unit-callout {
+    transition: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .unit-callout {
+    max-width: calc(100% - 24px);
+    bottom: 56px;
+  }
+}
+
+.deploy-menu.wide {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.deploy-menu.wide h4 {
+  grid-column: 1 / -1;
+}
+
+/* While the battle log is open, the Pass button moves out of its way. */
+.log-drawer:not(.collapsed) ~ .float-pass {
+  top: 12px;
+  bottom: auto;
+}
+
+/* When the selected unit is low on screen, the command bar docks at the top instead. */
+.unit-callout.dock-top {
+  top: 12px;
+  bottom: auto;
+  translate: -50% -140%;
+}
+
+.unit-callout.dock-top.in {
+  translate: -50% 0;
+}
+
+/* ---------- who goes first? ---------- */
+.order-choice {
+  position: absolute;
+  z-index: 9;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: min(420px, calc(100% - 24px));
+  background: var(--panel, #fffaf0);
+  border: 4px solid var(--ink, #2b2140);
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 var(--ink, #2b2140);
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.order-choice h3 {
+  margin: 0 0 4px;
+  font-family: var(--font-display, inherit);
+  text-transform: uppercase;
+}
+
+.order-choice p {
+  margin: 0 0 10px;
+}
+
+.order-choice .row {
+  justify-content: center;
+}

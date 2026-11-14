@@ -1,4 +1,4 @@
-# SCDMG (working codename)
+# Super Cool Desktop Miniatures Game (SCDMG)
 
 A cartoon sci-fi skirmish miniatures game that runs in the browser. You play against an AI opponent. This is an original game: the setting, factions, units and rules are all our own.
 
@@ -36,6 +36,15 @@ Each round has four phases: **Movement** (deploy, move, disengage, hunker), **As
 - **Dustline Militia:** scrappy frontier settlers. Rivet Grunts (Overwatch or Jump Jets upgrades), Patch Medic, Big Bertha (Barrage), and the Sky Rustler crop-duster flyer.
 - **The Munch:** a goofy, ravenous critter swarm. Regrowing Nibbler Packs, slowing Goo Spitters, exploding Buzz Swarm flyers, and Big Mama Chomp (Brood Call, Tunnel).
 - **Lumen Concord:** smug crystal aristocrats. Blinking Prism Guard, Glimmer Lancer snipers, the Shimmer Skiff, and the Lumen Warden (Radiance, Recall Beam).
+
+## Desktop app (Windows portable .exe)
+
+```bash
+npm run package  # builds release/SCDMG-<version>-portable.exe (~100 MB, single file)
+npm run desktop  # runs the desktop build locally in Electron
+```
+
+Copy the exe to any Windows 10/11 x64 PC and run it. It needs no install and no Node.js, and it runs fully offline. The exe is unsigned, so on first run SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**. Save data (lists, maps, factions, settings) is kept in `%APPDATA%\SCDMG` and survives replacing the exe with a newer build. Press **Alt** for the File menu, which has backup, restore and "open data folder". **F11** toggles fullscreen. Details, the security settings, and how to swap in a real icon are in [docs/packaging.md](docs/packaging.md).
 
 ## Licence
 

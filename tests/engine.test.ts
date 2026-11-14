@@ -9,6 +9,7 @@ import { profileOf } from "../src/engine/profile";
 import { aliveModels, eligibleUnits, isEngaged, presenceController, supplyUsed, unitById } from "../src/engine/rules";
 import { lineOfSight, planRoute } from "../src/engine/terrain";
 import type { Command, Elevation, FactionId, GameState, Unit, Vec } from "../src/engine/types";
+import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
 
 const ok = (r: ReturnType<typeof applyCommand>): GameState => {
   if (!r.ok) throw new Error(r.error);
@@ -31,7 +32,7 @@ const uidOf = (s: GameState, owner: 0 | 1, profileId: string, nth = 0): string =
   s.units.filter((u) => u.owner === owner && u.profileId === profileId)[nth]!.uid;
 
 function game(setup: Partial<GameSetup> = {}): GameState {
-  const s = createGame({ factions: ["militia", "munch"], seed: 7, ...setup });
+  const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed: 7, ...setup });
   s.initiative = 0;
   s.activePlayer = 0;
   return s;
@@ -56,8 +57,8 @@ describe("elevation", () => {
 
   it("ground units must use a ramp or ladder to get onto a platform", () => {
     const s = game();
-    const grunts = place(s, uidOf(s, 0, "mil-grunts", 2), { x: 18, y: 25 });
-    const route = planRoute(s, grunts, { x: 18, y: 25 }, 0, { x: 15, y: 19.5 });
+    const grunts = place(s, uidOf(s, 0, "mil-grunts", 2), { x: 18, y: 23.8 });
+    const route = planRoute(s, grunts, { x: 18, y: 23.8 }, 0, { x: 15, y: 19.5 });
     expect(typeof route).toBe("object");
     if (typeof route === "object") expect(route.via).toBe("ramp-a");
     // Straight up the cliff from the side isn't possible without a ladder nearby; Bertha can't climb ladders.
@@ -88,16 +89,50 @@ describe("elevation", () => {
   });
 });
 
+describe("pathfinding", () => {
+  it("routes around a building instead of failing", () => {
+    const s = game();
+    const g = place(s, uidOf(s, 0, "mil-grunts", 2), { x: 6.5, y: 18.5 });
+    // The barn (x 4-9, y 11-16) sits between here and the target.
+    const r = planRoute(s, g, { x: 6.5, y: 18.5 }, 0, { x: 6.5, y: 8.5 });
+    expect(typeof r).toBe("object");
+    if (typeof r !== "object") return;
+    expect(r.legs.length).toBeGreaterThan(1);
+    expect(r.length).toBeGreaterThan(10);
+    expect(r.length).toBeLessThan(16);
+  });
+
+  it("respects the move allowance", () => {
+    const s = game();
+    const g = place(s, uidOf(s, 0, "mil-grunts", 2), { x: 6.5, y: 18.5 });
+    const plan = planUnitMove(s, g, 0, { x: 6.5, y: 8.5 }, { allowance: 6 });
+    expect(typeof plan).toBe("string");
+  });
+
+  it("walks around enemy models", () => {
+    const s = game();
+    const g = place(s, uidOf(s, 0, "mil-grunts", 2), { x: 20, y: 28 });
+    const e = unitById(s, uidOf(s, 1, "munch-mama"))!;
+    e.onBoard = true;
+    e.models[0]!.pos = { x: 20, y: 25 };
+    const r = planRoute(s, g, { x: 20, y: 28 }, 0, { x: 20, y: 22 });
+    expect(typeof r).toBe("object");
+    if (typeof r === "object") expect(r.legs.length).toBeGreaterThan(1);
+  });
+});
+
 describe("multi-model movement", () => {
-  it("followers end within coherency of the leader", () => {
+  it("followers end in chain coherency (each within 2\" of a squad mate)", () => {
     const s = game();
     const u = place(s, uidOf(s, 0, "mil-grunts", 2), { x: 26, y: 33 });
     const plan = planUnitMove(s, u, 0, { x: 26, y: 28 }, { allowance: 6 });
     expect(typeof plan).toBe("object");
     if (typeof plan !== "object") return;
     const r = profileOf(u).baseRadius;
-    const lead = plan.placements[0]!.pos;
-    for (const p of plan.placements) expect(dist(p.pos, lead) - 2 * r).toBeLessThanOrEqual(COHERENCY + 1e-6);
+    for (const p of plan.placements) {
+      const nearest = Math.min(...plan.placements.filter((q) => q !== p).map((q) => dist(p.pos, q.pos) - 2 * r));
+      expect(nearest).toBeLessThanOrEqual(COHERENCY + 1e-6);
+    }
   });
 });
 
@@ -136,7 +171,8 @@ describe("deployment, supply and phases", () => {
 
 describe("combat and keywords", () => {
   it("ground melee can't hit flyers and ground-only guns can't shoot them", () => {
-    const s = game();
+    // Explicit lists, so the test doesn't depend on which flyers the starter rosters carry.
+    const s = game({ lists: [[{ profileId: "mil-bertha", upgrades: [] }], [{ profileId: "munch-buzz", upgrades: [] }]] });
     const bertha = place(s, uidOf(s, 0, "mil-bertha"), { x: 10, y: 28 });
     const buzz = place(s, uidOf(s, 1, "munch-buzz"), { x: 12.8, y: 28 });
     expect(planMelee(bertha, buzz, profileOf(bertha).weapons[1]!)).toMatch(/flyers/);
@@ -151,6 +187,8 @@ describe("combat and keywords", () => {
     grunts.models[1]!.pos = { x: 9.5, y: 17.5 };
     grunts.models[2]!.pos = { x: 1.5, y: 13.5 };
     grunts.models[3]!.pos = { x: 1.5, y: 12.3 };
+    // Any extra squad members stay out of sight too (squad size is a balance knob).
+    for (const m of grunts.models.slice(4)) m.pos = { x: 1.5, y: 11.1 - (m.id - 4) * 1.2 };
     const target = place(s, uidOf(s, 1, "munch-spitter"), { x: 11, y: 13 });
     const plan = planShooting(s, grunts, target, profileOf(grunts).weapons[0]!);
     expect(typeof plan).toBe("object");
@@ -165,7 +203,13 @@ describe("combat and keywords", () => {
     s.activePlayer = 1;
     s = ok(applyCommand(s, { type: "charge", uid: nib.uid, target: uidOf(s, 0, "mil-grunts", 2) }));
     expect(isEngaged(s, unitById(s, nib.uid)!)).toBe(true);
-    // Player 0 can't shoot while engaged, so the phase should roll on to combat.
+    // The charged grunts may return point-blank fire at the unit they're fighting (and only that unit).
+    const grunts = uidOf(s, 0, "mil-grunts", 2);
+    expect(s.phase).toBe("assault");
+    expect(eligibleUnits(s, 0).map((u) => u.uid)).toContain(grunts);
+    s = ok(applyCommand(s, { type: "shoot", uid: grunts, target: nib.uid, weapon: 0 }));
+    // With nothing left to do in the assault phase, it rolls on to combat, chargers first.
+    while (s.phase === "assault") s = ok(applyCommand(s, { type: "pass", player: s.activePlayer }));
     expect(s.phase).toBe("combat");
     expect(eligibleUnits(s, s.activePlayer).every((u) => u.status.charged)).toBe(true);
   });
@@ -228,7 +272,7 @@ describe("AI", () => {
   }
 
   it("never returns an illegal command mid-game", () => {
-    let s = createGame({ factions: ["concord", "munch"], seed: 5 });
+    let s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["concord", "munch"], seed: 5 });
     for (let i = 0; i < 40 && !s.over; i++) {
       s = playAiTurn(s);
       for (const u of s.units.filter((x) => x.onBoard)) expect(aliveModels(u).length).toBeGreaterThan(0);

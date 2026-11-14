@@ -8,8 +8,10 @@ export interface AbilityDef {
   /** Active abilities: the phase they're used in (it takes the unit's activation). */
   phase?: Phase;
   usesPerGame?: number;
-  /** What the active ability needs from the player. */
-  needs?: "point" | "friendlyUnit" | "friendlyUnitAndPoint";
+  /** Command points the ability burns from the player's shared CP pool (unit abilities and supports share it). */
+  cp?: number;
+  /** What the active ability needs from the player. Active abilities without `needs` target the unit itself. */
+  needs?: "point" | "friendlyUnit" | "friendlyUnitAndPoint" | "enemyUnit";
   range?: number;
 }
 
@@ -83,8 +85,18 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     range: 3,
     text: 'Movement phase: a friendly unit within 3" heals 2 HP. If it has lost models, revive one first.',
   },
+  hatch: {
+    id: "hatch",
+    name: "Hatchlings",
+    kind: "active",
+    phase: "movement",
+    needs: "friendlyUnit",
+    range: 3,
+    text: 'Movement phase: a friendly unit within 3" regrows up to 2 lost models (1 HP each). Not while engaged.',
+  },
   barrage: {
     id: "barrage",
+    cp: 1,
     name: "Barrage",
     kind: "active",
     phase: "assault",
@@ -95,6 +107,7 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
   },
   tunnel: {
     id: "tunnel",
+    cp: 2,
     name: "Tunnel",
     kind: "active",
     phase: "movement",
@@ -104,6 +117,7 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
   },
   blink: {
     id: "blink",
+    cp: 1,
     name: "Blink",
     kind: "active",
     phase: "movement",
@@ -114,6 +128,7 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
   },
   recall: {
     id: "recall",
+    cp: 2,
     name: "Recall Beam",
     kind: "active",
     phase: "assault",
@@ -121,5 +136,116 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     range: 12,
     usesPerGame: 1,
     text: 'Assault phase, once per game: teleport a friendly, unengaged unit within 12" to within 4" of this unit. It can still act afterwards.',
+  },
+  steadying: {
+    id: "steadying",
+    name: "Steadying Presence",
+    kind: "passive",
+    range: 6,
+    text: 'Friendly units within 6" of this unit (and this unit) get +1 nerve.',
+  },
+  "mending-aura": {
+    id: "mending-aura",
+    name: "Mending Spores",
+    kind: "passive",
+    range: 6,
+    text: 'End of round: other friendly units within 6" that took no damage this round heal 1 HP on their most hurt model, as if they had Regen.',
+  },
+  lurk: {
+    id: "lurk",
+    name: "Lurk",
+    kind: "reactive",
+    range: 3,
+    text: 'Once per round, when an enemy ground unit ends a move, charge, deployment or teleport within 3" of this unit, each of its models lashes out with 2 dice, hitting on a 4+ for 1 damage, AP1.',
+  },
+  grapple: {
+    id: "grapple",
+    cp: 1,
+    name: "Reel In",
+    kind: "active",
+    phase: "assault",
+    needs: "enemyUnit",
+    range: 10,
+    usesPerGame: 2,
+    text: 'Assault phase, twice per game: hook an enemy unit within 10" that this unit can see and drag it up to 4" straight toward this unit (never into base contact). Heavy units, flyers, structures and engaged units are immune.',
+  },
+  "rocket-hop": {
+    id: "rocket-hop",
+    cp: 1,
+    name: "Rocket Hop",
+    kind: "active",
+    phase: "assault",
+    needs: "point",
+    range: 6,
+    usesPerGame: 2,
+    text: 'Assault phase, twice per game: leap up to 6" over walls and barricades, landing on any level (not in base contact). The unit can still shoot or charge afterwards.',
+  },
+  rampage: {
+    id: "rampage",
+    name: "Rampage",
+    kind: "active",
+    phase: "assault",
+    text: "Assault phase: work up a frenzy. Until the end of the round this unit gets +1 melee die per model, but its saves are one worse.",
+  },
+  spotter: {
+    id: "spotter",
+    cp: 1,
+    name: "Spotter",
+    kind: "active",
+    phase: "assault",
+    needs: "enemyUnit",
+    range: 18,
+    text: 'Assault phase: call out an enemy unit within 18" that this unit can see. Until the end of the round, your shooting at it hits one better (never better than 2+).',
+  },
+  "bubble-shield": {
+    id: "bubble-shield",
+    cp: 1,
+    name: "Bubble Shield",
+    kind: "active",
+    phase: "movement",
+    needs: "friendlyUnit",
+    range: 6,
+    usesPerGame: 2,
+    text: 'Movement phase, twice per game: this unit or a friendly unit within 6" gets +1 shield on every model until the end of the round, even above its normal maximum.',
+  },
+  "sugar-rush": {
+    id: "sugar-rush",
+    name: "Sugar Rush",
+    kind: "active",
+    phase: "movement",
+    text: "Movement phase: +2 move until the end of the round, but the unit's sturdiest model takes 1 damage (no save). Can't be used if it would destroy the unit.",
+  },
+  provoke: {
+    id: "provoke",
+    cp: 1,
+    name: "Provoke",
+    kind: "active",
+    phase: "movement",
+    range: 18,
+    usesPerGame: 2,
+    text: 'Movement phase, twice per game: until the end of the round, enemy units within 18" of this unit must shoot it if their weapon can, rather than another target (except pistol shots in melee).',
+  },
+  "demo-charge": {
+    id: "demo-charge",
+    cp: 1,
+    name: "Demo Charge",
+    kind: "active",
+    phase: "assault",
+    needs: "enemyUnit",
+    range: 4,
+    usesPerGame: 1,
+    text: 'Assault phase, once per game: lob a charge at a ground enemy unit within 4" (no sight needed). Roll 3 dice: each 3+ is a hit for 2 damage, AP1, or 3 damage against structures and mechs. The unit can still shoot afterwards.',
+  },
+  "burrow-exit": {
+    id: "burrow-exit",
+    name: "Burrow Exit",
+    kind: "passive",
+    text: 'Your reserves can deploy within 3" of this structure.',
+  },
+  "ward-aura": {
+    id: "ward-aura",
+    name: "Glimmer Field",
+    kind: "passive",
+    text: 'Enemy ranged attacks on friendly units with a model within 4" of this structure hit one worse.',
   },
 };

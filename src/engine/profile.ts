@@ -4,11 +4,18 @@ import { baseProfile } from "./data/factions";
 import type { AbilityId, Keyword, Unit, UnitProfile } from "./types";
 
 const cache = new Map<string, UnitProfile>();
+/** Fast path: a unit's upgrade list is never edited in place, so its identity is a good cache key. */
+const byList = new WeakMap<string[], { profileId: string; profile: UnitProfile }>();
 
 export function profileFor(profileId: string, upgrades: string[]): UnitProfile {
-  const key = `${profileId}|${[...upgrades].sort().join(",")}`;
+  const quick = byList.get(upgrades);
+  if (quick && quick.profileId === profileId) return quick.profile;
+  const key = upgrades.length === 0 ? profileId : `${profileId}|${[...upgrades].sort().join(",")}`;
   const hit = cache.get(key);
-  if (hit) return hit;
+  if (hit) {
+    byList.set(upgrades, { profileId, profile: hit });
+    return hit;
+  }
   const base = baseProfile(profileId);
   const p: UnitProfile = structuredClone(base);
   for (const id of upgrades) {
@@ -25,6 +32,7 @@ export function profileFor(profileId: string, upgrades: string[]): UnitProfile {
     }
   }
   cache.set(key, p);
+  byList.set(upgrades, { profileId, profile: p });
   return p;
 }
 
@@ -33,3 +41,8 @@ export const profileOf = (u: Unit): UnitProfile => profileFor(u.profileId, u.upg
 export const hasKeyword = (u: Unit, k: Keyword): boolean => profileOf(u).keywords.includes(k);
 export const hasAbility = (u: Unit, a: AbilityId): boolean => profileOf(u).abilities.includes(a);
 export const isFlying = (u: Unit): boolean => hasKeyword(u, "flying");
+
+/** Forget cached effective profiles (call after custom factions are re-registered). */
+export function clearProfileCache(): void {
+  cache.clear();
+}

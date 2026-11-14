@@ -1,14 +1,25 @@
+import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
 
 import { aiCommand } from "../engine/ai";
 import { expectedDamage, planMelee, planShooting, type AttackPlan } from "../engine/combat";
 import { ABILITIES } from "../engine/data/abilities";
-import { FACTIONS } from "../engine/data/factions";
+import { factionOf, supportOf } from "../engine/data/factions";
+import { abilityOf } from "../engine/reactions";
+import { CP_CAP, airdropSpotProblem, canPlaySupport, cpPerRound, deployZones, supportTarget, teleportProblem } from "../engine/supports";
+import { airdropNoGo } from "./fx/dropship";
 import { MAPS } from "../engine/data/maps";
 import { MISSIONS } from "../engine/data/missions";
-import { planUnitMove } from "../engine/formation";
-import { applyCommand, createGame, planCharge, wouldEngage, type GameSetup } from "../engine/game";
-import { dist } from "../engine/geometry";
+import { coverRating, planUnitMove } from "../engine/formation";
+import {
+  applyCommand,
+  createGame,
+  planCharge,
+  wouldEngage,
+  type GameSetup,
+  RALLY_CP,
+} from "../engine/game";
+import { dist, pointInZone } from "../engine/geometry";
 import { profileOf } from "../engine/profile";
 import {
   aliveModels,
@@ -23,10 +34,14 @@ import {
   unitById,
   unitGap,
 } from "../engine/rules";
-import { planRoute } from "../engine/terrain";
+import { lineOfSight, platformAt, planRoute } from "../engine/terrain";
 import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec } from "../engine/types";
-import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine } from "./describe";
+import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine, impactLine, evadeLine, reportHits, unitName, abilityStatusTags } from "./describe";
+import { ComicAlerts, type AlertTone } from "./alerts";
+import { DICE_SPEED_LABEL, DiceTray, type DiceRoll, type DiceSpeed } from "./dice";
 import { BoardRenderer, drawPos, type RenderView } from "./renderer";
+import { audio } from "../audio"; // [audio]
+import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserveRowsHtml, reservesHeading } from "./recruit";
 
 const HUMAN = 0;
 const AI = 1;
@@ -42,10 +57,23 @@ function setHTML(el: Element, html: string): boolean {
 }
 
 type Mode =
+  /** Context orders: point at ground to move, at an enemy to shoot/charge/fight. */
+  | { kind: "auto" }
   | { kind: "none" }
   | { kind: "move" | "advance" | "disengage" | "charge" | "deploy" }
   | { kind: "shoot" | "fight"; weapon: number | null }
-  | { kind: "ability"; id: AbilityId };
+  | { kind: "ability"; id: AbilityId }
+  /** `unit`: for unit-and-point supports (teleports), the friendly unit picked so far. */
+  | { kind: "support"; support: string; ability: string; unit?: string }
+  | { kind: "measure"; from?: Vec; fromElev?: number; fromUnit?: string };
+
+/** The line under each phase banner. */
+const PHASE_HINT: Record<string, string> = {
+  movement: "Deploy, move, disengage or hunker",
+  assault: "Shoot, charge or advance",
+  combat: "Engaged units fight. Chargers swing first!",
+  scoring: "Tally the objectives, then end-of-round upkeep",
+};
 
 export class Controller {
   private state: GameState;
@@ -56,6 +84,25 @@ export class Controller {
   private mode: Mode = { kind: "none" };
   private hover: Vec | null = null;
   private aiRunning = false;
+  /** States before each of your commands, for Undo. */
+  private history: GameState[] = [];
+  /** Nobody acts until the opening initiative roll-off has been shown. */
+  private started = false;
+  private tray: DiceTray;
+  private alerts: ComicAlerts;
+  private logDrawer: HTMLDivElement;
+  private passBtn: HTMLButtonElement;
+  private deployMenu: HTMLDivElement | null = null;
+  private unread = 0;
+  /** Lets phase banners land before the AI carries on. */
+  /**
+   * Presenting an action: its dice (waiting for you to throw yours), then its outcome, then phase
+   * banners and the scoring walkthrough, one step at a time. Nobody acts until it's done.
+   */
+  private busy = false;
+  private presenting: Promise<void> = Promise.resolve();
+  /** Events from the command that produced the current state (lets the renderer draw exact effects). */
+  private lastEvents: GameEvent[] = [];
   private generation = 0;
   private tooltip: HTMLDivElement;
 
@@ -70,11 +117,45 @@ export class Controller {
     this.tooltip.className = "tooltip";
     this.tooltip.style.display = "none";
     els.stage.appendChild(this.tooltip);
+    this.tray = new DiceTray(els.stage);
+    renderer.autoPhaseBanners = false;
+    renderer.onViewChange = () => {
+      this.closeDeployMenu();
+      this.refresh();
+    };
+    this.tray.onTumble = (count, quick) => audio.dice(count, quick); // [audio]
+    audio.startBattle(this.state, setup.seed); // [audio]
+    // Right-hand panel: what you're doing first (unit + actions), then supports, then the army.
     els.sidebar.innerHTML = `
-      <section class="panel" id="army"></section>
       <section class="panel" id="card"></section>
       <section class="panel actions" id="actions"></section>
-      <section class="panel" id="log"></section>`;
+      <section class="panel" id="supports"></section>
+      <section class="panel" id="army"></section>`;
+    this.alerts = new ComicAlerts(els.stage);
+    // Battle log lives in a drawer at the bottom of the board, minimised by default.
+    this.logDrawer = document.createElement("div");
+    this.logDrawer.className = "log-drawer collapsed";
+    const tab = document.createElement("button");
+    tab.type = "button";
+    tab.className = "secondary log-tab";
+    tab.innerHTML = `📜 Battle log <span class="badge"></span>`;
+    const logBody = document.createElement("div");
+    logBody.id = "log";
+    this.logDrawer.append(logBody, tab);
+    tab.addEventListener("click", () => {
+      this.logDrawer.classList.toggle("collapsed");
+      this.unread = 0;
+      this.updateLogBadge();
+      logBody.scrollTop = logBody.scrollHeight;
+    });
+    els.stage.appendChild(this.logDrawer);
+    // A floating Pass button on the board.
+    this.passBtn = document.createElement("button");
+    this.passBtn.type = "button";
+    this.passBtn.className = "float-pass";
+    this.passBtn.hidden = true;
+    this.passBtn.addEventListener("click", () => this.issue({ type: "pass", player: HUMAN }));
+    els.stage.appendChild(this.passBtn);
     renderer.onPointerMove = (p) => {
       this.hover = p;
       this.refresh();
@@ -87,23 +168,143 @@ export class Controller {
     window.onkeydown = (e) => this.key(e);
     const mission = MISSIONS[this.state.missionId]!;
     this.log(
-      `<b>${esc(mission.name)} at ${esc(MAPS[this.state.mapId]!.name)}.</b> ${esc(mission.blurb)} You (${esc(FACTIONS[setup.factions[0]].name)}, cyan) vs the AI (${esc(FACTIONS[setup.factions[1]].name)}, red). ${this.state.initiative === HUMAN ? "You have" : "The AI has"} the initiative.`,
+      `<b>${esc(mission.name)} at ${esc(setup.map?.name ?? MAPS[this.state.mapId]?.name ?? "the battlefield")}.</b> ${esc(mission.blurb)} You (${esc(factionOf(setup.factions[0]).name)}, cyan) vs the AI (${esc(factionOf(setup.factions[1]).name)}, red). ${this.state.initiative === HUMAN ? "You have" : "The AI has"} the initiative.`,
     );
-    this.log(`Your army starts in reserve. Deploy units into your shaded zone from the <b>Army</b> panel.`);
+    if (mission.roles) {
+      this.log(
+        `You play <b>${esc(mission.roles[0].name)}</b>: ${esc(mission.roles[0].blurb)} The AI plays <b>${esc(mission.roles[1].name)}</b>: ${esc(mission.roles[1].blurb)}`,
+      );
+    }
+    this.log(
+      `Your army starts in reserve. Deploy units into your shaded zone from the <b>Army</b> panel.`,
+    );
+    this.refresh();
+    void this.start();
+  }
+
+  /** Opening: show the initiative roll-off, then hand over to whoever won it. */
+  private async start(): Promise<void> {
+    const rolls = this.state.initiativeRolls ?? [];
+    const last = rolls[rolls.length - 1];
+    if (last) {
+      const ties = rolls.length - 1;
+      const gen = this.generation;
+      await this.tray.show({
+        title: ties ? `Initiative roll-off (${ties} tie${ties > 1 ? "s" : ""} re-rolled)` : "Initiative roll-off",
+        groups: [
+          { label: "You", rolls: [last[0]], side: "p0", need: null },
+          { label: "AI", rolls: [last[1]], side: "p1", need: null },
+        ],
+        verdict: this.state.orderChoice
+          ? this.state.orderChoice.player === HUMAN
+            ? "You won: choose who goes first!"
+            : "The AI won the roll-off"
+          : this.state.initiative === HUMAN
+            ? "You go first!"
+            : "The AI goes first!",
+      });
+      if (gen !== this.generation) return;
+      // Only once the dice are down (in Throw mode, after you've thrown yours).
+      this.log(
+        `🎲 Initiative roll-off: you ${last[0]}, AI ${last[1]}${ties ? ` (after ${ties} tie${ties > 1 ? "s" : ""})` : ""}. ${this.state.initiative === HUMAN ? "You" : "The AI"} won and ${this.state.orderChoice ? "chooses who goes first" : "goes first"}.`,
+      );
+    }
+    this.started = true;
     this.refresh();
     void this.runAi();
+  }
+
+  /** Dice for the rolls in a batch of events (attacks, impacts, barrages, blasts, morale). */
+  private diceFor(events: GameEvent[]): DiceRoll[] {
+    const s = this.state;
+    const side = (uid: string): "p0" | "p1" => (unitById(s, uid)?.owner === HUMAN ? "p0" : "p1");
+    const out: DiceRoll[] = [];
+    for (const e of events) {
+      if (e.type === "attack") {
+        const r = e.report;
+        const { rolled, total: hits, evaded } = reportHits(r);
+        const saves: number[] = [];
+        const needs: (number | null)[] = [];
+        r.saveOn.forEach((need, i) => {
+          if (need === null) return;
+          saves.push(r.saveRolls[i] ?? 0);
+          needs.push(need);
+        });
+        const label = r.kind === "impact" ? "Impact" : r.kind === "barrage" ? "Blast" : r.kind === "overwatch" ? "Overwatch" : "To hit";
+        out.push({
+          title: `${unitName(s, r.uid)} → ${unitName(s, r.target)} · ${r.weapon}`,
+          groups: [
+            {
+              label,
+              rolls: r.hitRolls,
+              need: r.hitOn,
+              side: side(r.uid),
+              result: `${rolled + (r.precisionMoved ?? 0)} hit${rolled + (r.precisionMoved ?? 0) === 1 ? "" : "s"}${r.precisionMoved ? ` (${r.precisionMoved} by precision)` : ""}`,
+            },
+            ...(r.evadeRolls && r.evadeRolls.length
+              ? [
+                  {
+                    label: "Evade",
+                    rolls: r.evadeRolls,
+                    need: r.evadeOn ?? null,
+                    side: side(r.target),
+                    result: `${evaded} dodged${r.evadesCancelled ? ` (${r.evadesCancelled} tracked)` : ""}`,
+                  },
+                ]
+              : []),
+            { label: "Saves", rolls: saves, need: needs, side: side(r.target), result: `${r.damage} dmg` },
+          ],
+          verdict: r.unitDestroyed ? "Wiped out!" : r.modelsKilled ? `${r.modelsKilled} down!` : hits === 0 ? "Whiff!" : "",
+        });
+      } else if (e.type === "rolloff") {
+        const last = e.rolls[e.rolls.length - 1]!;
+        out.push({
+          title: "Tie on VP: initiative roll-off",
+          groups: [
+            { label: "You", rolls: [last[0]], side: "p0", need: null },
+            { label: "AI", rolls: [last[1]], side: "p1", need: null },
+          ],
+          verdict: e.winner === HUMAN ? "You choose the order!" : "The AI chooses the order",
+        });
+      } else if (e.type === "morale") {
+        out.push({
+          title: `${unitName(s, e.uid)} tests its nerve`,
+          groups: [{ label: "2d6", rolls: e.roll, need: null, side: side(e.uid), result: `${e.roll[0] + e.roll[1]} vs ${e.nerve}` }],
+          verdict: e.shaken ? "Shaken!" : "Holds firm",
+        });
+      }
+    }
+    return out;
+  }
+
+  /** Queue the dice for some events; resolves when they've been shown. */
+  private playDice(events: GameEvent[]): Promise<void> {
+    let last: Promise<void> = Promise.resolve();
+    for (const roll of this.diceFor(events)) last = this.tray.show({ ...roll, onSettled: audio.takeOutcome() }); // [audio] hit/KO sounds on settle
+    return last;
+  }
+
+  private cycleDice(): void {
+    const order: DiceSpeed[] = ["throw", "full", "quick", "off"];
+    this.tray.setSpeed(order[(order.indexOf(this.tray.speed) + 1) % order.length]!);
+    this.refresh();
   }
 
   destroy(): void {
     this.generation++;
     this.tooltip.remove();
+    this.tray.destroy();
+    this.alerts.destroy();
+    this.logDrawer.remove();
+    this.passBtn.remove();
+    this.closeDeployMenu();
     window.onkeydown = null;
   }
 
   // ---------- helpers ----------
 
   private humanTurn(): boolean {
-    return !this.state.over && !this.aiRunning && this.state.activePlayer === HUMAN;
+    return this.started && !this.state.over && !this.aiRunning && !this.busy && this.state.activePlayer === HUMAN;
   }
 
   private sel(): Unit | undefined {
@@ -126,11 +327,33 @@ export class Controller {
     const p = profileOf(u);
     switch (this.state.phase) {
       case "movement":
-        return { kind: isEngaged(this.state, u) ? "disengage" : "move" };
       case "assault":
-        if (p.weapons.some((w) => !w.melee)) return { kind: "shoot", weapon: null };
-        if (p.weapons.some((w) => w.melee)) return { kind: "charge" };
-        return { kind: "advance" };
+      case "combat":
+        void p;
+        return { kind: "auto" };
+      default:
+        return { kind: "none" };
+    }
+  }
+
+  /** The order the pointer implies right now: an explicit button choice wins, otherwise context decides. */
+  private contextMode(sel: Unit, hit: { unit: Unit; model: Model } | undefined): Mode {
+    if (this.mode.kind !== "auto") return this.mode;
+    const s = this.state;
+    const enemy = hit && hit.unit.owner !== sel.owner ? hit.unit : undefined;
+    switch (s.phase) {
+      case "movement":
+        if (enemy) return { kind: "none" };
+        return { kind: isEngaged(s, sel) ? "disengage" : "move" };
+      case "assault": {
+        const weapons = profileOf(sel).weapons;
+        if (enemy) {
+          if (typeof this.bestWeapon(sel, enemy, false) !== "string") return { kind: "shoot", weapon: null };
+          if (weapons.some((w) => w.melee) && !sel.status.disengaged) return { kind: "charge" };
+          return { kind: "shoot", weapon: null };
+        }
+        return sel.status.disengaged || isEngaged(s, sel) ? { kind: "none" } : { kind: "advance" };
+      }
       case "combat":
         return { kind: "fight", weapon: null };
       default:
@@ -139,6 +362,7 @@ export class Controller {
   }
 
   private select(u: Unit, leader?: number): void {
+    audio.ui("select"); // [audio]
     this.selected = u.uid;
     this.leader = leader ?? aliveModels(u)[0]?.id ?? null;
     this.deployUid = null;
@@ -155,9 +379,14 @@ export class Controller {
     this.mode = { kind: "none" };
   }
 
-  private bestWeapon(a: Unit, t: Unit, melee: boolean): { index: number; plan: AttackPlan } | string {
+  private bestWeapon(
+    a: Unit,
+    t: Unit,
+    melee: boolean,
+  ): { index: number; plan: AttackPlan } | string {
     const weapons = profileOf(a).weapons;
-    const chosen = this.mode.kind === "shoot" || this.mode.kind === "fight" ? this.mode.weapon : null;
+    const chosen =
+      this.mode.kind === "shoot" || this.mode.kind === "fight" ? this.mode.weapon : null;
     let best: { index: number; plan: AttackPlan; exp: number } | null = null;
     let err = melee ? "No melee weapon" : "No ranged weapon";
     weapons.forEach((w, i) => {
@@ -176,19 +405,82 @@ export class Controller {
   // ---------- input ----------
 
   private click(p: Vec): void {
+    if (this.mode.kind === "measure") {
+      const hit = this.modelAt(p);
+      this.mode = hit
+        ? {
+            kind: "measure",
+            from: hit.model.pos,
+            fromElev: hit.model.elevation,
+            fromUnit: hit.unit.uid,
+          }
+        : { kind: "measure", from: p, fromElev: platformAt(this.state, p) ? 1 : 0 };
+      this.refresh();
+      return;
+    }
+    this.closeDeployMenu();
     if (!this.humanTurn()) return;
+    if (this.state.phase === "movement" && this.mode.kind === "none" && !this.sel() && !this.modelAt(p)) {
+      const res = deployChoices(this.state, HUMAN);
+      if (res.some((u) => deployZones(this.state, u).some((poly) => pointInZone(p, poly)))) {
+        this.openDeployMenu(p, res);
+        return;
+      }
+    }
     const s = this.state;
     const hit = this.modelAt(p);
     const sel = this.sel();
 
+    if (this.mode.kind === "support") {
+      const a = abilityOf(this.mode.support, this.mode.ability)!;
+      const need = supportTarget(a);
+      const base = {
+        type: "support" as const,
+        player: HUMAN as 0,
+        support: this.mode.support,
+        ability: this.mode.ability,
+      };
+      if (need === "friendlyUnit" && hit && hit.unit.owner === HUMAN)
+        this.issue({ ...base, target: hit.unit.uid });
+      else if (need === "enemyUnit" && hit && hit.unit.owner !== HUMAN)
+        this.issue({ ...base, target: hit.unit.uid });
+      else if (need === "point") this.issue({ ...base, point: p });
+      else if (need === "reservePoint" && !hit) {
+        // A spot it can't land on says why straight away, instead of opening the unit menu.
+        const bad = a.effect.kind === "airdrop" ? airdropSpotProblem(s, HUMAN, a.effect, p) : null;
+        if (bad) this.flash(bad);
+        else {
+          const droppable = deployChoices(s, HUMAN).filter((u) => !profileOf(u).structure);
+          this.openDeployMenu(p, droppable, { title: `${a.name}: drop which unit?`, pick: (u) => this.issue({ ...base, target: u.uid, point: p }) });
+        }
+      } else if (need === "unitPoint") {
+        // Two clicks: one of your units, then where it goes.
+        if (hit && hit.unit.owner === HUMAN) {
+          this.mode = { ...this.mode, unit: hit.unit.uid };
+          this.refresh();
+        } else if (this.mode.unit && !hit) this.issue({ ...base, target: this.mode.unit, point: p });
+      }
+      return;
+    }
     if (this.mode.kind === "deploy" && this.deployUid) {
       if (!hit) this.issue({ type: "deploy", uid: this.deployUid, to: p });
       return;
     }
     if (this.mode.kind === "ability" && sel) {
       const def = ABILITIES[this.mode.id];
+      if (def.needs === "enemyUnit") {
+        if (hit && hit.unit.owner !== HUMAN)
+          this.issue({ type: "ability", uid: sel.uid, ability: this.mode.id, target: hit.unit.uid });
+        return;
+      }
       if (def.needs === "friendlyUnit") {
-        if (hit && hit.unit.owner === HUMAN) this.issue({ type: "ability", uid: sel.uid, ability: this.mode.id, target: hit.unit.uid });
+        if (hit && hit.unit.owner === HUMAN)
+          this.issue({
+            type: "ability",
+            uid: sel.uid,
+            ability: this.mode.id,
+            target: hit.unit.uid,
+          });
         return;
       }
       if (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget) {
@@ -199,7 +491,13 @@ export class Controller {
         return;
       }
       if (!hit || def.needs === "point") {
-        this.issue({ type: "ability", uid: sel.uid, ability: this.mode.id, point: p, target: this.abilityTarget ?? undefined });
+        this.issue({
+          type: "ability",
+          uid: sel.uid,
+          ability: this.mode.id,
+          point: p,
+          target: this.abilityTarget ?? undefined,
+        });
         return;
       }
     }
@@ -212,28 +510,53 @@ export class Controller {
       }
       return;
     }
+    const order = sel ? this.contextMode(sel, hit) : this.mode;
     if (hit && sel) {
-      if (this.mode.kind === "shoot") {
+      if (order.kind === "shoot") {
         const b = this.bestWeapon(sel, hit.unit, false);
         if (typeof b === "string") this.flash(b);
         else this.issue({ type: "shoot", uid: sel.uid, target: hit.unit.uid, weapon: b.index });
-      } else if (this.mode.kind === "charge") {
+      } else if (order.kind === "charge") {
         this.issue({ type: "charge", uid: sel.uid, target: hit.unit.uid });
-      } else if (this.mode.kind === "fight") {
+      } else if (order.kind === "fight") {
         const b = this.bestWeapon(sel, hit.unit, true);
         if (typeof b === "string") this.flash(b);
         else this.issue({ type: "fight", uid: sel.uid, target: hit.unit.uid, weapon: b.index });
       }
       return;
     }
-    if (!hit && sel && this.leader !== null && (this.mode.kind === "move" || this.mode.kind === "advance" || this.mode.kind === "disengage")) {
-      this.issue({ type: this.mode.kind, uid: sel.uid, leader: this.leader, to: p });
+    if (
+      !hit &&
+      sel &&
+      this.leader !== null &&
+      (order.kind === "move" || order.kind === "advance" || order.kind === "disengage")
+    ) {
+      this.issue({ type: order.kind, uid: sel.uid, leader: this.leader, to: p });
     }
   }
 
   private key(e: KeyboardEvent): void {
-    if (!this.humanTurn()) return;
+    if ((e.key === "m" || e.key === "M") && !e.ctrlKey && !e.metaKey) {
+      this.toggleMeasure();
+      return;
+    }
+    if ((e.key === "z" || e.key === "Z") && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      this.undo();
+      return;
+    }
+    if (!this.humanTurn()) {
+      if (e.key === "Escape" && this.mode.kind === "measure") {
+        this.mode = { kind: "none" };
+        this.refresh();
+      }
+      return;
+    }
     const sel = this.sel();
+    if (e.key === "Escape" && this.deployMenu) {
+      this.closeDeployMenu();
+      return;
+    }
     if (e.key === "Escape") {
       this.clearSelection();
       this.refresh();
@@ -249,51 +572,180 @@ export class Controller {
   private issue(cmd: Command): boolean {
     const r = applyCommand(this.state, cmd);
     if (!r.ok) {
+      audio.ui("error"); // [audio]
       this.flash(r.error);
       return false;
     }
     const before = this.state;
-    this.state = r.state;
-    this.handleEvents(before, r.events);
+    this.history.push(before);
+    if (this.history.length > 60) this.history.shift();
+    const keepUid = cmd.type === "ability" ? cmd.uid : undefined;
+    const keepLeader = this.leader;
     this.clearSelection();
-    this.refresh();
-    void this.runAi();
+    const gen = this.generation;
+    void this.present(before, r.state, r.events).then(() => {
+      if (gen !== this.generation) return;
+      // An ability is a free action inside the unit's activation: keep it selected for its main action.
+      const keep = keepUid ? unitById(this.state, keepUid) : undefined;
+      if (keep && eligibleUnits(this.state, HUMAN).includes(keep)) {
+        this.select(keep, keep.models.some((m) => m.id === keepLeader && m.alive) ? (keepLeader ?? undefined) : undefined);
+        return;
+      }
+      this.refresh();
+      void this.runAi();
+    });
     return true;
   }
 
+  /** Take back your last command (and anything the AI did after it). Dice are seeded, so redoing it rolls the same. */
+  private undo(): void {
+    if (!this.humanTurn() || !this.history.length) return;
+    this.state = this.history.pop()!;
+    this.lastEvents = [];
+    this.clearSelection();
+    this.log("↶ Undid your last action.");
+    this.refresh();
+  }
+
+  private toggleMeasure(): void {
+    this.clearSelection();
+    this.mode = this.mode.kind === "measure" ? { kind: "none" } : { kind: "measure" };
+    this.refresh();
+  }
+
+  /** Narrate, log and mark up a batch of events (the presenter paces the batches and plays their sounds). */
   private handleEvents(before: GameState, events: GameEvent[]): void {
+    this.narrate(before, events);
     const centre = (uid: string): Vec | null => {
       const u = unitById(this.state, uid) ?? unitById(before, uid);
       const ms = u ? u.models.filter((m) => m.alive) : [];
       const list = ms.length ? ms : (unitById(before, uid)?.models.filter((m) => m.alive) ?? []);
       if (!list.length) return null;
-      return { x: list.reduce((s, m) => s + m.pos.x, 0) / list.length, y: list.reduce((s, m) => s + m.pos.y, 0) / list.length };
+      return {
+        x: list.reduce((s, m) => s + m.pos.x, 0) / list.length,
+        y: list.reduce((s, m) => s + m.pos.y, 0) / list.length,
+      };
     };
     for (const e of events) {
       const text = describeEvent(this.state, e);
       const owner =
-        e.type === "attack" ? unitById(before, e.report.uid)?.owner : "uid" in e ? unitById(before, e.uid)?.owner : "player" in e ? e.player : undefined;
+        e.type === "attack"
+          ? unitById(before, e.report.uid)?.owner
+          : "uid" in e
+            ? unitById(before, e.uid)?.owner
+            : "player" in e
+              ? e.player
+              : undefined;
       if (text) this.log(text, owner);
       if (e.type === "attack") {
         const at = centre(e.report.target);
-        if (at) this.renderer.floatText(at, e.report.unitDestroyed ? "KO!" : e.report.damage ? `-${e.report.damage}` : "Whiff!", e.report.damage ? 0xff6b6b : 0xffffff);
-      } else if (e.type === "phase") {
-        this.renderer.floatText({ x: this.state.board.width / 2, y: this.state.board.height / 2 }, `${PHASE_NAMES[e.phase]}!`, 0xffc83d);
+        if (at)
+          this.renderer.floatText(
+            at,
+            e.report.unitDestroyed ? "KO!" : e.report.damage ? `-${e.report.damage}` : "Whiff!",
+            e.report.damage ? 0xff6b6b : 0xffffff,
+          );
       } else if (e.type === "scored") {
-        this.renderer.floatText({ x: this.state.board.width / 2, y: this.state.board.height / 2 + 2 }, `${e.player === HUMAN ? "You" : "AI"} +${e.vp} VP`, e.player === HUMAN ? 0x2fb5c8 : 0xf0565b);
+        // Over the objective it was scored for, when the reason names one.
+        const n = /objective (\d+)/i.exec(e.reason)?.[1];
+        const obj = n ? this.state.objectives.find((o) => o.number === Number(n)) : undefined;
+        this.renderer.floatText(
+          obj ? obj.pos : { x: this.state.board.width / 2, y: this.state.board.height / 2 + 2 },
+          `${e.player === HUMAN ? "You" : "AI"} +${e.vp} VP`,
+          e.player === HUMAN ? 0x2fb5c8 : 0xf0565b,
+        );
       } else if (e.type === "gameOver") {
         setTimeout(() => this.showGameOver(), 900);
       }
     }
   }
 
+  /** Queue an action's presentation (see `busy`). Resolves once it has played out. */
+  private present(before: GameState, after: GameState, events: GameEvent[]): Promise<void> {
+    const gen = this.generation;
+    this.presenting = this.presenting.then(() => this.presentNow(before, after, events, gen));
+    return this.presenting;
+  }
+
+  private async presentNow(before: GameState, after: GameState, events: GameEvent[], gen: number): Promise<void> {
+    this.busy = true;
+    this.refresh();
+    try {
+      // 1. The action itself: its sounds and dice first (yours wait for you to throw them), then the outcome.
+      const cut = events.findIndex((e) => e.type === "phase" || e.type === "roundEnded");
+      const action = cut < 0 ? events : events.slice(0, cut);
+      const later = cut < 0 ? [] : events.slice(cut);
+      audio.onGameEvents(action, after); // [audio] SFX, battle intensity, victory/defeat stinger
+      await this.playDice(action);
+      if (gen !== this.generation) return;
+      this.state = after;
+      this.lastEvents = events;
+      this.handleEvents(before, action);
+      this.refresh();
+      await this.alerts.idle();
+      // 2. What follows, one step at a time: phase banners, then the scoring walkthrough (each score,
+      // healing, recharges, upkeep) with its own sound and call-out as it happens.
+      for (const e of later) {
+        if (gen !== this.generation) return;
+        audio.onGameEvents([e], after);
+        if (e.type === "phase") {
+          await this.renderer.banner(`${PHASE_NAMES[e.phase]} phase`, { sub: PHASE_HINT[e.phase], kicker: `Round ${e.round}`, tone: "neutral" });
+          continue;
+        }
+        await this.playDice([e]);
+        this.handleEvents(before, [e]);
+        this.walkthrough(e);
+        await this.alerts.idle();
+      }
+      if (gen !== this.generation) return;
+      // 3. Whose turn it is now.
+      const s = this.state;
+      if (!s.over && !s.orderChoice && before.activePlayer !== s.activePlayer) {
+        await this.alerts.push(s.activePlayer === HUMAN ? "YOUR TURN!" : "AI'S TURN", {
+          sub: `${PHASE_NAMES[s.phase]} phase`,
+          tone: s.activePlayer === HUMAN ? "you" : "ai",
+          ms: 1000,
+        });
+      }
+    } finally {
+      if (gen === this.generation) {
+        this.busy = false;
+        this.refresh();
+      }
+    }
+  }
+
+  /** Call-outs for the end-of-round steps (scores have theirs in `narrate`). */
+  private walkthrough(e: GameEvent): void {
+    const s = this.state;
+    const who = (p: number) => (p === HUMAN ? "You" : "AI");
+    const tone = (p: number): AlertTone => (p === HUMAN ? "you" : "ai");
+    if (e.type === "ability" && (e.ability === "regen" || e.ability === "regrow")) {
+      const owner = unitById(s, e.uid)?.owner ?? HUMAN;
+      void this.alerts.push(e.ability === "regrow" ? "REGROW!" : "REGEN!", { sub: e.text, tone: tone(owner), ms: 1000 });
+    } else if (e.type === "rallied" && e.how === "roll") {
+      const owner = unitById(s, e.uid)?.owner ?? HUMAN;
+      void this.alerts.push("BACK IN THE FIGHT", { sub: `${unitName(s, e.uid)} shakes it off`, tone: tone(owner), ms: 1000 });
+    } else if (e.type === "expired") {
+      void this.alerts.push("POOF!", { sub: `${unitName(s, e.uid)} is gone`, tone: "neutral", ms: 900 });
+    } else if (e.type === "recharged") {
+      void this.alerts.push("SHIELDS UP", { sub: `${who(e.player)}: ${e.models} model${e.models === 1 ? "" : "s"} recharge`, tone: tone(e.player), ms: 900 });
+    } else if (e.type === "upkeep") {
+      const bits = [`+${e.resources} ⚙`, e.supply ? `+${e.supply} ◆ supply` : "", e.cp ? `+${e.cp} CP` : ""].filter(Boolean).join(" · ");
+      void this.alerts.push(`${who(e.player).toUpperCase()}: SUPPLIES IN`, { sub: bits, tone: tone(e.player), ms: 1100 });
+    } else if (e.type === "roundEnded") {
+      void this.alerts.push(`ROUND ${e.round} DONE`, { sub: `You ${s.players[0].vp} VP · AI ${s.players[1].vp} VP`, tone: "neutral", big: true, ms: 1600 });
+    }
+  }
+
   private async runAi(): Promise<void> {
-    if (this.aiRunning || this.state.over || this.state.activePlayer !== AI) return;
+    if (!this.started || this.aiRunning || this.state.over || this.state.activePlayer !== AI) return;
     const gen = this.generation;
     this.aiRunning = true;
     this.refresh();
     try {
       while (!this.state.over && this.state.activePlayer === AI) {
+        await this.presenting;
         await sleep(420);
         if (gen !== this.generation) return;
         const cmd = aiCommand(this.state);
@@ -307,9 +759,8 @@ export class Controller {
           r = applyCommand(this.state, { type: "pass", player: AI });
           if (!r.ok) break;
         }
-        const before = this.state;
-        this.state = r.state;
-        this.handleEvents(before, r.events);
+        await this.present(this.state, r.state, r.events);
+        if (gen !== this.generation) return;
         this.selected = null;
         this.refresh();
       }
@@ -341,25 +792,35 @@ export class Controller {
       friendlyMarks: [],
       zone: null,
       blast: null,
+      events: this.lastEvents,
+      ready: eligibleUnits(s, s.activePlayer).map((u) => u.uid),
     };
     let tip: string | null = null;
 
-    if (this.humanTurn()) {
+    if (this.mode.kind === "measure") {
+      tip = this.previewMeasure(hit, view);
+    } else if (this.humanTurn()) {
       if (this.mode.kind === "deploy" && this.deployUid) {
         const u = unitById(s, this.deployUid)!;
-        view.zone = s.spawn[HUMAN];
+        view.zone = deployZones(s, u);
         if (this.hover && !hit) {
-          const plan = planUnitMove(s, u, u.models[0]!.id, this.hover, { allowance: 0, teleport: true, zone: s.spawn[HUMAN] });
+          const plan = planUnitMove(s, u, u.models[0]!.id, this.hover, {
+            allowance: 0,
+            teleport: true,
+            zone: deployZones(s, u),
+          });
           const r = profileOf(u).baseRadius;
           if (typeof plan === "string") {
             view.ghosts = [{ pos: this.hover, radius: r }];
             view.ghostOk = false;
             tip = plan;
           } else {
-            view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r }));
+            view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r, cover: coverRating(s, u, p.pos, p.elevation) }));
             tip = `Deploy ${profileOf(u).name}`;
           }
         }
+      } else if (this.mode.kind === "support") {
+        tip = this.previewForSupport(this.mode.support, this.mode.ability, hit, view);
       } else if (sel) {
         tip = this.previewForSelected(sel, hit, view);
       }
@@ -367,33 +828,203 @@ export class Controller {
     this.renderer.render(view);
     this.renderTooltip(tip);
     this.renderTopbar();
+    if (!tip && hit && !this.deployMenu) tip = this.unitBrief(hit.unit);
+    this.renderCallout(sel);
+    this.passBtn.hidden = !this.humanTurn();
+    const canClaim =
+      (s.phase === "movement" || s.phase === "combat") &&
+      (s.initiativeClaim ?? null) === null &&
+      !s.players[AI].passed &&
+      eligibleUnits(s, HUMAN).length + (s.phase === "movement" ? reserves(s, HUMAN).length : 0) > 0;
+    this.passBtn.textContent = canClaim
+      ? `⏭ Pass early: lead the ${s.phase === "movement" ? "Assault phase" : "next round"} [P]`
+      : `⏭ Pass ${PHASE_NAMES[s.phase].toLowerCase()} phase [P]`;
+    this.passBtn.title = canClaim
+      ? "Stop acting this phase. Passing first claims the initiative: you go first in the next phase."
+      : "Stop acting this phase.";
+    this.renderOrderChoice();
     this.renderArmy();
+    this.renderSupports();
+    this.applyFactionAccents(hit?.unit ?? sel);
     this.renderCard(hit?.unit ?? sel ?? (this.deployUid ? unitById(s, this.deployUid) : undefined));
     this.renderActions(sel);
   }
 
-  private previewForSelected(sel: Unit, hit: { unit: Unit; model: Model } | undefined, view: RenderView): string | null {
+  private previewMeasure(hit: { unit: Unit; model: Model } | undefined, view: RenderView): string {
+    const m = this.mode;
+    if (m.kind !== "measure") return "";
+    if (!m.from) return "📏 Measuring: click a model or a spot to measure from. M or Esc to stop.";
+    if (!this.hover) return "📏 Move the pointer to measure.";
+    const s = this.state;
+    const to = hit ? hit.model.pos : this.hover;
+    const toElev = hit ? hit.model.elevation : platformAt(s, to) ? 1 : 0;
+    const fromElev = (m.fromElev ?? 0) as 0 | 1 | 2;
+    const sight = lineOfSight(s, m.from, fromElev, to, toElev as 0 | 1 | 2);
+    view.sightLines = [{ from: m.from, to, ok: sight }];
+    const d = dist(m.from, to);
+    const fromUnit = m.fromUnit ? unitById(s, m.fromUnit) : undefined;
+    const edge =
+      (fromUnit ? profileOf(fromUnit).baseRadius : 0) + (hit ? profileOf(hit.unit).baseRadius : 0);
+    const parts = [`📏 ${d.toFixed(1)}"`];
+    if (edge > 0) parts.push(`edge to edge ${Math.max(0, d - edge).toFixed(1)}"`);
+    parts.push(sight ? "sight: clear" : "sight: blocked");
+    return parts.join(" · ");
+  }
+
+  private previewForSupport(
+    supportId: string,
+    abilityId: string,
+    hit: { unit: Unit; model: Model } | undefined,
+    view: RenderView,
+  ): string {
+    const s = this.state;
+    const a = abilityOf(supportId, abilityId)!;
+    const need = supportTarget(a);
+    if (need === "friendlyUnit") view.friendlyMarks = onBoard(s, HUMAN).map((u) => u.uid);
+    if (need === "reservePoint" && this.hover) view.blast = { center: this.hover, radius: 1 };
+    const picked = need === "unitPoint" && this.mode.kind === "support" && this.mode.unit ? unitById(s, this.mode.unit) : undefined;
+    if (need === "unitPoint" && !picked) view.friendlyMarks = onBoard(s, HUMAN).filter((u) => !profileOf(u).structure).map((u) => u.uid);
+    if (need === "enemyUnit") view.targets = onBoard(s, AI).map((u) => ({ uid: u.uid, ok: true }));
+    if (need === "point" && this.hover) {
+      const e = a.effect;
+      const radius =
+        e.kind === "blast"
+          ? e.radius
+          : e.kind === "summon"
+            ? profileOf({ profileId: e.profileId, upgrades: [] } as unknown as Unit).baseRadius
+            : 1;
+      view.blast = { center: this.hover, radius };
+    }
+    const why = canPlaySupport(s, HUMAN, supportId, abilityId);
+    if (why) return why;
+    if (picked && a.effect.kind === "teleport") {
+      // Show the reach and where the squad would land.
+      const lead = aliveModels(picked)[0];
+      if (lead) view.moveRing = { center: lead.pos, radius: a.effect.range };
+      if (this.hover && !hit && lead) {
+        const bad = teleportProblem(s, HUMAN, a.effect, picked, this.hover);
+        const plan = bad ?? planUnitMove(s, picked, lead.id, this.hover, { allowance: 0, teleport: true });
+        const r = profileOf(picked).baseRadius;
+        if (typeof plan === "string") {
+          view.ghosts = [{ pos: this.hover, radius: r }];
+          view.ghostOk = false;
+          return `${a.name}: ${plan}`;
+        }
+        view.ghosts = plan.placements.map((at) => ({ pos: at.pos, radius: r, cover: coverRating(s, picked, at.pos, at.elevation) }));
+        return `${a.name}: move ${profileOf(picked).name} here`;
+      }
+      return `${a.name}: click where ${profileOf(picked).name} goes. Esc cancels.`;
+    }
+    if (a.effect.kind === "airdrop") {
+      // Show where it can't land, and say why when the pointer is on such a spot.
+      view.noGo = airdropNoGo(s, HUMAN, a.effect);
+      const bad = this.hover && !hit ? airdropSpotProblem(s, HUMAN, a.effect, this.hover) : null;
+      if (bad) return `${a.name}: ${bad}`;
+    }
+    const hint =
+      need === "friendlyUnit"
+        ? "Click one of your units."
+        : need === "enemyUnit"
+          ? "Click an enemy unit."
+          : need === "reservePoint"
+            ? "Click a spot, then pick a reserve unit to drop there."
+            : need === "unitPoint"
+              ? "Click one of your units, then where it goes."
+              : "Click a spot on the board.";
+    if (hit && need !== "point") return `${a.name}: ${profileOf(hit.unit).name}`;
+    return `${a.name} (${a.cp} CP): ${hint} Esc cancels.`;
+  }
+
+  private renderSupports(): void {
+    const s = this.state;
+    const el = this.els.sidebar.querySelector("#supports");
+    if (!el) return;
+    const me = s.players[HUMAN];
+    const ai = s.players[AI];
+    const cards = me.supports
+      .map((c) => {
+        const def = supportOf(c.id);
+        const buttons = def.abilities
+          .map((a) => {
+            const why = this.humanTurn()
+              ? canPlaySupport(s, HUMAN, c.id, a.id)
+              : "Wait for your turn";
+            const on =
+              this.mode.kind === "support" &&
+              this.mode.support === c.id &&
+              this.mode.ability === a.id;
+            const when = a.timing === "any" ? "any phase" : `${PHASE_NAMES[a.timing]}`;
+            return `<button class="mini support-btn ${on ? "selected" : ""}" data-support="${esc(c.id)}" data-sab="${esc(a.id)}" ${why ? "disabled" : ""} title="${esc(a.text + (why ? ` (${why})` : ""))}">
+              ${esc(a.name)} <small>${a.cp} CP · ${esc(when)}${a.exhaust ? " · exhausts" : ""}</small></button>`;
+          })
+          .join("");
+        return `<div class="support-card ${c.exhausted ? "exhausted" : ""}">
+          <div class="support-head"><b>${esc(def.name)}</b> <small>+${def.cp} CP/round${c.exhausted ? " · exhausted" : ""}</small></div>
+          <div class="support-abilities">${buttons}</div>
+        </div>`;
+      })
+      .join("");
+    const armed = me.armed
+      .map(
+        (a) =>
+          `<span class="tag">⚡ ${esc(abilityOf(a.support, a.ability)?.name ?? a.ability)}</span>`,
+      )
+      .join("");
+    const html = `
+      <h3 style="margin:0 0 4px">${factionEmblemSvg(s.factions[HUMAN], 22)} Supports <span class="chip cp">✦ ${me.cp}/${CP_CAP} CP</span> <small class="hint">+${cpPerRound(me.supports)}/round</small></h3>
+      ${cards || `<p class="hint">No supports in this list.</p>`}
+      ${armed ? `<div class="tags">Armed: ${armed}</div>` : ""}
+      <p class="hint" style="margin:4px 0 0">AI: ✦ ${ai.cp} CP${ai.armed.length ? ` · ${ai.armed.length} reaction${ai.armed.length > 1 ? "s" : ""} armed` : ""}</p>`;
+    const holder = el as HTMLElement & { __html?: string };
+    if (holder.__html === html) return;
+    holder.__html = html;
+    el.innerHTML = html;
+    el.querySelectorAll<HTMLButtonElement>("button[data-support]").forEach((b) =>
+      b.addEventListener("click", () => {
+        const support = b.dataset.support!;
+        const ability = b.dataset.sab!;
+        const a = abilityOf(support, ability)!;
+        if (supportTarget(a) === "none") {
+          this.issue({ type: "support", player: HUMAN as 0, support, ability });
+          return;
+        }
+        this.clearSelection();
+        this.mode = { kind: "support", support, ability };
+        this.refresh();
+      }),
+    );
+  }
+
+  private previewForSelected(
+    sel: Unit,
+    hit: { unit: Unit; model: Model } | undefined,
+    view: RenderView,
+  ): string | null {
     const s = this.state;
     const r = profileOf(sel).baseRadius;
     const leader = sel.models.find((m) => m.id === this.leader && m.alive) ?? aliveModels(sel)[0];
-    const mode = this.mode;
+    const mode = this.contextMode(sel, hit);
     if (!leader) return null;
 
     if (mode.kind === "move" || mode.kind === "advance" || mode.kind === "disengage") {
       const mv = effectiveMove(s, sel);
       view.moveRing = { center: leader.pos, radius: mv };
-      if (!this.hover || hit) return hit && hit.unit.uid === sel.uid ? "Click to make this model the leader" : null;
+      if (!this.hover || hit)
+        return hit && hit.unit.uid === sel.uid ? "Click to make this model the leader" : null;
       const plan = planUnitMove(s, sel, leader.id, this.hover, { allowance: mv });
       if (typeof plan === "string") {
         view.ghosts = [{ pos: this.hover, radius: r }];
         view.ghostOk = false;
         return plan;
       }
-      view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r }));
+      view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r, cover: coverRating(s, sel, p.pos, p.elevation) }));
       const route = planRoute(s, sel, leader.pos, leader.elevation, this.hover);
-      if (typeof route !== "string") view.path = [route.legs[0]!.from, ...route.legs.map((l) => l.to)];
-      const engages = mode.kind !== "disengage" && plan.placements.some((p) => wouldEngage(s, sel, p.pos));
-      const stillEngaged = mode.kind === "disengage" && plan.placements.some((p) => wouldEngage(s, sel, p.pos));
+      if (typeof route !== "string")
+        view.path = [route.legs[0]!.from, ...route.legs.map((l) => l.to)];
+      const engages =
+        mode.kind !== "disengage" && plan.placements.some((p) => wouldEngage(s, sel, p.pos));
+      const stillEngaged =
+        mode.kind === "disengage" && plan.placements.some((p) => wouldEngage(s, sel, p.pos));
       if (engages) {
         view.ghostOk = false;
         return "Only a charge can move into base contact";
@@ -408,14 +1039,21 @@ export class Controller {
     if (mode.kind === "shoot" || mode.kind === "fight") {
       const melee = mode.kind === "fight";
       const pool = melee ? engagedWith(s, sel) : onBoard(s, AI);
-      for (const e of pool) view.targets.push({ uid: e.uid, ok: typeof this.bestWeapon(sel, e, melee) !== "string" });
+      for (const e of pool)
+        view.targets.push({ uid: e.uid, ok: typeof this.bestWeapon(sel, e, melee) !== "string" });
       if (hit && hit.unit.owner !== HUMAN) {
         const b = this.bestWeapon(sel, hit.unit, melee);
         if (typeof b === "string") return b;
         const w = profileOf(sel).weapons[b.index]!;
         for (const a of b.plan.attackers) {
-          const near = b.plan.targets.reduce((x, y) => (dist(x.pos, a.model.pos) < dist(y.pos, a.model.pos) ? x : y));
-          view.sightLines.push({ from: drawPos(sel, a.model), to: drawPos(hit.unit, near), ok: true });
+          const near = b.plan.targets.reduce((x, y) =>
+            dist(x.pos, a.model.pos) < dist(y.pos, a.model.pos) ? x : y,
+          );
+          view.sightLines.push({
+            from: drawPos(sel, a.model),
+            to: drawPos(hit.unit, near),
+            ok: true,
+          });
         }
         const dice = b.plan.attackers.reduce((n, a) => n + a.dice, 0);
         const exp = expectedDamage(s, sel, hit.unit, b.plan, melee);
@@ -427,7 +1065,8 @@ export class Controller {
     if (mode.kind === "charge") {
       const mv = effectiveMove(s, sel);
       view.moveRing = { center: leader.pos, radius: mv + r };
-      for (const e of onBoard(s, AI)) view.targets.push({ uid: e.uid, ok: unitGap(sel, e) <= mv + 1 });
+      for (const e of onBoard(s, AI))
+        view.targets.push({ uid: e.uid, ok: unitGap(sel, e) <= mv + 1 });
       if (hit && hit.unit.owner !== HUMAN) {
         const plan = planCharge(s, sel, hit.unit);
         if (typeof plan === "string") return plan;
@@ -439,29 +1078,48 @@ export class Controller {
 
     if (mode.kind === "ability") {
       const def = ABILITIES[mode.id];
-      if (def.needs === "friendlyUnit" || (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget)) {
+      if (def.needs === "enemyUnit") {
+        const range = def.range ?? 0;
+        view.moveRing = { center: leader.pos, radius: range + r };
+        for (const e of onBoard(s, AI)) view.targets.push({ uid: e.uid, ok: unitGap(sel, e) <= range });
+        return hit && hit.unit.owner !== HUMAN ? `${def.name}: ${profileOf(hit.unit).name}` : `${def.name}: click an enemy unit within ${range}"`;
+      }
+      if (
+        def.needs === "friendlyUnit" ||
+        (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget)
+      ) {
         view.friendlyMarks = onBoard(s, HUMAN)
-          .filter((f) => (mode.id === "recall" ? f.uid !== sel.uid && unitGap(sel, f) <= (def.range ?? 12) : f.uid === sel.uid || unitGap(sel, f) <= (def.range ?? 3)))
+          .filter((f) =>
+            mode.id === "recall"
+              ? f.uid !== sel.uid && unitGap(sel, f) <= (def.range ?? 12)
+              : f.uid === sel.uid || unitGap(sel, f) <= (def.range ?? 3),
+          )
           .map((f) => f.uid);
-        return def.needs === "friendlyUnit" ? `${def.name}: click a friendly unit` : `${def.name}: click a friendly unit to bring over`;
+        return def.needs === "friendlyUnit"
+          ? `${def.name}: click a friendly unit`
+          : `${def.name}: click a friendly unit to bring over`;
       }
       if (mode.id === "barrage") {
         if (this.hover) view.blast = { center: this.hover, radius: 2 };
         view.moveRing = { center: leader.pos, radius: def.range ?? 24 };
         return "Barrage: hits every ground model under the blast, yours too";
       }
-      const mover = mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget)! : sel;
-      if (mode.id === "blink") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
+      const mover =
+        mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget)! : sel;
+      if (mode.id === "blink" || mode.id === "rocket-hop") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
       if (mode.id === "recall") view.moveRing = { center: leader.pos, radius: 4 + r };
       if (this.hover && !hit) {
         const mr = profileOf(mover).baseRadius;
-        const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, this.hover, { allowance: 0, teleport: true });
+        const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, this.hover, {
+          allowance: 0,
+          teleport: true,
+        });
         if (typeof plan === "string") {
           view.ghosts = [{ pos: this.hover, radius: mr }];
           view.ghostOk = false;
           return plan;
         }
-        view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: mr }));
+        view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: mr, cover: coverRating(s, mover, p.pos, p.elevation) }));
         return `${def.name}: click to teleport here`;
       }
       return def.text;
@@ -489,6 +1147,14 @@ export class Controller {
       .join("");
     const status = s.over
       ? "Game over"
+      : !this.started
+        ? "Rolling for initiative…"
+      : this.busy
+        ? "Resolving…"
+      : s.orderChoice
+        ? s.orderChoice.player === HUMAN
+          ? "Choose who goes first"
+          : "The AI is choosing who goes first…"
       : this.aiRunning || s.activePlayer === AI
         ? "AI is thinking…"
         : s.phase === "movement"
@@ -496,8 +1162,10 @@ export class Controller {
           : s.phase === "assault"
             ? "Your assault: shoot, charge or advance"
             : "Combat: pick an engaged unit to fight";
-    const changed = setHTML(this.els.topbar, `
-      <span class="logo">SCDMG</span>
+    const changed = setHTML(
+      this.els.topbar,
+      `
+      <span class="logo" aria-label="SCDMG">${wordmarkSvg(true)}</span>
       <span class="chip">Round ${s.round}/${s.maxRounds}</span>
       <span class="phases">${phases}</span>
       <span class="score">
@@ -506,10 +1174,23 @@ export class Controller {
       </span>
       <span class="status">${esc(status)}</span>
       <span class="spacer"></span>
+      <button class="secondary" id="btn-fit" title="Fit the board to the screen (0)">⤢ Fit</button>
+      <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" title="Measure distances and check line of sight (M)">📏 Measure</button>
+      <button class="secondary" id="btn-undo" ${this.humanTurn() && this.history.length ? "" : "disabled"} title="Take back your last action (Ctrl+Z)">↶ Undo</button>
+      <button class="secondary" id="btn-dice" title="Dice: Throw (you throw your own dice), Auto, Quick or Off">🎲 Dice: ${DICE_SPEED_LABEL[this.tray.speed]}</button>
+      <span id="audio-slot"></span>
       <button class="secondary" id="btn-rules">How to play</button>
-      <button class="secondary" id="btn-new">New game</button>`);
+      <button class="secondary" id="btn-new">New game</button>`,
+    );
     if (!changed) return;
+    audio.mountButton(this.els.topbar.querySelector("#audio-slot")); // [audio]
+    this.els.topbar
+      .querySelector("#btn-measure")!
+      .addEventListener("click", () => this.toggleMeasure());
+    this.els.topbar.querySelector("#btn-undo")!.addEventListener("click", () => this.undo());
+    this.els.topbar.querySelector("#btn-fit")!.addEventListener("click", () => this.renderer.resetView());
     this.els.topbar.querySelector("#btn-rules")!.addEventListener("click", () => showRules());
+    this.els.topbar.querySelector("#btn-dice")!.addEventListener("click", () => this.cycleDice());
     this.els.topbar.querySelector("#btn-new")!.addEventListener("click", () => this.onNewGame());
   }
 
@@ -519,21 +1200,14 @@ export class Controller {
     const me = s.players[HUMAN];
     const ai = s.players[AI];
     const canDeploy = this.humanTurn() && s.phase === "movement";
-    const rows = reserves(s, HUMAN)
-      .map((u) => {
-        const p = profileOf(u);
-        const why = canAffordDeploy(s, u);
-        const on = this.deployUid === u.uid;
-        return `<div class="reserve ${on ? "on" : ""}">
-          <span><b>${esc(p.name)}</b> <small>⚙${p.cost} · ◆${p.supply}${u.upgrades.length ? " · " + u.upgrades.map((id) => esc(p.upgrades.find((x) => x.id === id)?.name ?? id)).join(", ") : ""}</small></span>
-          <button class="mini" data-deploy="${u.uid}" ${canDeploy && !why ? "" : "disabled"} title="${esc(why ?? "Place it in your zone")}">${on ? "Placing…" : "Deploy"}</button>
-        </div>`;
-      })
-      .join("");
-    const changed = setHTML(el, `
+    const rows = reserveRowsHtml(s, HUMAN, canDeploy, this.deployUid);
+    const changed = setHTML(
+      el,
+      `
       <div class="army-row"><span class="chip p0">You</span> ⚙ ${me.resources} · ◆ ${supplyUsed(s, HUMAN)}/${me.supplyCap} supply</div>
-      <div class="army-row"><span class="chip p1">AI</span> ⚙ ${ai.resources} · ◆ ${supplyUsed(s, AI)}/${ai.supplyCap} supply · ${reserves(s, AI).length} in reserve</div>
-      ${rows ? `<h3 style="margin-top:6px">Reserves</h3>${rows}` : `<p class="hint">Everything is deployed.</p>`}`);
+      <div class="army-row"><span class="chip p1">AI</span> ⚙ ${ai.resources} · ◆ ${supplyUsed(s, AI)}/${ai.supplyCap} supply · ${aiReserveText(s, AI)}</div>
+      ${rows ? `<h3 style="margin-top:6px">${reservesHeading(s)}</h3>${rows}` : `<p class="hint">Everything is deployed.</p>`}`,
+    );
     if (!changed) return;
     el.querySelectorAll<HTMLButtonElement>("button[data-deploy]").forEach((b) =>
       b.addEventListener("click", () => {
@@ -549,7 +1223,10 @@ export class Controller {
     const el = this.els.sidebar.querySelector("#card")!;
     const s = this.state;
     if (!u) {
-      setHTML(el, `<h3>No unit selected</h3><p class="hint">Click one of your units to activate it, or deploy from reserves. Hover anything to inspect it.</p>`);
+      setHTML(
+        el,
+        `<h3>No unit selected</h3><p class="hint">Click one of your units to activate it, or deploy from reserves. Hover anything to inspect it.</p>`,
+      );
       return;
     }
     const p = profileOf(u);
@@ -561,11 +1238,17 @@ export class Controller {
       u.status.charged && "charged",
       u.status.disengaged && "disengaged",
       u.status.slowedRounds > 0 && "slowed",
+      u.status.shaken && "😱 shaken",
       !u.onBoard && "in reserve",
     ].filter(Boolean);
-    setHTML(el, `
+    const canRally =
+      u.status.shaken && u.owner === HUMAN && this.humanTurn() && s.players[HUMAN].cp >= RALLY_CP;
+    const fearless = !!p.structure || p.keywords.includes("fearless");
+    const changed = setHTML(
+      el,
+      `
       <h3>${esc(p.name)} <span class="chip ${u.owner === HUMAN ? "p0" : "p1"}" style="font-size:.75rem">${u.owner === HUMAN ? "You" : "AI"}</span></h3>
-      <p class="sub">${esc(FACTIONS[p.faction].name)} · ⚙${p.cost} · ◆${p.supply} · ${alive}/${p.models} models · ${esc(p.blurb)}</p>
+      <p class="sub">${esc(factionOf(p.faction).name)} · ⚙${p.cost} · ◆${p.supply} · ${alive}/${p.models} models · ${fearless ? "fearless" : `nerve ${p.nerve ?? 7}`} · ${esc(p.blurb)}</p>
       <div class="stats">
         <div>${u.onBoard ? effectiveMove(s, u) : p.move}"<small>Move</small></div>
         <div>${p.hp}<small>HP/model</small></div>
@@ -574,8 +1257,17 @@ export class Controller {
       </div>
       <div class="tags">${p.keywords.map((k) => `<span class="tag kw" title="${esc(KEYWORD_TEXT[k])}">${esc(k)}</span>`).join("")}</div>
       ${p.weapons.map((w) => `<div class="weapon">⚔ ${esc(weaponLine(w))}</div>`).join("")}
+      ${p.impact ? `<div class="weapon">${esc(impactLine(p))}</div>` : ""}
+      ${p.evade ? `<div class="weapon">${esc(evadeLine(p))}</div>` : ""}
       ${p.abilities.map((a) => `<div class="ability"><b>${esc(ABILITIES[a].name)}</b> <small>(${ABILITIES[a].kind}${ABILITIES[a].usesPerGame ? `, ${ABILITIES[a].usesPerGame - (u.abilityUses[a] ?? 0)} left` : ""})</small>: ${esc(ABILITIES[a].text)}</div>`).join("")}
-      ${statuses.length ? `<div class="tags">${statuses.map((x) => `<span class="tag">${x}</span>`).join("")}</div>` : ""}`);
+      ${statuses.length ? `<div class="tags">${statuses.map((x) => `<span class="tag">${x}</span>`).join("")}</div>` : ""}
+      ${canRally ? `<button class="mini" id="rally-btn" style="margin-top:6px">📣 Rally (${RALLY_CP} CP)</button>` : ""}`,
+    );
+    if (changed && canRally) {
+      el.querySelector("#rally-btn")?.addEventListener("click", () =>
+        this.issue({ type: "rally", player: HUMAN as 0, target: u.uid }),
+      );
+    }
   }
 
   private renderActions(sel: Unit | undefined): void {
@@ -585,7 +1277,7 @@ export class Controller {
       setHTML(el, `<p class="hint">${s.over ? "The battle is over." : "Waiting for the AI…"}</p>`);
       return;
     }
-    const passBtn = `<button data-act="pass" class="secondary">⏭ Pass rest of ${PHASE_NAMES[s.phase].toLowerCase()} phase [P]</button>`;
+    const passBtn = "";
     if (!sel) {
       const n = eligibleUnits(s, HUMAN).length;
       const hint =
@@ -596,7 +1288,8 @@ export class Controller {
             : s.phase === "movement" && reserves(s, HUMAN).some((u) => !canAffordDeploy(s, u))
               ? "Deploy from your reserves, or pass."
               : "Nothing left to activate. Pass to move on.";
-      if (setHTML(el, `<p class="hint" style="margin:0">${hint}</p>${passBtn}`)) this.bindActions(el, undefined);
+      if (setHTML(el, `<p class="hint" style="margin:0">${hint}</p>${passBtn}`))
+        this.bindActions(el, undefined);
       return;
     }
     const p = profileOf(sel);
@@ -609,12 +1302,28 @@ export class Controller {
         .filter((a) => ABILITIES[a].kind === "active" && ABILITIES[a].phase === s.phase)
         .map((a) => {
           const def = ABILITIES[a];
-          const left = def.usesPerGame === undefined ? null : def.usesPerGame - (sel.abilityUses[a] ?? 0);
-          return btn("ability", `✨ ${def.name}${left !== null ? ` (${left})` : ""}`, m.kind === "ability" && m.id === a, `data-ab="${a}"`, left === 0);
+          const left =
+            def.usesPerGame === undefined ? null : def.usesPerGame - (sel.abilityUses[a] ?? 0);
+          return btn(
+            "ability",
+            `✨ ${def.name}${left !== null ? ` (${left} left)` : ""}${def.cp ? ` · ${def.cp} CP` : ""}`,
+            m.kind === "ability" && m.id === a,
+            `data-ab="${a}"`,
+            left === 0 || (def.cp ?? 0) > s.players[HUMAN].cp,
+          );
         });
     if (s.phase === "movement") {
-      out.push(`<p class="hint" style="margin:0">Click a model to make it the leader (★), then click where it should go. The rest follow within 2".</p>`);
-      if (isEngaged(s, sel)) out.push(btn("disengage", `🏃 Disengage (up to ${effectiveMove(s, sel)}")`, m.kind === "disengage"));
+      out.push(
+        `<p class="hint" style="margin:0">Click a model to make it the leader (★), then click where it should go. The rest follow within 2".</p>`,
+      );
+      if (isEngaged(s, sel))
+        out.push(
+          btn(
+            "disengage",
+            `🏃 Disengage (up to ${effectiveMove(s, sel)}")`,
+            m.kind === "disengage",
+          ),
+        );
       else out.push(btn("move", `🏃 Move (up to ${effectiveMove(s, sel)}")`, m.kind === "move"));
       out.push(...abilityButtons());
       out.push(btn("hunker", "🧱 Hunker down (+1 save vs shots) [H]", false));
@@ -623,16 +1332,44 @@ export class Controller {
       p.weapons.forEach((w, i) => {
         if (w.melee) return;
         const blocked = sel.status.disengaged && !p.keywords.includes("light");
-        out.push(btn("shoot", `🎯 ${esc(w.name)} (${w.range}")`, m.kind === "shoot" && m.weapon === i, `data-w="${i}"`, blocked));
+        out.push(
+          btn(
+            "shoot",
+            `🎯 ${esc(w.name)} (${w.range}")`,
+            m.kind === "shoot" && m.weapon === i,
+            `data-w="${i}"`,
+            blocked,
+          ),
+        );
       });
-      if (p.weapons.some((w) => w.melee)) out.push(btn("charge", `💥 Charge (up to ${effectiveMove(s, sel)}")`, m.kind === "charge", "", sel.status.disengaged));
-      out.push(btn("advance", `🏃 Advance (up to ${effectiveMove(s, sel)}")`, m.kind === "advance", "", sel.status.disengaged));
+      if (p.weapons.some((w) => w.melee))
+        out.push(
+          btn(
+            "charge",
+            `💥 Charge (up to ${effectiveMove(s, sel)}")`,
+            m.kind === "charge",
+            "",
+            sel.status.disengaged,
+          ),
+        );
+      out.push(
+        btn(
+          "advance",
+          `🏃 Advance (up to ${effectiveMove(s, sel)}")`,
+          m.kind === "advance",
+          "",
+          sel.status.disengaged,
+        ),
+      );
       out.push(...abilityButtons());
       out.push(btn("hunker", "🧱 Hunker down [H]", false));
       out.push(btn("hold", "✋ Hold", false));
     } else if (s.phase === "combat") {
       p.weapons.forEach((w, i) => {
-        if (w.melee) out.push(btn("fight", `⚔ ${esc(w.name)}`, m.kind === "fight" && m.weapon === i, `data-w="${i}"`));
+        if (w.melee)
+          out.push(
+            btn("fight", `⚔ ${esc(w.name)}`, m.kind === "fight" && m.weapon === i, `data-w="${i}"`),
+          );
       });
       out.push(`<p class="hint" style="margin:0">Click an engaged enemy to fight it.</p>`);
       out.push(btn("hold", "✋ Don't fight", false));
@@ -653,10 +1390,14 @@ export class Controller {
         if (!sel) return;
         if (a === "hunker") return void this.issue({ type: "hunker", uid: sel.uid });
         if (a === "hold") return void this.issue({ type: "hold", uid: sel.uid });
-        if (a === "move" || a === "advance" || a === "disengage" || a === "charge") this.mode = { kind: a };
-        else if (a === "shoot" || a === "fight") this.mode = { kind: a, weapon: Number(b.dataset.w) };
+        if (a === "move" || a === "advance" || a === "disengage" || a === "charge")
+          this.mode = { kind: a };
+        else if (a === "shoot" || a === "fight")
+          this.mode = { kind: a, weapon: Number(b.dataset.w) };
         else if (a === "ability") {
-          this.mode = { kind: "ability", id: b.dataset.ab as AbilityId };
+          const id = b.dataset.ab as AbilityId;
+          if (!ABILITIES[id].needs) return void this.issue({ type: "ability", uid: sel.uid, ability: id });
+          this.mode = { kind: "ability", id };
           this.abilityTarget = null;
         }
         this.refresh();
@@ -664,8 +1405,274 @@ export class Controller {
     );
   }
 
+  /** One-line call-out for a hovered unit: statuses, abilities ready now, what it can still do. */
+  private unitBrief(u: Unit): string {
+    const s = this.state;
+    const p = profileOf(u);
+    const bits: string[] = [`${p.name} (${u.owner === HUMAN ? "yours" : "AI"})`];
+    if (u.onBoard && eligibleUnits(s, u.owner).includes(u)) bits.push("✅ can act");
+    else if (u.onBoard) bits.push("💤 done this phase");
+    if (u.status.shaken) bits.push("😱 Shaken");
+    if (u.onBoard && isEngaged(s, u)) bits.push("⚔ engaged");
+    if (u.status.hunkered) bits.push("🧱 hunkered");
+    if (u.status.slowedRounds > 0) bits.push("🐌 slowed");
+    bits.push(...abilityStatusTags(u));
+    for (const a of p.abilities) {
+      const def = ABILITIES[a];
+      if (def.kind !== "active") continue;
+      const left = def.usesPerGame === undefined ? null : def.usesPerGame - (u.abilityUses[a] ?? 0);
+      if (left === 0) continue;
+      bits.push(`✨ ${def.name}${def.cp ? ` (${def.cp} CP)` : ""}${def.phase === s.phase ? " ready" : ` in ${PHASE_NAMES[def.phase!]}`}`);
+    }
+    if (p.impact) bits.push("💥 impact on charge");
+    return bits.join(" · ");
+  }
+
+  /** Docked command bar for the selected unit: abilities, rally, hunker, hold. */
+  private renderCallout(sel: Unit | undefined): void {
+    const s = this.state;
+    let el = this.els.stage.querySelector<HTMLDivElement>(".unit-callout");
+    if (!sel || !this.humanTurn() || !sel.onBoard) {
+      el?.remove();
+      return;
+    }
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "unit-callout";
+      this.els.stage.appendChild(el);
+    }
+    const p = profileOf(sel);
+    const cp = s.players[HUMAN].cp;
+    const chips: string[] = [];
+    for (const a of p.abilities) {
+      const def = ABILITIES[a];
+      if (def.kind !== "active" || def.phase !== s.phase) continue;
+      const left = def.usesPerGame === undefined ? null : def.usesPerGame - (sel.abilityUses[a] ?? 0);
+      const cost = def.cp ?? 0;
+      const why = left === 0 ? "used up" : cost > cp ? `needs ${cost} CP` : "";
+      chips.push(
+        `<button data-co="ability" data-ab="${a}" ${why ? "disabled" : ""} title="${esc(def.text)}">✨ ${esc(def.name)}${cost ? ` <small>${cost} CP</small>` : ""}${why ? ` <small>(${why})</small>` : ""}</button>`,
+      );
+    }
+    if (sel.status.shaken) chips.push(`<button data-co="rally" ${cp >= RALLY_CP ? "" : "disabled"}>📣 Rally <small>${RALLY_CP} CP</small></button>`);
+    if (s.phase !== "combat") chips.push(`<button data-co="hunker" class="secondary">🧱 Hunker</button>`);
+    chips.push(`<button data-co="hold" class="secondary">✋ ${s.phase === "combat" ? "Don't fight" : "Hold"}</button>`);
+    const hint =
+      s.phase === "movement"
+        ? "Point at ground to move"
+        : s.phase === "assault"
+          ? "Point at an enemy to shoot or charge, or at ground to advance"
+          : "Point at an engaged enemy to fight";
+    const html = `<div class="co-head"><b>${esc(p.name)}</b> <small>${esc(hint)}</small></div><div class="co-chips">${chips.join("")}</div>`;
+    const holder = el as HTMLDivElement & { __html?: string };
+    if (holder.__html !== html) {
+      holder.__html = html;
+      el.innerHTML = html;
+      el.querySelectorAll<HTMLButtonElement>("button[data-co]").forEach((b) =>
+        b.addEventListener("click", () => {
+          const what = b.dataset.co;
+          if (what === "rally") return void this.issue({ type: "rally", player: HUMAN as 0, target: sel.uid });
+          if (what === "hunker") return void this.issue({ type: "hunker", uid: sel.uid });
+          if (what === "hold") return void this.issue({ type: "hold", uid: sel.uid });
+          if (what === "ability") {
+            const id = b.dataset.ab as AbilityId;
+            if (!ABILITIES[id].needs) return void this.issue({ type: "ability", uid: sel.uid, ability: id });
+            this.mode = { kind: "ability", id };
+            this.abilityTarget = null;
+            this.refresh();
+          }
+        }),
+      );
+    }
+    // Docked at the bottom-centre of the board (see hud.css); if the unit itself is low on screen,
+    // dock at the top instead so the bar never sits on top of the unit you're ordering.
+    const lead = sel.models.find((m) => m.id === this.leader && m.alive) ?? aliveModels(sel)[0];
+    if (lead) {
+      const sp = this.renderer.toScreen(drawPos(sel, lead));
+      el.classList.toggle("dock-top", sp.y > this.els.stage.clientHeight * 0.55);
+    }
+    requestAnimationFrame(() => el?.classList.add("in"));
+  }
+
+  /** "Go first or second?" prompt when the order is the human's choice. */
+  private renderOrderChoice(): void {
+    const s = this.state;
+    let el = this.els.stage.querySelector<HTMLDivElement>(".order-choice");
+    const mine = this.started && !s.over && s.orderChoice?.player === HUMAN && !this.aiRunning && !this.busy;
+    if (!mine) {
+      el?.remove();
+      return;
+    }
+    if (el) return;
+    el = document.createElement("div");
+    el.className = "order-choice";
+    const why =
+      s.orderChoice!.reason === "rolloff"
+        ? "You won the initiative roll-off!"
+        : s.orderChoice!.reason === "tie"
+          ? "Tied on VP, and you won the roll-off!"
+          : "You're behind on VP, so you call it.";
+    const title = document.createElement("h3");
+    title.textContent = `Round ${s.round}: who goes first?`;
+    const sub = document.createElement("p");
+    sub.textContent = `${why} Going first gets you into position first; going second lets you react to the enemy.`;
+    const row = document.createElement("div");
+    row.className = "row";
+    for (const [label, goFirst] of [
+      ["▶ We go first", true],
+      ["⏸ They go first", false],
+    ] as const) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = label;
+      if (!goFirst) b.className = "secondary";
+      b.addEventListener("click", () => {
+        el?.remove();
+        this.issue({ type: "chooseOrder", player: HUMAN as 0, goFirst });
+      });
+      row.appendChild(b);
+    }
+    el.append(title, sub, row);
+    this.els.stage.appendChild(el);
+    (row.firstElementChild as HTMLButtonElement | null)?.focus({ preventScroll: true });
+  }
+
+  /** Pop-up menu of reserves at a spot in your deployment zone. */
+  private openDeployMenu(p: Vec, units: Unit[], drop?: { title: string; pick: (u: Unit) => void }): void {
+    const s = this.state;
+    const menu = document.createElement("div");
+    menu.className = units.length > 5 ? "deploy-menu wide" : "deploy-menu";
+    const title = document.createElement("h4");
+    title.textContent = drop?.title ?? deployMenuTitle(s);
+    menu.appendChild(title);
+    for (const u of units) {
+      const prof = profileOf(u);
+      const why =
+        canAffordDeploy(s, u) ??
+        (drop ? null : deployZones(s, u).some((poly) => pointInZone(p, poly)) ? null : "Not in this unit's deployment area");
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "secondary";
+      b.disabled = !!why;
+      b.title = why ?? prof.blurb;
+      const name = document.createElement("span");
+      name.textContent = prof.name;
+      const cost = document.createElement("small");
+      cost.textContent = deployMenuDetail(s, u, why);
+      b.append(name, cost);
+      b.addEventListener("click", () => {
+        this.closeDeployMenu();
+        if (drop) drop.pick(u);
+        else this.issue({ type: "deploy", uid: u.uid, to: p });
+      });
+      menu.appendChild(b);
+    }
+    const sp = this.renderer.toScreen(p);
+    const stage = this.els.stage;
+    stage.appendChild(menu);
+    // Place it next to the click, kept fully inside the board area.
+    const w = menu.offsetWidth;
+    const h = menu.offsetHeight;
+    menu.style.left = `${Math.max(6, Math.min(stage.clientWidth - w - 6, sp.x + 10))}px`;
+    menu.style.top = `${Math.max(6, Math.min(stage.clientHeight - h - 6, sp.y - h / 2))}px`;
+    this.deployMenu = menu;
+    (menu.querySelector("button:not([disabled])") as HTMLButtonElement | null)?.focus({ preventScroll: true });
+  }
+
+  private closeDeployMenu(): void {
+    this.deployMenu?.remove();
+    this.deployMenu = null;
+  }
+
+  /** Comic-strip narration for a batch of events (plus whose turn it is now). */
+  private narrate(before: GameState, events: GameEvent[]): void {
+    const s = this.state;
+    const ownerOf = (uid: string) => unitById(s, uid)?.owner ?? unitById(before, uid)?.owner;
+    const toneFor = (owner: number | undefined, goodForMe = true): AlertTone =>
+      owner === undefined ? "neutral" : (owner === HUMAN) === goodForMe ? "you" : "ai";
+    for (const e of events) {
+      if (e.type === "attack") {
+        const r = e.report;
+        const a = unitName(s, r.uid);
+        const t = unitName(s, r.target);
+        if (r.unitDestroyed) {
+          this.alerts.push("WIPED OUT!", { sub: `${a} finishes off ${t}`, tone: ownerOf(r.target) === HUMAN ? "bad" : "good" });
+        } else if (r.kind === "impact" && r.damage > 0) {
+          this.alerts.push("SLAM!", { sub: `${a} crashes into ${t}: ${r.damage} dmg`, tone: toneFor(ownerOf(r.uid)) });
+        } else if (r.damage >= 3) {
+          const word = r.kind === "barrage" ? "KA-BOOM!" : r.kind === "fight" ? "CHOMP!" : r.kind === "overwatch" ? "AMBUSH!" : "BLAM!";
+          this.alerts.push(word, { sub: `${a} → ${t}: ${r.damage} dmg`, tone: toneFor(ownerOf(r.uid)) });
+        } else if (r.kind === "overwatch") {
+          this.alerts.push("OVERWATCH!", { sub: `${a} opens fire on ${t}`, tone: toneFor(ownerOf(r.uid)) });
+        }
+      } else if (e.type === "moved" && e.kind === "charge") {
+        this.alerts.push("CHARGE!", { sub: `${unitName(s, e.uid)} charges in`, tone: toneFor(ownerOf(e.uid)) });
+      } else if (e.type === "moved" && e.kind === "teleport") {
+        this.alerts.push("ZAP!", { sub: `${unitName(s, e.uid)} teleports`, tone: toneFor(ownerOf(e.uid)) });
+      } else if (e.type === "deployed" && ownerOf(e.uid) === AI) {
+        this.alerts.push("REINFORCEMENTS!", { sub: `The AI deploys ${unitName(s, e.uid)}`, tone: "ai" });
+      } else if (e.type === "morale" && e.shaken) {
+        this.alerts.push("SHAKEN!", { sub: `${unitName(s, e.uid)} loses its nerve`, tone: ownerOf(e.uid) === HUMAN ? "bad" : "good" });
+      } else if (e.type === "rallied" && e.how === "cp") {
+        this.alerts.push("RALLY!", { sub: `${unitName(s, e.uid)} steadies up`, tone: toneFor(ownerOf(e.uid)) });
+      } else if (e.type === "support" && e.player === AI) {
+        this.alerts.push("AI SUPPORT!", { sub: e.text, tone: "ai" });
+      } else if (e.type === "summoned") {
+        this.alerts.push("INCOMING!", { sub: `${unitName(s, e.uid)} appears`, tone: toneFor(ownerOf(e.uid)) });
+      } else if (e.type === "scored") {
+        this.alerts.push(`+${e.vp} VP`, { sub: `${e.player === HUMAN ? "You" : "AI"}: ${e.reason}`, tone: e.player === HUMAN ? "you" : "ai" });
+      } else if (e.type === "flag") {
+        this.alerts.push("SNACK ALERT!", { sub: e.text, tone: "good" });
+      } else if (e.type === "phase") {
+        // The phase banner (see handleEvents) holds the AI until it has landed.
+      } else if (e.type === "rolloff") {
+        this.log(`🎲 Tied on VP: roll-off. You ${e.rolls[e.rolls.length - 1]![0]}, AI ${e.rolls[e.rolls.length - 1]![1]}. ${e.winner === HUMAN ? "You choose" : "The AI chooses"} who goes first.`);
+        this.alerts.push("TIE! ROLL-OFF", { sub: `${e.winner === HUMAN ? "You" : "The AI"} won: choose who goes first`, tone: e.winner === HUMAN ? "you" : "ai" });
+      } else if (e.type === "orderChosen") {
+        const first = e.goFirst ? e.player : e.player === 0 ? 1 : 0;
+        const who = e.player === HUMAN ? "You" : "The AI";
+        this.log(`${who} chose to go ${e.goFirst ? "first" : "second"} in round ${e.round}.`);
+        this.alerts.push(first === HUMAN ? "YOU GO FIRST!" : "AI GOES FIRST", {
+          sub: `${who} chose to go ${e.goFirst ? "first" : "second"}`,
+          tone: first === HUMAN ? "you" : "ai",
+        });
+      } else if (e.type === "initiativeClaimed") {
+        const who = e.player === HUMAN ? "You" : "The AI";
+        const next = e.nextPhase === "assault" ? "the Assault phase" : "next round";
+        this.log(`⚡ ${who} passed early and claimed the initiative for ${next}.`);
+        this.alerts.push("INITIATIVE CLAIMED!", { sub: `${who} will lead ${next}`, tone: e.player === HUMAN ? "you" : "ai" });
+      } else if (e.type === "gameOver") {
+        const word = e.winner === "draw" ? "STALEMATE!" : e.winner === HUMAN ? "VICTORY!" : "DEFEAT!";
+        this.alerts.push(word, { sub: e.reason, big: true, tone: e.winner === HUMAN ? "you" : e.winner === "draw" ? "neutral" : "ai", ms: 3500 });
+      }
+    }
+  }
+
+  /** Faction accent styling (data-faction / --faction-color) on the army, supports and unit card panels. */
+  private applyFactionAccents(focus: Unit | undefined): void {
+    const set = (sel: string, factionId: string) => {
+      const el = this.els.sidebar.querySelector<HTMLElement>(sel);
+      if (!el || el.dataset.faction === factionId) return;
+      el.dataset.faction = factionId;
+      el.style.setProperty("--faction-color", `#${factionOf(factionId).color.toString(16).padStart(6, "0")}`);
+    };
+    const mine = this.state.factions[HUMAN];
+    set("#army", mine);
+    set("#supports", mine);
+    set("#card", focus ? profileOf(focus).faction : mine);
+  }
+
+  private updateLogBadge(): void {
+    const badge = this.logDrawer.querySelector(".badge");
+    if (badge) badge.textContent = this.unread ? String(this.unread) : "";
+  }
+
   private log(html: string, owner?: number): void {
-    const el = this.els.sidebar.querySelector("#log")!;
+    const el = this.logDrawer.querySelector("#log")!;
+    if (this.logDrawer.classList.contains("collapsed")) {
+      this.unread++;
+      this.updateLogBadge();
+    }
     const p = document.createElement("p");
     if (owner !== undefined) p.className = `p${owner}`;
     p.innerHTML = html;
@@ -679,7 +1686,8 @@ export class Controller {
 
   private showGameOver(): void {
     const s = this.state;
-    const title = s.winner === "draw" ? "It's a draw!" : s.winner === HUMAN ? "Victory!" : "Defeat!";
+    const title =
+      s.winner === "draw" ? "It's a draw!" : s.winner === HUMAN ? "Victory!" : "Defeat!";
     const overlay = document.getElementById("overlay")!;
     overlay.innerHTML = `
       <div class="modal" style="max-width:420px;text-align:center">
@@ -692,7 +1700,9 @@ export class Controller {
       </div>`;
     overlay.classList.add("show");
     overlay.querySelector("#go-again")!.addEventListener("click", () => this.onNewGame());
-    overlay.querySelector("#go-close")!.addEventListener("click", () => overlay.classList.remove("show"));
+    overlay
+      .querySelector("#go-close")!
+      .addEventListener("click", () => overlay.classList.remove("show"));
   }
 }
 
@@ -704,7 +1714,7 @@ export function showRules(): void {
       <p class="tagline">Each round has four phases. Players take turns activating one unit at a time; whoever has the initiative goes first.</p>
       <ol>
         <li><b>Movement:</b> deploy a unit from reserves into your zone (costs ⚙ resources and ◆ supply), move, disengage from melee, hunker down, or use a movement ability.</li>
-        <li><b>Assault:</b> shoot, charge into base contact, advance, hunker, or use an assault ability. Engaged units sit this out.</li>
+        <li><b>Assault:</b> shoot, charge into base contact, advance, hunker, or use an assault ability. Engaged units can only shoot the unit they're fighting.</li>
         <li><b>Combat:</b> engaged units fight. Units that charged fight first and get +1 die per model.</li>
         <li><b>Scoring:</b> the mission awards VP. Shields recharge, regenerating critters heal, you gain resources and your supply cap grows.</li>
       </ol>
@@ -715,10 +1725,20 @@ export function showRules(): void {
         <li><b>Keywords</b> matter: armoured shrugs off 1 AP unless the weapon is built to crack armour; some weapons get bonus dice or damage against light, armoured or flying targets.</li>
         <li><b>Supply:</b> destroyed units free their supply, so you can bring in more from reserves.</li>
       </ul>
-      <p class="hint">Keys: Esc cancels, H hunkers, P passes the rest of the phase. Hover enemies with a unit selected to see the odds.</p>
+      <ul>
+        <li><b>Morale:</b> battered units test their nerve and can become Shaken (they hit worse, won't charge, can't hold objectives). Rally them for 1 CP.</li>
+        <li><b>Terrain:</b> scrub and craters are difficult terrain (double cost to cross). Models in the line of fire give the target cover.</li>
+        <li><b>Weapon traits:</b> blast, torrent, heavy, rending and pistol. Some units also deal impact damage when their charge lands.</li>
+        <li><b>Attacks:</b> roll to hit; <b>precision</b> turns some misses into hits. Then the target may roll <b>evade</b> (only in the situations its card lists: point-blank, shooting, melee or blasts); <b>tracking</b> cancels evades. Whatever gets through rolls armour saves.</li>
+        <li><b>Melee and shooting:</b> you can't shoot into a melee without precision, and engaged units can only shoot what they're fighting. Point-blank pistol shots can't be evaded.</li>
+        <li><b>Supports:</b> spend CP on your support cards as free actions; reactions arm now and fire later.</li>
+        <li><b>Unit abilities</b> are free actions during that unit's activation (one per phase): Blink then move, Recall then shoot. Some cost CP from the same pool as supports.</li>
+      </ul>
+      <p class="hint">Keys: Esc cancels, H hunkers, P passes the rest of the phase, M measures, Ctrl+Z undoes. Hover enemies with a unit selected to see the odds.</p>
       <button id="rules-close">Got it</button>
     </div>`;
   overlay.classList.add("show");
-  overlay.querySelector("#rules-close")!.addEventListener("click", () => overlay.classList.remove("show"));
+  overlay
+    .querySelector("#rules-close")!
+    .addEventListener("click", () => overlay.classList.remove("show"));
 }
-

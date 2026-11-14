@@ -1,0 +1,61 @@
+/* Audio button and volume popover. Uses the game's tokens with fallbacks. */
+
+.audio-btn {
+  min-width: 2.4em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  line-height: 1;
+}
+
+.audio-pop {
+  position: fixed;
+  z-index: 1000;
+  width: 240px;
+  padding: 10px 12px;
+  background: var(--panel, #fffaf0);
+  color: var(--ink, #2b2140);
+  border: 2px solid var(--ink, #2b2140);
+  border-radius: var(--radius, 12px);
+  box-shadow: var(--shadow, 0 4px 0 #2b2140);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.audio-pop .audio-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.audio-pop .audio-mute {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.audio-pop .audio-row {
+  display: grid;
+  grid-template-columns: 4.2em 1fr 2.2em;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.audio-pop .audio-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--p0, #2fb5c8);
+}
+
+.audio-pop output {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted, #7a6c8f);
+}
+
+.audio-pop .audio-note {
+  margin: 0 0 6px;
+  color: var(--muted, #7a6c8f);
+  font-size: 0.8rem;
+}

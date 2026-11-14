@@ -2,3 +2,7 @@ node_modules/
 dist/
 .remember/
 *.log
+# desktop packaging
+release/
+dist-desktop/
+.cache/
