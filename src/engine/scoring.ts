@@ -310,7 +310,8 @@ export function scoreRound(s: GameState, events: GameEvent[]): void {
       const culled: [number, number] = [...(ms.culled ?? [0, 0])];
       for (const p of players) {
         const kills = destroyedSupply(s, other(p));
-        award(p, (kills - culled[p]) * rule.vpPerSupply, "destroying enemy supply");
+        // floors of the running totals, so a fractional rate (1 VP per 2 supply) pays as each step is crossed
+        award(p, Math.floor(kills * rule.vpPerSupply + 1e-9) - Math.floor(culled[p] * rule.vpPerSupply + 1e-9), "destroying enemy supply");
         culled[p] = kills;
       }
       ms = { ...ms, culled };

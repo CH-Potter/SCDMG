@@ -188,6 +188,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Instant win:** a lead of more than 8 VP (10 or 12 in big-swing missions) wins on the spot.
 - **Kill VP** is paid as a unit's supply drops, not only when its last model dies.
 - **Blast** weapons get their extra die against units with 7+ models left (was 5+).
+- **Scrapheap Showdown** now pays 1 VP for every 2 enemy supply destroyed and 3 VP per held neutral objective (was 1 and 1), with a 15 VP instant-win limit. Kill-only scoring had left the Munch winning almost none of these games.
 - New setting: the Munch are Dr. Graft's grafted critter army and the Lumen Concord are alien invaders; their units were renamed.
 
 **Bigger squads:**
@@ -268,7 +269,7 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
 | Swipe the Snack | 6 | Grab the enemy's snack from their home objective: +1 VP each round you hold it, and 4 VP when you carry it into your own deployment zone or home objective. If the carrier dies, the snack drops; touching your own dropped snack sends it home. Neutral objectives score 1 VP each from round 3 |
 | *Assault:* Frontline | 6 | Sticky control. 1 VP per owned neutral objective each round; 4 VP for owning the enemy's home objective |
 | *Assault:* The Great Snack Heist | 7 | +1 VP each round you hold their snack; 5 VP for carrying it into your deployment zone or home objective; neutral objectives score 1 VP each from round 3 |
-| *Assault:* Scrapheap Showdown | 5 | 1 VP per enemy supply destroyed; 1 VP per neutral objective held each round |
+| *Assault:* Scrapheap Showdown | 5 | 1 VP for every 2 enemy supply destroyed; 3 VP per neutral objective held each round |
 | Top of the Heap | 5 | The **heap** is the neutral objective nearest the centre. Holding it scores 1 VP, then 2, 3 and 4 VP (the cap) for each round in a row you keep it; losing it, or nobody holding it, resets the count. Other neutral objectives score 1 VP each round |
 | Scrap Rush | 5 | Each neutral objective holds 3 loads of scrap. Holding one at the end of a round hauls a load: 1 VP and 2 resources. Empty piles score nothing |
 | *Assault:* Shifting Ground | 6 | One neutral objective is **live** each round and scores 3 VP; the others score 1 VP. The next live objective is rolled at the start (and after each scoring phase) and announced a round ahead |
@@ -299,7 +300,7 @@ A faction with no buyable permanent structure gets 3 resources instead of each f
 
 **Stragglers:** a model left more than 2" from its squad (for example after casualties) moves as far as it can toward the leader. It catches up rather than blocking the whole move.
 
-The game ends after the last round (most VP wins), or immediately if an army has no units left on the board or in reserve, or the moment one side leads by **more than 8 VP**, which wins at once. Missions with big late swings raise that limit so a real comeback stays possible: **10 VP** for Scrapyard Brawl, Swipe the Snack, Top of the Heap, Claim-Jump Siege, Frontline and Most Wanted, and **12 VP** for The Great Snack Heist, Scrapheap Showdown, Shifting Ground and Strongbox Run.
+The game ends after the last round (most VP wins), or immediately if an army has no units left on the board or in reserve, or the moment one side leads by **more than 8 VP**, which wins at once. Missions with big late swings raise that limit so a real comeback stays possible: **10 VP** for Scrapyard Brawl, Swipe the Snack, Top of the Heap, Claim-Jump Siege, Frontline and Most Wanted, **12 VP** for The Great Snack Heist, Shifting Ground and Strongbox Run, and **15 VP** for Scrapheap Showdown, where held objectives swing the score fastest.
 
 ## Maps
 

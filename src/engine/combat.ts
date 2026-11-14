@@ -418,12 +418,16 @@ function concedeSupply(s: GameState, t: Unit, events: GameEvent[]): void {
   const lost = supplyLost(t);
   const paid = t.supplyPaid ?? 0;
   if (lost <= paid) return;
+  // the side's running total, so fractional rates (1 VP per 2 supply) pay out as the total crosses each step
+  const before = s.units.reduce((n, u) => n + (u.owner === t.owner ? (u.supplyPaid ?? 0) : 0), 0);
   t.supplyPaid = lost;
+  const after = before + lost - paid;
   const enemy = t.owner === 0 ? 1 : 0;
   const gone = !aliveModels(t).length;
   for (const rule of MISSIONS[s.missionId]!.scoring) {
     if (rule.kind !== "eliminate") continue;
-    const vp = (lost - paid) * rule.vpPerSupply;
+    const vp = Math.floor(after * rule.vpPerSupply + 1e-9) - Math.floor(before * rule.vpPerSupply + 1e-9);
+    if (vp <= 0) continue;
     s.players[enemy].vp += vp;
     events.push({ type: "scored", player: enemy, vp, reason: `${gone ? "destroying" : "cutting down"} ${profileOf(t).name}` });
   }

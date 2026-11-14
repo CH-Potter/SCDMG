@@ -82,7 +82,7 @@ function vpBucket(reason: string): string {
   if (r.includes("salvage")) return "loot";
   if (r.includes("keeping their")) return "guard";
   if (r.includes("home")) return "home";
-  if (r.includes("supply") || r.includes("destroy") || r.includes("kill")) return "kills";
+  if (r.includes("supply") || r.includes("destroy") || r.includes("kill") || r.includes("cutting down")) return "kills";
   if (r.includes("objective") || r.includes("hold") || r.includes("own")) return "objectives";
   return "other";
 }

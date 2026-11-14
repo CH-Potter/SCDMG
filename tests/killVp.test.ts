@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { applyDamage, planShooting } from "../src/engine/combat";
 import { BLAST_SQUAD } from "../src/engine/constants";
 import { createGame } from "../src/engine/game";
+import { MISSIONS } from "../src/engine/data/missions";
 import { profileFor, profileOf } from "../src/engine/profile";
 import { freshStatus } from "../src/engine/supports";
 import { aliveModels, supplyFor, unitById } from "../src/engine/rules";
@@ -68,6 +69,26 @@ describe("kill VP follows the supply a squad loses", () => {
     for (const m of dead) Object.assign(m, { alive: true, hp: p.hp, shield: p.shield });
     for (let i = 0; i < dead.length; i++) total += killOne(s, pack);
     expect(total).toBe(1);
+  });
+
+  it("a half rate (Scrapheap Showdown) pays 1 VP each time the side's conceded supply passes another 2", () => {
+    const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed: 7, missionId: "scrapheap" });
+    const rate = MISSIONS.scrapheap!.scoring.find((r) => r.kind === "eliminate")!;
+    expect(rate.kind === "eliminate" && rate.vpPerSupply).toBe(0.5);
+    const packs = s.units.filter((u) => u.owner === 1 && profileOf(u).models > 1);
+    expect(packs.length).toBeGreaterThan(1);
+    packs.forEach((u, i) => place(s, u.uid, { x: 4 + i * 8, y: 8 }));
+    let conceded = 0;
+    for (const u of packs) {
+      while (aliveModels(u).length) {
+        const vp = killOne(s, u);
+        conceded = packs.reduce((n, x) => n + (x.supplyPaid ?? 0), 0);
+        expect(vp).toBeLessThanOrEqual(1);
+        // VP always equals half the side's conceded supply, rounded down, across squads.
+        expect(s.players[0].vp).toBe(Math.floor(conceded / 2));
+      }
+    }
+    expect(conceded).toBe(packs.reduce((n, u) => n + profileOf(u).supply, 0));
   });
 
   it("the cull scoring rule counts the supply squads have conceded", () => {
