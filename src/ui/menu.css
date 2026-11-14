@@ -6,9 +6,43 @@
   transform: rotate(-1.5deg);
 }
 
-.modal.menu,
 .lb {
   max-width: 1200px;
+}
+
+/* The main menu fills the window, with the same 10px margin as the game screen. */
+#overlay:has(> .modal.menu) {
+  padding: 10px;
+  place-items: stretch;
+}
+
+.modal.menu {
+  max-width: none;
+  max-height: none;
+  height: 100%;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+
+/* Keep "To battle!" in reach however far down the page you are. */
+.modal.menu .start-row {
+  position: sticky;
+  bottom: -20px;
+  z-index: 2;
+  margin: 16px -24px -20px;
+  padding: 12px 24px;
+  background: var(--halftone), var(--panel-2);
+  border-top: 3px solid var(--ink);
+}
+
+@media (max-width: 720px) {
+  #overlay:has(> .modal.menu) {
+    padding: 8px;
+  }
+  .modal.menu .start-row {
+    bottom: -14px;
+    margin: 14px -14px -14px;
+    padding: 10px 14px;
+  }
 }
 
 .menu-head,
