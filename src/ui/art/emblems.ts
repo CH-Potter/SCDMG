@@ -65,54 +65,71 @@ function militia(color: number, id: string): string {
   ${[[14, 17], [50, 17], [14, 37], [50, 37], [32, 55]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#c9c2b4" stroke="${INK}" stroke-width="1"/>`).join("")}`;
 }
 
-/** The Munch: a hungry round maw full of teeth, two mean eyes, a drip of drool. */
+/** The Munch: a chrome-jawed beetle wearing the overmind lens, on a hive-hex plate wired with glowing nodes. */
 function munch(color: number, id: string): string {
-  const c = css(mix(shade(color, -0.1), 0x4d5a62, 0.25));
-  const stripe = css(color);
-  const teethTop = Array.from({ length: 7 }, (_, i) => {
-    const x = 15 + i * 5;
-    return `M${x} 36 L${x + 2.5} ${43 + (i % 2) * 2} L${x + 5} 36`;
-  }).join(" ");
-  const teethBot = Array.from({ length: 6 }, (_, i) => {
-    const x = 17.5 + i * 5;
-    return `M${x} 51 L${x + 2.5} ${45 - (i % 2) * 2} L${x + 5} 51`;
-  }).join(" ");
-  return `${defs(id, "rgba(28,21,18,0.35)")}
-  <path d="M8 34 C8 16 20 6 32 6 C46 6 57 17 56 33 C55 50 45 59 32 59 C18 59 8 50 8 34 Z" fill="${INK}" transform="translate(2 2)"/>
-  ${([[14, 12, -0.5], [24, 6, -0.15], [36, 6, 0.15], [47, 11, 0.5]] as [number, number, number][]).map(([x, y, r]) => `<path d="M${x - 4} ${y + 6} L${x} ${y - 6} L${x + 4} ${y + 6} Z" fill="#f2ead2" stroke="${INK}" stroke-width="2" stroke-linejoin="round" transform="rotate(${(r as number) * 40} ${x} ${y})"/>`).join("")}
-  <path d="M8 34 C8 16 20 6 32 6 C46 6 57 17 56 33 C55 50 45 59 32 59 C18 59 8 50 8 34 Z" fill="${c}" stroke="${INK}" stroke-width="3"/>
-  <path d="M56 33 C55 50 45 59 32 59 C40 54 48 46 50 32 C51 24 49 16 45 11 C52 16 56 24 56 33 Z" fill="url(#ht${id})"/>
-  <path d="M14 22 Q18 26 16 31 M20 15 Q25 20 23 26" stroke="${stripe}" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M12 38 C14 32 50 32 52 38 C52 50 44 55 32 55 C20 55 12 50 12 38 Z" fill="#c2475e" stroke="${INK}" stroke-width="2.4"/>
-  <path d="M15 39 C17 35 47 35 49 39 C49 48 42 52 32 52 C22 52 15 48 15 39 Z" fill="#3a0a16"/>
-  <ellipse cx="32" cy="47" rx="8" ry="3" fill="#e46a82"/>
-  <path d="${teethTop}" fill="#f2ead2" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>
-  <path d="${teethBot}" fill="#f2ead2" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>
-  <ellipse cx="23" cy="25" rx="5" ry="4.2" fill="#ffd23a" stroke="${INK}" stroke-width="1.8"/><ellipse cx="24" cy="25" rx="1.2" ry="3.2" fill="${INK}"/>
-  <ellipse cx="41" cy="24" rx="5.4" ry="4.6" fill="#ffd23a" stroke="${INK}" stroke-width="1.8"/><ellipse cx="42" cy="24" rx="1.3" ry="3.4" fill="${INK}"/>
-  <path d="M17 18 L28 22 M47 17 L36 21" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
-  <path d="M38 52 Q39 57 38 60" stroke="#c6ea52" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="38" cy="60.5" r="1.8" fill="#c6ea52" stroke="${INK}" stroke-width="0.8"/>`;
+  const glow = css(mix(color, 0xe8ff9a, 0.35));
+  const ring = css(color);
+  const hex = (r: number, cy = 33) =>
+    Array.from({ length: 6 }, (_, i) => {
+      const a = -Math.PI / 2 + (i * Math.PI) / 3;
+      return `${(32 + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`;
+    }).join(" ");
+  const nodes = Array.from({ length: 6 }, (_, i) => {
+    const a = -Math.PI / 2 + (i * Math.PI) / 3;
+    return [32 + Math.cos(a) * 22.5, 33 + Math.sin(a) * 22.5] as const;
+  });
+  // three stubby legs a side, mirrored
+  const legs = "M25 33 L18 30 L16 26 M24 40 L16 41 L13 44 M25 47 L19 51 L18 55";
+  const mirror = "M39 33 L46 30 L48 26 M40 40 L48 41 L51 44 M39 47 L45 51 L46 55";
+  return `${defs(id, "rgba(28,21,18,0.4)")}
+  <polygon points="${hex(28)}" fill="${INK}" transform="translate(2 2)"/>
+  <polygon points="${hex(28)}" fill="#3b4148" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="${hex(22.5)}" fill="none" stroke="${ring}" stroke-width="2"/>
+  ${nodes.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="${glow}" stroke="${INK}" stroke-width="0.9"/>`).join("")}
+  <path d="M32 5 L56 19 L56 47 L32 61 Z" fill="url(#ht${id})" opacity="0.8"/>
+  <path d="${legs} ${mirror}" stroke="${INK}" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="${legs} ${mirror}" stroke="#6b4a33" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="32" cy="43" rx="10.5" ry="12.5" fill="#5a3a26" stroke="${INK}" stroke-width="2.4"/>
+  <path d="M32 43 m-10.5 0 a10.5 12.5 0 0 0 10.5 12.5 L32 30.5 a10.5 12.5 0 0 0 -10.5 12.5" fill="#6e4830"/>
+  <path d="M25 36 Q26 32 30 31" stroke="#a7774f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M32 31 L32 55" stroke="${INK}" stroke-width="1.4"/>
+  <ellipse cx="32" cy="29" rx="8.5" ry="5" fill="#4a3020" stroke="${INK}" stroke-width="2.2"/>
+  <path d="M28.5 18 C24 15 23.5 10 27.5 8 C27.5 11 29 13.5 31.5 15.5 Z" fill="#c9d0d6" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M35.5 18 C40 15 40.5 10 36.5 8 C36.5 11 35 13.5 32.5 15.5 Z" fill="#c9d0d6" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="32" cy="21.5" r="6.5" fill="#aeb8c0" stroke="${INK}" stroke-width="2.2"/>
+  <path d="M27.5 19.5 A5 5 0 0 1 31 16.2" stroke="#eef2f5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <circle cx="32" cy="21.5" r="4.2" fill="${glow}" opacity="0.35"/>
+  <circle cx="32" cy="21.5" r="2.6" fill="${glow}" stroke="${INK}" stroke-width="1.2"/>
+  <circle cx="31.2" cy="20.7" r="0.8" fill="#ffffff"/>`;
 }
 
-/** Lumen Concord: a radiant faceted crystal under a little crown, on a gold-rimmed medallion. */
+/** Lumen Concord: a smug alien in a fishbowl helmet, gold collar and little crown, on a radiant medallion. */
 function concord(color: number, id: string): string {
-  const g = css(mix(shade(color, 0.45), 0xf4f0ff, 0.25));
-  const gd = css(shade(color, -0.1));
   const rays = Array.from({ length: 12 }, (_, i) => {
     const a = (i / 12) * Math.PI * 2;
     return `M${(32 + Math.cos(a) * 18).toFixed(1)} ${(34 + Math.sin(a) * 18).toFixed(1)} L${(32 + Math.cos(a) * 25).toFixed(1)} ${(34 + Math.sin(a) * 25).toFixed(1)}`;
   }).join(" ");
+  const skin = "#9fe3c4";
+  const lid = "#74c4a2";
   return `${defs(id, "rgba(44,47,88,0.4)")}
   <circle cx="34" cy="36" r="26" fill="${INK}"/>
   <circle cx="32" cy="34" r="26" fill="#2c2f58" stroke="${INK}" stroke-width="3"/>
   <circle cx="32" cy="34" r="22.5" fill="none" stroke="#dcb55a" stroke-width="2.2"/>
   <path d="${rays}" stroke="${css(shade(color, 0.5))}" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
-  <path d="M32 12 L44 30 L32 56 L20 30 Z" fill="${g}" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>
-  <path d="M32 12 L44 30 L32 56 Z" fill="${gd}" opacity="0.55"/>
-  <path d="M32 12 L44 30 L32 56 Z" fill="url(#ht${id})"/>
-  <path d="M20 30 L44 30 M32 12 L28 30 L32 56" stroke="${INK}" stroke-width="1" opacity="0.5" fill="none"/>
-  <path d="M25 27 L30 17" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
-  <path d="M23 9 L26 13 L29 7 L32 12 L35 7 L38 13 L41 9 L40 15 L24 15 Z" fill="#dcb55a" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  <circle cx="32" cy="33" r="15.5" fill="${css(mix(color, 0xffffff, 0.6))}" opacity="0.28"/>
+  <path d="M23.5 34 C23.5 25 27 20.5 32 20.5 C37 20.5 40.5 25 40.5 34 C40.5 40 37 44 32 45 C27 44 23.5 40 23.5 34 Z" fill="${skin}" stroke="${INK}" stroke-width="2"/>
+  <path d="M36 23 C38.5 25 39.5 29 39.3 33" stroke="${lid}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <ellipse cx="28" cy="34" rx="3.4" ry="2.5" fill="${INK}" transform="rotate(12 28 34)"/>
+  <ellipse cx="36" cy="34" rx="3.4" ry="2.5" fill="${INK}" transform="rotate(-12 36 34)"/>
+  <path d="M24.6 33.2 C25.5 31 30 31.2 31.4 33.6 Z M39.4 33.2 C38.5 31 34 31.2 32.6 33.6 Z" fill="${lid}" stroke="${INK}" stroke-width="1"/>
+  <circle cx="29" cy="34.7" r="0.7" fill="#ffffff"/><circle cx="37" cy="34.7" r="0.7" fill="#ffffff"/>
+  <path d="M29.5 40.3 Q32.5 41.6 35 39.4" stroke="${INK}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <circle cx="32" cy="33" r="15.5" fill="none" stroke="${INK}" stroke-width="2.4"/>
+  <path d="M21 28 A12 12 0 0 1 28.5 19.4" stroke="#ffffff" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="41.5" cy="25" r="1.2" fill="#ffffff" opacity="0.8"/>
+  <path d="M19.5 45 C24 50 40 50 44.5 45 L44.5 49 C40 54.5 24 54.5 19.5 49 Z" fill="#dcb55a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="32" cy="50.6" r="1.8" fill="${css(shade(color, 0.3))}" stroke="${INK}" stroke-width="0.9"/>
+  <path d="M25 13.5 L27.2 16.6 L29.6 11.4 L32 15.6 L34.4 11.4 L36.8 16.6 L39 13.5 L38 19 L26 19 Z" fill="#dcb55a" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>`;
 }
 
 /** A procedural emblem for a custom faction: shape and pattern from its name hash, icon from its look. */
