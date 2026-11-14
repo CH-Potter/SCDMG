@@ -16,6 +16,7 @@ Free and open source under the [MIT licence](LICENSE).
 - **A map editor and a faction forge** for building your own content, with custom unit art.
 - **Procedural music and sound**, one style per faction.
 - **A story to fight over**: lore pages for the valley and each faction, and comic-panel intro animations drawn live with the game's own miniatures.
+- **A campaign**, the Dustline War: linked Skirmish and Assault battles on a map of the valley, with places that change hands, perks, an army that carries over, story scenes and a finale, for each of the three factions.
 - **A portable Windows build** that runs offline with no install.
 
 ## Run it
@@ -34,7 +35,7 @@ npm run build    # typecheck + production build into dist/
 
 Each round has four phases: **Movement** (deploy, move, disengage, hunker), **Assault** (shoot, charge, advance), **Combat** (engaged units fight; chargers first) and **Scoring**. Players alternate activations within each phase. Armies start in reserve and deploy over time, limited by resources and a growing supply cap. Squads move by leader plus coherency; range, line of sight and cover are per model. Raised platforms are reached by ramps and ladders. Keywords such as light, armoured, heavy, flying and jump give soft rock–paper–scissors.
 
-The full rules are in [docs/rules.md](docs/rules.md), and each faction's design pillars are in [docs/factions.md](docs/factions.md). The story of the Dustline valley, its three sides and the places they fight over is in [docs/lore.md](docs/lore.md), and in the game under **📖 Lore**.
+The full rules are in [docs/rules.md](docs/rules.md), and each faction's design pillars are in [docs/factions.md](docs/factions.md). The story of the Dustline valley, its three sides and the places they fight over is in [docs/lore.md](docs/lore.md), and in the game under **📖 Lore**. The campaign that turns it into a war you play through is described in [docs/campaign.md](docs/campaign.md), and starts from **⚔ Campaign** on the main menu.
 
 ## Factions
 

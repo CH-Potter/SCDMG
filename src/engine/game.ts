@@ -9,7 +9,7 @@
 
 import { ABILITIES } from "./data/abilities";
 import { defaultListFor, defaultSupportsFor } from "./data/factions";
-import { MERCY_LEAD } from "./constants";
+import { CP_CAP, MERCY_LEAD } from "./constants";
 import { consumeReaction } from "./reactions";
 import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type ArmyRule } from "./openRoster";
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
@@ -82,7 +82,22 @@ export interface GameSetup {
   armyRule?: ArmyRule;
   /** Open roster: most copies of one unit on the table at once. Default: the mode's max copies; null = no limit. */
   openCap?: number | null;
+  /**
+   * A small head start for either side (the campaign's place perks): extra starting resources and
+   * CP, added on top of the mission's economy. CP stays within the usual cap. Leave it out for a
+   * normal game.
+   */
+  startBonus?: [StartBonus | undefined, StartBonus | undefined];
 }
+
+/** Extra starting resources and CP for one side (see `GameSetup.startBonus`). */
+export interface StartBonus {
+  resources?: number;
+  cp?: number;
+}
+
+/** A bonus amount as a whole, non-negative number (anything odd counts as nothing). */
+const bonusAmount = (n: unknown): number => (typeof n === "number" && Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0);
 
 const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
 
@@ -164,6 +179,12 @@ export function createGame(setup: GameSetup): GameState {
   state.initiativeClaim = null;
   // Per-role economy, garrisons, live objectives, salvage loads and convoy cargo (scoring.ts).
   setupMission(state);
+  setup.startBonus?.forEach((b, p) => {
+    if (!b) return;
+    const pl = state.players[p as PlayerId];
+    pl.resources += bonusAmount(b.resources);
+    pl.cp = Math.min(CP_CAP, pl.cp + bonusAmount(b.cp));
+  });
   if (open) setupOpenRoster(state, setup.openCap === null ? undefined : (setup.openCap ?? defaultOpenCap(map.mode)));
   return state;
 }

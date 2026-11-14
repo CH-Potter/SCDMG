@@ -22,7 +22,8 @@ export interface SceneDef {
 }
 
 export interface IntroDef {
-  id: IntroId;
+  /** An intro id (remembered as seen once played), or "story" for a campaign story scene (never remembered). */
+  id: IntroId | "story";
   /** For the layer's accessible name, e.g. "The Dustline" or "The Munch". */
   title: string;
   /** Unit profile ids the scenes use, painted before the intro starts. */
@@ -317,7 +318,7 @@ function focusKey(el: Element | null): string | null {
 /** Play an intro. Only one plays at a time: starting another closes the first. */
 export function playIntro(def: IntroDef, opts: PlayOptions = {}): IntroHandle {
   active?.close();
-  markIntroSeen(def.id);
+  if (def.id !== "story") markIntroSeen(def.id);
   const still = opts.reduced ?? reducedMotion();
   const prevFocus = document.activeElement as HTMLElement | null;
   const prevKey = focusKey(prevFocus);
@@ -326,7 +327,7 @@ export function playIntro(def: IntroDef, opts: PlayOptions = {}): IntroHandle {
   layer.className = `intro-layer ${still ? "is-still" : "is-loading"}`;
   layer.setAttribute("role", "dialog");
   layer.setAttribute("aria-modal", "true");
-  layer.setAttribute("aria-label", `Intro: ${def.title}`);
+  layer.setAttribute("aria-label", `${def.id === "story" ? "Story" : "Intro"}: ${def.title}`);
   layer.dataset.intro = def.id;
   layer.innerHTML = `
     <div class="intro-top">

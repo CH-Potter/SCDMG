@@ -6,6 +6,7 @@ import { FACTIONS, isBuiltInFaction, listCost, factionOf, supportsCost } from ".
 import type { MapDef } from "../engine/data/maps";
 import { economyOf, missionMapProblem, MISSIONS, swapMapSides, swapMissionSides, type MissionDef } from "../engine/data/missions";
 import { MODES, type ModeId } from "../engine/data/modes";
+import type { StartBonus } from "../engine/game";
 import type { FactionId, ListEntry } from "../engine/types";
 import { mapsForMode } from "./customMaps";
 import { esc } from "./describe";
@@ -25,6 +26,8 @@ export interface MenuChoice {
   supports: [string[], string[]];
   /** "open": an open roster (RTS-style) game, no lists (lists and supports are then empty). */
   armyRule?: ArmyRule;
+  /** Campaign perks: a small head start for either side (see GameSetup.startBonus). */
+  startBonus?: [StartBonus | undefined, StartBonus | undefined];
 }
 
 export interface MenuOptions {
@@ -33,6 +36,7 @@ export interface MenuOptions {
   onMapBuilder: () => void;
   onFactionForge: () => void;
   onRules: () => void;
+  onCampaign: () => void;
 }
 
 interface Prefs {
@@ -109,6 +113,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
             <p class="tagline"><b>SCDMG</b>: a cartoon sci-fi skirmish on the tabletop. Pick a mode, a mission, a battlefield and your armies. <button type="button" class="linkish" id="m-intro">▶ Watch the intro</button></p>
           </div>
           <div class="row">
+            <button id="m-campaign" title="The Dustline War: a campaign of linked battles for one side">⚔ Campaign</button>
             <button class="secondary" id="m-lists">📜 List builder</button>
             <button class="secondary" id="m-maps">🗺 Map builder</button>
             <button class="secondary" id="m-forge">🧬 Faction forge</button>
@@ -235,6 +240,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
 
   const bind = (mission: MissionDef, map: MapDef | undefined, side: 0 | 1) => {
     const $ = (sel: string) => host.querySelector(sel)!;
+    $("#m-campaign").addEventListener("click", () => opts.onCampaign());
     $("#m-lists").addEventListener("click", () => opts.onListBuilder(prefs.faction[0], prefs.mode));
     $("#m-maps").addEventListener("click", () => opts.onMapBuilder());
     $("#m-forge").addEventListener("click", () => opts.onFactionForge());

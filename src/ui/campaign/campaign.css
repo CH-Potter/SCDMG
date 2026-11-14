@@ -1,0 +1,737 @@
+/* The campaign screen: the side picker, the map of the Dustline, the battles on offer, the briefing,
+   perks, armies and the story so far. Builds on the tokens in style.css and the menu's cards. */
+
+.campaign h1 {
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+}
+
+.cmp-message {
+  margin: 6px 0;
+  padding: 4px 10px;
+  background: var(--halftone), #fff0c4;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+/* ---------- picking a side ---------- */
+
+.cmp-sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+button.cmp-side {
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.cmp-side-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cmp-side-head b {
+  display: block;
+  font-size: 1.3rem;
+  line-height: 1.05;
+}
+
+.cmp-side-head small,
+.cmp-battle-head small {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.cmp-side-blurb,
+.cmp-side-line {
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+
+.cmp-side-line b {
+  font-family: var(--font-body);
+  font-weight: 800;
+}
+
+.cmp-side-go {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 3px 12px;
+  background: var(--hatch), var(--fc, var(--accent));
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.cmp-how {
+  margin: 0;
+  padding-left: 20px;
+  max-width: 80ch;
+}
+
+.cmp-how li {
+  margin: 4px 0;
+}
+
+/* ---------- header and act bar ---------- */
+
+.cmp-head[data-faction] {
+  border-top: 0;
+  background: none;
+}
+
+.cmp-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cmp-title .tagline {
+  margin: 2px 0 0;
+}
+
+.cmp-actbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 10px 0 12px;
+  padding: 8px 12px;
+  background: var(--halftone), var(--panel-2);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.cmp-actbar p {
+  margin: 0;
+  flex: 1 1 320px;
+}
+
+.cmp-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cmp-acts li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px 2px 3px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.cmp-acts li span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--sand);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.cmp-acts li.done {
+  color: var(--ink);
+}
+
+.cmp-acts li.done span {
+  background: var(--hatch), #9be08f;
+}
+
+.cmp-acts li.current {
+  color: var(--ink);
+  background: var(--halftone), #fff0c4;
+  outline: 3px solid var(--accent);
+  transform: rotate(-2deg);
+}
+
+.cmp-acts li.current span {
+  background: var(--hatch), var(--accent);
+}
+
+.cmp-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cmp-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--rust);
+}
+
+/* ---------- the result of the last battle ---------- */
+
+.cmp-news {
+  margin-bottom: 12px;
+  border-left: 10px solid var(--accent);
+}
+
+.cmp-news.tone-win {
+  border-left-color: var(--good);
+}
+
+.cmp-news.tone-loss {
+  border-left-color: var(--bad);
+}
+
+.cmp-news ul,
+.cmp-chronicle ul,
+.cmp-perks ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+/* ---------- layout ---------- */
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.cmp-side-col {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 980px) {
+  .cmp-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- the map ---------- */
+
+.cmp-map {
+  position: relative;
+  aspect-ratio: 1000 / 640;
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.cmp-map-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+button.cmp-pin {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  transform: translate(-50%, -24px);
+  text-align: center;
+}
+
+button.cmp-pin:hover:not(:disabled) {
+  transform: translate(-50%, -26px);
+  box-shadow: none;
+  filter: none;
+  z-index: 4;
+}
+
+button.cmp-pin:active:not(:disabled) {
+  transform: translate(-50%, -23px);
+  box-shadow: none;
+}
+
+button.cmp-pin:focus-visible {
+  box-shadow: none;
+  outline: none;
+  z-index: 5;
+}
+
+button.cmp-pin:focus-visible .cmp-pin-badge {
+  outline: 3px solid var(--p0);
+  outline-offset: 3px;
+}
+
+.cmp-pin-badge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  background: var(--hatch), var(--fc, #d9ccb4);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.cmp-pin-badge .emblem {
+  width: 30px;
+  height: 30px;
+}
+
+.cmp-pin.is-landmark .cmp-pin-badge {
+  width: 32px;
+  height: 32px;
+}
+
+.cmp-pin.is-landmark .cmp-pin-badge .emblem {
+  width: 22px;
+  height: 22px;
+}
+
+.cmp-pin.is-mine .cmp-pin-badge {
+  box-shadow:
+    0 0 0 3px var(--panel),
+    0 0 0 6px var(--p0),
+    2px 2px 0 6px var(--ink);
+}
+
+.cmp-pin-none,
+.cmp-swords-key {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--panel);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.cmp-pin-badge .cmp-pin-none {
+  border: 0;
+  background: none;
+  font-size: 1.1rem;
+}
+
+.cmp-pin-name {
+  max-width: 120px;
+  padding: 0 5px;
+  background: var(--panel);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.cmp-pin-swords {
+  position: absolute;
+  top: -9px;
+  right: -12px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--accent);
+  font-size: 0.85rem;
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+.cmp-swords-key {
+  background: var(--accent);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.cmp-pin.is-open .cmp-pin-badge {
+  animation: cmp-pulse 1.6s ease-in-out infinite;
+}
+
+.cmp-pin.is-open .cmp-pin-name {
+  background: var(--halftone), #fff0c4;
+}
+
+.cmp-pin.is-selected .cmp-pin-badge {
+  outline: 4px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cmp-pin.is-selected .cmp-pin-name {
+  background: var(--accent);
+}
+
+@keyframes cmp-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+/* Small maps: only name the places you can fight at (and the one you picked). */
+@container (max-width: 560px) {
+  .cmp-pin-name {
+    display: none;
+  }
+  .cmp-pin.is-open .cmp-pin-name,
+  .cmp-pin.is-selected .cmp-pin-name {
+    display: block;
+    font-size: 0.66rem;
+    max-width: 86px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cmp-pin-badge {
+    width: 32px;
+    height: 32px;
+  }
+  .cmp-pin-badge .emblem {
+    width: 22px;
+    height: 22px;
+  }
+  .cmp-pin.is-landmark .cmp-pin-badge {
+    width: 24px;
+    height: 24px;
+  }
+  .cmp-pin.is-landmark .cmp-pin-badge .emblem {
+    width: 16px;
+    height: 16px;
+  }
+  button.cmp-pin {
+    transform: translate(-50%, -18px);
+  }
+  .cmp-pin-swords {
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+    top: -8px;
+    right: -10px;
+  }
+}
+
+.cmp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 8px 0 4px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.cmp-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cmp-place-box {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--panel);
+}
+
+.cmp-place-box[data-faction] {
+  border-left: 8px solid var(--fc);
+}
+
+.cmp-place-box h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+}
+
+.cmp-place-box p {
+  margin: 4px 0;
+  font-size: 0.92rem;
+}
+
+.cmp-place-hint {
+  margin: 8px 0 0;
+}
+
+/* ---------- battles ---------- */
+
+.cmp-battle-list {
+  display: grid;
+  gap: 8px;
+}
+
+button.cmp-battle {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  background: var(--panel);
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+button.cmp-battle.selected {
+  background: var(--halftone), #fff0c4;
+  outline: 4px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.cmp-battle-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmp-battle-head b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.cmp-battle-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.cmp-battle-stake {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+/* ---------- briefing, perks, armies ---------- */
+
+.cmp-hook {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.cmp-facts {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 8px;
+}
+
+.cmp-facts div {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 8px;
+}
+
+.cmp-facts dt {
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.cmp-facts dd {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.cmp-facts .emblem {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 480px) {
+  .cmp-facts div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.cmp-army {
+  margin: 0 0 4px;
+  font-size: 0.92rem;
+}
+
+.cmp-budget {
+  display: inline-block;
+  padding: 0 7px;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  background: var(--hatch), #9be08f;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+.cmp-budget.over {
+  background: var(--hatch), var(--p1);
+}
+
+.cmp-brief h3,
+.cmp-perks h3 {
+  margin: 10px 0 4px;
+}
+
+.cmp-brief-actions {
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.cmp-perks li {
+  margin: 3px 0;
+  font-size: 0.92rem;
+}
+
+.cmp-perks li.capped {
+  color: var(--muted);
+}
+
+.cmp-armies {
+  display: grid;
+  gap: 6px;
+}
+
+.cmp-army-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 2px dashed rgba(28, 21, 18, 0.2);
+}
+
+.cmp-army-row small {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ---------- the story so far ---------- */
+
+.cmp-chronicle {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.cmp-chronicle h3 {
+  margin: 10px 0 4px;
+  font-size: 1rem;
+}
+
+.cmp-chronicle li,
+.cmp-news li {
+  margin: 3px 0;
+  font-size: 0.9rem;
+}
+
+li.tone-win {
+  color: #2a6b26;
+  font-weight: 700;
+}
+
+li.tone-loss {
+  color: var(--bad);
+  font-weight: 700;
+}
+
+li.tone-lost {
+  color: var(--rust);
+}
+
+li.tone-meanwhile {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ---------- the end ---------- */
+
+.cmp-ending {
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.cmp-ending p {
+  max-width: 70ch;
+  margin: 6px auto;
+}
+
+.cmp-ending .row {
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.cmp-ending-title {
+  margin: 4px 0 10px;
+  font-size: clamp(1.8rem, 5vw, 3.2rem) !important;
+  color: #fff3d6;
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--ink);
+  transform: rotate(-1.5deg);
+}
+
+.cmp-ending.tone-loss .cmp-ending-title {
+  color: #ffd2c8;
+}
+
+.cmp-ending blockquote {
+  margin: 6px auto 10px;
+  max-width: 60ch;
+  padding: 8px 12px;
+  background: #fffaf0;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-weight: 700;
+}
+
+.cmp-ending cite {
+  display: block;
+  font-style: normal;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* The campaign list builder: no name field, so say whose army it is. */
+.lb-campaign-army {
+  margin: 0;
+  align-self: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmp-pin.is-open .cmp-pin-badge {
+    animation: none;
+  }
+  .cmp-acts li.current {
+    transform: none;
+  }
+}

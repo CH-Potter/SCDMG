@@ -62,6 +62,22 @@ import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserv
 const HUMAN = 0;
 const AI = 1;
 
+/** How a battle ended, for a campaign: the winner (0 is you), the score, and whether you retreated. */
+export interface BattleResult {
+  winner: GameState["winner"];
+  vp: [number, number];
+  retreated: boolean;
+}
+
+/** Optional hooks into the game screen. */
+export interface ControllerHooks {
+  /** A campaign battle: the game-over screen and the top bar lead back to the campaign with the result. */
+  campaign?: {
+    title: string;
+    onResult: (r: BattleResult) => void;
+  };
+}
+
 /** The disengage odds in words: a clean break, or exhausted for the assault phase. */
 function disengageText(s: GameState, u: Unit): string {
   const o = disengageOdds(s, u);
@@ -136,6 +152,7 @@ export class Controller {
     private els: { topbar: HTMLElement; sidebar: HTMLElement; stage: HTMLElement },
     private onNewGame: () => void,
     setup: GameSetup,
+    private hooks: ControllerHooks = {},
   ) {
     this.state = createGame(setup);
     // Dev server only: a console handle (window.__scdmg) for poking at the game while testing the UI.
@@ -198,6 +215,7 @@ export class Controller {
     renderer.onPointerDown = (p) => this.click(p);
     window.onkeydown = (e) => this.key(e);
     const mission = MISSIONS[this.state.missionId]!;
+    if (hooks.campaign) this.log(`⚔ <b>Campaign: ${esc(hooks.campaign.title)}.</b>`);
     this.log(
       `<b>${esc(mission.name)} at ${esc(setup.map?.name ?? MAPS[this.state.mapId]?.name ?? "the battlefield")}.</b> ${esc(mission.blurb)} You (${esc(factionOf(setup.factions[0]).name)}, cyan) vs the AI (${esc(factionOf(setup.factions[1]).name)}, red). ${this.state.initiative === HUMAN ? "You have" : "The AI has"} the initiative.`,
     );
@@ -1442,7 +1460,11 @@ export class Controller {
       <button class="secondary" id="btn-dice" title="Dice: Throw (you throw your own dice), Auto, Quick or Off">🎲 Dice: ${DICE_SPEED_LABEL[this.tray.speed]}</button>
       <span id="audio-slot"></span>
       <button class="secondary" id="btn-rules">How to play</button>
-      <button class="secondary" id="btn-new">New game</button>`,
+      ${
+        this.hooks.campaign
+          ? `<button class="${s.over ? "" : "secondary"}" id="btn-new" title="${s.over ? "Take the result back to the campaign map" : "Leave this battle: it counts as a defeat"}">${s.over ? "⚔ Back to the campaign" : "⚑ Retreat"}</button>`
+          : `<button class="secondary" id="btn-new">New game</button>`
+      }`,
     );
     if (!changed) return;
     audio.mountButton(this.els.topbar.querySelector("#audio-slot")); // [audio]
@@ -1453,7 +1475,24 @@ export class Controller {
     this.els.topbar.querySelector("#btn-fit")!.addEventListener("click", () => this.renderer.resetView());
     this.els.topbar.querySelector("#btn-rules")!.addEventListener("click", () => showRules());
     this.els.topbar.querySelector("#btn-dice")!.addEventListener("click", () => this.cycleDice());
-    this.els.topbar.querySelector("#btn-new")!.addEventListener("click", () => this.onNewGame());
+    this.els.topbar.querySelector("#btn-new")!.addEventListener("click", () => (this.hooks.campaign ? this.leaveCampaignBattle() : this.onNewGame()));
+  }
+
+  private resultSent = false;
+
+  /** Campaign: report the result once (a retreat mid-battle counts as a defeat). */
+  private reportResult(retreated: boolean): void {
+    const c = this.hooks.campaign;
+    if (!c || this.resultSent) return;
+    this.resultSent = true;
+    const s = this.state;
+    c.onResult({ winner: retreated ? AI : s.winner, vp: [s.players[0].vp, s.players[1].vp], retreated });
+  }
+
+  private leaveCampaignBattle(): void {
+    if (this.state.over) return this.reportResult(false);
+    if (!confirm("Retreat from this battle? It counts as a defeat in the campaign.")) return;
+    this.reportResult(true);
   }
 
   private renderArmy(): void {
@@ -1955,6 +1994,26 @@ export class Controller {
     const title =
       s.winner === "draw" ? "It's a draw!" : s.winner === HUMAN ? "Victory!" : "Defeat!";
     const overlay = document.getElementById("overlay")!;
+    if (this.hooks.campaign) {
+      overlay.innerHTML = `
+      <div class="modal" style="max-width:440px;text-align:center" role="dialog" aria-modal="true" aria-labelledby="go-title">
+        <h1 id="go-title">${title}</h1>
+        <p class="tagline">${esc(this.hooks.campaign.title)} · Final score: you ${s.players[0].vp}, AI ${s.players[1].vp}</p>
+        <div class="row" style="justify-content:center">
+          <button id="go-campaign">⚔ Back to the campaign</button>
+          <button class="secondary" id="go-close">Look at the board</button>
+        </div>
+      </div>`;
+      overlay.classList.add("show");
+      const back = overlay.querySelector<HTMLButtonElement>("#go-campaign")!;
+      back.addEventListener("click", () => this.reportResult(false));
+      overlay.querySelector("#go-close")!.addEventListener("click", () => {
+        overlay.classList.remove("show");
+        this.renderTopbar();
+      });
+      back.focus();
+      return;
+    }
     overlay.innerHTML = `
       <div class="modal" style="max-width:420px;text-align:center">
         <h1>${title}</h1>

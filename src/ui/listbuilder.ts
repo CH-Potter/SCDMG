@@ -6,7 +6,7 @@ import { ABILITIES } from "../engine/data/abilities";
 import { entryCost, FACTIONS, listCost, factionOf, supportsCost } from "../engine/data/factions";
 import { MODES, type ModeId } from "../engine/data/modes";
 import { profileFor } from "../engine/profile";
-import type { FactionId, SupportDef, UnitProfile } from "../engine/types";
+import type { FactionId, ListEntry, SupportDef, UnitProfile } from "../engine/types";
 import { esc, KEYWORD_TEXT, weaponLine, impactLine, evadeLine } from "./describe";
 import { downloadJson, newId, pickJsonFile, slug } from "./files";
 import { deleteList, exportable, fromImport, isStarter, listProblems, listsFor, saveList, starterList, type SavedList } from "./lists";
@@ -16,6 +16,23 @@ export interface ListBuilderOptions {
   faction?: FactionId;
   mode?: ModeId;
   listId?: string;
+  /**
+   * Campaign muster: edit one army for the campaign, within its budget. The faction and mode are
+   * fixed, the list library (load, save, import, export) is hidden, and "Use this army" hands the
+   * roster back instead of saving it.
+   */
+  campaign?: {
+    title: string;
+    /** Roster budget (resources), replacing the mode's limit. */
+    budget: number;
+    /** A line explaining the budget. */
+    note: string;
+    entries: ListEntry[];
+    supports: string[];
+    /** What "Reset to starter" restores. */
+    starter: { entries: ListEntry[]; supports: string[] };
+    onDone: (entries: ListEntry[], supports: string[]) => void;
+  };
 }
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
@@ -23,8 +40,10 @@ const hex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
 export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): void {
   const faction = opts.faction ?? "militia";
   const mode = opts.mode ?? "skirmish";
+  const camp = opts.campaign;
   let list: SavedList = structuredClone(listsFor(faction, mode).find((l) => l.id === opts.listId) ?? starterList(faction, mode));
   if (isStarter(list)) list = { ...list, id: newId("list"), name: `My ${factionOf(faction).name}` };
+  if (camp) list = { id: "campaign", name: camp.title, faction, mode, entries: structuredClone(camp.entries), supports: [...camp.supports], updated: 0 };
   let dirty = false;
   let message = "";
 
@@ -32,9 +51,10 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
     const f = factionOf(list.faction);
     const m = MODES[list.mode];
     const cost = listCost(list.entries);
-    const problems = listProblems(list);
-    const saved = listsFor(list.faction, list.mode).filter((l) => !isStarter(l));
-    const pct = Math.min(100, (cost / m.rosterLimit) * 100);
+    const limit = camp ? camp.budget : m.rosterLimit;
+    const problems = camp ? listProblems(list, false, { limit, label: "campaign budget" }) : listProblems(list);
+    const saved = camp ? [] : listsFor(list.faction, list.mode).filter((l) => !isStarter(l));
+    const pct = Math.min(100, (cost / Math.max(1, limit)) * 100);
 
     // Re-rendering replaces the page, so keep the scroll position where the player was.
     const scroller = host.querySelector<HTMLElement>(".lb");
@@ -44,29 +64,45 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
       <div class="lb">
         <header class="lb-head" data-faction="${esc(list.faction)}" style="--faction-color:${hex(f.color)}">
           <div>
-            <h1>${factionEmblemSvg(list.faction, 40)} List builder</h1>
-            <p class="tagline">Build a roster within the ${esc(m.name)} limits: ⚙${m.rosterLimit} resources, up to ${m.maxUnits} units, max ${m.maxCopies} of any one unit.</p>
+            <h1>${factionEmblemSvg(list.faction, 40)} ${camp ? esc(camp.title) : "List builder"}</h1>
+            <p class="tagline">${
+              camp
+                ? `${esc(camp.note)} Up to ${m.maxUnits} units, max ${m.maxCopies} of any one unit, ✦${m.fizzLimit} Fizz of supports.`
+                : `Build a roster within the ${esc(m.name)} limits: ⚙${m.rosterLimit} resources, up to ${m.maxUnits} units, max ${m.maxCopies} of any one unit.`
+            }</p>
           </div>
           <div class="row">
-            <button class="secondary" id="lb-import">Import…</button>
+            ${
+              camp
+                ? `<button class="secondary" id="lb-close">Back to the campaign</button>`
+                : `<button class="secondary" id="lb-import">Import…</button>
             <button class="secondary" id="lb-export">Export</button>
-            <button class="secondary" id="lb-close">Back to menu</button>
+            <button class="secondary" id="lb-close">Back to menu</button>`
+            }
           </div>
         </header>
         <div class="lb-bar panel">
-          <label>Name <input id="lb-name" maxlength="60" value="${esc(list.name)}"/></label>
-          <label>Faction <select id="lb-faction">${Object.values(FACTIONS)
-            .map((x) => `<option value="${x.id}" ${x.id === list.faction ? "selected" : ""}>${esc(x.name)}</option>`)
-            .join("")}</select></label>
+          ${
+            camp
+              ? `<p class="lb-campaign-army"><b>${esc(f.name)}</b> · ${esc(m.name)} army for the campaign</p>`
+              : `<label>Name <input id="lb-name" maxlength="60" value="${esc(list.name)}"/></label>`
+          }
+          ${
+            camp
+              ? ""
+              : `<label>Faction <select id="lb-faction">${Object.values(FACTIONS)
+                  .map((x) => `<option value="${x.id}" ${x.id === list.faction ? "selected" : ""}>${esc(x.name)}</option>`)
+                  .join("")}</select></label>
           <label>Mode <select id="lb-mode">${Object.values(MODES)
             .map((x) => `<option value="${x.id}" ${x.id === list.mode ? "selected" : ""}>${esc(x.name)}</option>`)
             .join("")}</select></label>
           <label>Load <select id="lb-load"><option value="">Saved lists…</option>${saved
             .map((l) => `<option value="${esc(l.id)}" ${l.id === list.id ? "selected" : ""}>${esc(l.name)}</option>`)
-            .join("")}</select></label>
+            .join("")}</select></label>`
+          }
           <div class="lb-cost">
-            <div class="meter ${cost > m.rosterLimit ? "over" : ""}"><span style="width:${pct}%"></span></div>
-            <b>⚙ ${cost}/${m.rosterLimit}</b> · <b>✦ ${supportsCost(list.supports)}/${m.fizzLimit} Fizz</b> · ${list.entries.length}/${m.maxUnits} units · ◆ ${list.entries.reduce((s, e) => s + profileFor(e.profileId, e.upgrades).supply, 0)} supply
+            <div class="meter ${cost > limit ? "over" : ""}"><span style="width:${pct}%"></span></div>
+            <b>⚙ ${cost}/${limit}</b> · <b>✦ ${supportsCost(list.supports)}/${m.fizzLimit} Fizz</b> · ${list.entries.length}/${m.maxUnits} units · ◆ ${list.entries.reduce((s, e) => s + profileFor(e.profileId, e.upgrades).supply, 0)} supply
           </div>
         </div>
         <div class="lb-body">
@@ -89,8 +125,12 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
             }</div>
             ${message ? `<p class="hint">${esc(message)}</p>` : ""}
             <div class="row">
-              <button id="lb-save" ${problems.length ? "disabled" : ""}>Save${dirty ? " *" : ""}</button>
-              <button class="secondary" id="lb-saveas" ${problems.length ? "disabled" : ""}>Save as new</button>
+              ${
+                camp
+                  ? `<button id="lb-use" ${problems.length ? "disabled" : ""}>Use this army</button>`
+                  : `<button id="lb-save" ${problems.length ? "disabled" : ""}>Save${dirty ? " *" : ""}</button>
+              <button class="secondary" id="lb-saveas" ${problems.length ? "disabled" : ""}>Save as new</button>`
+              }
               <button class="secondary" id="lb-starter">Reset to starter</button>
               ${saved.some((l) => l.id === list.id) ? `<button class="secondary danger" id="lb-delete">Delete</button>` : ""}
             </div>
@@ -172,19 +212,20 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
   const bind = () => {
     const $ = <T extends Element>(sel: string) => host.querySelector<T>(sel);
     $("#lb-close")!.addEventListener("click", () => {
-      if (dirty && !confirm("Leave without saving this list?")) return;
+      if (dirty && !confirm(camp ? "Go back without using this army?" : "Leave without saving this list?")) return;
       opts.onClose();
     });
-    $<HTMLInputElement>("#lb-name")!.addEventListener("change", (e) => change(() => (list.name = (e.target as HTMLInputElement).value)));
-    $<HTMLSelectElement>("#lb-faction")!.addEventListener("change", (e) => {
+    $("#lb-use")?.addEventListener("click", () => camp?.onDone(structuredClone(list.entries), [...list.supports]));
+    $<HTMLInputElement>("#lb-name")?.addEventListener("change", (e) => change(() => (list.name = (e.target as HTMLInputElement).value)));
+    $<HTMLSelectElement>("#lb-faction")?.addEventListener("change", (e) => {
       const fid = (e.target as HTMLSelectElement).value as FactionId;
       if (list.entries.length && !confirm("Switching faction clears the roster. Continue?")) return render();
       change(() => {
         list = { ...starterList(fid, list.mode), id: newId("list"), name: `My ${factionOf(fid).name}`, entries: [], supports: [] };
       });
     });
-    $<HTMLSelectElement>("#lb-mode")!.addEventListener("change", (e) => change(() => (list.mode = (e.target as HTMLSelectElement).value as ModeId)));
-    $<HTMLSelectElement>("#lb-load")!.addEventListener("change", (e) => {
+    $<HTMLSelectElement>("#lb-mode")?.addEventListener("change", (e) => change(() => (list.mode = (e.target as HTMLSelectElement).value as ModeId)));
+    $<HTMLSelectElement>("#lb-load")?.addEventListener("change", (e) => {
       const id = (e.target as HTMLSelectElement).value;
       const found = listsFor(list.faction, list.mode).find((l) => l.id === id);
       if (!found) return;
@@ -234,7 +275,7 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
     });
     $("#lb-starter")!.addEventListener("click", () =>
       change(() => {
-        const st = starterList(list.faction, list.mode);
+        const st = camp ? structuredClone(camp.starter) : starterList(list.faction, list.mode);
         list.entries = st.entries;
         list.supports = st.supports;
       }, "Reset to the starter roster."),
@@ -247,8 +288,8 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
       message = "List deleted.";
       render();
     });
-    $("#lb-export")!.addEventListener("click", () => downloadJson(`scdmg-list-${slug(list.name)}`, exportable(list)));
-    $("#lb-import")!.addEventListener("click", async () => {
+    $("#lb-export")?.addEventListener("click", () => downloadJson(`scdmg-list-${slug(list.name)}`, exportable(list)));
+    $("#lb-import")?.addEventListener("click", async () => {
       try {
         const result = fromImport(await pickJsonFile());
         if (Array.isArray(result)) {

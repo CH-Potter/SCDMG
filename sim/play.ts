@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { aiCommand } from "../src/engine/ai";
 import { defaultListFor } from "../src/engine/data/factions";
-import { applyCommand, createGame } from "../src/engine/game";
+import { applyCommand, createGame, type StartBonus } from "../src/engine/game";
 import { MISSIONS } from "../src/engine/data/missions";
 import { MERCY_LEAD } from "../src/engine/constants";
 import { isFlying, profileOf } from "../src/engine/profile";
@@ -74,6 +74,22 @@ const openRoster = process.env.SIM_OPEN === "1";
 const openCapEnv = process.env.SIM_OPEN_CAP;
 const openCap = openCapEnv === undefined ? undefined : openCapEnv === "none" ? null : Number(openCapEnv);
 
+/**
+ * SIM_BONUS: a head start for player 1 (side A), like the campaign's place perks, to check one isn't a
+ * walkover, e.g. SIM_BONUS="resources=2,cp=2".
+ */
+const startBonus: [StartBonus, undefined] | undefined = process.env.SIM_BONUS
+  ? [
+      Object.fromEntries(
+        process.env.SIM_BONUS.split(",").map((kv) => {
+          const [k, v] = kv.split("=");
+          return [k!.trim(), Number(v)];
+        }),
+      ) as StartBonus,
+      undefined,
+    ]
+  : undefined;
+
 /** Collapse a scoring reason like "held objective 3" into a short bucket. */
 function vpBucket(reason: string): string {
   const r = reason.toLowerCase();
@@ -116,6 +132,7 @@ export function playGame(job: Job): GameResult {
     mapId,
     lists: [listFor(factions[0], job.mode), listFor(factions[1], job.mode)],
     ...(openRoster ? { armyRule: "open" as const, openCap } : {}),
+    ...(startBonus ? { startBonus } : {}),
   });
   const counts: Record<string, number> = {};
   const damage: [number, number] = [0, 0];

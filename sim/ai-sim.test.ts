@@ -21,6 +21,7 @@
 //   SIM_MAPS     comma-separated map ids to include (default: every map that fits the mission)
 //   SIM_OPEN     1 = open roster (RTS-style) games: no lists, recruit any unit (src/engine/openRoster.ts)
 //   SIM_OPEN_CAP per-unit cap on the table in open roster games: a number, or "none" (default: the mode's max copies)
+//   SIM_BONUS    a campaign-style head start for player 1 (side A), e.g. "resources=2,cp=2" (see play.ts)
 // Each mission plays only on the maps it fits (missionFitsMap: mode, required map tags, symmetric vs
 // asymmetric). Role missions also get a per-role win-rate table (side A = player 1, side B = player 2).
 

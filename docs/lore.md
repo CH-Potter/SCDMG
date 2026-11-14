@@ -136,7 +136,7 @@ The intros are drawn live in the game's own style (the real miniatures, emblems 
 
 ## For campaign builders
 
-Import from `src/engine/data/lore.ts`:
+The game's own campaign, the Dustline War, is built on this lore: see [campaign.md](campaign.md). Import from `src/engine/data/lore.ts`:
 
 - `WORLD`: `name`, `summary`, `prize`, `conflict`, `history` (eras), `intro` (captions).
 - `LORE_FACTIONS[factionId]`: `epithet`, `tagline`, `leaderId`, `homeId`, `goal`, `stakes`, `story`, `quote`, and a lore note for every unit (`units`) and support card (`supports`), keyed by the game's ids.

@@ -75,8 +75,11 @@ export function findList(id: string): SavedList | undefined {
   return listSavedLists().find((l) => l.id === id);
 }
 
-/** Problems that make a list unplayable. `strict` also checks the name. */
-export function listProblems(l: Partial<SavedList>, strict = true): string[] {
+/**
+ * Problems that make a list unplayable. `strict` also checks the name. `budget` replaces the mode's
+ * roster limit (the campaign's growing budget).
+ */
+export function listProblems(l: Partial<SavedList>, strict = true, budget?: { limit: number; label: string }): string[] {
   const errs: string[] = [];
   if (!l || typeof l !== "object") return ["Not a list"];
   if (strict && !l.name?.trim()) errs.push("Give the list a name");
@@ -108,7 +111,9 @@ export function listProblems(l: Partial<SavedList>, strict = true): string[] {
   if (new Set(sups).size !== sups.length) errs.push("Each support can only be taken once");
   if (errs.length) return errs;
   const cost = listCost(l.entries);
-  if (cost > mode!.rosterLimit) errs.push(`Over the ${mode!.name} limit: ${cost}/${mode!.rosterLimit} resources`);
+  if (budget) {
+    if (cost > budget.limit) errs.push(`Over the ${budget.label}: ${cost}/${budget.limit} resources`);
+  } else if (cost > mode!.rosterLimit) errs.push(`Over the ${mode!.name} limit: ${cost}/${mode!.rosterLimit} resources`);
   if (l.entries.length > mode!.maxUnits) errs.push(`Too many units: ${l.entries.length}/${mode!.maxUnits}`);
   const fizz = supportsCost(sups);
   if (fizz > mode!.fizzLimit) errs.push(`Over the ${mode!.name} Fizz budget: ${fizz}/${mode!.fizzLimit}`);

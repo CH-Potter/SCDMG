@@ -327,3 +327,14 @@ Every built-in map has a tactical shape, not just scattered cover. Sight-blockin
 - **Gutterbend Derailment (wall of wrecks):** a derailed ore train lies across the middle. Squeeze through the 3.6" gaps between the cars, climb over the ore car or a boxcar, or go round the open ends, each next to one side's forward pocket. Main line on the short edge plus a forward pocket.
 
 **Role-mission maps (asymmetric):** Grubstake Redoubt (siege), Wreck of the Velvet Comet (salvage) and Gemhaul Ambush (convoy) are built for their missions and balanced by simulation rather than by mirroring. Each blurb says which side is A and which is B.
+
+## Campaign
+
+**⚔ Campaign** on the main menu plays the Dustline War as one of the three built-in factions: three acts of linked Skirmish and Assault battles on a map of the valley, then a finale at Fizzwater Ford. Every battle uses the normal rules, missions and maps above, against the AI. What the campaign adds:
+
+- **Places.** Winning a battle takes its place; losing hands it to the enemy; a draw leaves it as it was. Battles you skip fall to the enemy when the act ends.
+- **Perks.** Each battlefield you hold gives a small edge in later battles: +1 CP, +1 starting resource, +2 roster budget, a free unit or a free support card. They are capped per battle at +2 CP, +2 resources, +3 budget, one free unit and one free support.
+- **Armies.** One Skirmish and one Assault roster carry over between battles, built in the list builder within the campaign budget (⚙24 / ⚙45 in Act I, ⚙27 / ⚙50 in Act II, ⚙30 / ⚙55 from Act III on). The AI's starter army is trimmed to the same budget. A lost battle leaves your army battered: ⚙3 less for the next battle.
+- **Retreat** on the top bar leaves a campaign battle as a defeat.
+
+The full design, the perks of every place and the save format are in [campaign.md](campaign.md).

@@ -3,7 +3,8 @@ import { registerCustomFactions } from "./engine/data/factions";
 import { openMapBuilder } from "./editor/index";
 import { openFactionForge } from "./forge/index";
 import { listCustomFactions } from "./ui/customFactions";
-import { Controller, showRules } from "./ui/controller";
+import { Controller, showRules, type ControllerHooks } from "./ui/controller";
+import type { CampaignReturn } from "./ui/campaign/index";
 import { openListBuilder } from "./ui/listbuilder";
 import { maybeGameIntro } from "./ui/loreLinks";
 import { openMenu, type MenuChoice } from "./ui/menu";
@@ -44,10 +45,31 @@ function showMenu(): void {
         },
       }),
     onRules: () => showRules(),
+    onCampaign: () => showCampaign(),
   });
 }
 
-function startGame(choice: MenuChoice): void {
+/** The campaign screen (loaded on first use). `result` is the battle you just came back from, if any. */
+function showCampaign(result?: CampaignReturn): void {
+  audio.setMood("menu"); // [audio]
+  void import("./ui/campaign/index")
+    .then((m) =>
+      m.openCampaign(overlay, {
+        result,
+        onExit: showMenu,
+        onBattle: (launch) =>
+          startGame(launch.choice, {
+            campaign: { title: launch.title, onResult: (r) => showCampaign({ battleId: launch.battleId, ...r }) },
+          }),
+      }),
+    )
+    .catch((err) => {
+      console.warn("Couldn't open the campaign:", err);
+      showMenu();
+    });
+}
+
+function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
   overlay.classList.remove("show");
   overlay.innerHTML = "";
   controller?.destroy();
@@ -65,7 +87,8 @@ function startGame(choice: MenuChoice): void {
     mapId: choice.map.id,
     missionId: choice.mission.id,
     armyRule: choice.armyRule,
-  });
+    startBonus: choice.startBonus,
+  }, hooks);
 }
 
 // Custom factions from the Faction Forge join the built-ins.
