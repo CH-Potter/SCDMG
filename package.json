@@ -1,10 +1,33 @@
 {
   "name": "scdmg",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.4.0",
   "description": "Super Cool Desktop Miniatures Game (SCDMG): a cartoon sci-fi skirmish miniatures game for the browser.",
+  "keywords": [
+    "game",
+    "tabletop",
+    "miniatures",
+    "skirmish",
+    "wargame",
+    "strategy",
+    "pixijs",
+    "typescript",
+    "electron"
+  ],
+  "homepage": "https://github.com/CH-Potter/SCDMG#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CH-Potter/SCDMG.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CH-Potter/SCDMG/issues"
+  },
+  "author": "Craig Potter (https://github.com/CH-Potter)",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
