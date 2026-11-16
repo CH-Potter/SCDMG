@@ -11,6 +11,7 @@ import {
   dist,
   pointInPolygon,
   pointSegmentDistance,
+  segmentEntry,
   segmentIntersectsPolygon,
   segmentNearPolygon,
   segmentPolygonDistance,
@@ -95,6 +96,84 @@ function obscured(s: GameState, from: Vec, target: Unit, tm: Model, shooterUid: 
     }
   }
   return false;
+}
+
+/** What a mark on an aim line means. */
+export type ShotMarkKind = "blocks" | "cover" | "cover-ignored" | "plunge";
+
+/** A point of interest along a shot, `t` of the way (0..1) from the shooter to the target model. */
+export interface ShotMark {
+  t: number;
+  kind: ShotMarkKind;
+  note: string;
+}
+
+export interface ShotLine {
+  sight: boolean;
+  /** The target model gets cover (−1 to its save) against this shot. */
+  cover: boolean;
+  marks: ShotMark[];
+}
+
+const FEATURE_NAME: Record<string, string> = {
+  building: "a building",
+  wall: "a wall",
+  platform: "a raised platform",
+  cover: "area cover",
+  barricade: "a barricade",
+};
+
+/**
+ * Explain one shot for the aim line: which features block it, which give the target cover, models
+ * in the way, a ledge, or plunging fire that ignores cover. Uses the same rules as `lineOfSight`
+ * and `hasCover`, so what it shows is what the dice will use.
+ */
+export function shotLine(s: GameState, from: Vec, fromElev: Elevation, target: Unit, tm: Model, shooterUid?: string): ShotLine {
+  const marks: ShotMark[] = [];
+  const eye = Math.max(fromElev, tm.elevation);
+  for (const t of s.terrain) {
+    if (featureTop(t) <= eye) continue;
+    const at = segmentEntry(from, tm.pos, t.poly);
+    if (at !== null) marks.push({ t: at, kind: "blocks", note: `${FEATURE_NAME[t.kind] ?? t.kind} blocks sight` });
+  }
+  const sight = !marks.length;
+  const cover = sight && hasCover(s, from, fromElev, target, tm, shooterUid);
+  const immune = isFlying(target) ? "flyers ignore cover" : hasKeyword(target, "heavy") ? "heavy units ignore cover" : null;
+  const plunging = !immune && fromElev > tm.elevation;
+  const kind: ShotMarkKind = immune || plunging ? "cover-ignored" : "cover";
+  const why = immune ?? (plunging ? "shooting down ignores cover" : "−1 to their save");
+  for (const t of s.terrain) {
+    if (t.kind !== "cover" && t.kind !== "barricade") continue;
+    if (!terrainCovers([t], from, tm.pos, tm.elevation)) continue;
+    marks.push({ t: segmentEntry(from, tm.pos, t.poly) ?? 1, kind, note: `${FEATURE_NAME[t.kind]}: ${why}` });
+  }
+  if (shooterUid) {
+    const at = firstObstruction(s, from, target, tm, shooterUid);
+    if (at !== null) marks.push({ t: at, kind, note: `models in the way: ${why}` });
+  }
+  if (tm.elevation === 1 && fromElev === 0 && !immune) marks.push({ t: 1, kind: "cover", note: "target up on a ledge: −1 to their save" });
+  if (plunging && marks.some((x) => x.kind === "cover-ignored")) marks.push({ t: 0, kind: "plunge", note: "plunging fire from above" });
+  marks.sort((a, b) => a.t - b.t);
+  return { sight, cover, marks };
+}
+
+/** How far along the shot (0..1) the first other model it passes through stands (see `obscured`). */
+function firstObstruction(s: GameState, from: Vec, target: Unit, tm: Model, shooterUid: string): number | null {
+  let best: number | null = null;
+  const dx = tm.pos.x - from.x;
+  const dy = tm.pos.y - from.y;
+  const L2 = dx * dx + dy * dy || 1;
+  for (const u of s.units) {
+    if (!u.onBoard || u.uid === shooterUid || u.uid === target.uid || isFlying(u)) continue;
+    const r = profileOf(u).baseRadius;
+    for (const m of u.models) {
+      if (!m.alive || m.elevation !== tm.elevation) continue;
+      if (pointSegmentDistance(m.pos, from, tm.pos) >= r) continue;
+      const t = Math.max(0, Math.min(1, ((m.pos.x - from.x) * dx + (m.pos.y - from.y) * dy) / L2));
+      if (best === null || t < best) best = t;
+    }
+  }
+  return best;
 }
 
 export interface Placed {

@@ -278,12 +278,23 @@ export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
     const key = focusKey();
     const scroller = host.querySelector<HTMLElement>(".modal");
     const top = scroller?.scrollTop ?? 0;
+    const mapLeft = host.querySelector<HTMLElement>(".cmp-map-scroll")?.scrollLeft;
     if (!state) host.innerHTML = pickScreen();
     else if (state.ending) host.innerHTML = endingScreen(state);
     else host.innerHTML = mainScreen(state);
     host.classList.add("show");
     const next = host.querySelector<HTMLElement>(".modal");
     if (next) next.scrollTop = top;
+    const map = host.querySelector<HTMLElement>(".cmp-map-scroll");
+    if (map && map.scrollWidth > map.clientWidth) {
+      if (mapLeft !== undefined) map.scrollLeft = mapLeft;
+      else {
+        // First look at a scrolled map: centre it on a battle on offer (or the middle of the valley).
+        const pin = map.querySelector<HTMLElement>(".cmp-pin.is-selected, .cmp-pin.is-open");
+        const x = pin ? pin.offsetLeft : map.scrollWidth / 2;
+        map.scrollLeft = Math.max(0, x - map.clientWidth / 2);
+      }
+    }
     bind();
     if (key) host.querySelector<HTMLElement>(key)?.focus({ preventScroll: true });
   };
@@ -365,7 +376,8 @@ export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
         </button>`;
       })
       .join("");
-    return `<div class="cmp-map">${valleyMapSvg()}${pins}</div>`;
+    // On narrow screens the map keeps a readable size and scrolls sideways inside its panel.
+    return `<div class="cmp-map-scroll"><div class="cmp-map">${valleyMapSvg()}${pins}</div></div><p class="cmp-map-hint">Swipe the map sideways to see the whole valley.</p>`;
   };
 
   const legend = (s: CampaignState): string => `

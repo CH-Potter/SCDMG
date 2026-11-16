@@ -94,3 +94,39 @@ export function drawGhost(g: Graphics, pos: Vec, r: number, ok: boolean, good: n
   g.stroke({ width: 0.07, color: c });
   g.moveTo(pos.x - 0.18, pos.y).lineTo(pos.x + 0.18, pos.y).moveTo(pos.x, pos.y - 0.18).lineTo(pos.x, pos.y + 0.18).stroke({ width: 0.06, color: INK, alpha: 0.8 });
 }
+
+/** A short bar across an aim line where the weapon's reach ends. */
+export function drawRangeTick(g: Graphics, from: Vec, to: Vec, at: Vec): void {
+  const L = Math.hypot(to.x - from.x, to.y - from.y) || 1;
+  const nx = -(to.y - from.y) / L;
+  const ny = (to.x - from.x) / L;
+  const w = 0.32;
+  g.moveTo(at.x - nx * w, at.y - ny * w).lineTo(at.x + nx * w, at.y + ny * w).stroke({ width: 0.16, color: INK });
+  g.moveTo(at.x - nx * w, at.y - ny * w).lineTo(at.x + nx * w, at.y + ny * w).stroke({ width: 0.08, color: 0xd23a2f });
+}
+
+const MARK_GREY = 0xb8ad9a;
+
+/** A mark on an aim line: ✕ blocked, shield for cover (grey and struck through when ignored), arrow for plunging fire. */
+export function drawShotMark(g: Graphics, p: Vec, kind: "blocks" | "cover" | "cover-ignored" | "plunge"): void {
+  if (kind === "blocks") {
+    g.circle(p.x, p.y, 0.3).fill(0xd23a2f).stroke({ width: 0.06, color: INK });
+    const d = 0.14;
+    g.moveTo(p.x - d, p.y - d).lineTo(p.x + d, p.y + d).moveTo(p.x + d, p.y - d).lineTo(p.x - d, p.y + d).stroke({ width: 0.08, color: 0xffffff });
+    return;
+  }
+  if (kind === "plunge") {
+    g.circle(p.x, p.y, 0.28).fill(COVER_FULL).stroke({ width: 0.06, color: INK });
+    g.moveTo(p.x, p.y - 0.16).lineTo(p.x, p.y + 0.12).moveTo(p.x - 0.11, p.y + 0.02).lineTo(p.x, p.y + 0.14).lineTo(p.x + 0.11, p.y + 0.02).stroke({ width: 0.07, color: INK });
+    return;
+  }
+  const c = kind === "cover" ? COVER_PARTIAL : MARK_GREY;
+  const w = 0.24;
+  const h = 0.3;
+  g.poly([p.x - w, p.y - h * 0.8, p.x + w, p.y - h * 0.8, p.x + w, p.y, p.x, p.y + h, p.x - w, p.y]).fill(c).stroke({ width: 0.06, color: INK });
+  if (kind === "cover") {
+    g.moveTo(p.x - w * 0.55, p.y - h * 0.2).lineTo(p.x + w * 0.55, p.y - h * 0.2).stroke({ width: 0.07, color: INK }); // a "−" for −1 save
+  } else {
+    g.moveTo(p.x - w * 1.1, p.y + h * 0.7).lineTo(p.x + w * 1.1, p.y - h * 1.0).stroke({ width: 0.07, color: INK });
+  }
+}

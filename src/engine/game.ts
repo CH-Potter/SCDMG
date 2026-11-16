@@ -15,7 +15,7 @@ import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type 
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
-import { applyDamage, planMelee, planShooting, resolveAttack, saveNeeded, planImpact, moraleCheck, type AttackPlan } from "./combat";
+import { applyDamage, blastOn, planMelee, planShooting, resolveAttack, planImpact, moraleCheck, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
 import { dist, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
@@ -44,6 +44,7 @@ import { cleanupRound, dropCarriedFlag, economyState, scoreRound, setupMission, 
 import { allPlaced, checkPlacement, elevationFor, lineOfSight, type Placed } from "./terrain";
 import type {
   AbilityId,
+  AttackReport,
   Command,
   CommandResult,
   Elevation,
@@ -100,6 +101,16 @@ export interface StartBonus {
 const bonusAmount = (n: unknown): number => (typeof n === "number" && Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0);
 
 const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
+
+/**
+ * Resolve an attack and log it ahead of the events it caused (morale tests, abilities such as
+ * Refraction), so the dice tray and log show the attack first and its consequences after.
+ */
+function pushAttack(events: GameEvent[], resolve: (events: GameEvent[]) => AttackReport): void {
+  const at = events.length;
+  const report = resolve(events);
+  events.splice(at, 0, { type: "attack", report });
+}
 
 export function createGame(setup: GameSetup): GameState {
   const map = setup.map ?? MAPS[setup.mapId ?? "dustbowl"];
@@ -371,7 +382,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
       if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
       if (consumeReaction(s, target.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
-      events.push({ type: "attack", report: resolveAttack(s, unit, target, w.name, plan, "shoot", events) });
+      pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "shoot", ev));
       break;
     }
     case "fight": {
@@ -382,7 +393,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const plan = planMelee(unit, target, w);
       if (typeof plan === "string") return plan;
       unit.status.fought = true;
-      events.push({ type: "attack", report: resolveAttack(s, unit, target, w.name, plan, "fight", events) });
+      pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "fight", ev));
       break;
     }
     case "ability": {
@@ -453,7 +464,7 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   if (consumeReaction(s, target.owner, "enemyCharges", events)) target.status.braced = true;
   // Impact on charge: slam into the target before the combat phase.
   const impact = planImpact(unit, target);
-  if (impact) events.push({ type: "attack", report: resolveAttack(s, unit, target, "Impact", impact, "impact", events) });
+  if (impact) pushAttack(events, (ev) => resolveAttack(s, unit, target, "Impact", impact, "impact", ev));
   return null;
 }
 
@@ -555,40 +566,12 @@ function useAbility(
         const r = profileOf(t).baseRadius;
         const caught = aliveModels(t).filter((m) => dist(m.pos, point) <= 2 + r);
         if (!caught.length) continue;
-        const hitRolls: number[] = [];
-        const saveRolls: number[] = [];
-        const saveOn: (number | null)[] = [];
-        let damage = 0;
-        let killed = 0;
-        for (const m of caught) {
-          const roll = rollD6(s);
-          hitRolls.push(roll);
-          if (roll < 4) continue;
-          const st = saveNeeded(s, unit, t, m, 1, false);
-          saveOn.push(st);
-          const sv = st === null ? 0 : rollD6(s);
-          saveRolls.push(sv);
-          if (st !== null && sv >= st) continue;
-          damage += applyDamage(s, t, m, 1, events);
-          if (!m.alive) killed += 1;
-        }
-        if (damage > 0) moraleCheck(s, t, events);
-        events.push({
+        const at = events.length; // the attack is logged ahead of the damage and morale it causes
+        const rolled = blastOn(s, t, caught, { hit: 4, damage: 1, ap: 1 }, events);
+        if (rolled.damage > 0) moraleCheck(s, t, events);
+        events.splice(at, 0, {
           type: "attack",
-          report: {
-            uid: unit.uid,
-            target: t.uid,
-            weapon: "Barrage",
-            kind: "barrage",
-            attackers: 1,
-            hitRolls,
-            hitOn: 4,
-            saveRolls,
-            saveOn,
-            damage,
-            modelsKilled: killed,
-            unitDestroyed: t.destroyed,
-          },
+          report: { uid: unit.uid, target: t.uid, weapon: "Barrage", kind: "barrage", attackers: 1, hitOn: 4, ...rolled, unitDestroyed: t.destroyed },
         });
       }
       break;
@@ -713,7 +696,7 @@ function useAbility(
       const plan = planDemoCharge(unit, t);
       if (!plan) return "No target in reach";
       say(`${name} lobs a demo charge!`);
-      events.push({ type: "attack", report: resolveAttack(s, unit, t, def.name, plan, "shoot", events) });
+      pushAttack(events, (ev) => resolveAttack(s, unit, t, def.name, plan, "shoot", ev));
       break;
     }
     default:
@@ -741,7 +724,7 @@ function react(s: GameState, mover: Unit, events: GameEvent[]): void {
     if (consumeReaction(s, mover.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
     w.reactionsUsed.push("overwatch");
     events.push({ type: "ability", uid: w.uid, ability: "overwatch", text: `${profileOf(w).name} opens fire on overwatch!` });
-    events.push({ type: "attack", report: resolveAttack(s, w, mover, weapon.name, plan, "overwatch", events) });
+    pushAttack(events, (ev) => resolveAttack(s, w, mover, weapon.name, plan, "overwatch", ev));
     if (mover.destroyed) return;
   }
   if (isFlying(mover)) return;
@@ -752,7 +735,7 @@ function react(s: GameState, mover: Unit, events: GameEvent[]): void {
     if (!plan) continue;
     w.reactionsUsed.push("lurk");
     events.push({ type: "ability", uid: w.uid, ability: "lurk", text: `${profileOf(w).name} lashes out from hiding!` });
-    events.push({ type: "attack", report: resolveAttack(s, w, mover, ABILITIES.lurk.name, plan, "impact", events) });
+    pushAttack(events, (ev) => resolveAttack(s, w, mover, ABILITIES.lurk.name, plan, "impact", ev));
     if (mover.destroyed) return;
   }
 }

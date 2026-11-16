@@ -354,6 +354,10 @@ button.selected {
 button.secondary {
   background: var(--panel);
 }
+/* A toggled-on secondary button (e.g. Measure) must still look on. */
+button.secondary.selected {
+  background: var(--halftone), #9be08f;
+}
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,

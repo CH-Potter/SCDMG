@@ -248,6 +248,45 @@ export function saveNeeded(s: GameState, a: Unit, t: Unit, tm: Model, ap: number
   return save > 6 ? null : save;
 }
 
+/**
+ * A blast landing on the models of `t` it catches (a unit's barrage or a support card's strike):
+ * one hit die per caught model, then the target's blast evade, then a save (no cover from a blast
+ * dropping out of the sky). Damage is applied as it goes; the caller logs the attack and the morale.
+ */
+export function blastOn(
+  s: GameState,
+  t: Unit,
+  caught: Model[],
+  e: { hit: number; damage: number; ap: number },
+  events: GameEvent[],
+): Pick<AttackReport, "hitRolls" | "evadeRolls" | "evadeOn" | "saveRolls" | "saveOn" | "damage" | "modelsKilled"> {
+  const evadeOn = evadeTarget(t, defaultConditions("barrage"));
+  const hitRolls: number[] = [];
+  const evadeRolls: number[] = [];
+  const saveRolls: number[] = [];
+  const saveOn: (number | null)[] = [];
+  let damage = 0;
+  let modelsKilled = 0;
+  for (const m of caught) {
+    const roll = rollD6(s);
+    hitRolls.push(roll);
+    if (roll < e.hit) continue;
+    if (evadeOn !== null) {
+      const ev = rollD6(s);
+      evadeRolls.push(ev);
+      if (ev >= evadeOn) continue;
+    }
+    const st = saveNeeded(s, t, t, m, e.ap, false);
+    saveOn.push(st);
+    const sv = st === null ? 0 : rollD6(s);
+    saveRolls.push(sv);
+    if (st !== null && sv >= st) continue;
+    damage += applyDamage(s, t, m, e.damage, events);
+    if (!m.alive) modelsKilled += 1;
+  }
+  return { hitRolls, ...(evadeOn !== null && evadeRolls.length ? { evadeRolls, evadeOn } : {}), saveRolls, saveOn, damage, modelsKilled };
+}
+
 const pAtLeast = (n: number): number => Math.max(0, Math.min(1, (7 - n) / 6));
 
 function nearestAttacker(plan: AttackPlan, tm: Model): Model | undefined {

@@ -168,3 +168,27 @@ export function polygonCentroid(poly: Vec[]): Vec {
   const s = poly.reduce((acc, p) => add(acc, p), { x: 0, y: 0 });
   return scale(s, 1 / poly.length);
 }
+
+/**
+ * How far along a→b (0..1) the segment first enters the polygon: 0 if `a` is inside, null if it
+ * never touches it.
+ */
+export function segmentEntry(a: Vec, b: Vec, poly: Vec[]): number | null {
+  if (!segmentIntersectsPolygon(a, b, poly)) return null;
+  if (pointInPolygon(a, poly)) return 0;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  let best = 1;
+  for (let i = 0, n = poly.length; i < n; i++) {
+    const p = poly[i]!;
+    const q = poly[(i + 1) % n]!;
+    const ex = q.x - p.x;
+    const ey = q.y - p.y;
+    const den = dx * ey - dy * ex;
+    if (Math.abs(den) < EPS) continue; // parallel edge: the entry is found on a neighbouring edge
+    const t = ((p.x - a.x) * ey - (p.y - a.y) * ex) / den;
+    const u = ((p.x - a.x) * dy - (p.y - a.y) * dx) / den;
+    if (t >= -EPS && t <= 1 + EPS && u >= -EPS && u <= 1 + EPS) best = Math.min(best, Math.max(0, t));
+  }
+  return best;
+}

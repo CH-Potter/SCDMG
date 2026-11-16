@@ -200,6 +200,9 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Campaign:** the Dustline War, linked battles for each faction (see *Campaign* below).
 - **Lore and intros:** lore pages for the valley and each faction, and intro animations for the game and each faction.
 
+**Added in v0.7:**
+- **Barrages and support-card blasts** now let the target roll its blast evade for each hit, as the evade rules always said. Their target always gets its save, even when the caster has no unit on the table (it used to get none).
+
 ## Tabletop staples
 
 - **Impact on charge:** some units (Munch melee critters, Big Bertha's ram) roll impact dice when a charge lands. Each model in base contact rolls the unit's `impact` dice at the charged unit. Hits get normal saves, and the damage happens before the combat phase.

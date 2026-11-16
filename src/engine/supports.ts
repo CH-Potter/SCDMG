@@ -1,13 +1,12 @@
 // Off-board supports: command points (CP), playing support abilities as free actions,
 // summoned structures, and the round refresh. Reactions live in reactions.ts.
 
-import { applyDamage, saveNeeded, moraleCheck, isFearless, nerveTest } from "./combat";
+import { blastOn, moraleCheck, isFearless, nerveTest } from "./combat";
 import { SUPPORTS, supportOf } from "./data/factions";
 import { planUnitMove, reviveSpot } from "./formation";
 import { dist, ngon } from "./geometry";
 import { hasAbility, isFlying, profileFor, profileOf } from "./profile";
 import { REACTION_TRIGGER, abilityOf } from "./reactions";
-import { rollD6 } from "./rng";
 import { aliveModels, canAffordDeploy, isEngaged, onBoard, unitById, unitGap, HOME_EXCLUSION, nearEnemyHome } from "./rules";
 import { lineOfSight, platformAt } from "./terrain";
 import type { Command, GameEvent, GameState, PlayerId, SupportAbilityDef, SupportEffect, Unit, UnitStatus, Vec } from "./types";
@@ -426,40 +425,13 @@ function blast(
     const r = profileOf(t).baseRadius;
     const caught = aliveModels(t).filter((m) => dist(m.pos, p) <= e.radius + r);
     if (!caught.length) continue;
-    const hitRolls: number[] = [];
-    const saveRolls: number[] = [];
-    const saveOn: (number | null)[] = [];
-    let damage = 0;
-    let killed = 0;
-    for (const m of caught) {
-      const roll = rollD6(s);
-      hitRolls.push(roll);
-      if (roll < e.hit) continue;
-      const st = source ? saveNeeded(s, source, t, m, e.ap, false) : null;
-      saveOn.push(st);
-      const sv = st === null ? 0 : rollD6(s);
-      saveRolls.push(sv);
-      if (st !== null && sv >= st) continue;
-      damage += applyDamage(s, t, m, e.damage, events);
-      if (!m.alive) killed += 1;
-    }
-    if (damage > 0) moraleCheck(s, t, events);
-    events.push({
+    const at = events.length; // the attack is logged ahead of the damage and morale it causes
+    // The target always gets its save (and blast evade), whether or not the caster has a unit on the table.
+    const rolled = blastOn(s, t, caught, e, events);
+    if (rolled.damage > 0) moraleCheck(s, t, events);
+    events.splice(at, 0, {
       type: "attack",
-      report: {
-        uid: source?.uid ?? t.uid,
-        target: t.uid,
-        weapon: name,
-        kind: "barrage",
-        attackers: 1,
-        hitRolls,
-        hitOn: e.hit,
-        saveRolls,
-        saveOn,
-        damage,
-        modelsKilled: killed,
-        unitDestroyed: t.destroyed,
-      },
+      report: { uid: source?.uid ?? t.uid, target: t.uid, weapon: name, kind: "barrage", attackers: 1, hitOn: e.hit, ...rolled, unitDestroyed: t.destroyed },
     });
   }
 }

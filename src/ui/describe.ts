@@ -176,3 +176,16 @@ export function abilityStatusTags(u: Unit): string[] {
   if (u.models.some((m) => m.alive && m.shield > max)) tags.push("🫧 bubble shield");
   return tags;
 }
+
+/**
+ * A one-word verdict on an attack that did no harm, so a dodge or a save isn't called a miss:
+ * "Missed!" (no dice hit), "Dodged!" (every hit evaded) or "No damage!" (hits landed but were saved
+ * or soaked). Empty when the attack did damage.
+ */
+export function noHarmVerdict(r: AttackReport): string {
+  if (r.damage > 0 || r.modelsKilled || r.unitDestroyed) return "";
+  const h = reportHits(r);
+  if (h.rolled + (r.precisionMoved ?? 0) === 0) return "Missed!";
+  if (h.total <= 0) return "Dodged!";
+  return "No damage!";
+}

@@ -18,13 +18,13 @@ import { factionOf } from "../engine/data/factions";
 import { dist } from "../engine/geometry";
 import { isFlying, profileOf } from "../engine/profile";
 import { aliveModels, modelsEngage, presenceController } from "../engine/rules";
-import { planRoute } from "../engine/terrain";
+import { planRoute, type ShotMarkKind } from "../engine/terrain";
 import type { AttackReport, GameEvent, GameState, Model, Objective, Phase, Unit, UnitProfile, Vec } from "../engine/types";
 import { figureSpec, IDLE_BREATH, rotates, type FigureKind, type FigureSpec, type Look } from "./art/figures";
 import { makeCanvas } from "./art/ink";
 import { paintGround, paintTerrain } from "./art/terrain";
 import { baseTex, figureTex, iconTex, refreshLettering, type FigureTex } from "./art/textures";
-import { ACCENT, BAD, CLASH, dashCircle, dashLine, dashPoly, drawCoverPip, drawGhost, flat, GOOD, INK, PLAYER_COLORS, SAND_DARK, shade, SHIELD } from "./boardArt";
+import { ACCENT, BAD, CLASH, dashCircle, dashLine, dashPoly, drawCoverPip, drawGhost, drawRangeTick, drawShotMark, flat, GOOD, INK, PLAYER_COLORS, SAND_DARK, shade, SHIELD } from "./boardArt";
 import { PHASE_NAMES } from "./describe";
 import { backOut, Banner, type BannerOpts, easeInOut, easeOut, FONT, FxLayer, Polyline } from "./fx";
 import { DropShipFx, drawNoGo, type NoGoRing } from "./fx/dropship";
@@ -57,6 +57,21 @@ export interface Ghost {
   cover?: 0 | 1 | 2;
 }
 
+/**
+ * An aim or measuring line. `marks` (from `shotLine`) show what the terrain along it does: a red ✕
+ * where sight is blocked, an amber shield where the target gets cover, a grey shield where cover is
+ * ignored, a green arrow for plunging fire. `rangeT` (0..1) is where the weapon's reach ends: the
+ * rest is drawn red, with a tick. `label` is shown beside the line (e.g. the distance).
+ */
+export interface SightLine {
+  from: Vec;
+  to: Vec;
+  ok: boolean;
+  marks?: { t: number; kind: ShotMarkKind }[];
+  rangeT?: number;
+  label?: string;
+}
+
 export interface RenderView {
   state: GameState;
   selected: string | null;
@@ -66,7 +81,7 @@ export interface RenderView {
   ghostOk: boolean;
   path: Vec[] | null;
   targets: { uid: string; ok: boolean }[];
-  sightLines: { from: Vec; to: Vec; ok: boolean }[];
+  sightLines: SightLine[];
   friendlyMarks: string[];
   zone: Vec[][] | null;
   blast: { center: Vec; radius: number } | null;
@@ -232,6 +247,9 @@ export class BoardRenderer {
   private models = new Map<string, ModelView>();
   private objectives = new Map<string, ObjectiveView>();
   private labels: Text[] = [];
+  /** Distance labels on aim lines, pooled and reused every redraw. */
+  private aimLabelLayer = new Container();
+  private aimLabels: Text[] = [];
   private ppi = 20;
   /** Camera: current (cam) and target (camT) pixels-per-inch and board offset; fit = whole board on stage. */
   private cam = { ppi: 20, x: 0, y: 0 };
@@ -300,6 +318,7 @@ export class BoardRenderer {
       this.modelLayer,
       this.engageOver,
       this.topOverlay,
+      this.aimLabelLayer,
       this.fx.root,
       this.dropShip.root,
     );
@@ -492,6 +511,7 @@ export class BoardRenderer {
       this.ppi = this.cam.ppi;
       this.fx.textScale = 1 / this.ppi;
       for (const t of this.labels) t.scale.set(1 / this.ppi);
+      for (const t of this.aimLabels) t.scale.set(1 / this.ppi);
       this.maybeRebake();
     }
     this.onViewChange?.();
@@ -626,6 +646,23 @@ export class BoardRenderer {
     this.labelLayer.addChild(t);
     this.labels.push(t);
     return t;
+  }
+
+  /** Show pooled aim label `i` (created on first use; the pool survives board rebuilds). */
+  private aimLabel(i: number, text: string, pos: Vec, color: number): void {
+    let t = this.aimLabels[i];
+    if (!t) {
+      t = new Text({ text, style: { fontFamily: FONT, fontSize: 24, fill: color, stroke: { color: INK, width: 6, join: "round" } } });
+      t.anchor.set(0.5, 1.15);
+      t.resolution = 1;
+      this.aimLabelLayer.addChild(t);
+      this.aimLabels.push(t);
+    }
+    if (t.text !== text) t.text = text;
+    t.style.fill = color;
+    t.scale.set(1 / this.ppi);
+    t.position.set(pos.x, pos.y);
+    t.visible = true;
   }
 
   // ---------- static board ----------
@@ -1457,13 +1494,32 @@ export class BoardRenderer {
       drawGhost(top, gh.pos, gh.radius, v.ghostOk, GOOD, BAD);
       if (gh.cover && v.ghostOk) drawCoverPip(top, gh.pos, gh.radius, gh.cover);
     }
+    let aimLabel = 0;
     for (const l of v.sightLines) {
-      dashLine(top, l.from, l.to, 0.4, 0.22);
-      top.stroke({ width: 0.15, color: INK, alpha: 0.5 });
-      dashLine(top, l.from, l.to, 0.4, 0.22);
-      top.stroke({ width: 0.08, color: l.ok ? GOOD : BAD, alpha: 0.95 });
+      const at = (t: number): Vec => ({ x: l.from.x + (l.to.x - l.from.x) * t, y: l.from.y + (l.to.y - l.from.y) * t });
+      // Where the shot stops working: the weapon's reach, or the first thing that blocks sight.
+      const block = l.marks?.find((m) => m.kind === "blocks")?.t;
+      const cut = Math.min(1, l.rangeT ?? 1, block ?? 1);
+      const reach = at(cut);
+      const live = l.ok ? GOOD : cut < 1 ? 0xfff3d6 : BAD;
+      if (cut > 0.001) {
+        dashLine(top, l.from, reach, 0.4, 0.22);
+        top.stroke({ width: 0.15, color: INK, alpha: 0.5 });
+        dashLine(top, l.from, reach, 0.4, 0.22);
+        top.stroke({ width: 0.08, color: live, alpha: 0.95 });
+      }
+      if (cut < 0.999) {
+        dashLine(top, reach, l.to, 0.18, 0.22);
+        top.stroke({ width: 0.12, color: INK, alpha: 0.35 });
+        dashLine(top, reach, l.to, 0.18, 0.22);
+        top.stroke({ width: 0.07, color: BAD, alpha: 0.85 });
+      }
+      if (l.rangeT !== undefined && l.rangeT < 1) drawRangeTick(top, l.from, l.to, at(l.rangeT));
       top.circle(l.to.x, l.to.y, 0.13).fill(l.ok ? GOOD : BAD).stroke({ width: 0.04, color: INK });
+      for (const m of l.marks ?? []) drawShotMark(top, at(m.t), m.kind);
+      if (l.label) this.aimLabel(aimLabel++, l.label, at(l.ok ? 0.55 : 0.3), l.ok ? 0xffffff : 0xffd2c8);
     }
+    for (let i = aimLabel; i < this.aimLabels.length; i++) this.aimLabels[i]!.visible = false;
     for (const t of v.targets) {
       const u = this.units.get(t.uid);
       if (!u || !u.onBoard) continue;

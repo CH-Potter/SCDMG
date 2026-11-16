@@ -735,3 +735,32 @@ li.tone-meanwhile {
     transform: none;
   }
 }
+
+/* ---------- the map on narrow screens ---------- */
+
+/* Below the map's readable size it scrolls sideways inside its panel, so the pins and their names
+   stay big enough to read and tap instead of shrinking into a crowd. */
+.cmp-map-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.cmp-map-scroll > .cmp-map {
+  min-width: 660px;
+}
+
+.cmp-map-hint {
+  display: none;
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .cmp-map-hint {
+    display: block;
+  }
+}

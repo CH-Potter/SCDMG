@@ -2,7 +2,7 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
 
 import { aiCommand } from "../engine/ai";
-import { expectedDamage, planMelee, planShooting, type AttackPlan } from "../engine/combat";
+import { evadeTarget, expectedDamage, planMelee, planShooting, rangedCanHit, saveNeeded, type AttackPlan } from "../engine/combat";
 import { ABILITIES } from "../engine/data/abilities";
 import { factionOf, supportOf } from "../engine/data/factions";
 import { abilityOf } from "../engine/reactions";
@@ -50,9 +50,9 @@ import {
   supplyUsed,
   unitById,
 } from "../engine/rules";
-import { lineOfSight, platformAt, planRoute } from "../engine/terrain";
-import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec } from "../engine/types";
-import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine, impactLine, evadeLine, reportHits, unitName, abilityStatusTags } from "./describe";
+import { lineOfSight, platformAt, planRoute, shotLine } from "../engine/terrain";
+import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec, Weapon } from "../engine/types";
+import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine, impactLine, evadeLine, reportHits, noHarmVerdict, unitName, abilityStatusTags } from "./describe";
 import { ComicAlerts, type AlertTone } from "./alerts";
 import { DICE_SPEED_LABEL, DiceTray, type DiceRoll, type DiceSpeed } from "./dice";
 import { BoardRenderer, drawPos, type RenderView } from "./renderer";
@@ -103,7 +103,14 @@ type Mode =
   | { kind: "ability"; id: AbilityId }
   /** `unit`: for unit-and-point supports (teleports), the friendly unit picked so far. */
   | { kind: "support"; support: string; ability: string; unit?: string }
-  | { kind: "measure"; from?: Vec; fromElev?: number; fromUnit?: string };
+  /** Measuring: the first click sets `from`, the second pins `to` (so touch screens, with no hover, can measure); a third starts over. */
+  | {
+      kind: "measure";
+      from?: Vec;
+      fromElev?: number;
+      fromUnit?: string;
+      to?: { pos: Vec; elev: number; unit?: string };
+    };
 
 /** The line under each phase banner. */
 const PHASE_HINT: Record<string, string> = {
@@ -271,7 +278,7 @@ export class Controller {
     for (const e of events) {
       if (e.type === "attack") {
         const r = e.report;
-        const { rolled, total: hits, evaded } = reportHits(r);
+        const { rolled, evaded } = reportHits(r);
         const saves: number[] = [];
         const needs: (number | null)[] = [];
         r.saveOn.forEach((need, i) => {
@@ -303,7 +310,7 @@ export class Controller {
               : []),
             { label: "Saves", rolls: saves, need: needs, side: side(r.target), result: `${r.damage} dmg` },
           ],
-          verdict: r.unitDestroyed ? "Wiped out!" : r.modelsKilled ? `${r.modelsKilled} down!` : hits === 0 ? "Whiff!" : "",
+          verdict: r.unitDestroyed ? "Wiped out!" : r.modelsKilled ? `${r.modelsKilled} down!` : noHarmVerdict(r),
         });
       } else if (e.type === "rolloff") {
         const last = e.rolls[e.rolls.length - 1]!;
@@ -430,6 +437,62 @@ export class Controller {
     this.mode = { kind: "none" };
   }
 
+  /**
+   * Aim lines from each of the shooter's models to the nearest enemy model, marked with what the
+   * terrain does to the shot (blocked, cover, cover ignored) and where the weapon's reach ends.
+   * `firing` is the models that can actually shoot (null: work it out from range and sight).
+   * Returns short notes for the status line.
+   */
+  private aimLines(view: RenderView, a: Unit, t: Unit, w: Weapon, firing: Set<Model> | null): string[] {
+    const s = this.state;
+    const ra = profileOf(a).baseRadius;
+    const rt = profileOf(t).baseRadius;
+    const reach = w.range + ra + rt; // centre to centre
+    const tms = aliveModels(t);
+    if (!tms.length) return [];
+    let shots = 0;
+    let covered = 0;
+    let short = Infinity;
+    let blockedBy: string | null = null;
+    let ignored: string | null = null;
+    let labelledOk = false;
+    let labelledBad = false;
+    for (const am of aliveModels(a)) {
+      const near = tms.reduce((x, y) => (dist(x.pos, am.pos) <= dist(y.pos, am.pos) ? x : y));
+      const d = dist(am.pos, near.pos);
+      const line = shotLine(s, am.pos, am.elevation, t, near, a.uid);
+      const outOfRange = d > reach + 1e-6;
+      const ok = firing ? firing.has(am) : !outOfRange && line.sight;
+      if (ok) {
+        shots++;
+        if (line.cover) covered++;
+      } else if (outOfRange) short = Math.min(short, d - reach);
+      else blockedBy ??= line.marks.find((m) => m.kind === "blocks")?.note ?? null;
+      ignored ??= line.marks.find((m) => m.kind === "cover-ignored")?.note ?? null;
+      // Label the distance on one good line and one bad one, not on every model of a big squad.
+      const blocked = !line.sight && !outOfRange;
+      const label = (ok && !labelledOk) || (!ok && !labelledBad) ? (blocked ? "✕ blocked" : `${Math.max(0, d - ra - rt).toFixed(1)}" of ${w.range}"`) : undefined;
+      if (label) {
+        if (ok) labelledOk = true;
+        else labelledBad = true;
+      }
+      view.sightLines.push({
+        from: drawPos(a, am),
+        to: drawPos(t, near),
+        ok,
+        marks: line.marks,
+        rangeT: outOfRange ? reach / d : undefined,
+        label,
+      });
+    }
+    const notes: string[] = [];
+    if (covered) notes.push(covered === shots ? "🛡 in cover: −1 to their save" : `🛡 ${covered} of ${shots} shots into cover (−1 save)`);
+    else if (ignored && shots) notes.push(ignored);
+    if (short < Infinity) notes.push(`${shots ? "some models are" : "nearest is"} ${short.toFixed(1)}" out of range`);
+    if (blockedBy) notes.push(blockedBy);
+    return notes;
+  }
+
   private bestWeapon(
     a: Unit,
     t: Unit,
@@ -464,6 +527,16 @@ export class Controller {
   private click(raw: Vec): void {
     if (this.mode.kind === "measure") {
       const hit = this.modelAt(raw);
+      if (this.mode.from && !this.mode.to) {
+        this.mode = {
+          ...this.mode,
+          to: hit
+            ? { pos: hit.model.pos, elev: hit.model.elevation, unit: hit.unit.uid }
+            : { pos: raw, elev: platformAt(this.state, raw) ? 1 : 0 },
+        };
+        this.refresh();
+        return;
+      }
       this.mode = hit
         ? {
             kind: "measure",
@@ -692,8 +765,10 @@ export class Controller {
   }
 
   private toggleMeasure(): void {
+    // Read the mode before clearSelection resets it, or the button could only ever turn measuring on.
+    const measuring = this.mode.kind === "measure";
     this.clearSelection();
-    this.mode = this.mode.kind === "measure" ? { kind: "none" } : { kind: "measure" };
+    this.mode = measuring ? { kind: "none" } : { kind: "measure" };
     this.refresh();
   }
 
@@ -726,7 +801,7 @@ export class Controller {
         if (at)
           this.renderer.floatText(
             at,
-            e.report.unitDestroyed ? "KO!" : e.report.damage ? `-${e.report.damage}` : "Whiff!",
+            e.report.unitDestroyed ? "KO!" : e.report.damage ? `-${e.report.damage}` : noHarmVerdict(e.report),
             e.report.damage ? 0xff6b6b : 0xffffff,
           );
       } else if (e.type === "scored") {
@@ -973,21 +1048,24 @@ export class Controller {
   private previewMeasure(hit: { unit: Unit; model: Model } | undefined, view: RenderView): Cue {
     const m = this.mode;
     if (m.kind !== "measure") return info("");
-    if (!m.from) return info("📏 Measuring: click a model or a spot to measure from. M or Esc to stop.", "pointer");
-    if (!this.hover) return info("📏 Move the pointer to measure.");
+    if (!m.from) return info("📏 Measuring: tap or click a model or a spot to measure from. Tap 📏 Measure again (or M, Esc) to stop.", "pointer");
     const s = this.state;
-    const to = hit ? hit.model.pos : this.hover;
-    const toElev = hit ? hit.model.elevation : platformAt(s, to) ? 1 : 0;
+    const pinned = m.to;
+    if (!pinned && !this.hover) return info("📏 Point at, or tap, where to measure to.");
+    const hitTo = pinned ? (pinned.unit ? { unit: unitById(s, pinned.unit)! } : undefined) : hit;
+    const to = pinned ? pinned.pos : hit ? hit.model.pos : this.hover!;
+    const toElev = pinned ? pinned.elev : hit ? hit.model.elevation : platformAt(s, to) ? 1 : 0;
     const fromElev = (m.fromElev ?? 0) as 0 | 1 | 2;
     const sight = lineOfSight(s, m.from, fromElev, to, toElev as 0 | 1 | 2);
     view.sightLines = [{ from: m.from, to, ok: sight }];
     const d = dist(m.from, to);
     const fromUnit = m.fromUnit ? unitById(s, m.fromUnit) : undefined;
     const edge =
-      (fromUnit ? profileOf(fromUnit).baseRadius : 0) + (hit ? profileOf(hit.unit).baseRadius : 0);
+      (fromUnit ? profileOf(fromUnit).baseRadius : 0) + (hitTo ? profileOf(hitTo.unit).baseRadius : 0);
     const parts = [`📏 ${d.toFixed(1)}"`];
     if (edge > 0) parts.push(`edge to edge ${Math.max(0, d - edge).toFixed(1)}"`);
     parts.push(sight ? "sight: clear" : "sight: blocked");
+    if (pinned) parts.push("tap again to measure from somewhere else");
     return info(parts.join(" · "), "pointer");
   }
 
@@ -1251,16 +1329,31 @@ export class Controller {
       if (own) return ownCue();
       if (hit && hit.unit.owner !== HUMAN) {
         const b = this.bestWeapon(sel, hit.unit, melee);
-        if (typeof b === "string") return bad(b);
-        const w = profileOf(sel).weapons[b.index]!;
-        for (const a of b.plan.attackers) {
-          const near = b.plan.targets.reduce((x, y) => (dist(x.pos, a.model.pos) < dist(y.pos, a.model.pos) ? x : y));
-          view.sightLines.push({ from: drawPos(sel, a.model), to: drawPos(hit.unit, near), ok: true });
+        if (typeof b === "string") {
+          // Still draw the aim lines with the longest-reaching gun, so you can see what's in the way or how far short it falls.
+          if (!melee) {
+            const gun = profileOf(sel)
+              .weapons.filter((x) => !x.melee && rangedCanHit(x, hit.unit))
+              .sort((x, y) => y.range - x.range)[0];
+            if (gun) {
+              const why = this.aimLines(view, sel, hit.unit, gun, null);
+              return bad(why.length ? `${b} · ${why.join(" · ")}` : b);
+            }
+          }
+          return bad(b);
         }
+        const w = profileOf(sel).weapons[b.index]!;
+        const terrain = melee ? [] : this.aimLines(view, sel, hit.unit, w, new Set(b.plan.attackers.map((a) => a.model)));
         const dice = b.plan.attackers.reduce((n, a) => n + a.dice, 0);
         const exp = expectedDamage(s, sel, hit.unit, b.plan, melee);
+        // What stands between a hit and a wound, so armour and dodges don't read as bad luck.
+        const tm = b.plan.targets[0]!;
+        const from = b.plan.attackers.reduce((x, y) => (dist(y.model.pos, tm.pos) < dist(x.model.pos, tm.pos) ? y : x)).model;
+        const save = saveNeeded(s, sel, hit.unit, tm, b.plan.ap, melee, from);
+        const evade = b.plan.evadeOn === undefined ? evadeTarget(hit.unit, melee ? ["melee"] : ["ranged"]) : b.plan.evadeOn;
+        const defence = `${evade ? `they dodge on ${evade}+${b.plan.tracking ? ` (tracking ${b.plan.tracking})` : ""}, ` : ""}${save === null ? "no save" : `save on ${save}+`}`;
         return ok(
-          `${melee ? "⚔ Fight" : "🎯 Shoot"} with ${w.name}: ${b.plan.attackers.length} model${b.plan.attackers.length > 1 ? "s" : ""}, ${dice} dice hitting on ${b.plan.hitOn}+ · AP${b.plan.ap} · ≈${exp.toFixed(1)} damage`,
+          `${melee ? "⚔ Fight" : "🎯 Shoot"} with ${w.name}: ${b.plan.attackers.length} model${b.plan.attackers.length > 1 ? "s" : ""}, ${dice} ${dice === 1 ? "die" : "dice"} hitting on ${b.plan.hitOn}+ · AP${b.plan.ap} · ${defence} · ≈${exp.toFixed(1)} damage${terrain.length ? ` · ${terrain.join(" · ")}` : ""}`,
           "target",
         );
       }
@@ -1455,7 +1548,7 @@ export class Controller {
       <span class="status">${esc(status)}</span>
       <span class="spacer"></span>
       <button class="secondary" id="btn-fit" title="Fit the board to the screen (0)">⤢ Fit</button>
-      <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" title="Measure distances and check line of sight (M)">📏 Measure</button>
+      <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" aria-pressed="${this.mode.kind === "measure"}" title="${this.mode.kind === "measure" ? "Stop measuring (M or Esc)" : "Measure distances and check line of sight (M)"}">📏 Measure</button>
       <button class="secondary" id="btn-undo" ${this.humanTurn() && this.history.length ? "" : "disabled"} title="Take back your last action (Ctrl+Z)">↶ Undo</button>
       <button class="secondary" id="btn-dice" title="Dice: Throw (you throw your own dice), Auto, Quick or Off">🎲 Dice: ${DICE_SPEED_LABEL[this.tray.speed]}</button>
       <span id="audio-slot"></span>
