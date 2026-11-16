@@ -45,3 +45,6 @@ pnpm-debug.log*
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# Browser automation scratch output (Playwright MCP)
+.playwright-mcp/
