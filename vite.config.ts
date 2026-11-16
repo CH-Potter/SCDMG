@@ -2,13 +2,14 @@ import { defineConfig } from "vitest/config";
 import { desktopOfflineFonts, desktopPixiNoEval } from "./scripts/vite-plugin-desktop.mjs";
 
 // `--mode desktop` is used only by `npm run package` / `npm run desktop` (Electron build).
-// Every other mode (dev server, `npm run build`, Vitest) gets exactly the previous config.
+// The web build uses relative asset paths too, so it works from any folder, such as GitHub Pages'
+// https://<user>.github.io/SCDMG/ (see .github/workflows/pages.yml).
 export default defineConfig(({ mode }) => {
   const desktop = mode === "desktop";
   return {
+    base: "./",
     ...(desktop
       ? {
-          base: "./",
           plugins: [desktopPixiNoEval(), desktopOfflineFonts()],
           build: { outDir: "dist-desktop", emptyOutDir: true },
         }

@@ -11,7 +11,7 @@ Free and open source under the [GNU GPL v3 or later](LICENSE).
 
 ![A Skirmish battle on Dustbowl Crossing: Rivet Grunts shoot Dr. Graft and Big Mama, with the dice tray showing 3 hits](docs/images/battle.webp)
 
-**[Download the latest release](https://github.com/CH-Potter/SCDMG/releases/latest)** · [Run it from source](#run-from-source) · [Rules](docs/rules.md) · [Lore](docs/lore.md)
+**[▶ Play in your browser](https://ch-potter.github.io/SCDMG/)** · **[Download for Windows](https://github.com/CH-Potter/SCDMG/releases/latest)** · [Run it from source](#run-from-source) · [Rules](docs/rules.md) · [Lore](docs/lore.md)
 
 ## What's in it
 
@@ -77,6 +77,10 @@ The **faction forge** shows every built-in faction's codex, and lets you copy on
 - **A portable Windows build** runs offline with no install.
 
 ## Play it
+
+### In your browser
+
+Play the latest release at **[ch-potter.github.io/SCDMG](https://ch-potter.github.io/SCDMG/)**: nothing to install. It works on desktop browsers, tablets and phones (touch is supported). Your armies, maps, factions and campaign are saved in that browser only, so use the same browser to pick up where you left off.
 
 ### Download (Windows)
 
