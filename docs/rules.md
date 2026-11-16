@@ -1,4 +1,4 @@
-# Super Cool Desktop Miniatures Game: rules (v0.8)
+# Super Cool Desktop Miniatures Game: rules (v0.9)
 
 This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
@@ -217,6 +217,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Militia Skirmish supports: the Ammo Wagon instead of the Tractor Depot.** With the rifle nerf and a tougher Big Mama the Militia fell behind the Munch in Skirmish; Crate of Rivets and Sandbag Social give the gunline back some bite. Assault keeps the depot.
 - **Concord Assault extras: a third Phase Guard (with Extra Guard) instead of the Sunray Tower, and the Grand Strider without Lustre Core.** On the long board the Concord out-damaged both armies but lost on objective VP (Frontline about 25%); a structure can't hold an objective.
 - Checked by AI-vs-AI simulation at 3 seeds: every pairing now scores 45–55% in both modes.
+- **Moves through area cover:** the rule is unchanged (area cover costs double), but a move that is too far because of it now says so: *Too far: 7.3" of 6", as crossing area cover costs double*, and the preview draws the route in red.
 
 ### Flyers
 
