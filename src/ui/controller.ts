@@ -129,9 +129,8 @@ export class Controller {
   private abilityTarget: string | null = null;
   private mode: Mode = { kind: "none" };
   private hover: Vec | null = null;
-  /** Touch play (see touch.ts): the hover came from a tap, where the last tap landed, and the order it previewed. */
+  /** Touch play (see touch.ts): the hover came from a tap, and the order it previewed. */
   private touchHover = false;
-  private lastTap: Vec | null = null;
   private pendingTap: Command | null = null;
   /** Set while a board tap is being handled, so `issue` holds the order for a confirming second tap. */
   private touchTap = false;
@@ -550,12 +549,9 @@ export class Controller {
    */
   private click(raw: Vec, touch = false): void {
     if (!touch) return this.clickAt(raw);
-    const again = !!this.lastTap && dist(this.lastTap, raw) <= this.tapSlop();
-    this.lastTap = raw;
     this.hover = raw;
     this.touchHover = true;
-    // Measuring by finger: taps move the far end; tapping the far end again measures on from there.
-    if (this.mode.kind === "measure" && this.mode.from && !again) return this.refresh();
+    // Measuring works the same by finger as by mouse (see clickAt): start, pin the far end, start over.
     const held = this.pendingTap;
     this.touchTap = true;
     try {
@@ -776,7 +772,6 @@ export class Controller {
       }
       cmd = pending;
       this.hover = null;
-      this.lastTap = null;
     }
     this.pendingTap = null;
     const why = commandProblem(this.state, cmd);
