@@ -582,9 +582,9 @@ const munch: Faction = {
     { profileId: "munch-nibblers", upgrades: ["legs"] },
     { profileId: "munch-spitter", upgrades: [] },
     { profileId: "munch-flapjaw", upgrades: [] },
-    { profileId: "munch-mama", upgrades: ["tunnel"] },
-    { profileId: "munch-nibblers", upgrades: ["legs"] },
-    { profileId: "munch-nanny", upgrades: [] },
+    { profileId: "munch-mama", upgrades: [] },
+    { profileId: "munch-nibblers", upgrades: ["legs", "litter"] },
+    { profileId: "munch-buzz", upgrades: [] },
   ],
   profiles: [
     {
@@ -629,12 +629,12 @@ const munch: Faction = {
       evade: { target: 5, against: ["pointBlank"] },
       nerve: 6,
       weapons: [
-        ranged("Goo Glob", 14, 1, 4, { ap: 1, targets: "ground", bonuses: [{ vs: "armoured", damage: 1 }] }),
+        ranged("Goo Glob", 14, 1, 4, { ap: 1, targets: "all", bonuses: [{ vs: "armoured", damage: 1 }] }),
         melee("Gummy Bite", 1, 5),
       ],
       abilities: ["sticky-goo", "regen", "grapple"],
       upgrades: [
-        { id: "acid", name: "Acid Goo", cost: 1, weapon: { index: 0, patch: { targets: "all" } }, text: "Goo Glob can hit flyers." },
+        { id: "acid", name: "Acid Goo", cost: 1, weapon: { index: 0, patch: { ap: 2 } }, text: "Goo Glob gets +1 AP." },
       ],
       blurb: "Spinnerets swapped for a web cannon. Whatever it hits stops running.",
     },

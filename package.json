@@ -1,7 +1,7 @@
 {
   "name": "scdmg",
   "private": true,
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Super Cool Desktop Miniatures Game (SCDMG): a cartoon sci-fi skirmish miniatures game for the browser.",
   "keywords": [
     "game",

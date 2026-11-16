@@ -74,6 +74,7 @@ describe("forward-deploy limits", () => {
     s.activePlayer = 0;
     s.players[0].cp = 8;
     const m = unitById(s, uidOf(s, 0, "munch-mama"))!;
+    m.upgrades = ["tunnel"]; // Tunnel Claws (not in every starter list)
     place(s, m.uid, { x: 17, y: 32 });
     return { s, m };
   };

@@ -1,4 +1,4 @@
-# Super Cool Desktop Miniatures Game: rules (v0.7)
+# Super Cool Desktop Miniatures Game: rules (v0.8)
 
 This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
@@ -208,6 +208,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 **Added in v0.8:**
 - **Flyers never get stuck in a melee.** Ground units can't charge them; a flyer's charge is a dive that strikes with its impact and leaves both sides free. Flyers fight from range (or with a dive or suicide attack): the Steel-Jaw Crows' bite is now their dive (2 impact dice each on 4+, AP1; Can-Opener Beak makes it AP2), and the Bomb Wasps trade their sting for **Bombs Away!**, a once-per-game suicide dive. Ground units may move under a flyer but not stop on its base.
 - **Shooting into a melee** no longer needs precision, but without it every miss rolls again at your own unit in the fight.
+- **The Munch, rebalanced for the flyer rules:** with no melee reaching flyers, the Web-Gunner Spiders' Goo Glob now hits flyers as standard (Acid Goo gives +1 AP instead). The Munch starter army swaps the Brood Scorpion and Big Mama's Tunnel Claws for a swarm of Bomb Wasps and 3 more Chrome-Jaw Beetles. Checked by AI-vs-AI simulation in both modes.
 - **Indirect fire:** mortars (the Spud Lobber and Stink Shell) and Barrage lob shells that need no line of sight but can drift off target, then burst on everyone under them, friend or foe. See *Indirect fire*.
 
 ### Flyers

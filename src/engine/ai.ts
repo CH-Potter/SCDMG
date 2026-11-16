@@ -22,7 +22,7 @@ import { SHELL_BURST } from "./constants";
 import { applyCommand, planDemoCharge, RALLY_CP } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
-import { hasKeyword, isFlying, profileOf } from "./profile";
+import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
 import {
   aliveModels,
   controlWeight,
@@ -103,6 +103,8 @@ export function canReach(s: GameState, u: Unit, o: Objective): boolean {
 
 const rangedWeapons = (u: Unit) => profileOf(u).weapons.filter((w) => !w.melee);
 const meleeWeapons = (u: Unit) => profileOf(u).weapons.filter((w) => w.melee);
+/** A flyer that strikes by diving (impact) or bombing: it wants to get close to ground units. */
+const divesAt = (u: Unit, e: Unit): boolean => isFlying(u) && !isFlying(e) && (!!profileOf(u).impact || hasAbility(u, "bombs-away"));
 const isMeleeUnit = (u: Unit): boolean => rangedWeapons(u).length === 0;
 
 // ---------- mission model ----------
@@ -338,7 +340,7 @@ export function evaluate(s: GameState, me: PlayerId): number {
         }
       }
       if (isMeleeUnit(u) || flying) {
-        const reachable = enemies.filter((e) => meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)));
+        const reachable = enemies.filter((e) => divesAt(u, e) || meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)));
         if (reachable.length) {
           const gap = Math.min(...reachable.map((e) => unitGap(u, e)));
           score -= Math.max(0, gap - prof.move) * 0.18;
@@ -426,6 +428,18 @@ function followUp(s: GameState, u: Unit): number {
   const canShoot = !u.status.disengaged || hasKeyword(u, "light");
   let best = 0;
   for (const e of enemies) {
+    // A flyer's dive (its impact) or the wasps' bomb run: no melee follows, so count it in full.
+    if (divesAt(u, e) && !u.status.disengaged && unitGap(u, e) <= effectiveMove(s, u) + 0.8) {
+      const imp = prof.impact;
+      const fail = (ap: number) => {
+        const save = profileOf(e).armor + ap;
+        return save > 6 ? 1 : 1 - pAtLeast(Math.max(2, save));
+      };
+      if (imp) best = Math.max(best, attackValue(s, e, aliveModels(u).length * imp.dice * pAtLeast(imp.hit) * fail(imp.ap) * imp.damage) * 0.8);
+      if (hasAbility(u, "bombs-away") && !(u.abilityUses["bombs-away"] ?? 0)) {
+        best = Math.max(best, attackValue(s, e, aliveModels(u).length * pAtLeast(3) * fail(1)) * 0.5);
+      }
+    }
     for (const w of prof.weapons) {
       if (w.melee) {
         if (u.status.disengaged || !meleeCanHit(u, e, w.targets)) continue;
