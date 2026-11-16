@@ -1,4 +1,4 @@
-# Super Cool Desktop Miniatures Game: rules (v0.6)
+# Super Cool Desktop Miniatures Game: rules (v0.7)
 
 This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
