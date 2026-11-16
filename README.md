@@ -1,13 +1,13 @@
 # Super Cool Desktop Miniatures Game (SCDMG)
 
 [![CI](https://github.com/CH-Potter/SCDMG/actions/workflows/ci.yml/badge.svg)](https://github.com/CH-Potter/SCDMG/actions/workflows/ci.yml)
-[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+[![Licence: GPL v3+](https://img.shields.io/badge/licence-GPL--3.0--or--later-blue.svg)](LICENSE)
 
 **A cartoon sci-fi tabletop skirmish you play against an AI.** Push a squad of farmers with riveted rifles up a dusty valley, drown the enemy in chrome-jawed beetles, or beam in a handful of smug aliens with ray guns. Measure, aim, roll the dice and see who holds the objectives when the dust settles.
 
 It runs in the browser or as a portable Windows app. This is an original game: the setting, factions, units and rules are all our own.
 
-Free and open source under the [MIT licence](LICENSE).
+Free and open source under the [GNU GPL v3 or later](LICENSE).
 
 ![A Skirmish battle on Dustbowl Crossing: Rivet Grunts shoot Dr. Graft and Big Mama, with the dice tray showing 3 hits](docs/images/battle.webp)
 
@@ -135,4 +135,6 @@ Bug reports, balance feedback, maps and code are all welcome. See [CONTRIBUTING.
 
 ## Licence
 
-[MIT](LICENSE). You can use, copy, modify and redistribute the game, including commercially, as long as the licence notice stays with it.
+[GNU General Public License v3.0 or later](LICENSE). You can use, copy, modify and redistribute the game, including commercially, as long as you share your source under the same licence and keep the copyright and credit notices (including the one on the main menu).
+
+Copyright © 2026 Craig Potter and SCDMG contributors. Releases up to v0.7.0 were published under the MIT licence.
