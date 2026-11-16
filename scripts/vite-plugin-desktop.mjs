@@ -1,5 +1,5 @@
-// Vite plugins used ONLY for the desktop (Electron) build: `vite build --mode desktop`.
-// `npm run dev`, `npm run build`, `npm test` and `npm run sim` never load them.
+// Vite plugins for the production builds: desktopPixiNoEval only for the desktop (Electron) build
+// (`vite build --mode desktop`), desktopOfflineFonts for both it and the web build (`npm run build`).
 //
 // 1. desktopPixiNoEval: the packaged app runs under a CSP without 'unsafe-eval'. Pixi v8
 //    refuses to start in that environment unless `pixi.js/unsafe-eval` (its eval-free
