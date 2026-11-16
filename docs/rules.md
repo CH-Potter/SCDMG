@@ -211,6 +211,13 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **The Munch, rebalanced for the flyer rules:** with no melee reaching flyers, the Web-Gunner Spiders' Goo Glob now hits flyers as standard (Acid Goo gives +1 AP instead). The Munch starter army swaps the Brood Scorpion and Big Mama's Tunnel Claws for a swarm of Bomb Wasps and 3 more Chrome-Jaw Beetles. Checked by AI-vs-AI simulation in both modes.
 - **Indirect fire:** mortars (the Spud Lobber and Stink Shell) and Barrage lob shells that need no line of sight but can drift off target, then burst on everyone under them, friend or foe. See *Indirect fire*.
 
+**Added in v0.9:**
+- **Rivet Rifle: no bonus against armoured targets** (it had +1 AP), so armour shrugs off its AP like any other gun's. Massed rifles were the Phase Guard's and Big Mama's main killer, and the Concord lost the objective missions to the Militia in both modes. Armour-cracking is left to Big Bertha and the Squinter.
+- **Dr. Graft and Big Mama: 14 HP (was 12).** She was shot down crossing the board in about half her games (63% against the Militia in Skirmish) for 1–3 damage a game; now it takes one more Sunlance or Thumper wound to drop her.
+- **Militia Skirmish supports: the Ammo Wagon instead of the Tractor Depot.** With the rifle nerf and a tougher Big Mama the Militia fell behind the Munch in Skirmish; Crate of Rivets and Sandbag Social give the gunline back some bite. Assault keeps the depot.
+- **Concord Assault extras: a third Phase Guard (with Extra Guard) instead of the Sunray Tower, and the Grand Strider without Lustre Core.** On the long board the Concord out-damaged both armies but lost on objective VP (Frontline about 25%); a structure can't hold an objective.
+- Checked by AI-vs-AI simulation at 3 seeds: every pairing now scores 45–55% in both modes.
+
 ### Flyers
 
 - **No melee engagement.** A flyer is never engaged with anything, so it can always move and shoot freely, and nothing is ever stuck fighting it. Flyers and ground units can still shoot each other (if their weapons can hit the other).

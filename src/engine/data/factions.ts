@@ -56,8 +56,9 @@ const militia: Faction = {
   color: 0xf28c28,
   look: "cap",
   // The drop-ship balances in Skirmish but runs away with the long Assault board (sims: ~84% Militia),
-  // so Assault keeps the old starter set.
-  defaultSupports: ["mil-depot", "mil-dropship"],
+  // so Assault keeps the old starter set. Skirmish takes the Ammo Wagon rather than the Tractor Depot:
+  // after the Rivet Rifle lost its anti-armour bonus the Militia fell behind the Munch there.
+  defaultSupports: ["mil-wagon", "mil-dropship"],
   assaultSupports: ["mil-vane"],
   assaultStarter: ["mil-radio", "mil-depot", "mil-airstrip"],
   supports: [
@@ -210,7 +211,9 @@ const militia: Faction = {
       baseRadius: 0.55,
       keywords: ["infantry", "light"],
       evade: { target: 6, against: ["pointBlank"] },
-      weapons: [ranged("Rivet Rifle", 22, 1, 4, { bonuses: [{ vs: "armoured", ap: 1 }] }), melee("Shovel Swing", 1, 5)],
+      // No bonus against armoured targets: it made massed rifles the Phase Guard's and Big Mama's main
+      // killer. Armour-cracking is Big Bertha's and the Squinter's job.
+      weapons: [ranged("Rivet Rifle", 22, 1, 4), melee("Shovel Swing", 1, 5)],
       abilities: ["entrenched", "demo-charge"],
       upgrades: [
         { id: "extra", name: "Extra Hands", cost: 1, addModels: 2, text: "+2 models." },
@@ -667,7 +670,8 @@ const munch: Faction = {
       supply: 4,
       models: 1,
       move: 6,
-      hp: 12,
+      // 14 HP (was 12): she was shot down crossing the board in about half her games.
+      hp: 14,
       shield: 0,
       armor: 4,
       baseRadius: 1.4,
@@ -986,11 +990,13 @@ const concord: Faction = {
       ],
     },
   ],
+  // A third Phase Guard rather than the Sunray Tower: on the long board the Concord out-shot everyone
+  // but lost on objective VP, and a structure can't hold an objective.
   assaultExtras: [
     { profileId: "con-lancer", upgrades: [] },
-    { profileId: "con-facet", upgrades: ["lustre"] },
+    { profileId: "con-facet", upgrades: [] },
     { profileId: "con-sylph", upgrades: ["plumage"] },
-    { profileId: "con-obelisk", upgrades: [] },
+    { profileId: "con-guard", upgrades: ["third"] },
   ],
   defaultList: [
     { profileId: "con-guard", upgrades: [] },
