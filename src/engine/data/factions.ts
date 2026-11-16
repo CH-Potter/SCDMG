@@ -604,7 +604,9 @@ const munch: Faction = {
       nerve: 6,
       weapons: [melee("Chompers", 1, 4, { bonuses: [{ vs: "light", dice: 1 }] })],
       abilities: ["regrow", "rampage"],
-      impact: { dice: 1, hit: 4, damage: 1, ap: 0 },
+      // Swarm impact hits on 5+: impact dice scale with squad size, and at 4+ the 9-beetle squad landed
+      // more impact hits than the old 6-beetle one (sims: 58% of all beetle damage came from impact).
+      impact: { dice: 1, hit: 5, damage: 1, ap: 0 },
       upgrades: [
         { id: "litter", name: "Bigger Litter", cost: 1, addModels: 3, text: "+3 models." },
         { id: "legs", name: "Leg Day", cost: 1, move: 2, text: "+2 move." },
@@ -753,7 +755,8 @@ const munch: Faction = {
       nerve: 6,
       weapons: [melee("Kick-Bite", 1, 4, { ap: 1 })],
       abilities: ["regrow", "sugar-rush"],
-      impact: { dice: 1, hit: 3, damage: 1, ap: 0 },
+      // Swarm impact hits on 5+, like the beetles and wasps (at 3+ two-thirds of the foxes' damage was impact).
+      impact: { dice: 1, hit: 5, damage: 1, ap: 0 },
       upgrades: [
         { id: "springs", name: "Bigger Springs", cost: 1, move: 2, text: "+2 move." },
         { id: "more", name: "More Hoppers", cost: 1, addModels: 2, text: "+2 models." },

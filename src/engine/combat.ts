@@ -268,7 +268,14 @@ export function expectedDamage(s: GameState, a: Unit, t: Unit, plan: AttackPlan,
   let hits = dice * pHit + Math.min(plan.precision ?? 0, dice * (1 - pHit));
   const evadeOn = plan.evadeOn === undefined ? evadeTarget(t, melee ? ["melee"] : ["ranged"]) : plan.evadeOn;
   if (evadeOn !== null) hits -= Math.max(0, hits * pAtLeast(evadeOn) - (plan.tracking ?? 0));
-  return Math.min(cap, hits * pFail * perHit);
+  const unsaved = hits * pFail;
+  let total = unsaved * perHit;
+  // Refraction (unused this round) takes 1 off the first unsaved ranged wound: a whole wound for a 1-damage weapon.
+  if (!melee && dice > 0 && hasAbility(t, "refraction") && !t.reactionsUsed.includes("refraction")) {
+    const perDie = Math.min(1, unsaved / dice);
+    total -= 1 - (1 - perDie) ** dice;
+  }
+  return Math.max(0, Math.min(cap, total));
 }
 
 /** Pick which model takes the next hit: finish off wounded models first, then the closest. */

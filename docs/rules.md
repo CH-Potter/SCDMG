@@ -199,6 +199,8 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Scrapheap Showdown** now pays 1 VP for every 2 enemy supply destroyed and 3 VP per held neutral objective (was 1 and 1), with a 15 VP instant-win limit. Kill-only scoring had left the Munch winning almost none of these games.
 - **Campaign:** the Dustline War, linked battles for each faction (see *Campaign* below).
 - **Lore and intros:** lore pages for the valley and each faction, and intro animations for the game and each faction.
+- **Swarm impact hits on 5+:** Chrome-Jaw Beetles (was 4+) and Piston Foxes (was 3+) now land impact on 5+, like the Bomb Wasps. Every model rolls its own impact die, so when the squads grew (beetles 6→9, foxes 5→8) their impact grew with them. A full beetle charge landed about 3 wounds before the defender could act, and impact was more than half of all beetle and fox damage in AI play. In a straight dice count, a 9-beetle charge wiped a Phase Guard or Grannies squad about 70% of the time before it could strike back (about 57% now). Single big beasts and the crows keep 4+.
+- **Refraction in the odds:** the expected damage shown in the attack preview, and used by the AI to pick targets, now counts an unused Refraction. Against a 1-damage gun it cancels the first wound, so a Rivet Rifle volley at the Shimmer Saucer was previewed at about 1.9 damage but really did about 1.
 
 ## Tabletop staples
 
