@@ -15,7 +15,7 @@ import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type 
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
-import { applyDamage, blastOn, planMelee, planShooting, resolveAttack, planImpact, moraleCheck, type AttackPlan } from "./combat";
+import { applyDamage, burstAt, planMelee, planShooting, resolveAttack, planImpact, scatterShell, shellAim, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
 import { dist, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
@@ -382,6 +382,14 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
       if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
       if (consumeReaction(s, target.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
+      if (plan.indirect) {
+        // Lobbed: one shell per firing model, aimed at the target; it may drift, then bursts on everyone under it.
+        for (const _ of plan.attackers) {
+          const landed = scatterShell(s, unit, w.name, shellAim(target), plan.hitOn, events);
+          burstAt(s, unit, w.name, landed, { hit: plan.hitOn, damage: plan.damage, ap: plan.ap }, events);
+        }
+        break;
+      }
       pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "shoot", ev));
       break;
     }
@@ -561,19 +569,9 @@ function useAbility(
       const reach = aliveModels(unit).some((m) => dist(m.pos, point) <= (def.range ?? 24));
       if (!reach) return `Out of range (${def.range}")`;
       say(`${name} lobs a barrage!`);
-      for (const t of onBoard(s)) {
-        if (isFlying(t)) continue;
-        const r = profileOf(t).baseRadius;
-        const caught = aliveModels(t).filter((m) => dist(m.pos, point) <= 2 + r);
-        if (!caught.length) continue;
-        const at = events.length; // the attack is logged ahead of the damage and morale it causes
-        const rolled = blastOn(s, t, caught, { hit: 4, damage: 1, ap: 1 }, events);
-        if (rolled.damage > 0) moraleCheck(s, t, events);
-        events.splice(at, 0, {
-          type: "attack",
-          report: { uid: unit.uid, target: t.uid, weapon: "Barrage", kind: "barrage", attackers: 1, hitOn: 4, ...rolled, unitDestroyed: t.destroyed },
-        });
-      }
+      // Shells can drift (see scatterShell), and burst on everyone under them.
+      const landed = scatterShell(s, unit, "Barrage", point, 4, events);
+      burstAt(s, unit, "Barrage", landed, { hit: 4, damage: 1, ap: 1 }, events);
       break;
     }
     case "tunnel": {

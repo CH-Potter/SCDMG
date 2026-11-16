@@ -14,6 +14,7 @@
 // Effects are driven by diffing the previous and current GameState, sharpened by `RenderView.events`.
 
 import { Application, CanvasSource, Container, Graphics, Matrix, Sprite, Text, Texture } from "pixi.js";
+import { SHELL_BURST } from "../engine/constants";
 import { factionOf } from "../engine/data/factions";
 import { dist } from "../engine/geometry";
 import { isFlying, profileOf } from "../engine/profile";
@@ -86,6 +87,8 @@ export interface RenderView {
   friendlyMarks: string[];
   zone: Vec[][] | null;
   blast: { center: Vec; radius: number } | null;
+  /** Optional: how far an indirect shell (and its burst) could reach if it drifts: a dashed ring. */
+  drift?: { center: Vec; radius: number };
   /** Optional: red no-go rings (where a support airdrop can't land). */
   noGo?: NoGoRing[];
   /** Optional: the attack being declared or resolved (attacker ring, arrow, target crosshair). See attackMark.ts. */
@@ -950,7 +953,24 @@ export class BoardRenderer {
     summoned: Set<string>,
   ): void {
     let base = 0;
+    // The last indirect shell this batch: its bursts don't lob a second shell.
+    let shell: { uid: string; arrive: number } | null = null;
     for (const e of events) {
+      if (e.type === "scatter") {
+        const a = prevUnits.get(e.uid) ?? this.units.get(e.uid);
+        const am = a ? aliveModels(a)[0] : undefined;
+        if (!a || !am) continue;
+        const from = this.muzzleAt(a, am, e.aim, base, true);
+        let t = base + this.fx.lob(from, e.aim, 0xff8a3d, base);
+        if (e.drift > 0) {
+          this.fx.ring(e.aim, 0.2, 0.9, 0xffffff, t, 0.1); // where it was aimed
+          t += this.fx.bounce(e.aim, e.landed, 0xff8a3d, t);
+        }
+        this.fx.ring(e.landed, 0.4, SHELL_BURST + 0.4, 0xff8a3d, t, 0.2);
+        shell = { uid: e.uid, arrive: t };
+        base = t;
+        continue;
+      }
       if (e.type === "moved") {
         if (e.kind === "charge") charged.add(e.uid);
         if (e.kind === "teleport") teleported.add(e.uid);
@@ -968,7 +988,7 @@ export class BoardRenderer {
         const near = (m: Model) => Math.min(...tm.map((x) => dist(x.pos, m.pos)));
         const shooters = am.slice().sort((x, y) => near(x) - near(y)).slice(0, Math.max(1, r.attackers));
         const start = r.kind === "overwatch" ? base + 120 : base;
-        const arrive = this.shoot(a, shooters, now ?? t, tm, r.kind, start);
+        const arrive = r.kind === "barrage" && shell?.uid === r.uid ? shell.arrive : this.shoot(a, shooters, now ?? t, tm, r.kind, start);
         hitDelay.set(r.target, Math.max(hitDelay.get(r.target) ?? 0, arrive));
         const c = centroid(tm.map((m) => drawPos(t, m)));
         if (!r.damage) this.fx.later(arrive, () => this.fx.impact(c, 0.45, 0xffffff));
@@ -1486,10 +1506,21 @@ export class BoardRenderer {
       g.stroke({ width: 0.09, color: 0xffffff, alpha: 0.9 });
     }
     if (v.noGo) drawNoGo(g, v.noGo);
+    if (v.drift) {
+      // Above the miniatures, so it reads over a crowded spot.
+      const { center: c, radius } = v.drift;
+      g.circle(c.x, c.y, radius).fill({ color: 0xff8a3d, alpha: 0.1 });
+      dashCircle(top, c.x, c.y, radius, Math.max(16, Math.round(radius * 4)), 0.5);
+      top.stroke({ width: 0.16, color: INK, alpha: 0.6 });
+      dashCircle(top, c.x, c.y, radius, Math.max(16, Math.round(radius * 4)), 0.5);
+      top.stroke({ width: 0.09, color: 0xff8a3d, alpha: 0.95 });
+    }
     if (v.blast) {
       const { center: c, radius } = v.blast;
       g.circle(c.x, c.y, radius).fill({ color: 0xff8a3d, alpha: 0.3 }).stroke({ width: 0.14, color: INK });
       g.circle(c.x, c.y, radius).stroke({ width: 0.08, color: 0xff8a3d });
+      top.circle(c.x, c.y, radius).stroke({ width: 0.14, color: INK, alpha: 0.7 });
+      top.circle(c.x, c.y, radius).stroke({ width: 0.08, color: 0xff8a3d });
       g.circle(c.x, c.y, radius * 0.5).stroke({ width: 0.06, color: 0xff8a3d, alpha: 0.8 });
       g.moveTo(c.x - radius - 0.3, c.y).lineTo(c.x - radius * 0.3, c.y).moveTo(c.x + radius * 0.3, c.y).lineTo(c.x + radius + 0.3, c.y);
       g.moveTo(c.x, c.y - radius - 0.3).lineTo(c.x, c.y - radius * 0.3).moveTo(c.x, c.y + radius * 0.3).lineTo(c.x, c.y + radius + 0.3);

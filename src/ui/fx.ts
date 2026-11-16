@@ -182,6 +182,25 @@ export class FxLayer {
     return travel;
   }
 
+  /** A shell that missed its mark bouncing along the ground from `from` to where it settles (two shrinking hops). */
+  bounce(from: Vec, to: Vec, color: number, delay = 0): number {
+    const L = Math.hypot(to.x - from.x, to.y - from.y);
+    if (this.reduced || L < 0.05) return 0;
+    const g = new Graphics();
+    const travel = Math.min(700, 260 + L * 60);
+    this.add(g, delay, travel, (k) => {
+      const x = from.x + (to.x - from.x) * k;
+      const y = from.y + (to.y - from.y) * k;
+      // two hops, the second lower than the first
+      const z = Math.abs(Math.sin(k * Math.PI * 2)) * (k < 0.5 ? 0.9 : 0.45);
+      g.clear();
+      g.moveTo(from.x, from.y).lineTo(x, y).stroke({ width: 0.06, color: INK, alpha: 0.35 });
+      g.ellipse(x, y, 0.3, 0.15).fill({ color: INK, alpha: 0.3 });
+      g.circle(x, y - z, 0.3).fill(color).stroke({ width: 0.08, color: INK });
+    });
+    return travel;
+  }
+
   /** Melee: three quick inked claw swipes across the target. */
   slash(at: Vec, r: number, color: number, delay = 0): void {
     const g = new Graphics();

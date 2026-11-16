@@ -1,6 +1,6 @@
 // Human-readable text for units, weapons and events.
 
-import { BLAST_SQUAD } from "../engine/constants";
+import { BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT } from "../engine/constants";
 import { ABILITIES } from "../engine/data/abilities";
 import { profileOf } from "../engine/profile";
 import { unitById } from "../engine/rules";
@@ -29,6 +29,7 @@ export const TRAIT_TEXT: Record<WeaponTrait, string> = {
   heavy: "heavy (hits worse after moving)",
   rending: "rending (6s get +1 AP)",
   pistol: "pistol (no evade at point-blank)",
+  indirect: `indirect (no sight needed; lands on target on its hit roll, else drifts up to ${SHELL_DRIFT}"; ${SHELL_BURST}" burst hits everyone under it)`,
 };
 
 export const PHASE_NAMES: Record<Phase, string> = {
@@ -126,6 +127,10 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
       return e.kind === "charge" ? `${esc(unitName(s, e.uid))} charges!` : e.kind === "disengage" ? `${esc(unitName(s, e.uid))} disengages.` : null;
     case "hunkered":
       return `${esc(unitName(s, e.uid))} hunkers down.`;
+    case "scatter":
+      return e.drift === 0
+        ? `💣 ${esc(unitName(s, e.uid))}'s ${esc(e.weapon)} lands right on target (rolled ${e.roll}, needed ${e.need}+).`
+        : `💣 ${esc(unitName(s, e.uid))}'s ${esc(e.weapon)} drifts ${e.drift}" off target (rolled ${e.roll}, needed ${e.need}+${e.spotted ? "; spotted, so it drifts half as far" : ""}).`;
     case "ability":
       return `✨ ${esc(e.text)}`;
     case "passed":

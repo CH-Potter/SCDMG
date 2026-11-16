@@ -112,11 +112,11 @@ describe("kill VP follows the supply a squad loses", () => {
 describe("blast weapons", () => {
   it(`get their extra die only against squads of ${BLAST_SQUAD} or more models`, () => {
     const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed: 8 });
-    // Field a Spud Mortar whether or not the starter list has one.
-    const prof = profileFor("mil-mortar", []);
+    // Field a Big Bertha (Thumper Cannon: blast) whether or not the starter list has one.
+    const prof = profileFor("mil-bertha", []);
     s.units.push({
       uid: "test-mortar",
-      profileId: "mil-mortar",
+      profileId: "mil-bertha",
       upgrades: [],
       owner: 0,
       models: [{ id: 0, pos: { x: 0, y: 0 }, elevation: 0, hp: prof.hp, shield: prof.shield, alive: true }],

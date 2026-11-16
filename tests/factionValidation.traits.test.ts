@@ -10,7 +10,7 @@ const has = (problems: string[], text: string) => problems.some((p) => p.include
 describe("weapon traits, nerve and fearless", () => {
   it("knows the new keyword and traits", () => {
     expect(KEYWORDS).toContain("fearless");
-    expect([...TRAITS].sort()).toEqual(["blast", "heavy", "pistol", "rending", "torrent"]);
+    expect([...TRAITS].sort()).toEqual(["blast", "heavy", "indirect", "pistol", "rending", "torrent"]);
   });
 
   it("validates traits and nerve", () => {

@@ -17,7 +17,8 @@ import { airdropSpotProblem, canPlaySupport, deployZones, supportTarget } from "
 import { abilityOf } from "./reactions";
 import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
-import { evadeTarget, expectedDamage, isFearless, nerveOf, planMelee, planShooting, shakeChance, weaponBonus } from "./combat";
+import { evadeTarget, expectedDamage, isFearless, nerveOf, planMelee, planShooting, shakeChance, shellOdds, shellSpotted, weaponBonus } from "./combat";
+import { SHELL_BURST } from "./constants";
 import { applyCommand, planDemoCharge, RALLY_CP } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
@@ -694,16 +695,20 @@ function barrageCandidates(s: GameState, u: Unit, range: number): Candidate[] {
     seen.push(p);
     if (!aliveModels(u).some((m) => dist(m.pos, p) <= range)) continue;
     let v = 0;
+    // The shell may drift (see scatterShell): count the enemy part at its odds of landing near the
+    // mark, but keep the full risk to our own units, so it isn't dropped next to friends.
+    const { onTarget } = shellOdds(4, shellSpotted(s, u, p));
+    const accuracy = onTarget + (1 - onTarget) * 0.2;
     for (const t of onBoard(s)) {
       if (isFlying(t)) continue;
       const r = profileOf(t).baseRadius;
-      const caught = aliveModels(t).filter((m) => dist(m.pos, p) <= 2 + r);
+      const caught = aliveModels(t).filter((m) => dist(m.pos, p) <= SHELL_BURST + r + (t.owner === u.owner ? 3 : 0));
       if (!caught.length) continue;
       const save = profileOf(t).armor + 1 - (t.status.hunkered ? 1 : 0);
       const pFail = save > 6 ? 1 : 1 - pAtLeast(Math.max(2, save));
       const evadeOn = evadeTarget(t, ["ranged", "blast"]);
       const exp = caught.length * 0.5 * pFail * (evadeOn === null ? 1 : 1 - pAtLeast(evadeOn));
-      v += t.owner === u.owner ? -exp * valuePerWound(t) * 2 : attackValue(s, t, exp);
+      v += t.owner === u.owner ? -exp * valuePerWound(t) * 2 : attackValue(s, t, exp * accuracy);
     }
     scored.push({ p, v });
   }

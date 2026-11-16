@@ -452,7 +452,7 @@ const militia: Faction = {
       armor: 4,
       baseRadius: 0.9,
       keywords: ["structure", "mech"],
-      weapons: [ranged("Spud Lobber", 30, 3, 4, { ap: 1, targets: "ground", traits: ["blast"] })],
+      weapons: [ranged("Spud Lobber", 30, 3, 4, { ap: 1, targets: "ground", traits: ["indirect"] })],
       abilities: [],
       upgrades: [{ id: "boom-spuds", name: "Boom Spuds", cost: 2, addAbilities: ["barrage"], text: "Gains Barrage." }],
       structure: { lifetime: "permanent", fieldDeploy: 6 },
@@ -778,7 +778,7 @@ const munch: Faction = {
       keywords: ["beast", "monster", "heavy"],
       nerve: 7,
       weapons: [
-        ranged("Stink Shell", 20, 3, 4, { ap: 1, targets: "ground", traits: ["blast"] }),
+        ranged("Stink Shell", 20, 3, 4, { ap: 1, targets: "ground", traits: ["indirect"] }),
         melee("Belly Bump", 2, 4),
       ],
       abilities: ["sticky-goo", "regen"],

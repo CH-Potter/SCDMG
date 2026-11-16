@@ -2,7 +2,8 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
 
 import { aiCommand } from "../engine/ai";
-import { evadeTarget, expectedDamage, planMelee, planShooting, rangedCanHit, saveNeeded, type AttackPlan } from "../engine/combat";
+import { evadeTarget, expectedDamage, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
+import { SHELL_BURST } from "../engine/constants";
 import { ABILITIES } from "../engine/data/abilities";
 import { factionOf, supportOf } from "../engine/data/factions";
 import { abilityOf } from "../engine/reactions";
@@ -35,7 +36,7 @@ import {
   RALLY_CP,
 } from "../engine/game";
 import { dist, pointInZone } from "../engine/geometry";
-import { profileFor, profileOf } from "../engine/profile";
+import { isFlying, profileFor, profileOf } from "../engine/profile";
 import {
   aliveModels,
   canAffordDeploy,
@@ -325,6 +326,12 @@ export class Controller {
           ],
           verdict: r.unitDestroyed ? "Wiped out!" : r.modelsKilled ? `${r.modelsKilled} down!` : noHarmVerdict(r),
         });
+      } else if (e.type === "scatter") {
+        out.push({
+          title: `${unitName(s, e.uid)} · ${e.weapon} lands…`,
+          groups: [{ label: "On target", rolls: [e.roll], need: e.need, side: side(e.uid), result: e.drift ? `drifts ${e.drift}"` : "on target" }],
+          verdict: e.drift ? `Drifted ${e.drift}"!` : "Bullseye!",
+        });
       } else if (e.type === "rolloff") {
         const last = e.rolls[e.rolls.length - 1]!;
         out.push({
@@ -457,6 +464,30 @@ export class Controller {
    * `firing` is the models that can actually shoot (null: work it out from range and sight).
    * Returns short notes for the status line.
    */
+  /**
+   * Preview a lobbed (indirect) shot: the burst where it's aimed, a dashed ring for how far it could
+   * land if it drifts, a line from the mortar, and the odds, with a warning if your own units are in reach.
+   */
+  private previewShell(view: RenderView, a: Unit, t: Unit, w: Weapon, plan: AttackPlan): Cue {
+    const s = this.state;
+    const aim = shellAim(t);
+    const spotted = shellSpotted(s, a, aim);
+    const { onTarget, maxDrift } = shellOdds(plan.hitOn, spotted);
+    view.blast = { center: aim, radius: SHELL_BURST };
+    view.drift = { center: aim, radius: maxDrift + SHELL_BURST };
+    const from = plan.attackers.reduce((x, y) => (dist(y.model.pos, aim) < dist(x.model.pos, aim) ? y : x)).model;
+    const d = dist(from.pos, aim);
+    view.sightLines.push({ from: drawPos(a, from), to: aim, ok: true, label: `${d.toFixed(1)}" of ${w.range}"` });
+    const reach = maxDrift + SHELL_BURST;
+    const risky = onBoard(s, a.owner).filter((u) => !isFlying(u) && aliveModels(u).some((m) => dist(m.pos, aim) <= reach + profileOf(u).baseRadius));
+    const exp = expectedDamage(s, a, t, plan, false);
+    const shells = plan.attackers.length;
+    return ok(
+      `💣 Lob ${w.name}${shells > 1 ? ` ×${shells}` : ""}: lands on target on ${plan.hitOn}+ (${Math.round(onTarget * 100)}%), else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"} · ${SHELL_BURST}" burst rolls ${plan.hitOn}+ for every model under it, AP${plan.ap} · ≈${exp.toFixed(1)} damage${risky.length ? ` · ⚠ could hit your ${risky.map((u) => profileOf(u).name).join(", ")}` : ""}`,
+      "target",
+    );
+  }
+
   private aimLines(view: RenderView, a: Unit, t: Unit, w: Weapon, firing: Set<Model> | null): string[] {
     const s = this.state;
     const ra = profileOf(a).baseRadius;
@@ -848,7 +879,9 @@ export class Controller {
               ? e.player
               : undefined;
       if (text) this.log(text, owner);
-      if (e.type === "attack") {
+      if (e.type === "scatter") {
+        this.renderer.floatText(e.landed, e.drift ? `Drifted ${e.drift}"` : "On target!", e.drift ? 0xffd2a0 : 0xffffff);
+      } else if (e.type === "attack") {
         const at = centre(e.report.target);
         if (at)
           this.renderer.floatText(
@@ -1404,6 +1437,7 @@ export class Controller {
           return bad(b);
         }
         const w = profileOf(sel).weapons[b.index]!;
+        if (b.plan.indirect) return this.previewShell(view, sel, hit.unit, w, b.plan);
         const terrain = melee ? [] : this.aimLines(view, sel, hit.unit, w, new Set(b.plan.attackers.map((a) => a.model)));
         const dice = b.plan.attackers.reduce((n, a) => n + a.dice, 0);
         const exp = expectedDamage(s, sel, hit.unit, b.plan, melee);
@@ -1483,8 +1517,13 @@ export class Controller {
       if (hit && mode.id !== "barrage") return bad(`${def.name}: pick open ground`);
       const why = commandProblem(s, { type: "ability", uid: sel.uid, ability: mode.id, point: hp, target: this.abilityTarget ?? undefined });
       if (mode.id === "barrage") {
-        view.blast = { center: hp, radius: 2 };
-        return why ? bad(`${def.name}: ${why}`) : ok("Barrage: hits every ground model under the blast, yours too", "target");
+        const spotted = shellSpotted(s, sel, hp);
+        const { maxDrift } = shellOdds(4, spotted);
+        view.blast = { center: hp, radius: SHELL_BURST };
+        view.drift = { center: hp, radius: maxDrift + SHELL_BURST };
+        return why
+          ? bad(`${def.name}: ${why}`)
+          : ok(`Barrage: lands here on a 4+, else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"} · hits every ground model under the blast, yours too`, "target");
       }
       const mr = profileOf(mover).baseRadius;
       const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, hp, { allowance: 0, teleport: true });

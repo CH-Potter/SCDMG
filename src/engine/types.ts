@@ -72,8 +72,10 @@ export type AbilityId =
  * - heavy: hits one worse if the unit has moved this round
  * - rending: natural 6s to hit get +1 AP
  * - pistol: point-blank shots (at a unit you're engaged with) don't allow evade rolls
+ * - indirect: lobbed (mortars): needs no line of sight; the shell may drift off target, then bursts on
+ *   every model under it, friend or foe (SHELL_BURST, SHELL_DRIFT). The weapon's dice don't apply.
  */
-export type WeaponTrait = "blast" | "torrent" | "heavy" | "rending" | "pistol";
+export type WeaponTrait = "blast" | "torrent" | "heavy" | "rending" | "pistol" | "indirect";
 
 export interface WeaponBonus {
   vs: Keyword;
@@ -520,6 +522,8 @@ export type GameEvent =
   | { type: "deployed"; uid: string }
   | { type: "moved"; uid: string; kind: "move" | "disengage" | "advance" | "charge" | "teleport"; /** Disengage only: it didn't outnumber the enemy in supply. */ exhausted?: boolean }
   | { type: "attack"; report: AttackReport }
+  /** An indirect shell (mortar, Barrage) aimed at `aim` landed at `landed`: on target if `roll` >= `need`, else it drifted `drift` inches (halved when a firing model could see the spot). */
+  | { type: "scatter"; uid: string; weapon: string; aim: Vec; landed: Vec; roll: number; need: number; drift: number; spotted: boolean }
   | { type: "hunkered"; uid: string }
   | { type: "held"; uid: string }
   | { type: "ability"; uid: string; ability: AbilityId; text: string }

@@ -23,7 +23,7 @@ const KEYWORD_SET: Record<Keyword, true> = {
   structure: true,
   fearless: true,
 };
-const TRAIT_SET: Record<WeaponTrait, true> = { blast: true, torrent: true, heavy: true, rending: true, pistol: true };
+const TRAIT_SET: Record<WeaponTrait, true> = { blast: true, torrent: true, heavy: true, rending: true, pistol: true, indirect: true };
 export const KEYWORDS = Object.keys(KEYWORD_SET) as readonly Keyword[];
 export const TRAITS = Object.keys(TRAIT_SET) as readonly WeaponTrait[];
 export const LOOKS = ["cap", "teeth", "crystal", "plain"] as const;

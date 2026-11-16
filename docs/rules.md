@@ -139,7 +139,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Active abilities** use the unit's activation in their phase:
   - Patch Up (heal or revive)
   - Hatchlings (Brood Scorpion: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
-  - Barrage (indirect blast; friendly fire happens)
+  - Barrage (an indirect shell at a point; it can drift, see *Indirect fire*; friendly fire happens)
   - Tunnel (pop up anywhere on the ground ≥6" from enemies)
   - Blink (teleport 10", can land on platforms)
   - Recall Beam (teleport a friendly unit next to the Warden; it can still act afterwards)
@@ -205,6 +205,20 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Refraction in the odds:** the expected damage shown in the attack preview, and used by the AI to pick targets, now counts an unused Refraction. Against a 1-damage gun it cancels the first wound, so a Rivet Rifle volley at the Shimmer Saucer was previewed at about 1.9 damage but really did about 1.
 - **Barrages and support-card blasts** now let the target roll its blast evade for each hit, as the evade rules always said. Their target always gets its save, even when the caster has no unit on the table (it used to get none).
 
+**Added in v0.8:**
+- **Indirect fire:** mortars (the Spud Lobber and Stink Shell) and Barrage lob shells that need no line of sight but can drift off target, then burst on everyone under them, friend or foe. See *Indirect fire*.
+
+### Indirect fire
+
+Weapons with the **indirect** trait, and the Barrage ability, lob a shell instead of shooting straight:
+
+- **No line of sight needed.** The target only has to be in range. Indirect weapons can't fire while their unit is in a melee, or as overwatch, and they still can't pick out a unit that's already in a melee.
+- **Aim:** the shell is aimed at the target model nearest the middle of the unit (Barrage: the point you pick).
+- **Does it land on target?** Roll a die against the weapon's hit number (4+ for both mortars and Barrage, after the usual modifiers such as Shaken). On a success it lands where it was aimed.
+- **Drift:** otherwise it drifts a d6" in a random direction, staying on the table. If any model in the firing unit can see the aim point, the drift is halved (rounding up), so a spotter makes it far more accurate.
+- **Burst:** where it lands, every model of every ground unit within 2" (base edge) is rolled for, **yours included**: hit on the weapon's hit number, then the target's blast evade, then a save (no cover against a shell from above; hunkering and digging in still count). Each failed save deals the weapon's damage. The weapon's dice count doesn't apply.
+- Each firing model lobs one shell. Sticky Goo slows every unit the burst hurts.
+
 ## Tabletop staples
 
 - **Impact on charge:** some units (Munch melee critters, Big Bertha's ram) roll impact dice when a charge lands. Each model in base contact rolls the unit's `impact` dice at the charged unit. Hits get normal saves, and the damage happens before the combat phase.
@@ -217,6 +231,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 | heavy | hits one worse if the unit moved this round |
 | rending | natural 6s to hit get +1 AP |
 | pistol | point-blank shots (at a unit you're engaged with) can't be evaded |
+| indirect | lobbed shells (the Spud Lobber and Stink Shell): see *Indirect fire* below |
 
 - **Morale:**
   - When a unit at half strength or less (counting wounds) takes damage, it rolls 2d6 against its **nerve** (default 7; Munch critters 6, Concord 8–9). If the roll is above its nerve, the unit is **Shaken**.

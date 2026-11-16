@@ -1,14 +1,14 @@
 // Attack resolution: per-model range/sight, keyword bonuses, wound allocation, saves, reactions.
 
-import { BLAST_SQUAD } from "./constants";
+import { BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT } from "./constants";
 import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
-import { rollD6 } from "./rng";
+import { nextRandom, rollD6 } from "./rng";
 import { aliveModels, AURA_RANGE, ENGAGE_RANGE, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
 import { consumeReaction } from "./reactions";
-import { hasCover, lineOfSight } from "./terrain";
-import type { AttackReport, EvadeCondition, GameEvent, GameState, Model, Unit, Weapon } from "./types";
+import { hasCover, lineOfSight, platformAt } from "./terrain";
+import type { AttackReport, EvadeCondition, GameEvent, GameState, Model, Unit, Vec, Weapon } from "./types";
 
 export type AttackKind = AttackReport["kind"];
 
@@ -26,6 +26,11 @@ export interface AttackPlan {
   tracking?: number;
   /** Evade target the defender rolls per hit, or null for none. Left undefined, resolveAttack works it out from the attack kind. */
   evadeOn?: number | null;
+  /**
+   * A lobbed shot (indirect weapon): each attacking model fires one shell at the target that may
+   * drift, then bursts on every model under it (scatterShell, burstAt). The dice counts don't apply.
+   */
+  indirect?: boolean;
 }
 
 export const hasTrait = (w: Weapon, t: NonNullable<Weapon["traits"]>[number]): boolean => !!w.traits?.includes(t);
@@ -135,6 +140,9 @@ function wardedAgainst(s: GameState, t: Unit): boolean {
 export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: AttackKind = "shoot"): AttackPlan | string {
   if (w.melee) return "That's a melee weapon";
   if (!rangedCanHit(w, t)) return isFlying(t) ? `${w.name} can't hit flyers` : `${w.name} only hits flyers`;
+  const indirect = hasTrait(w, "indirect");
+  if (indirect && kind !== "shoot") return `${w.name} is lobbed: it can only be fired as a normal shot`;
+  if (indirect && isEngaged(s, a)) return "Too close to lob a shell: this unit is in a melee";
   if (kind !== "barrage") {
     const blocked = engagementBlock(s, a, t, w);
     if (blocked) return blocked;
@@ -150,7 +158,8 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     for (const tm of aliveModels(t)) {
       if (dist(am.pos, tm.pos) - ra - rt > w.range + 1e-6) continue;
       inRange = true;
-      if (!lineOfSight(s, am.pos, am.elevation, tm.pos, tm.elevation)) continue;
+      // Lobbed shells need no line of sight.
+      if (!indirect && !lineOfSight(s, am.pos, am.elevation, tm.pos, tm.elevation)) continue;
       targets.add(tm);
       any = true;
     }
@@ -185,6 +194,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     precision: precisionOf(a, w),
     tracking: trackingOf(a, w),
     evadeOn: conditions ? evadeTarget(t, conditions) : null,
+    ...(indirect ? { indirect: true } : {}),
   };
 }
 
@@ -297,6 +307,7 @@ function nearestAttacker(plan: AttackPlan, tm: Model): Model | undefined {
 
 /** Expected damage (for the AI and the UI preview), capped at the targetable wounds. */
 export function expectedDamage(s: GameState, a: Unit, t: Unit, plan: AttackPlan, melee: boolean): number {
+  if (plan.indirect) return expectedShells(s, a, t, plan);
   const dice = plan.attackers.reduce((sum, x) => sum + x.dice, 0);
   const tm = plan.targets[0]!;
   const st = saveNeeded(s, a, t, tm, plan.ap, melee, nearestAttacker(plan, tm));
@@ -477,4 +488,86 @@ function concedeSupply(s: GameState, t: Unit, events: GameEvent[]): void {
     s.players[enemy].vp += vp;
     events.push({ type: "scored", player: enemy, vp, reason: `${gone ? "destroying" : "cutting down"} ${profileOf(t).name}` });
   }
+}
+
+// ---------- indirect fire (mortars, Barrage) ----------
+
+/** Where an indirect shot at a unit is aimed: the target model nearest the middle of the unit. */
+export function shellAim(t: Unit): Vec {
+  const ms = aliveModels(t);
+  const c = { x: ms.reduce((n, m) => n + m.pos.x, 0) / ms.length, y: ms.reduce((n, m) => n + m.pos.y, 0) / ms.length };
+  return ms.reduce((best, m) => (dist(m.pos, c) < dist(best.pos, c) ? m : best)).pos;
+}
+
+/** Can any of the firing unit's models see the spot? Then a miss drifts only half as far. */
+export function shellSpotted(s: GameState, a: Unit, aim: Vec): boolean {
+  const elev = platformAt(s, aim) ? 1 : 0;
+  return aliveModels(a).some((m) => lineOfSight(s, m.pos, m.elevation, aim, elev));
+}
+
+/** The odds for one shell: the chance it lands on target, and the furthest it can drift if it doesn't. */
+export function shellOdds(need: number, spotted: boolean): { onTarget: number; maxDrift: number } {
+  return { onTarget: Math.max(0, Math.min(1, (7 - need) / 6)), maxDrift: spotted ? Math.ceil(SHELL_DRIFT / 2) : SHELL_DRIFT };
+}
+
+/**
+ * Lob one shell at `aim`: on a d6 of `need`+ it lands there; otherwise it drifts d6" (halved, rounding
+ * up, when a firing model can see the spot) in a random direction, staying on the table.
+ */
+export function scatterShell(s: GameState, a: Unit, weapon: string, aim: Vec, need: number, events: GameEvent[]): Vec {
+  const spotted = shellSpotted(s, a, aim);
+  const roll = rollD6(s);
+  let landed = aim;
+  let drift = 0;
+  if (roll < need) {
+    const d = rollD6(s);
+    drift = spotted ? Math.ceil(d / 2) : d;
+    const [v, next] = nextRandom(s.rng);
+    s.rng = next;
+    const angle = v * Math.PI * 2;
+    landed = {
+      x: Math.max(0, Math.min(s.board.width, aim.x + Math.cos(angle) * drift)),
+      y: Math.max(0, Math.min(s.board.height, aim.y + Math.sin(angle) * drift)),
+    };
+  }
+  events.push({ type: "scatter", uid: a.uid, weapon, aim, landed, roll, need, drift, spotted });
+  return landed;
+}
+
+/** A shell bursting at `p`: every model of every ground unit under it is rolled for, friend or foe. */
+export function burstAt(s: GameState, a: Unit, weapon: string, p: Vec, e: { hit: number; damage: number; ap: number }, events: GameEvent[]): void {
+  for (const t of onBoard(s)) {
+    if (isFlying(t)) continue;
+    const r = profileOf(t).baseRadius;
+    const caught = aliveModels(t).filter((m) => dist(m.pos, p) <= SHELL_BURST + r);
+    if (!caught.length) continue;
+    const at = events.length; // the attack is logged ahead of the damage and morale it causes
+    const rolled = blastOn(s, t, caught, e, events);
+    if (rolled.damage > 0) moraleCheck(s, t, events);
+    // Sticky Goo slows whoever the burst hurt, friend or foe.
+    if (rolled.damage > 0 && hasAbility(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
+    events.splice(at, 0, {
+      type: "attack",
+      report: { uid: a.uid, target: t.uid, weapon, kind: "barrage", attackers: 1, hitOn: e.hit, ...rolled, unitDestroyed: t.destroyed },
+    });
+  }
+}
+
+/** Expected damage to `t` from an indirect plan (previews and the AI): a burst on target, discounted for drift. */
+function expectedShells(s: GameState, a: Unit, t: Unit, plan: AttackPlan): number {
+  const aim = shellAim(t);
+  const spotted = shellSpotted(s, a, aim);
+  const { onTarget } = shellOdds(plan.hitOn, spotted);
+  const r = radiusOf(t);
+  const evadeOn = evadeTarget(t, defaultConditions("barrage"));
+  let burst = 0;
+  for (const m of aliveModels(t)) {
+    if (dist(m.pos, aim) > SHELL_BURST + r) continue;
+    const save = saveNeeded(s, t, t, m, plan.ap, false);
+    const through = pAtLeast(plan.hitOn) * (evadeOn === null ? 1 : 1 - pAtLeast(evadeOn)) * (save === null ? 1 : 1 - pAtLeast(save));
+    burst += through * Math.min(plan.damage, m.hp + m.shield);
+  }
+  // A shell that drifts still catches the edge of the unit now and then.
+  const drifted = spotted ? 0.35 : 0.15;
+  return plan.attackers.length * burst * (onTarget + (1 - onTarget) * drifted);
 }
