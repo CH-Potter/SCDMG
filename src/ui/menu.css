@@ -380,6 +380,13 @@ button.danger {
   margin-top: 3px;
 }
 
+/* Long ability names wrap instead of pushing the narrow sidebar sideways. */
+button.mini.support-btn {
+  flex-shrink: 1;
+  max-width: 100%;
+  white-space: normal;
+}
+
 .support-btn small {
   color: var(--muted);
   font-weight: 600;

@@ -299,6 +299,14 @@ button.mb-danger {
   border-width: 2px;
   box-shadow: 2px 2px 0 var(--ink);
 }
+/* Fingertip-sized zoom buttons on touch screens. */
+@media (pointer: coarse) {
+  .mb-zoom button {
+    min-width: 40px;
+    min-height: 40px;
+    text-align: center;
+  }
+}
 .mb-toast {
   position: absolute;
   left: 50%;

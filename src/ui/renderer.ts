@@ -31,6 +31,7 @@ import { DropShipFx, drawNoGo, type NoGoRing } from "./fx/dropship";
 
 export { INK, PLAYER_COLORS } from "./boardArt";
 import { drawAttackMark, drawExhausted, type AttackMarkView } from "./attackMark";
+import { TAP_SLOP_PX } from "./touch";
 export type { BannerTone } from "./fx";
 
 const MARGIN = 1.2;
@@ -257,7 +258,8 @@ export class BoardRenderer {
   autoPhaseBanners = true;
 
   onPointerMove: (p: Vec) => void = () => {};
-  onPointerDown: (p: Vec) => void = () => {};
+  /** A click or tap on the board (`touch`: it came from a finger, which can't hover first). */
+  onPointerDown: (p: Vec, touch: boolean) => void = () => {};
   onPointerLeave: () => void = () => {};
   /** Called whenever the camera pans or zooms (to reposition DOM popups placed with `toScreen`). */
   onViewChange?: () => void;
@@ -341,7 +343,7 @@ export class BoardRenderer {
       return { x: e.clientX - r.left, y: e.clientY - r.top };
     };
     const pointers = new Map<number, { x: number; y: number }>();
-    let drag: { id: number; sx: number; sy: number; camX: number; camY: number; panning: boolean; click: boolean } | null = null;
+    let drag: { id: number; sx: number; sy: number; camX: number; camY: number; panning: boolean; click: boolean; touch: boolean } | null = null;
     let pinch: { d: number; ppi: number } | null = null;
     canvas.addEventListener("pointerdown", (e) => {
       const p = local(e);
@@ -360,7 +362,8 @@ export class BoardRenderer {
       const pan = e.button === 1 || (e.button === 0 && this.spaceDown);
       if (e.button === 0 || e.button === 1) {
         if (e.button === 1) e.preventDefault();
-        drag = { id: e.pointerId, sx: p.x, sy: p.y, camX: this.camT.x, camY: this.camT.y, panning: pan, click: e.button === 0 && !pan };
+        const touch = e.pointerType === "touch";
+        drag = { id: e.pointerId, sx: p.x, sy: p.y, camX: this.camT.x, camY: this.camT.y, panning: pan, click: e.button === 0 && !pan, touch };
       }
     });
     canvas.addEventListener("pointermove", (e) => {
@@ -375,7 +378,8 @@ export class BoardRenderer {
       if (drag && drag.id === e.pointerId) {
         const dx = p.x - drag.sx;
         const dy = p.y - drag.sy;
-        if (!drag.panning && Math.hypot(dx, dy) > 6) {
+        // Fingers wobble more than mice: they get a bigger allowance before a tap turns into a pan.
+        if (!drag.panning && Math.hypot(dx, dy) > TAP_SLOP_PX[drag.touch ? "touch" : "mouse"]) {
           drag.panning = true;
           drag.click = false;
         }
@@ -390,6 +394,8 @@ export class BoardRenderer {
         }
       }
       if (p.x < 0 || p.y < 0 || p.x > this.app.screen.width || p.y > this.app.screen.height) return;
+      // A finger dragging is panning, not hovering: the hover stays on the last tap (see touch.ts).
+      if (e.pointerType === "touch") return;
       const b = this.toBoardAt(p.x, p.y);
       this.pointer = b;
       this.onPointerMove(b);
@@ -399,21 +405,29 @@ export class BoardRenderer {
       if (pointers.size < 2) pinch = null;
       if (drag && drag.id === e.pointerId) {
         const click = drag.click && !cancelled;
+        const touch = drag.touch;
         drag = null;
         if (click) {
           const p = local(e);
-          this.onPointerDown(this.toBoardAt(p.x, p.y));
+          const b = this.toBoardAt(p.x, p.y);
+          // A finger never hovered here: point the hover highlight at the tap.
+          if (touch) this.pointer = b;
+          this.onPointerDown(b, touch);
         }
       }
     };
     canvas.addEventListener("pointerup", (e) => end(e, false));
     canvas.addEventListener("pointercancel", (e) => end(e, true));
-    canvas.addEventListener("pointerleave", () => {
-      if (drag) return;
+    canvas.addEventListener("pointerleave", (e) => {
+      // A lifted finger "leaves" too: keep what the tap pointed at (its preview and unit card) on screen.
+      if (drag || e.pointerType === "touch") return;
       this.pointer = null;
       this.onPointerLeave();
       this.updateHover(false);
     });
+    // Taps are handled on pointerup above. Cancel the browser's own click that follows a touch, or it
+    // lands on whatever the tap just opened under the finger (the deploy menu's first unit, say).
+    canvas.addEventListener("touchend", (e) => e.cancelable && e.preventDefault(), { passive: false });
     canvas.addEventListener("auxclick", (e) => e.button === 1 && e.preventDefault());
     canvas.addEventListener(
       "wheel",
@@ -505,6 +519,11 @@ export class BoardRenderer {
     this.bakeTimer = window.setTimeout(() => {
       if (this.lastState) this.bakeBoard(this.lastState);
     }, 260);
+  }
+
+  /** Screen pixels per board inch at the current zoom. */
+  pixelsPerInch(): number {
+    return this.cam.ppi;
   }
 
   toScreen(p: Vec): Vec {

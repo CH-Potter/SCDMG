@@ -58,6 +58,7 @@ import { DICE_SPEED_LABEL, DiceTray, type DiceRoll, type DiceSpeed } from "./dic
 import { BoardRenderer, drawPos, type RenderView } from "./renderer";
 import { audio } from "../audio"; // [audio]
 import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserveRowsHtml, reservesHeading } from "./recruit";
+import { CONFIRM_SLOP_PX, pxToInches, sameOrder } from "./touch";
 
 const HUMAN = 0;
 const AI = 1;
@@ -121,6 +122,14 @@ export class Controller {
   private abilityTarget: string | null = null;
   private mode: Mode = { kind: "none" };
   private hover: Vec | null = null;
+  /** Touch play (see touch.ts): the hover came from a tap, where the last tap landed, and the order it previewed. */
+  private touchHover = false;
+  private lastTap: Vec | null = null;
+  private pendingTap: Command | null = null;
+  /** Set while a board tap is being handled, so `issue` holds the order for a confirming second tap. */
+  private touchTap = false;
+  /** When the floating Pass button last appeared (a tap meant for the board mustn't land on it). */
+  private passShownAt = 0;
   private aiRunning = false;
   /** States before each of your commands, for Undo. */
   private history: GameState[] = [];
@@ -202,17 +211,22 @@ export class Controller {
     this.passBtn.type = "button";
     this.passBtn.className = "float-pass";
     this.passBtn.hidden = true;
-    this.passBtn.addEventListener("click", () => this.issue({ type: "pass", player: HUMAN }));
+    this.passBtn.addEventListener("click", () => {
+      // It pops up when your turn starts, often right where a finger was about to tap the board.
+      if (performance.now() - this.passShownAt < 500) return;
+      this.issue({ type: "pass", player: HUMAN });
+    });
     els.stage.appendChild(this.passBtn);
     renderer.onPointerMove = (p) => {
       this.hover = p;
+      this.touchHover = false;
       this.refresh();
     };
     renderer.onPointerLeave = () => {
       this.hover = null;
       this.refresh();
     };
-    renderer.onPointerDown = (p) => this.click(p);
+    renderer.onPointerDown = (p, touch) => this.click(p, touch);
     window.onkeydown = (e) => this.key(e);
     const mission = MISSIONS[this.state.missionId]!;
     if (hooks.campaign) this.log(`⚔ <b>Campaign: ${esc(hooks.campaign.title)}.</b>`);
@@ -423,6 +437,7 @@ export class Controller {
   }
 
   private clearSelection(): void {
+    this.pendingTap = null;
     this.selected = null;
     this.leader = null;
     this.deployUid = null;
@@ -461,7 +476,36 @@ export class Controller {
 
   // ---------- input ----------
 
-  private click(raw: Vec): void {
+  /** Board inches a confirming second tap may be off by (a fingertip on screen at the current zoom). */
+  private tapSlop(): number {
+    return pxToInches(CONFIRM_SLOP_PX, this.renderer.pixelsPerInch());
+  }
+
+  /**
+   * A click, or a tap (`touch`). A finger can't hover, so a tap first points the hover (preview, tip,
+   * unit card) at where it landed; an order it would give waits for a second tap there (see `issue`).
+   */
+  private click(raw: Vec, touch = false): void {
+    if (!touch) return this.clickAt(raw);
+    const again = !!this.lastTap && dist(this.lastTap, raw) <= this.tapSlop();
+    this.lastTap = raw;
+    this.hover = raw;
+    this.touchHover = true;
+    // Measuring by finger: taps move the far end; tapping the far end again measures on from there.
+    if (this.mode.kind === "measure" && this.mode.from && !again) return this.refresh();
+    const held = this.pendingTap;
+    this.touchTap = true;
+    try {
+      this.clickAt(raw);
+    } finally {
+      this.touchTap = false;
+    }
+    // Only the very next tap can confirm a preview: a tap elsewhere in between drops it.
+    if (this.pendingTap === held) this.pendingTap = null;
+    this.refresh();
+  }
+
+  private clickAt(raw: Vec): void {
     if (this.mode.kind === "measure") {
       const hit = this.modelAt(raw);
       this.mode = hit
@@ -649,6 +693,19 @@ export class Controller {
   // ---------- commands ----------
 
   private issue(cmd: Command): boolean {
+    // A board tap: the first one only previews a legal order; a second tap on the same spot or unit
+    // carries out what was previewed.
+    if (this.touchTap && !commandProblem(this.state, cmd)) {
+      const pending = this.pendingTap;
+      if (!pending || !sameOrder(pending, cmd, this.tapSlop())) {
+        this.pendingTap = cmd;
+        return false;
+      }
+      cmd = pending;
+      this.hover = null;
+      this.lastTap = null;
+    }
+    this.pendingTap = null;
     const why = commandProblem(this.state, cmd);
     if (why) {
       this.reject(why);
@@ -950,15 +1007,22 @@ export class Controller {
     this.renderAttackLabel();
     this.renderTopbar();
     this.renderCallout(sel);
-    this.passBtn.hidden = !this.humanTurn();
+    // Not while "who goes first?" is up: that choice comes first.
+    const showPass = this.humanTurn() && !s.orderChoice;
+    if (showPass && this.passBtn.hidden) this.passShownAt = performance.now();
+    this.passBtn.hidden = !showPass;
     const canClaim =
       (s.phase === "movement" || s.phase === "combat") &&
       (s.initiativeClaim ?? null) === null &&
       !s.players[AI].passed &&
       eligibleUnits(s, HUMAN).length + (s.phase === "movement" ? reserves(s, HUMAN).length : 0) > 0;
-    this.passBtn.textContent = canClaim
-      ? `⏭ Pass early: lead the ${s.phase === "movement" ? "Assault phase" : "next round"} [P]`
-      : `⏭ Pass ${PHASE_NAMES[s.phase].toLowerCase()} phase [P]`;
+    // Small screens drop the long tail (.pass-more) and touch screens the key hint (see hud.css).
+    setHTML(
+      this.passBtn,
+      canClaim
+        ? `⏭ Pass early<span class="pass-more">: lead the ${s.phase === "movement" ? "Assault phase" : "next round"}</span><span class="key-hint"> [P]</span>`
+        : `⏭ Pass<span class="pass-more"> ${PHASE_NAMES[s.phase].toLowerCase()} phase</span><span class="key-hint"> [P]</span>`,
+    );
     this.passBtn.title = canClaim
       ? "Stop acting this phase. Passing first claims the initiative: you go first in the next phase."
       : "Stop acting this phase.";
@@ -1190,8 +1254,10 @@ export class Controller {
           this.issue({ type: "support", player: HUMAN as 0, support, ability });
           return;
         }
+        // Pressing the armed card again puts it away (no Esc key on a touch screen).
+        const on = this.mode.kind === "support" && this.mode.support === support && this.mode.ability === ability;
         this.clearSelection();
-        this.mode = { kind: "support", support, ability };
+        if (!on) this.mode = { kind: "support", support, ability };
         this.refresh();
       }),
     );
@@ -1364,10 +1430,15 @@ export class Controller {
     this.tooltip.style.display = "block";
     this.tooltip.className = `tooltip cue-${cue.tone}`;
     const glyph = toneGlyph(cue.tone);
-    this.tooltip.innerHTML = `${glyph ? `<b class="cue-glyph" aria-hidden="true">${glyph}</b>` : ""}<span>${esc(cue.text)}</span>`;
+    // A tapped order waiting for its second tap says so.
+    const confirm = this.touchHover && this.pendingTap && cue.tone === "ok" ? `<b class="cue-confirm">Tap again to confirm</b>` : "";
+    this.tooltip.innerHTML = `${glyph ? `<b class="cue-glyph" aria-hidden="true">${glyph}</b>` : ""}<span>${esc(cue.text)}${confirm}</span>`;
     const maxX = this.els.stage.clientWidth - 270;
     this.tooltip.style.left = `${Math.max(4, Math.min(maxX, sp.x + 20))}px`;
-    this.tooltip.style.top = `${sp.y + 20}px`;
+    // Kept on the board: below the spot, or above it near the bottom edge.
+    const h = this.tooltip.offsetHeight;
+    const below = sp.y + 20;
+    this.tooltip.style.top = `${below + h > this.els.stage.clientHeight - 4 ? Math.max(4, sp.y - h - 16) : below}px`;
   }
 
   // ---------- attack markers ----------
@@ -1527,7 +1598,7 @@ export class Controller {
     if (!u) {
       setHTML(
         el,
-        `<h3>No unit selected</h3><p class="hint">Click one of your units to activate it, or deploy from reserves. Hover anything to inspect it.</p>`,
+        `<h3>No unit selected</h3><p class="hint">Click one of your units to activate it, or deploy from reserves. Hover (or tap) anything to inspect it.</p>`,
       );
       return;
     }
@@ -1583,13 +1654,15 @@ export class Controller {
       const n = eligibleUnits(s, HUMAN).length;
       const hint =
         this.mode.kind === "deploy"
-          ? "Move over your shaded zone: a green ✓ shows where the unit fits, a red ✕ says why not. Click to place it."
+          ? "Move over (or tap) your shaded zone: a green ✓ shows where the unit fits, a red ✕ says why not. Click (or tap again) to place it."
           : n
             ? `${n} unit${n > 1 ? "s" : ""} can still act this phase. Click one to activate it.`
             : s.phase === "movement" && reserves(s, HUMAN).some((u) => !canAffordDeploy(s, u))
               ? "Deploy from your reserves, or pass."
               : "Nothing left to activate. Pass to move on.";
-      if (setHTML(el, `<p class="hint" style="margin:0">${hint}</p>`)) this.bindActions(el, undefined);
+      // Picking a spot for a reserve or a support card: a way out without a keyboard.
+      const cancel = this.mode.kind === "deploy" || this.mode.kind === "support" ? `<button data-act="cancel" class="secondary">Cancel<span class="key-hint"> [Esc]</span></button>` : "";
+      if (setHTML(el, `<p class="hint" style="margin:0">${hint}</p>${cancel}`)) this.bindActions(el, undefined);
       return;
     }
     const p = profileOf(sel);
@@ -1636,7 +1709,7 @@ export class Controller {
       const dis = why({ kind: "disengage" });
       out.push(btn("disengage", `🏃 Disengage (up to ${mv}")${dis ? "" : `<small class="odds">${esc(disengageText(s, sel))}</small>`}`, m.kind === "disengage", "", dis));
       out.push(...abilityButtons());
-      out.push(btn("hunker", "🧱 Hunker down (+1 save vs shots) [H]", false, "", why({ kind: "hunker" })));
+      out.push(btn("hunker", `🧱 Hunker down (+1 save vs shots)<span class="key-hint"> [H]</span>`, false, "", why({ kind: "hunker" })));
       out.push(btn("hold", "✋ Hold position", false, "", why({ kind: "hold" })));
     } else if (s.phase === "assault") {
       p.weapons.forEach((w, i) => {
@@ -1646,7 +1719,7 @@ export class Controller {
       if (p.weapons.some((w) => w.melee)) out.push(btn("charge", `💥 Charge (up to ${mv}")`, m.kind === "charge", "", why({ kind: "charge" })));
       out.push(btn("advance", `🏃 Advance (up to ${mv}")`, m.kind === "advance", "", why({ kind: "advance" })));
       out.push(...abilityButtons());
-      out.push(btn("hunker", "🧱 Hunker down [H]", false, "", why({ kind: "hunker" })));
+      out.push(btn("hunker", `🧱 Hunker down<span class="key-hint"> [H]</span>`, false, "", why({ kind: "hunker" })));
       out.push(btn("hold", "✋ Hold", false, "", why({ kind: "hold" })));
     } else if (s.phase === "combat") {
       p.weapons.forEach((w, i) => {
@@ -1655,7 +1728,7 @@ export class Controller {
       out.push(`<p class="hint" style="margin:0">Click an engaged enemy to fight it.</p>`);
       out.push(btn("hold", "✋ Don't fight", false, "", why({ kind: "hold" })));
     }
-    out.push(`<button data-act="cancel" class="secondary">Cancel [Esc]</button>`);
+    out.push(`<button data-act="cancel" class="secondary">Cancel<span class="key-hint"> [Esc]</span></button>`);
     if (setHTML(el, out.join("") + `<!--${sel.uid}-->`)) this.bindActions(el, sel);
   }
 
@@ -1714,7 +1787,9 @@ export class Controller {
   private renderCallout(sel: Unit | undefined): void {
     const s = this.state;
     let el = this.els.stage.querySelector<HTMLDivElement>(".unit-callout");
-    if (!sel || !this.humanTurn() || !sel.onBoard) {
+    // Placing a reserve or a support card: the bar just names it, with a way out (no Esc on a touch screen).
+    const picking = !sel && this.humanTurn() ? this.pickingLabel() : null;
+    if (!picking && (!sel || !this.humanTurn() || !sel.onBoard)) {
       el?.remove();
       return;
     }
@@ -1722,6 +1797,23 @@ export class Controller {
       el = document.createElement("div");
       el.className = "unit-callout";
       this.els.stage.appendChild(el);
+    }
+    const cancelBtn = `<button data-co="cancel" class="secondary co-cancel" title="Cancel (Esc)" aria-label="Cancel">✕</button>`;
+    if (picking || !sel) {
+      const html = `<div class="co-head"><b>${esc(picking ?? "")}</b></div><div class="co-chips">${cancelBtn}</div>`;
+      const holder = el as HTMLDivElement & { __html?: string };
+      if (holder.__html !== html) {
+        holder.__html = html;
+        el.innerHTML = html;
+        el.querySelector("button[data-co]")?.addEventListener("click", () => {
+          this.clearSelection();
+          this.refresh();
+        });
+      }
+      // Up top, out of the way of your deployment zone (usually along the bottom).
+      el.classList.add("dock-top");
+      requestAnimationFrame(() => el?.classList.add("in"));
+      return;
     }
     const p = profileOf(sel);
     const chips: string[] = [];
@@ -1743,6 +1835,7 @@ export class Controller {
     }
     if (s.phase !== "combat") chips.push(`<button data-co="hunker" class="secondary" ${buttonAttrs(actionProblem(s, sel.uid, { kind: "hunker" }))}>🧱 Hunker</button>`);
     chips.push(`<button data-co="hold" class="secondary" ${buttonAttrs(actionProblem(s, sel.uid, { kind: "hold" }))}>✋ ${s.phase === "combat" ? "Don't fight" : "Hold"}</button>`);
+    chips.push(cancelBtn);
     const hint =
       s.phase === "movement"
         ? engaged
@@ -1759,6 +1852,10 @@ export class Controller {
       el.querySelectorAll<HTMLButtonElement>("button[data-co]").forEach((b) =>
         b.addEventListener("click", () => {
           const what = b.dataset.co;
+          if (what === "cancel") {
+            this.clearSelection();
+            return this.refresh();
+          }
           if (what === "rally") return void this.issue({ type: "rally", player: HUMAN as 0, target: sel.uid });
           if (what === "hunker") return void this.issue({ type: "hunker", uid: sel.uid });
           if (what === "hold") return void this.issue({ type: "hold", uid: sel.uid });
@@ -1780,6 +1877,17 @@ export class Controller {
       el.classList.toggle("dock-top", sp.y > this.els.stage.clientHeight * 0.55);
     }
     requestAnimationFrame(() => el?.classList.add("in"));
+  }
+
+  /** What you're placing when no unit is selected: a reserve unit or a support card (null otherwise). */
+  private pickingLabel(): string | null {
+    const m = this.mode;
+    if (m.kind === "deploy" && this.deployUid) {
+      const u = unitById(this.state, this.deployUid);
+      return u ? `Deploy ${profileOf(u).name}` : null;
+    }
+    if (m.kind === "support") return abilityOf(m.support, m.ability)?.name ?? null;
+    return null;
   }
 
   /** "Go first or second?" prompt when the order is the human's choice. */
@@ -2061,6 +2169,7 @@ export function showRules(): void {
       </ul>
       <p class="hint">Keys: Esc cancels, H hunkers, P passes the rest of the phase, M measures, Ctrl+Z undoes. Hover enemies with a unit selected to see the odds.</p>
       <p class="hint">The pointer tells you what a click will do: a green ✓, crosshair or + means it works, a red no-entry sign means it won't, and the tip next to it says why. Greyed-out buttons say why they're off. Before any attack's dice, the board marks the attacker, the target and the weapon.</p>
+      <p class="hint">On a touch screen: tap a unit to select or inspect it. A tap that gives an order (move, shoot, charge, deploy...) first shows the preview and its tip; tap the same spot again to confirm. Drag to pan, pinch to zoom, and use ✕ on the unit bar to cancel.</p>
       <button id="rules-close">Got it</button>
     </div>`;
   overlay.classList.add("show");

@@ -149,6 +149,19 @@
   display: none;
 }
 
+/* Phones: a short "Pass" in the bottom-left corner, level with the log tab, in the strip below the
+   board, instead of over the right-hand end of your deployment zone where it catches stray taps. */
+@media (max-width: 720px) {
+  .float-pass {
+    bottom: 12px;
+    right: auto;
+    left: 12px;
+  }
+  .float-pass .pass-more {
+    display: none;
+  }
+}
+
 /* ---------- click-to-deploy menu ---------- */
 .deploy-menu {
   position: absolute;
@@ -254,6 +267,8 @@
 
 @media (max-width: 900px) {
   .unit-callout {
+    /* sized by its content, not squeezed into the half of the board right of `left: 50%` */
+    width: max-content;
     max-width: calc(100% - 24px);
     bottom: 56px;
   }
@@ -333,6 +348,16 @@
   border-color: var(--bad);
   background: var(--hatch), var(--panel);
   box-shadow: 3px 3px 0 var(--ink), inset 4px 0 0 var(--bad);
+}
+
+/* "Tap again to confirm" under a tapped order's tip (touch screens, see touch.ts). */
+.tooltip .cue-confirm {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--good);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .tooltip .cue-glyph {
