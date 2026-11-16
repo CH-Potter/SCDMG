@@ -50,4 +50,4 @@ VITEST_SIM=1 SIM_MODE=assault SIM_SEEDS=3 npx vitest run sim/ai-sim.test.ts --si
 3. Check that `npm run typecheck` and `npm test` pass, and run `npm run format`.
 4. Open a pull request describing what changed and why. Screenshots help for UI changes.
 
-By contributing, you agree that your contribution is licensed under the project's [MIT licence](LICENSE).
+By contributing, you agree that your contribution is licensed under the project's licence, the [GNU General Public License v3.0 or later](LICENSE), and that you keep the existing copyright and credit notices.

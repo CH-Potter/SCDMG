@@ -23,7 +23,7 @@
     "url": "https://github.com/CH-Potter/SCDMG/issues"
   },
   "author": "Craig Potter (https://github.com/CH-Potter)",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -59,7 +59,7 @@
     "appId": "com.scdmg.desktop",
     "productName": "Super Cool Desktop Miniatures Game",
     "executableName": "SCDMG",
-    "copyright": "Copyright (c) SCDMG contributors. MIT licence.",
+    "copyright": "Copyright (c) 2026 Craig Potter and SCDMG contributors. GNU GPL v3 or later.",
     "directories": {
       "output": "release",
       "buildResources": "build"

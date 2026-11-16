@@ -408,3 +408,11 @@ button.mini.support-btn {
 .faction-chip .emblem {
   margin-right: 2px;
 }
+
+/* The licence notice (GPL "Appropriate Legal Notices"): small, but always there. */
+.modal.menu .legal {
+  margin: 14px 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.35;
+}

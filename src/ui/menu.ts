@@ -187,6 +187,8 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
           ${[0, 1].map((p) => armyPicker(p as 0 | 1, mode)).join("")}
         </div>
 
+        <p class="legal">SCDMG © 2026 Craig Potter and SCDMG contributors. Free software under the GNU General Public License v3 or later, with ABSOLUTELY NO WARRANTY. You may share and change it under that licence, keeping these credits: see LICENSE, and the source, at github.com/CH-Potter/SCDMG.</p>
+
         <div class="row start-row">
           <button id="m-start" class="big" ${mapOk ? "" : "disabled"}>To battle!</button>
           <span class="hint">${esc(mission.name)}${mission.roles ? ` (as ${esc(mission.roles[side].name)})` : ""} · ${esc(map?.name ?? "no battlefield")} · ${esc(MODES[mode].name)}${prefs.army === "open" ? " · open roster" : ""}</span>
