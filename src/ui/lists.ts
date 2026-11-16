@@ -83,15 +83,15 @@ export function listProblems(l: Partial<SavedList>, strict = true, budget?: { li
   const errs: string[] = [];
   if (!l || typeof l !== "object") return ["Not a list"];
   if (strict && !l.name?.trim()) errs.push("Give the list a name");
-  if (!l.faction || !FACTIONS[l.faction]) errs.push("Unknown faction");
-  const mode = l.mode && MODES[l.mode];
+  if (!l.faction || !Object.hasOwn(FACTIONS, l.faction)) errs.push("Unknown faction");
+  const mode = l.mode && Object.hasOwn(MODES, l.mode) ? MODES[l.mode] : undefined;
   if (!mode) errs.push("Unknown game mode");
   if (!Array.isArray(l.entries)) return [...errs, "Missing units"];
   if (errs.length) return errs;
   if (!l.entries.length) errs.push("Add at least one unit");
   const counts = new Map<string, number>();
   for (const e of l.entries) {
-    const p = PROFILES[e?.profileId];
+    const p = typeof e?.profileId === "string" && Object.hasOwn(PROFILES, e.profileId) ? PROFILES[e.profileId] : undefined;
     if (!p) {
       errs.push(`Unknown unit ${e?.profileId}`);
       continue;
@@ -104,7 +104,7 @@ export function listProblems(l: Partial<SavedList>, strict = true, budget?: { li
   }
   const sups = Array.isArray(l.supports) ? l.supports : [];
   for (const id of sups) {
-    const sp = SUPPORTS[id];
+    const sp = typeof id === "string" && Object.hasOwn(SUPPORTS, id) ? SUPPORTS[id] : undefined;
     if (!sp) errs.push(`Unknown support ${id}`);
     else if (sp.faction !== l.faction) errs.push(`${sp.name} isn't a ${factionOf(l.faction!).name} support`);
   }

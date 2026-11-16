@@ -1401,6 +1401,9 @@ export class Controller {
       if (typeof plan === "string") {
         view.ghosts = [{ pos: hp, radius: r }];
         view.ghostOk = false;
+        // Still show the way it would have to go (in red), so a detour or slow ground explains "Too far".
+        const route = planRoute(s, sel, leader.pos, leader.elevation, hp);
+        if (typeof route !== "string") view.path = [route.legs[0]!.from, ...route.legs.map((l) => l.to)];
         return bad(why ?? plan);
       }
       view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r, cover: why ? undefined : coverRating(s, sel, p.pos, p.elevation) }));

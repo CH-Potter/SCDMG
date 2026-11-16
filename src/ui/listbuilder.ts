@@ -91,7 +91,7 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
             camp
               ? ""
               : `<label>Faction <select id="lb-faction">${Object.values(FACTIONS)
-                  .map((x) => `<option value="${x.id}" ${x.id === list.faction ? "selected" : ""}>${esc(x.name)}</option>`)
+                  .map((x) => `<option value="${esc(x.id)}" ${x.id === list.faction ? "selected" : ""}>${esc(x.name)}</option>`)
                   .join("")}</select></label>
           <label>Mode <select id="lb-mode">${Object.values(MODES)
             .map((x) => `<option value="${x.id}" ${x.id === list.mode ? "selected" : ""}>${esc(x.name)}</option>`)
@@ -152,7 +152,7 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
         <div class="lb-unit-head">
           <b>${esc(p.name)}</b>
           <span class="hint">⚙${p.cost} · ◆${p.supply} · ${p.models} model${p.models > 1 ? "s" : ""} · ${p.move}" · ${p.hp}HP${p.shield ? `+${p.shield}🛡` : ""} · ${p.armor}+</span>
-          <button class="mini" data-add="${p.id}" ${copies >= m.maxCopies ? "disabled" : ""}>Add${copies ? ` (${copies})` : ""}</button>
+          <button class="mini" data-add="${esc(p.id)}" ${copies >= m.maxCopies ? "disabled" : ""}>Add${copies ? ` (${copies})` : ""}</button>
         </div>
         <div class="tags">${p.keywords.map((k) => `<span class="tag kw" title="${esc(KEYWORD_TEXT[k])}">${k}</span>`).join("")}</div>
         ${p.weapons.map((w) => `<div class="weapon">⚔ ${esc(weaponLine(w))}</div>`).join("")}
@@ -194,7 +194,7 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
           p.upgrades.length
             ? `<div class="lb-ups">${p.upgrades
                 .map(
-                  (u) => `<label class="lb-up" title="${esc(u.text)}"><input type="checkbox" data-up="${i}" value="${u.id}" ${upgrades.includes(u.id) ? "checked" : ""}/> ${esc(u.name)} <small>+⚙${u.cost}: ${esc(u.text)}</small></label>`,
+                  (u) => `<label class="lb-up" title="${esc(u.text)}"><input type="checkbox" data-up="${i}" value="${esc(u.id)}" ${upgrades.includes(u.id) ? "checked" : ""}/> ${esc(u.name)} <small>+⚙${u.cost}: ${esc(u.text)}</small></label>`,
                 )
                 .join("")}</div>`
             : `<p class="hint" style="margin:0">No upgrades</p>`

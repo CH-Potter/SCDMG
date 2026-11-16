@@ -181,8 +181,12 @@ export function planUnitMove(
   if (!opts.teleport) {
     const route = planRoute(s, unit, leader.pos, leader.elevation, to, enemies, opts.allowance);
     if (typeof route === "string") return route;
-    if (route.length > opts.allowance + EPS)
-      return `Too far: ${route.length.toFixed(1)}" of ${opts.allowance}"`;
+    if (route.length > opts.allowance + EPS) {
+      // Say when area cover is what makes it too far (it costs double), since the move ring can't show it.
+      const walked = route.legs.reduce((n, l) => n + dist(l.from, l.to), 0);
+      const slow = route.length - walked > 0.05 ? ", as crossing area cover costs double" : "";
+      return `Too far: ${route.length.toFixed(1)}" of ${opts.allowance}"${slow}`;
+    }
     leaderDistance = route.length;
     via = route.via;
   }
