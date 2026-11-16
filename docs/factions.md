@@ -50,7 +50,7 @@ The farmland's own critters (beetles, spiders, wasps, scorpions, foxes, a skunk,
 - Keywords: beast, infantry, light; monsters; jumpers and flyers that bite.
 - Abilities: Regen, Regrow, Hatchlings, Lurk, Sticky Goo, Rampage, Sugar Rush, Brood Call, Mending Spores, Tunnel, Burrow Exit, Pop!, Reel In.
 - Supports: meleeBuff, regrow, rattle, slow, retaliate, and summons (Gopher Hole, Trapdoor Pit).
-- Stats: melee hit 4+ (Big Mama 3+); armour 6 (big beasts 4–5); nerve 6–7; cost 2–6, lowest per model; impact on most melee units. Evade against blasts and point-blank shots on swarms.
+- Stats: melee hit 4+ (Big Mama 3+); armour 6 (big beasts 4–5); nerve 6–7; cost 2–6, lowest per model; impact on most melee units: 4+ for single beasts and the crows, 5+ for the big swarms (Chrome-Jaw Beetles, Piston Foxes, Bomb Wasps). Evade against blasts and point-blank shots on swarms.
 
 **Arrival:** two-tier tunnelling. **Tunnel Network** opens a temporary **Gopher Hole** (gone at the end of the round) that your reserves can deploy next to. **The Sett Lab**, Dr. Graft's burrowed laboratory, is the permanent hole, bought in the list. Big Mama's **Tunnel Claws** let her burrow across the board once.
 

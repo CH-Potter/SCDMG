@@ -17,7 +17,7 @@ import { airdropSpotProblem, canPlaySupport, deployZones, supportTarget } from "
 import { abilityOf } from "./reactions";
 import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
-import { expectedDamage, isFearless, nerveOf, planMelee, planShooting, shakeChance, weaponBonus } from "./combat";
+import { evadeTarget, expectedDamage, isFearless, nerveOf, planMelee, planShooting, shakeChance, weaponBonus } from "./combat";
 import { applyCommand, planDemoCharge, RALLY_CP } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
@@ -701,7 +701,8 @@ function barrageCandidates(s: GameState, u: Unit, range: number): Candidate[] {
       if (!caught.length) continue;
       const save = profileOf(t).armor + 1 - (t.status.hunkered ? 1 : 0);
       const pFail = save > 6 ? 1 : 1 - pAtLeast(Math.max(2, save));
-      const exp = caught.length * 0.5 * pFail;
+      const evadeOn = evadeTarget(t, ["ranged", "blast"]);
+      const exp = caught.length * 0.5 * pFail * (evadeOn === null ? 1 : 1 - pAtLeast(evadeOn));
       v += t.owner === u.owner ? -exp * valuePerWound(t) * 2 : attackValue(s, t, exp);
     }
     scored.push({ p, v });
@@ -1171,7 +1172,9 @@ export function aiSupportCommand(s: GameState): Command | null {
           if (isFlying(t)) continue;
           const c = centroid(t);
           const caught = aliveModels(t).filter((m) => dist(m.pos, c) <= e.radius + profileOf(t).baseRadius).length;
-          consider({ ...base, point: c }, caught * pAtLeast(e.hit) * e.damage * valuePerWound(t) * 0.9);
+          const evadeOn = evadeTarget(t, ["ranged", "blast"]);
+          const dodge = evadeOn === null ? 1 : 1 - pAtLeast(evadeOn);
+          consider({ ...base, point: c }, caught * pAtLeast(e.hit) * dodge * e.damage * valuePerWound(t) * 0.9);
         }
       } else if (e.kind === "summon") {
         if (s.phase !== "movement" || !mine.length) continue;

@@ -25,6 +25,8 @@ export interface ProfileStat {
   deployed: number;
   destroyed: number;
   damage: number;
+  /** The part of `damage` dealt by impact on the charge. */
+  impact: number;
   /** Times this unit was standing on an objective its side controlled at the end of a round. */
   held: number;
 }
@@ -50,13 +52,28 @@ export interface GameResult {
   round: number;
   /** VP by scoring reason, per player. */
   vpBy: [Record<string, number>, Record<string, number>];
+  /** Wounds each side got back on the table: shields recharged, HP healed, models revived or regrown. */
+  restored: [Restored, Restored];
   profiles: Record<string, ProfileStat>;
   /** Role missions: the role ids of side A (player 1) and side B (player 2). */
   roles?: [string, string];
   error?: string;
 }
 
+export interface Restored {
+  shield: number;
+  hp: number;
+  models: number;
+}
+
 const MAX_CMDS = 3000;
+
+/** Each on-board model's alive/hp/shield, keyed by unit uid, to spot wounds coming back between commands. */
+function woundSnapshot(s: GameState): Map<string, { alive: boolean; hp: number; shield: number }[]> {
+  const snap = new Map<string, { alive: boolean; hp: number; shield: number }[]>();
+  for (const u of s.units) if (u.onBoard) snap.set(u.uid, u.models.map((m) => ({ alive: m.alive, hp: m.hp, shield: m.shield })));
+  return snap;
+}
 
 /**
  * SIM_LISTS: path to a JSON file of roster overrides, `{ [faction]: { skirmish?: ListEntry[], assault?: ListEntry[] } }`.
@@ -138,7 +155,11 @@ export function playGame(job: Job): GameResult {
   const damage: [number, number] = [0, 0];
   const vpBy: [Record<string, number>, Record<string, number>] = [{}, {}];
   const profiles: Record<string, ProfileStat> = {};
-  const stat = (id: string) => (profiles[id] ??= { deployed: 0, destroyed: 0, damage: 0, held: 0 });
+  const stat = (id: string) => (profiles[id] ??= { deployed: 0, destroyed: 0, damage: 0, impact: 0, held: 0 });
+  const restored: [Restored, Restored] = [
+    { shield: 0, hp: 0, models: 0 },
+    { shield: 0, hp: 0, models: 0 },
+  ];
   let n = 0;
   let maxMs = 0;
   let totalMs = 0;
@@ -154,6 +175,7 @@ export function playGame(job: Job): GameResult {
     totalMs += ms;
     const key = cmd.type === "ability" ? `ab:${cmd.ability}` : cmd.type;
     counts[key] = (counts[key] ?? 0) + 1;
+    const before = woundSnapshot(s);
     const r = applyCommand(s, cmd);
     if (!r.ok) {
       error = `illegal ${JSON.stringify(cmd)}: ${r.error}`;
@@ -165,6 +187,7 @@ export function playGame(job: Job): GameResult {
         if (u) {
           damage[u.owner] += e.report.damage;
           stat(u.profileId).damage += e.report.damage;
+          if (e.report.kind === "impact") stat(u.profileId).impact += e.report.damage;
         }
       } else if (e.type === "deployed") {
         const u = r.state.units.find((x) => x.uid === e.uid);
@@ -176,6 +199,21 @@ export function playGame(job: Job): GameResult {
         creditHolders(s, stat);
       } else if (e.type === "gameOver" && e.reason.includes("wiped")) wipeout = true;
       else if (e.type === "gameOver" && e.reason.includes("lead")) mercy = true;
+    }
+    if (r.ok) {
+      for (const u of r.state.units) {
+        const was = before.get(u.uid);
+        if (!was || !u.onBoard) continue;
+        u.models.forEach((m, i) => {
+          const b = was[i];
+          if (!b || !m.alive) return;
+          if (!b.alive) restored[u.owner].models += 1;
+          else {
+            restored[u.owner].shield += Math.max(0, m.shield - b.shield);
+            restored[u.owner].hp += Math.max(0, m.hp - b.hp);
+          }
+        });
+      }
     }
     s = r.state;
     const lead = s.players[0].vp - s.players[1].vp;
@@ -207,6 +245,7 @@ export function playGame(job: Job): GameResult {
     peakLead,
     round: s.round,
     vpBy,
+    restored,
     profiles,
     roles: rolesOf(missionId),
     error,

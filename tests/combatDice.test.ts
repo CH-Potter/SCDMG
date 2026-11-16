@@ -101,6 +101,33 @@ describe("combat dice: precision, evade, tracking", () => {
     expect(tracked).toBeGreaterThan(evade);
     expect(precise).toBeGreaterThan(noEvade);
   });
+
+  it("expected damage counts an unused Refraction against shooting, and matches the dice", () => {
+    const s = createGame({ factions: ["militia", "concord"], seed: 5 });
+    s.terrain = [];
+    const grunts = place(s, unitOf(s, 0, "mil-grunts").uid, { x: 12, y: 8 });
+    const saucer = place(s, unitOf(s, 1, "con-skiff").uid, { x: 12, y: 20 });
+    const rifle = profileOf(grunts).weapons[weaponIndex(grunts, "Rivet Rifle")]!;
+    const plan = planShooting(s, grunts, saucer, rifle);
+    if (typeof plan === "string") throw new Error(plan);
+    const exp = expectedDamage(s, grunts, saucer, plan, false);
+    // Without Refraction the same dice would be expected to do clearly more.
+    saucer.reactionsUsed.push("refraction");
+    const spent = expectedDamage(s, grunts, saucer, plan, false);
+    saucer.reactionsUsed = [];
+    expect(spent - exp).toBeGreaterThan(0.5);
+    // Melee isn't refracted.
+    expect(expectedDamage(s, grunts, saucer, plan, true)).toBeGreaterThan(exp);
+    let total = 0;
+    const n = 1500;
+    for (let i = 0; i < n; i++) {
+      saucer.reactionsUsed = [];
+      saucer.models.forEach((m) => Object.assign(m, { alive: true, hp: 4, shield: 3 }));
+      saucer.destroyed = false;
+      total += resolveAttack(s, grunts, saucer, rifle.name, plan, "shoot", []).damage;
+    }
+    expect(Math.abs(total / n - exp)).toBeLessThan(0.15);
+  });
 });
 
 describe("engagement and shooting", () => {
