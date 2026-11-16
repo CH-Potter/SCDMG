@@ -169,6 +169,16 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     usesPerGame: 2,
     text: 'Assault phase, twice per game: hook an enemy unit within 10" that this unit can see and drag it up to 4" straight toward this unit (never into base contact). Heavy units, flyers, structures and engaged units are immune.',
   },
+  "bombs-away": {
+    id: "bombs-away",
+    name: "Bombs Away!",
+    kind: "active",
+    phase: "assault",
+    needs: "enemyUnit",
+    range: 10,
+    usesPerGame: 1,
+    text: 'Assault phase, once per game: the whole swarm dives onto an enemy ground unit within 10" and blows itself up. Each wasp rolls a die, hitting on 3+ for 1 damage, AP1 (blast evade and saves apply, no cover). Then the wasps are gone, and the enemy scores nothing for them.',
+  },
   "rocket-hop": {
     id: "rocket-hop",
     cp: 1,

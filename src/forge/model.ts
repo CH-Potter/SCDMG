@@ -236,7 +236,7 @@ export const EFFECT_INFO: Record<SupportEffect["kind"], { label: string; reactio
     help: "Deploy a unit from reserve (paying its cost and supply) at a point near one of your models, or anywhere on the table for a drop-ship. Never next to the enemy's home objective.",
   },
   rattle: { label: "Rattle", reaction: false, help: "An enemy unit near your models takes a nerve test, at any strength, with a nerve penalty." },
-  aimBuff: { label: "Aim buff", reaction: false, help: "A friendly unit's attacks get extra precision and tracking this round (precision also lets it shoot into a melee)." },
+  aimBuff: { label: "Aim buff", reaction: false, help: "A friendly unit's attacks get extra precision and tracking this round (precision also keeps its shots into a melee off friends)." },
   regrow: { label: "Regrow", reaction: false, help: "A friendly unit regrows some of its lost models, at 1 HP each." },
   dugIn: { label: "Dig in", reaction: false, help: "A friendly unit gets better saves against shooting and barrages this round (stacks with cover and hunkering)." },
   teleport: { label: "Teleport", reaction: false, help: "Move a friendly, unengaged unit up to the range, ignoring terrain. It can still act afterwards." },

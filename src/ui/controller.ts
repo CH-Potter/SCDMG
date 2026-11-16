@@ -2,7 +2,7 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
 
 import { aiCommand } from "../engine/ai";
-import { evadeTarget, expectedDamage, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
+import { evadeTarget, expectedDamage, expectedStray, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
 import { SHELL_BURST } from "../engine/constants";
 import { ABILITIES } from "../engine/data/abilities";
 import { factionOf, supportOf } from "../engine/data/factions";
@@ -1447,6 +1447,8 @@ export class Controller {
         const save = saveNeeded(s, sel, hit.unit, tm, b.plan.ap, melee, from);
         const evade = b.plan.evadeOn === undefined ? evadeTarget(hit.unit, melee ? ["melee"] : ["ranged"]) : b.plan.evadeOn;
         const defence = `${evade ? `they dodge on ${evade}+${b.plan.tracking ? ` (tracking ${b.plan.tracking})` : ""}, ` : ""}${save === null ? "no save" : `save on ${save}+`}`;
+        const stray = melee ? null : expectedStray(s, sel, hit.unit, w, b.plan);
+        if (stray) terrain.push(`⚠ into a melee: every miss rolls again at your ${profileOf(stray.friend).name} (≈${stray.damage.toFixed(1)} damage)`);
         return ok(
           `${melee ? "⚔ Fight" : "🎯 Shoot"} with ${w.name}: ${b.plan.attackers.length} model${b.plan.attackers.length > 1 ? "s" : ""}, ${dice} ${dice === 1 ? "die" : "dice"} hitting on ${b.plan.hitOn}+ · AP${b.plan.ap} · ${defence} · ≈${exp.toFixed(1)} damage${terrain.length ? ` · ${terrain.join(" · ")}` : ""}`,
           "target",
@@ -2290,7 +2292,7 @@ export function showRules(): void {
         <li><b>Terrain:</b> scrub and craters are difficult terrain (double cost to cross). Models in the line of fire give the target cover.</li>
         <li><b>Weapon traits:</b> blast, torrent, heavy, rending and pistol. Some units also deal impact damage when their charge lands.</li>
         <li><b>Attacks:</b> roll to hit; <b>precision</b> turns some misses into hits. Then the target may roll <b>evade</b> (only in the situations its card lists: point-blank, shooting, melee or blasts); <b>tracking</b> cancels evades. Whatever gets through rolls armour saves.</li>
-        <li><b>Melee and shooting:</b> you can't shoot into a melee without precision, and engaged units can only shoot what they're fighting. Point-blank pistol shots can't be evaded.</li>
+        <li><b>Melee and shooting:</b> you can shoot into a melee, but without precision every miss rolls again at your own units in it; engaged units can only shoot what they're fighting. Point-blank pistol shots can't be evaded.</li>
         <li><b>Supports:</b> spend CP on your support cards as free actions; reactions arm now and fire later.</li>
         <li><b>Unit abilities</b> are free actions during that unit's activation (one per phase): Blink then move, Recall then shoot. Some cost CP from the same pool as supports.</li>
       </ul>

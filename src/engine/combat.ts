@@ -5,7 +5,7 @@ import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
 import { nextRandom, rollD6 } from "./rng";
-import { aliveModels, AURA_RANGE, ENGAGE_RANGE, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
+import { aliveModels, AURA_RANGE, ENGAGE_RANGE, engagedWith, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, modelsInReach, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
 import { consumeReaction } from "./reactions";
 import { hasCover, lineOfSight, platformAt } from "./terrain";
 import type { AttackReport, EvadeCondition, GameEvent, GameState, Model, Unit, Vec, Weapon } from "./types";
@@ -96,10 +96,12 @@ function effectiveAp(w: Weapon, target: Unit, bonusAp: number): number {
 export const precisionOf = (a: Unit, w: Weapon): number => Math.max(0, (w.precision ?? 0) + (a.status.precisionBonus ?? 0));
 export const trackingOf = (a: Unit, w: Weapon): number => Math.max(0, (w.tracking ?? 0) + (a.status.trackingBonus ?? 0));
 
-/** Melee blocks shooting: engaged units only shoot what they're fighting; only precise weapons shoot into a melee. */
-export function engagementBlock(s: GameState, a: Unit, t: Unit, w: Weapon): string | null {
+/**
+ * Melee limits shooting: engaged units only shoot what they're fighting. Anyone may shoot into a
+ * melee, but without precision their misses may hit their own side (see strayShots).
+ */
+export function engagementBlock(s: GameState, a: Unit, t: Unit): string | null {
   if (isEngaged(s, a)) return unitsEngage(a, t) ? null : "Engaged units can only shoot a unit they're fighting";
-  if (isEngaged(s, t) && precisionOf(a, w) < 1) return "That unit is in a melee: only a weapon with precision can pick it out";
   return null;
 }
 
@@ -144,7 +146,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
   if (indirect && kind !== "shoot") return `${w.name} is lobbed: it can only be fired as a normal shot`;
   if (indirect && isEngaged(s, a)) return "Too close to lob a shell: this unit is in a melee";
   if (kind !== "barrage") {
-    const blocked = engagementBlock(s, a, t, w);
+    const blocked = engagementBlock(s, a, t);
     if (blocked) return blocked;
   }
   const bonus = weaponBonus(w, t);
@@ -208,7 +210,7 @@ export function planImpact(a: Unit, t: Unit): AttackPlan | null {
   const attackers: AttackPlan["attackers"] = [];
   const targets = new Set<Model>();
   for (const am of aliveModels(a)) {
-    const touching = aliveModels(t).filter((tm) => modelsEngage(a, am, t, tm));
+    const touching = aliveModels(t).filter((tm) => modelsInReach(a, am, t, tm));
     if (!touching.length) continue;
     touching.forEach((tm) => targets.add(tm));
     attackers.push({ model: am, dice: Math.max(1, imp.dice) });
@@ -445,6 +447,21 @@ function killModel(s: GameState, t: Unit, tm: Model, events: GameEvent[], fromPo
   if (!aliveModels(t).length) destroyUnit(s, t, tm, events);
 }
 
+/**
+ * A unit spends itself (a suicide attack): every model is gone at once. The enemy scores no kill VP
+ * for it (they didn't do it), but it still counts as destroyed for "destroyed supply" scoring.
+ */
+export function sacrifice(s: GameState, t: Unit, events: GameEvent[]): void {
+  t.supplyPaid = profileOf(t).supply;
+  const ms = aliveModels(t);
+  for (const m of ms) {
+    m.alive = false;
+    m.hp = 0;
+    m.shield = 0;
+  }
+  if (ms.length) destroyUnit(s, t, ms[ms.length - 1]!, events);
+}
+
 function destroyUnit(s: GameState, t: Unit, last: Model, events: GameEvent[]): void {
   t.destroyed = true;
   t.onBoard = false;
@@ -570,4 +587,44 @@ function expectedShells(s: GameState, a: Unit, t: Unit, plan: AttackPlan): numbe
   // A shell that drifts still catches the edge of the unit now and then.
   const drifted = spotted ? 0.35 : 0.15;
   return plan.attackers.length * burst * (onTarget + (1 - onTarget) * drifted);
+}
+
+// ---------- shooting into a melee ----------
+
+/**
+ * Shooting into a melee without precision: the shooter's own unit fighting the target that the
+ * misses go at (the nearest to the shooter), or null if the shot can't stray (precision, or no
+ * friends in the melee).
+ */
+export function strayTarget(s: GameState, a: Unit, t: Unit, w: Weapon): Unit | null {
+  if (w.melee || precisionOf(a, w) >= 1 || hasTrait(w, "indirect")) return null;
+  const friends = engagedWith(s, t).filter((u) => u.owner === a.owner && u.uid !== a.uid);
+  if (!friends.length) return null;
+  return friends.reduce((x, y) => (unitGap(a, y) < unitGap(a, x) ? y : x));
+}
+
+/** Every missed die rolls again at the friend in the melee, as the same shot. */
+export function strayPlan(friend: Unit, plan: AttackPlan, misses: number): AttackPlan {
+  return {
+    attackers: [{ model: plan.attackers[0]!.model, dice: misses }],
+    targets: aliveModels(friend),
+    hitOn: plan.hitOn,
+    damage: plan.damage,
+    ap: plan.ap,
+    evadeOn: evadeTarget(friend, ["ranged"]),
+  };
+}
+
+/** Misses in an attack report (dice below the hit number that precision didn't rescue). */
+export const reportMisses = (r: AttackReport): number => Math.max(0, r.hitRolls.filter((x) => x < r.hitOn).length - (r.precisionMoved ?? 0));
+
+/** Expected damage a shot into a melee does to the shooter's own side (for previews and the AI). */
+export function expectedStray(s: GameState, a: Unit, t: Unit, w: Weapon, plan: AttackPlan): { friend: Unit; damage: number } | null {
+  const friend = strayTarget(s, a, t, w);
+  if (!friend) return null;
+  const dice = plan.attackers.reduce((n, x) => n + x.dice, 0);
+  const misses = dice * (1 - pAtLeast(plan.hitOn));
+  const fp = strayPlan(friend, plan, Math.max(1, Math.round(misses)));
+  const perDie = expectedDamage(s, a, friend, fp, false) / Math.max(1, Math.round(misses));
+  return { friend, damage: perDie * misses };
 }

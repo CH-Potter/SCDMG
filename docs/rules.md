@@ -104,7 +104,7 @@ Every attack, ranged or melee, runs the same sequence:
 - **Disengage:** move out of contact. Compare the unit's current **supply** with the total supply of the enemies it was engaged with. If it's worth **more**, it breaks away cleanly with no penalty. If it's worth the **same or less**, it's **exhausted** for the next phase: it sits out the assault phase and can't charge, though **light** units may still shoot.
 
 ### Engagement and shooting
-- **Shooting into a melee:** an unengaged unit can't shoot at an enemy unit that is engaged with anyone, unless the weapon has **precision 1+** (from the weapon or a buff).
+- **Shooting into a melee:** an unengaged unit may shoot an enemy unit that is in a melee. With **precision 1+** (from the weapon or a buff) it picks the target out cleanly. Without precision, resolve the shot as normal, then **every missed die rolls again, as the same shot, at your own unit in that melee** (the one nearest the shooter), with its evade and saves. Lobbed shells (indirect fire) don't stray this way: their burst hits whoever is under it.
 - **Shooting out of a melee:** an engaged unit can only shoot at a unit it is directly engaged with. It may do so in the assault phase with any ranged weapon.
 - **Point-blank shots** let the target use its point-blank (or ranged) evade. **Pistols** are built for this: point-blank pistol shots can't be evaded.
 
@@ -116,7 +116,7 @@ Every attack, ranged or melee, runs the same sequence:
 | light | Can still shoot when exhausted from disengaging. |
 | armoured | Ignores 1 AP, unless the weapon has a bonus against armoured targets. |
 | heavy | No ladders. Never gets cover. |
-| flying | Ignores terrain. Can't hold objectives. Ground melee can't reach it. Ranged weapons need `targets: all/air`. |
+| flying | Ignores terrain. Can't hold objectives. Never engaged in melee: ground units can't charge it, and its own charge is a dive (see *Flyers*). Ground units may move under it but not stop on its base. Ranged weapons need `targets: all/air`. |
 | jump | Changes level without ramps or ladders. |
 
 Weapons can carry **bonuses vs keywords** (extra dice, damage or AP). Examples: Chain Popper vs light, Thumper Cannon vs armoured, Flicker Cannon vs flying.
@@ -206,7 +206,17 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **Barrages and support-card blasts** now let the target roll its blast evade for each hit, as the evade rules always said. Their target always gets its save, even when the caster has no unit on the table (it used to get none).
 
 **Added in v0.8:**
+- **Flyers never get stuck in a melee.** Ground units can't charge them; a flyer's charge is a dive that strikes with its impact and leaves both sides free. Flyers fight from range (or with a dive or suicide attack): the Steel-Jaw Crows' bite is now their dive (2 impact dice each on 4+, AP1; Can-Opener Beak makes it AP2), and the Bomb Wasps trade their sting for **Bombs Away!**, a once-per-game suicide dive. Ground units may move under a flyer but not stop on its base.
+- **Shooting into a melee** no longer needs precision, but without it every miss rolls again at your own unit in the fight.
 - **Indirect fire:** mortars (the Spud Lobber and Stink Shell) and Barrage lob shells that need no line of sight but can drift off target, then burst on everyone under them, friend or foe. See *Indirect fire*.
+
+### Flyers
+
+- **No melee engagement.** A flyer is never engaged with anything, so it can always move and shoot freely, and nothing is ever stuck fighting it. Flyers and ground units can still shoot each other (if their weapons can hit the other).
+- **Ground units can't charge flyers.** Shoot them down.
+- **Dives.** A flyer with impact can charge a ground unit: it dives into base contact and rolls its impact dice (each model in reach), and that is the whole attack. Neither side is engaged afterwards.
+- **Flyers have no melee weapons.** They fight from range, with a dive, or with a suicide attack (the Bomb Wasps' **Bombs Away!**: once per game in the assault phase, the whole swarm dives onto an enemy ground unit within 10" and blows itself up; each wasp rolls a die, hitting on 3+ for 1 damage, AP1, with blast evade and saves. The wasps are then gone, and the enemy scores no kill VP for them).
+- **Bases.** Ground models may move under a flyer's base but can't stop on it. Flyers may hover over anyone.
 
 ### Indirect fire
 

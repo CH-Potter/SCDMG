@@ -30,6 +30,9 @@ export function profileFor(profileId: string, upgrades: string[]): UnitProfile {
       const w = p.weapons[u.weapon.index];
       if (w) p.weapons[u.weapon.index] = { ...w, ...u.weapon.patch };
     }
+    if (u.impact && p.impact) {
+      p.impact = { ...p.impact, ...u.impact };
+    }
   }
   cache.set(key, p);
   byList.set(upgrades, { profileId, profile: p });

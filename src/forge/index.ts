@@ -715,7 +715,7 @@ class FactionForge {
         ${numField("Damage", `${path}.damage`, w.damage, LIMITS.damage)}
         ${numField("AP", `${path}.ap`, w.ap, LIMITS.ap)}
         ${selectField("Can hit", `${path}.targets`, w.targets, [["ground", "Ground only"], ["air", "Air only"], ["all", "Ground and air"]])}
-        ${numField("Precision", `${path}.precision`, w.precision, LIMITS.precision, { opt: true, placeholder: "0", title: "Move up to this many missed dice into the hits. Precision 1+ also lets ranged weapons shoot into a melee." })}
+        ${numField("Precision", `${path}.precision`, w.precision, LIMITS.precision, { opt: true, placeholder: "0", title: "Move up to this many missed dice into the hits. Precision 1+ also lets ranged weapons shoot into a melee without the misses hitting friends." })}
         ${numField("Tracking", `${path}.tracking`, w.tracking, LIMITS.tracking, { opt: true, placeholder: "0", title: "Cancel up to this many of the target's successful evade rolls" })}
       </div>
       <div class="ff-sub">Traits</div>

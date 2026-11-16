@@ -17,7 +17,7 @@ import { airdropSpotProblem, canPlaySupport, deployZones, supportTarget } from "
 import { abilityOf } from "./reactions";
 import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
-import { evadeTarget, expectedDamage, isFearless, nerveOf, planMelee, planShooting, shakeChance, shellOdds, shellSpotted, weaponBonus } from "./combat";
+import { evadeTarget, expectedDamage, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { SHELL_BURST } from "./constants";
 import { applyCommand, planDemoCharge, RALLY_CP } from "./game";
 import { planUnitMove } from "./formation";
@@ -640,7 +640,9 @@ function attackCandidates(s: GameState, u: Unit): Candidate[] {
       const plan = planShooting(s, u, e, w);
       if (typeof plan === "string") continue;
       const exp = expectedDamage(s, u, e, plan, false);
-      out.push({ cmd: { type: "shoot", uid: u.uid, target: e.uid, weapon: i }, bonus: attackValue(s, e, exp) });
+      const stray = expectedStray(s, u, e, w, plan);
+      const risk = stray ? stray.damage * valuePerWound(stray.friend) * 2 : 0;
+      out.push({ cmd: { type: "shoot", uid: u.uid, target: e.uid, weapon: i }, bonus: attackValue(s, e, exp) - risk });
     }
   });
   return out;
@@ -648,9 +650,12 @@ function attackCandidates(s: GameState, u: Unit): Candidate[] {
 
 function chargeCandidates(s: GameState, u: Unit): Candidate[] {
   const out: Candidate[] = [];
-  if (!meleeWeapons(u).length || u.status.disengaged) return out;
+  // A flyer's charge is a dive: its impact, with no melee afterwards (flyers never engage).
+  const dive = isFlying(u);
+  if (u.status.disengaged || (dive ? !profileOf(u).impact : !meleeWeapons(u).length)) return out;
   for (const e of onBoard(s, other(u.owner))) {
-    if (!meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets))) continue;
+    if (isFlying(e)) continue; // flyers can't be charged
+    if (!dive && !meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets))) continue;
     if (unitGap(u, e) > effectiveMove(s, u) + 1) continue;
     const cmd: Command = { type: "charge", uid: u.uid, target: e.uid };
     const after = simulate(s, cmd);
@@ -659,6 +664,11 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
     const them = after.units.find((x) => x.uid === e.uid)!;
     if (me.destroyed || them.destroyed) {
       out.push({ cmd, bonus: 0 });
+      continue;
+    }
+    if (dive) {
+      const imp = planImpact(me, them);
+      out.push({ cmd, bonus: imp ? attackValue(after, them, expectedDamage(after, me, them, imp, true)) : 0 });
       continue;
     }
     let best = 0;
@@ -938,6 +948,26 @@ const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
     // firepower() is half the expected hits, so 2x fire is the round's incoming hits; most would have gone elsewhere.
     const value = fire * 1.2 * (soft - tough) - CP_VALUE - 0.3;
     return value > 0 ? [{ cmd: { type: "ability", uid: u.uid, ability: "provoke" }, bonus: value, stack: true, expected: true }] : [];
+  },
+  // The Bomb Wasps' suicide dive: worth it when the damage beats what the swarm itself is worth.
+  "bombs-away"(s, u) {
+    const def = ABILITIES["bombs-away"];
+    const out: Candidate[] = [];
+    const own = wounds(u) * valuePerWound(u);
+    for (const e of onBoard(s, other(u.owner))) {
+      if (isFlying(e) || unitGap(u, e) > (def.range ?? 10)) continue;
+      const plan: AttackPlan = {
+        attackers: aliveModels(u).map((model) => ({ model, dice: 1 })),
+        targets: aliveModels(e),
+        hitOn: 3,
+        damage: 1,
+        ap: 1,
+        evadeOn: evadeTarget(e, ["blast"]),
+      };
+      const v = attackValue(s, e, expectedDamage(s, u, e, plan, false)) - own;
+      out.push({ cmd: { type: "ability", uid: u.uid, ability: "bombs-away", target: e.uid }, bonus: v - 1, stack: true, expected: true });
+    }
+    return out;
   },
   // A once-per-game bomb: save it for a juicy target (structures and mechs especially).
   "demo-charge"(s, u) {

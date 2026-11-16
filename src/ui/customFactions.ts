@@ -6,7 +6,7 @@ import { BUILT_IN_FACTION_IDS, FACTIONS, isBuiltInFaction, registerCustomFaction
 import { CUSTOM_PREFIX, EFFECT_KINDS, factionProblems, KEYWORDS, LIFETIMES, LOOKS, TARGETS, TIMINGS, TRAITS, EVADE_CONDITIONS } from "../engine/data/factionValidation";
 import { ABILITIES } from "../engine/data/abilities";
 import { cleanArt } from "../engine/data/unitArt";
-import type { AbilityId, Faction, Keyword, ListEntry, StructureDef, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, UpgradeDef, Weapon, WeaponBonus, WeaponTrait, EvadeCondition } from "../engine/types";
+import type { AbilityId, Faction, ImpactDef, Keyword, ListEntry, StructureDef, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, UpgradeDef, Weapon, WeaponBonus, WeaponTrait, EvadeCondition } from "../engine/types";
 import { fixStructures, newProfile } from "../forge/model";
 import { loadJson, newId, saveJson, slug } from "./files";
 
@@ -231,6 +231,14 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
     if (u.addKeywords !== undefined) out.addKeywords = keywords(u.addKeywords, w);
     if (u.addAbilities !== undefined) out.addAbilities = abilities(u.addAbilities, w);
     if (isObj(u.weapon) && isObj(u.weapon.patch)) out.weapon = { index: num(u.weapon.index), patch: patch(u.weapon.patch, w) };
+    if (isObj(u.impact)) {
+      const imp: Partial<ImpactDef> = {};
+      for (const k of ["dice", "hit", "damage", "ap"] as const) {
+        const v = optNum(u.impact[k]);
+        if (v !== undefined) imp[k] = v;
+      }
+      out.impact = imp;
+    }
     return out;
   };
   const structure = (s: Obj, where: string): StructureDef => {

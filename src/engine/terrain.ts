@@ -217,8 +217,10 @@ export function checkPlacement(s: GameState, unit: Unit, pos: Vec, elev: Elevati
     }
   }
   for (const o of others) {
-    if (o.elevation !== elev) continue;
-    if (dist(o.pos, pos) < o.radius + r - EPS) return "Overlaps another model";
+    // A ground model may pass under a flyer but can't stop on its base (flyers may hover over anyone).
+    const underFlyer = o.elevation === 2 && elev !== 2;
+    if (o.elevation !== elev && !underFlyer) continue;
+    if (dist(o.pos, pos) < o.radius + r - EPS) return underFlyer ? "Can't stop under a flyer" : "Overlaps another model";
   }
   return null;
 }

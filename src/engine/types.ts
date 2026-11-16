@@ -54,6 +54,7 @@ export type AbilityId =
   | "blink" // teleport up to 10", even onto platforms
   | "recall" // teleport a friendly unit to the user
   | "grapple" // drag an enemy unit up to 4" toward this unit
+  | "bombs-away" // a flying swarm's suicide dive: every model bombs an enemy unit, then the unit is gone
   | "rocket-hop" // assault phase: leap up to 6" over terrain, then still shoot or charge
   | "rampage" // +1 melee die per model this round, saves one worse
   | "spotter" // your shots at a spotted enemy hit one better this round
@@ -96,7 +97,7 @@ export interface Weapon {
   targets: "ground" | "air" | "all";
   bonuses?: WeaponBonus[];
   traits?: WeaponTrait[];
-  /** Precision N: after rolling to hit, move up to N missed dice into the hits. Also lets the weapon shoot into a melee. */
+  /** Precision N: after rolling to hit, move up to N missed dice into the hits. Also lets the weapon shoot into a melee without its misses hitting friends. */
   precision?: number;
   /** Tracking N: cancel up to N of the defender's successful evade rolls. */
   tracking?: number;
@@ -122,6 +123,8 @@ export interface UpgradeDef {
   addAbilities?: AbilityId[];
   /** Replace or tweak a weapon by index. */
   weapon?: { index: number; patch: Partial<Weapon> };
+  /** Tweak the impact (a charge or a flyer's dive). */
+  impact?: Partial<ImpactDef>;
 }
 
 export interface UnitProfile {

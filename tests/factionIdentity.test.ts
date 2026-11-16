@@ -5,7 +5,7 @@
 //   Lumen Concord: few elite specialists. Shields, precision and tracking, teleporting about.
 
 import { describe, expect, it } from "vitest";
-import { saveNeeded, planShooting } from "../src/engine/combat";
+import { saveNeeded, planShooting, strayTarget } from "../src/engine/combat";
 import { ABILITIES } from "../src/engine/data/abilities";
 import { BUILT_IN_FACTION_IDS, defaultListFor, defaultSupportsFor, factionOf, supportOf } from "../src/engine/data/factions";
 import type { ModeId } from "../src/engine/data/modes";
@@ -96,7 +96,7 @@ describe("faction pillars in the data", () => {
   it("each signature ability belongs to one faction only", () => {
     const own: Record<string, AbilityId[]> = {
       militia: ["overwatch", "entrenched", "steady-aim", "spotter", "barrage", "demo-charge", "patch-up", "steadying", "rocket-hop"],
-      munch: ["regen", "regrow", "hatch", "lurk", "sticky-goo", "rampage", "sugar-rush", "brood-call", "mending-aura", "tunnel", "burrow-exit", "pop", "grapple"],
+      munch: ["regen", "regrow", "hatch", "lurk", "sticky-goo", "rampage", "sugar-rush", "brood-call", "mending-aura", "tunnel", "burrow-exit", "pop", "grapple", "bombs-away"],
       concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura"],
     };
     for (const [f, ids] of Object.entries(own)) for (const a of ids) expect(factionsWith(a), `${a}`).toEqual([f]);
@@ -222,7 +222,7 @@ describe("faction buffs", () => {
     expect(r.events.some((e) => e.type === "ability" && e.ability === "lurk" && e.uid === pit.uid)).toBe(true);
   });
 
-  it("Concord Point Out Flaws adds precision, so a unit can pick a target out of a melee", () => {
+  it("Concord Point Out Flaws adds precision, so a unit can pick a target out of a melee without hitting friends", () => {
     let s = game([L("con-dancers", "con-guard"), L("munch-nibblers")], { factions: ["concord", "munch"], supports: [["con-court"], []] });
     const dancers = place(s, "p0-0", { x: 10, y: 24 });
     const guard = place(s, "p0-1", { x: 10, y: 15.2 });
@@ -230,12 +230,13 @@ describe("faction buffs", () => {
     Object.assign(s, { phase: "assault" });
     expect(unitGap(guard, nibs)).toBeLessThan(1);
     const darts = profileOf(dancers).weapons[0]!;
-    expect(typeof planShooting(s, dancers, nibs, darts)).toBe("string"); // locked in a melee
+    expect(strayTarget(s, dancers, nibs, darts)?.uid).toBe(guard.uid); // misses would hit the guard
     s = ok(applyCommand(s, { type: "support", player: 0, support: "con-court", ability: "point-out-flaws", target: dancers.uid }));
     const d = unitById(s, dancers.uid)!;
     expect(d.status.precisionBonus).toBe(1);
     expect(d.status.trackingBonus).toBe(1);
     expect(typeof planShooting(s, d, unitById(s, nibs.uid)!, darts)).not.toBe("string");
+    expect(strayTarget(s, d, unitById(s, nibs.uid)!, darts)).toBeNull();
   });
 
   it("Concord Gate Step teleports a unit on the table, which can still act", () => {

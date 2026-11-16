@@ -15,7 +15,7 @@ import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type 
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
-import { applyDamage, burstAt, planMelee, planShooting, resolveAttack, planImpact, scatterShell, shellAim, type AttackPlan } from "./combat";
+import { applyDamage, burstAt, evadeTarget, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
 import { dist, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
@@ -106,10 +106,11 @@ const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
  * Resolve an attack and log it ahead of the events it caused (morale tests, abilities such as
  * Refraction), so the dice tray and log show the attack first and its consequences after.
  */
-function pushAttack(events: GameEvent[], resolve: (events: GameEvent[]) => AttackReport): void {
+function pushAttack(events: GameEvent[], resolve: (events: GameEvent[]) => AttackReport): AttackReport {
   const at = events.length;
   const report = resolve(events);
   events.splice(at, 0, { type: "attack", report });
+  return report;
 }
 
 export function createGame(setup: GameSetup): GameState {
@@ -390,7 +391,13 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
         }
         break;
       }
-      pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "shoot", ev));
+      // Into a melee without precision: the misses roll again at our own unit in the fight.
+      const friend = strayTarget(s, unit, target, w);
+      const report = pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "shoot", ev));
+      const misses = reportMisses(report);
+      if (friend && misses > 0 && friend.onBoard && aliveModels(friend).length) {
+        pushAttack(events, (ev) => resolveAttack(s, unit, friend, `${w.name} (stray)`, strayPlan(friend, plan, misses), "shoot", ev));
+      }
       break;
     }
     case "fight": {
@@ -460,19 +467,25 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   if (unit.status.disengaged) return "Exhausted from disengaging: it can't charge";
   if (unit.status.shaken) return "Shaken units won't charge";
   if (isEngaged(s, unit)) return "Already engaged";
-  const melee = profileOf(unit).weapons.filter((w) => w.melee);
-  if (!melee.some((w) => meleeCanHit(unit, target, w.targets))) {
-    return isFlying(target) ? "Nothing in this unit can reach flyers" : "This unit has no melee weapon";
+  // Flyers never get stuck in a melee: a ground unit can't charge one, and a flyer's charge is a
+  // dive that strikes with its impact and leaves both sides free.
+  if (isFlying(target)) return "Flyers can't be charged: shoot them down";
+  const dive = isFlying(unit);
+  if (dive) {
+    if (!profileOf(unit).impact) return "Flyers fight from range: this one has no dive attack";
+  } else if (!profileOf(unit).weapons.some((w) => w.melee && meleeCanHit(unit, target, w.targets))) {
+    return "This unit has no melee weapon";
   }
   const plan = planCharge(s, unit, target);
   if (typeof plan === "string") return plan;
   applyPlan(unit, plan);
-  if (!unitsEngage(unit, target)) return "Couldn't reach base contact";
+  const reached = dive ? unitGap(unit, target) <= ENGAGE_RANGE + 1e-6 : unitsEngage(unit, target);
+  if (!reached) return "Couldn't reach base contact";
   unit.status.charged = true;
   if (consumeReaction(s, target.owner, "enemyCharges", events)) target.status.braced = true;
-  // Impact on charge: slam into the target before the combat phase.
+  // Impact on charge: slam into the target before the combat phase (for a flyer, that's the whole dive).
   const impact = planImpact(unit, target);
-  if (impact) pushAttack(events, (ev) => resolveAttack(s, unit, target, "Impact", impact, "impact", ev));
+  if (impact) pushAttack(events, (ev) => resolveAttack(s, unit, target, dive ? "Dive" : "Impact", impact, "impact", ev));
   return null;
 }
 
@@ -632,6 +645,24 @@ function useAbility(
       if (pulled === 0) return "No room to drag it any closer";
       say(`${name} reels in ${profileOf(t).name} (${pulled}").`);
       events.push({ type: "moved", uid: t.uid, kind: "advance" });
+      break;
+    }
+    case "bombs-away": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (isFlying(t)) return "The bombs only hit ground units";
+      if (unitGap(unit, t) > (def.range ?? 10)) return `Must be within ${def.range}"`;
+      const plan: AttackPlan = {
+        attackers: aliveModels(unit).map((model) => ({ model, dice: 1 })),
+        targets: aliveModels(t),
+        hitOn: 3,
+        damage: 1,
+        ap: 1,
+        evadeOn: evadeTarget(t, ["blast"]),
+      };
+      say(`${name} dive-bomb ${profileOf(t).name}!`);
+      pushAttack(events, (ev) => resolveAttack(s, unit, t, "Bombs Away!", plan, "barrage", ev));
+      sacrifice(s, unit, events);
       break;
     }
     case "rocket-hop": {

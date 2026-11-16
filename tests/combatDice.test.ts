@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evadeTarget, expectedDamage, planShooting, resolveAttack, shotConditions, type AttackPlan } from "../src/engine/combat";
+import { evadeTarget, expectedDamage, planShooting, resolveAttack, shotConditions, strayTarget, type AttackPlan } from "../src/engine/combat";
 import { applyCommand, createGame } from "../src/engine/game";
 import { profileOf } from "../src/engine/profile";
 import { unitById, unitsEngage } from "../src/engine/rules";
@@ -136,19 +136,34 @@ describe("engagement and shooting", () => {
     expect(unitsEngage(grunts, dancers)).toBe(true);
   });
 
-  it("unengaged units can't shoot into a melee unless the weapon has precision", () => {
-    const { s, dancers } = melee();
+  it("anyone may shoot into a melee, but without precision the misses roll again at friends in it", () => {
+    const { s, grunts, dancers } = melee();
     const bertha = place(s, unitOf(s, 0, "mil-bertha").uid, { x: 4, y: 8 });
     const squinter = place(s, unitOf(s, 0, "mil-squinter").uid, { x: 20, y: 8 });
     const cannon = profileOf(bertha).weapons[weaponIndex(bertha, "Thumper Cannon")]!;
-    expect(planShooting(s, bertha, dancers, cannon)).toMatch(/melee/);
+    expect(typeof planShooting(s, bertha, dancers, cannon)).not.toBe("string");
+    expect(strayTarget(s, bertha, dancers, cannon)?.uid).toBe(grunts.uid);
     const rifle = profileOf(squinter).weapons[weaponIndex(squinter, "Varmint Rifle")]!;
     expect(rifle.precision).toBe(1);
-    const sq = planShooting(s, squinter, dancers, rifle);
-    expect(typeof sq === "string" ? sq : "ok").toBe("ok");
-    // A precision buff from an ability or support works too.
+    expect(strayTarget(s, squinter, dancers, rifle)).toBeNull();
+    // A precision buff from an ability or support keeps the shots off friends too.
     bertha.status.precisionBonus = 1;
-    expect(typeof planShooting(s, bertha, dancers, cannon)).not.toBe("string");
+    expect(strayTarget(s, bertha, dancers, cannon)).toBeNull();
+    bertha.status.precisionBonus = 0;
+    // The command path: every miss rolls again, as the same shot, at the grunts.
+    let strays = 0;
+    for (let seed = 1; seed <= 12; seed++) {
+      const g = structuredClone(s);
+      g.rng = seed * 7919;
+      const r = applyCommand(g, { type: "shoot", uid: bertha.uid, target: dancers.uid, weapon: weaponIndex(bertha, "Thumper Cannon") });
+      if (!r.ok) throw new Error(r.error);
+      const atks = r.events.filter((e): e is Extract<GameEvent, { type: "attack" }> => e.type === "attack");
+      const misses = atks[0]!.report.hitRolls.filter((x) => x < atks[0]!.report.hitOn).length;
+      const stray = atks.find((e) => e.report.target === grunts.uid);
+      expect(stray?.report.hitRolls.length ?? 0).toBe(misses);
+      if (stray) strays++;
+    }
+    expect(strays).toBeGreaterThan(0);
   });
 
   it("engaged units can only shoot the unit they're fighting, and it gets its point-blank evade", () => {

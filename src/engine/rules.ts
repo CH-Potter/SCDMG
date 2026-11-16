@@ -28,10 +28,19 @@ export function unitGap(a: Unit, b: Unit): number {
   return best;
 }
 
-/** Two models are in base contact for melee if close and on the same level (flyers reach anyone). */
-export function modelsEngage(a: Unit, am: Model, b: Unit, bm: Model): boolean {
+/** Two models are within striking reach (for impact on a charge or dive): close and on the same level; a flyer reaches any level. */
+export function modelsInReach(a: Unit, am: Model, b: Unit, bm: Model): boolean {
   if (modelGap(a, am, b, bm) > ENGAGE_RANGE + EPS) return false;
   return am.elevation === bm.elevation || am.elevation === 2 || bm.elevation === 2;
+}
+
+/**
+ * Two models are engaged in melee if close and on the same level. Flyers are never engaged: they
+ * fight from range, and a flyer's dive (its impact) leaves both sides free.
+ */
+export function modelsEngage(a: Unit, am: Model, b: Unit, bm: Model): boolean {
+  if (am.elevation === 2 || bm.elevation === 2) return false;
+  return modelsInReach(a, am, b, bm);
 }
 
 export function unitsEngage(a: Unit, b: Unit): boolean {
