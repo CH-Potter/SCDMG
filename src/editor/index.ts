@@ -504,6 +504,9 @@ class MapBuilder {
         this.select(hit);
         if (hit) {
           this.drag = { kind: "move", ref: hit, start: p, base: cloneMap(this.map), riders: ridersOf(this.map, hit), before: this.snapshot(), moved: false };
+        } else if (this.zoom > 1) {
+          // Dragging empty ground pans a zoomed-in board (the only way to pan on a touch screen).
+          this.drag = { kind: "pan", startPx: { x: e.clientX, y: e.clientY }, center: this.center ?? { x: this.map.width / 2, y: this.map.height / 2 } };
         }
         return;
       }
@@ -1298,7 +1301,7 @@ class MapBuilder {
     const c = this.cursor;
     el.textContent = c && c.x >= 0 && c.y >= 0 && c.x <= this.map.width && c.y <= this.map.height ? `${fmt(c.x)}", ${fmt(c.y)}"` : "";
     const t = TOOLS.find((x) => x.id === this.tool)!;
-    hint.textContent = this.tool === "select" ? "Scroll to zoom, Space+drag or middle-drag to pan" : `${t.label}: Esc to stop`;
+    hint.textContent = this.tool === "select" ? "Scroll to zoom; drag empty ground, Space+drag or middle-drag to pan" : `${t.label}: Esc to stop`;
   }
 
   private toast(msg: string, bad = false): void {

@@ -333,10 +333,13 @@ button {
     filter 0.1s;
 }
 
-button:hover:not(:disabled) {
-  filter: brightness(1.06) saturate(1.1);
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0 var(--ink);
+/* Only where there's a real hover: on touch screens :hover sticks after a tap and leaves the button lifted. */
+@media (hover: hover) {
+  button:hover:not(:disabled) {
+    filter: brightness(1.06) saturate(1.1);
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
 }
 button:active:not(:disabled) {
   transform: translate(2px, 2px);
@@ -390,6 +393,13 @@ button.linkish:hover:not(:disabled),
 button.linkish:active:not(:disabled) {
   transform: none;
   box-shadow: none;
+}
+@media (hover: hover) {
+  button.linkish:hover:not(:disabled) {
+    color: var(--rust);
+  }
+}
+button.linkish:active:not(:disabled) {
   color: var(--rust);
 }
 
@@ -429,7 +439,8 @@ button.linkish:active:not(:disabled) {
   font-weight: 600;
   max-width: 260px;
   box-shadow: 3px 3px 0 var(--ink);
-  z-index: 5;
+  /* above the unit bar, Pass and log buttons (6): on a small board they often sit where you point */
+  z-index: 7;
 }
 
 #overlay {
@@ -681,6 +692,99 @@ input,
 textarea {
   font: inherit;
   color: var(--ink);
+}
+
+/* ---------- touch screens ---------- */
+/* No double-tap-to-zoom delay on controls (pinch zoom still works). */
+button,
+a,
+select,
+input,
+label,
+summary {
+  touch-action: manipulation;
+}
+
+/* The board and its overlays: a long press shouldn't select text or pop the browser's callout. */
+#stage {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Keyboard shortcut hints ("[P]", "[Esc]") mean nothing without a keyboard. */
+@media (hover: none) and (pointer: coarse) {
+  .key-hint {
+    display: none;
+  }
+}
+
+/* Fingers need bigger targets than a mouse pointer (about 40px tall). */
+@media (pointer: coarse) {
+  #topbar button,
+  .actions button,
+  .deploy-menu button,
+  .order-choice button,
+  .log-tab,
+  .float-pass,
+  #overlay .modal button:not(.linkish) {
+    min-height: 40px;
+  }
+  .unit-callout button,
+  button.mini {
+    min-height: 36px;
+  }
+  .unit-callout .co-cancel {
+    min-width: 40px;
+    text-align: center;
+  }
+}
+
+/* Narrow windows: the status text can't push the buttons around as it changes. */
+@media (max-width: 1100px) {
+  #topbar .status {
+    flex: 1 1 140px;
+    min-width: 0;
+    line-height: 1.1;
+  }
+}
+/* Phones: round, phase and score share one line, then the status, then the buttons. */
+@media (max-width: 720px) {
+  #topbar {
+    gap: 6px;
+  }
+  #topbar .status {
+    flex: 1 0 100%;
+    font-size: 0.9rem;
+  }
+  #topbar .logo,
+  #topbar .mercy,
+  #topbar .phase:not(.current) {
+    display: none;
+  }
+  #topbar .phase.current {
+    border-right: 0;
+  }
+  #topbar button {
+    padding: 3px 7px;
+    font-size: 0.82rem;
+  }
+}
+
+/* Phones held sideways: every pixel of height goes to the board. */
+@media (max-height: 500px) and (min-width: 721px) {
+  #app {
+    gap: 6px;
+    padding: 6px;
+  }
+  #topbar {
+    padding: 2px 8px;
+    gap: 6px;
+  }
+  #topbar .logo,
+  #topbar .mercy {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
