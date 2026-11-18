@@ -34,7 +34,9 @@ import {
   chargeBonus,
   chargeNeed,
   closeRanksPreview,
+  BALE_OUT,
   createGame,
+  cropDustCaught,
   overwatchPlan,
   planCharge,
   planCloseRanks,
@@ -1638,7 +1640,8 @@ export class Controller {
       // Spot-picking abilities: Barrage, Blink, Tunnel, Rocket Hop, and Recall's second click.
       const mover = mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget) ?? sel : sel;
       if (mode.id === "barrage") view.moveRing = { center: leader.pos, radius: def.range ?? 24 };
-      if (mode.id === "blink" || mode.id === "rocket-hop") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
+      if (mode.id === "blink" || mode.id === "rocket-hop" || mode.id === "crop-dust") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
+      if (mode.id === "bale-out") view.moveRing = { center: leader.pos, radius: (def.range ?? 6) + r };
       if (mode.id === "recall") view.moveRing = { center: leader.pos, radius: 4 + r };
       if (!hp) return info(def.text);
       if (hit && mode.id !== "barrage") return bad(`${def.name}: pick open ground`);
@@ -1651,6 +1654,22 @@ export class Controller {
         return why
           ? bad(`${def.name}: ${why}`)
           : ok(`Barrage: ${maxDrift ? `lands here on a 4+, else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"}` : "lands here"} · hits every ground model under the blast, yours too`, "target");
+      }
+      if (mode.id === "bale-out") {
+        view.ghosts = [{ pos: hp, radius: profileFor(BALE_OUT.profileId, []).baseRadius }];
+        view.ghostOk = !why;
+        return why ? bad(`${def.name}: ${why}`) : ok(`${def.name}: drop the hay bales here (they block paths and give cover this round)`, "target");
+      }
+      if (mode.id === "crop-dust") {
+        const caught = cropDustCaught(s, sel, leader.pos, hp);
+        view.targets = caught.map((c) => ({ uid: c.unit.uid, ok: true }));
+        const n = caught.reduce((k, c) => k + c.models.length, 0);
+        if (!why) {
+          const mr0 = profileOf(sel).baseRadius;
+          view.ghosts = [{ pos: hp, radius: mr0 }];
+          view.ghostOk = true;
+          return ok(`${def.name}: fly here, spraying ${n} enemy model${n === 1 ? "" : "s"} near the path (each hit on a 4+)`, "target");
+        }
       }
       const mr = profileOf(mover).baseRadius;
       const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, hp, { allowance: 0, teleport: true });

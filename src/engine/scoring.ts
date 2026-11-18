@@ -465,7 +465,7 @@ export function cleanupRound(s: GameState, events: GameEvent[]): void {
   }
   for (const u of s.units) {
     const st = u.status;
-    Object.assign(st, { acted: false, moved: false, disengaged: false, hunkered: false, charged: false, fought: false, hurt: false, meleeBonus: 0, rangedBonus: 0, braced: false, abilityUsed: false, reckless: false, spotted: false, hasted: 0, provoking: false, evadeBonus: 0, precisionBonus: 0, trackingBonus: 0, dugIn: 0 });
+    Object.assign(st, { acted: false, moved: false, disengaged: false, hunkered: false, charged: false, fought: false, hurt: false, meleeBonus: 0, rangedBonus: 0, braced: false, abilityUsed: false, reckless: false, spotted: false, hasted: 0, provoking: false, evadeBonus: 0, precisionBonus: 0, trackingBonus: 0, dugIn: 0, blinded: false, exposed: false, smoked: 0, silenced: false, overcharged: false, overwatching: false });
     st.slowedRounds = Math.max(0, st.slowedRounds - 1);
     u.reactionsUsed = [];
   }

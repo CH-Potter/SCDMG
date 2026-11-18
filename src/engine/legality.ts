@@ -212,6 +212,7 @@ function abilityProblem(s: GameState, u: Unit, id: AbilityId): string | null {
   const used = u.abilityUses[id] ?? 0;
   if (def.usesPerGame !== undefined && used >= def.usesPerGame) return `${def.name} is used up`;
   if (u.status.abilityUsed) return "This unit has already used an ability this phase";
+  if (u.status.silenced) return "Silenced: it can't use abilities this round";
   const cp = def.cp ?? 0;
   if (s.players[u.owner].cp < cp) return `${def.name} needs ${cp} CP (you have ${s.players[u.owner].cp})`;
   if (isEngaged(s, u) && id !== "patch-up") return "Can't do that while engaged";

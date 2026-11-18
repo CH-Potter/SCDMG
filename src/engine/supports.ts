@@ -57,11 +57,20 @@ export function supportTarget(a: SupportAbilityDef): "none" | "friendlyUnit" | "
     case "aimBuff":
     case "regrow":
     case "dugIn":
+    case "smoke":
+    case "overwatch":
+    case "haste":
+    case "resonate":
+    case "overshield":
       return "friendlyUnit";
     case "teleport":
       return "unitPoint";
     case "slow":
     case "rattle":
+    case "spot":
+    case "blind":
+    case "expose":
+    case "silence":
       return "enemyUnit";
     case "airdrop":
       return "reservePoint";
@@ -320,6 +329,86 @@ export function playSupport(s: GameState, cmd: Extract<Command, { type: "support
       u.status.moved = true;
       events.push({ type: "moved", uid: u.uid, kind: "teleport" });
       text = `${card.name}: ${ability.name}! ${profileOf(u).name} steps through a gate of light.`;
+      break;
+    }
+    case "spot":
+    case "blind":
+    case "silence": {
+      const t = target!;
+      const near = aliveModels(t).some((m) => nearestFriendlyDistance(s, cmd.player, m.pos) <= e.range);
+      if (!near) return `Must be within ${e.range}" of one of your models`;
+      const st = t.status;
+      const name = profileOf(t).name;
+      if (e.kind === "spot") {
+        if (st.spotted) return "That unit is already spotted";
+        st.spotted = true;
+        text = `${card.name}: ${ability.name}! ${name} is spotted: your shots at it hit one better this round.`;
+      } else if (e.kind === "blind") {
+        if (!profileOf(t).weapons.some((w) => !w.melee)) return "That unit has no guns to put off";
+        if (st.blinded) return "That unit can already barely see";
+        st.blinded = true;
+        text = `${card.name}: ${ability.name}! ${name}'s shooting hits one worse this round.`;
+      } else {
+        if (st.silenced) return "That unit is already silenced";
+        st.silenced = true;
+        text = `${card.name}: ${ability.name}! ${name} can't use abilities or reactions this round.`;
+      }
+      break;
+    }
+    case "expose": {
+      const t = target!;
+      if (t.status.exposed) return "That unit is already in the light";
+      const seen = onBoard(s, cmd.player).some(
+        (u) => aliveModels(u).some((m) => aliveModels(t).some((tm) => dist(m.pos, tm.pos) <= e.range && lineOfSight(s, m.pos, m.elevation, tm.pos, tm.elevation))),
+      );
+      if (!seen) return `None of your models within ${e.range}" can see that unit`;
+      t.status.exposed = true;
+      text = `${card.name}: ${ability.name}! ${profileOf(t).name} gets no help from cover, hunkering or digging in this round.`;
+      break;
+    }
+    case "smoke": {
+      const st = target!.status;
+      if (st.smoked) return "That unit is already hidden in dust";
+      if (isStructure(target!)) return "Structures can't hide";
+      st.smoked = e.range;
+      text = `${card.name}: ${ability.name}! ${profileOf(target!).name} vanishes into the dust: only shots from within ${e.range}" can find it this round.`;
+      break;
+    }
+    case "overwatch": {
+      const u = target!;
+      if (hasAbility(u, "overwatch") || u.status.overwatching) return "That unit is already on overwatch";
+      if (!profileOf(u).weapons.some((w) => !w.melee && !w.traits?.includes("indirect"))) return "That unit has no gun to watch with";
+      u.status.overwatching = true;
+      text = `${card.name}: ${ability.name}! ${profileOf(u).name} watches the approaches (Overwatch this round).`;
+      break;
+    }
+    case "haste": {
+      const u = target!;
+      if (isStructure(u)) return "Structures can't move";
+      if (u.status.acted || s.phase === "combat") return "That unit has nowhere left to go this phase";
+      u.status.hasted = (u.status.hasted ?? 0) + e.move;
+      text = `${card.name}: ${ability.name}! ${profileOf(u).name} gets +${e.move}" move this round.`;
+      break;
+    }
+    case "resonate": {
+      const centre = target!;
+      let n = 0;
+      for (const u of onBoard(s, cmd.player)) {
+        if (u.uid !== centre.uid && unitGap(u, centre) > e.range) continue;
+        const max = profileOf(u).shield;
+        for (const m of aliveModels(u)) {
+          if (m.shield >= max) continue;
+          m.shield += 1;
+          n += 1;
+        }
+      }
+      if (!n) return "No shields to recharge there";
+      text = `${card.name}: ${ability.name}! Shields hum back up on ${n} model${n === 1 ? "" : "s"}.`;
+      break;
+    }
+    case "overshield": {
+      for (const m of aliveModels(target!)) m.shield += e.amount;
+      text = `${card.name}: ${ability.name}! ${profileOf(target!).name} glows with +${e.amount} shield.`;
       break;
     }
     case "slow": {

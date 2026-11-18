@@ -192,6 +192,7 @@ export function defaultEffect(kind: SupportEffect["kind"], f: Faction): SupportE
     case "heal":
       return { kind, amount: 2, revive: false };
     case "recharge":
+    case "overwatch":
     case "ward":
     case "brace":
       return { kind };
@@ -218,6 +219,20 @@ export function defaultEffect(kind: SupportEffect["kind"], f: Faction): SupportE
       return { kind, save: 1 };
     case "teleport":
       return { kind, range: 8 };
+    case "spot":
+    case "expose":
+      return { kind, range: 24 };
+    case "blind":
+    case "silence":
+      return { kind, range: 12 };
+    case "smoke":
+      return { kind, range: 12 };
+    case "resonate":
+      return { kind, range: 6 };
+    case "haste":
+      return { kind, move: 2 };
+    case "overshield":
+      return { kind, amount: 1 };
   }
 }
 
@@ -258,6 +273,15 @@ export const EFFECT_INFO: Record<SupportEffect["kind"], { label: string; reactio
   regrow: { label: "Regrow", reaction: false, help: "A friendly unit regrows some of its lost models, at 1 HP each." },
   dugIn: { label: "Dig in", reaction: false, help: "A friendly unit gets better saves against shooting and barrages this round (stacks with cover and hunkering)." },
   teleport: { label: "Teleport", reaction: false, help: "Move a friendly, unengaged unit up to the range, ignoring terrain. It can still act afterwards." },
+  spot: { label: "Spot", reaction: false, help: "An enemy unit near your models is spotted: your shots at it hit one better this round." },
+  smoke: { label: "Smoke", reaction: false, help: "A friendly unit hides in smoke or dust: it can only be shot from within the range this round." },
+  overwatch: { label: "Grant Overwatch", reaction: false, help: "A friendly unit with a gun gains Overwatch until the end of the round." },
+  haste: { label: "Haste", reaction: false, help: "A friendly unit gets extra move this round (it also adds to a rolled charge)." },
+  blind: { label: "Blind", reaction: false, help: "An enemy unit near your models: its shooting hits one worse this round." },
+  resonate: { label: "Resonance", reaction: false, help: "A friendly unit and every friendly unit within the range of it recharge 1 shield per model." },
+  expose: { label: "Expose", reaction: false, help: "An enemy unit one of your models can see within the range gets nothing from cover, hunkering or digging in against shooting this round." },
+  silence: { label: "Silence", reaction: false, help: "An enemy unit near your models can't use active abilities, and its reactive abilities don't trigger, this round." },
+  overshield: { label: "Overshield", reaction: false, help: "A friendly unit gets extra shield per model, even above its maximum, until the end of the round." },
   ward: { label: "Ward (reaction)", reaction: true, help: "Armed in advance: the next enemy ranged attack on one of your units this round hits one worse." },
   brace: { label: "Brace (reaction)", reaction: true, help: "Armed in advance: the next friendly unit charged this round gets +1 to saves in that combat." },
   retaliate: { label: "Retaliate (reaction)", reaction: true, help: "Armed in advance: when one of your units is destroyed, each enemy model touching it is hit." },
@@ -302,6 +326,24 @@ export function effectSummary(e: SupportEffect, f: Faction): string {
       return `A friendly unit gets +${e.save} to saves against shooting and barrages this round.`;
     case "teleport":
       return `Move a friendly, unengaged unit up to ${e.range}", ignoring terrain (not into base contact). It can still act afterwards.`;
+    case "spot":
+      return `An enemy unit within ${e.range}" of your models is spotted: your shots at it hit one better this round.`;
+    case "smoke":
+      return `A friendly unit can't be shot from more than ${e.range}" away this round.`;
+    case "overwatch":
+      return "A friendly unit gains Overwatch until the end of the round.";
+    case "haste":
+      return `A friendly unit gets +${e.move}" move this round.`;
+    case "blind":
+      return `An enemy unit within ${e.range}" of your models: its shooting hits one worse this round.`;
+    case "resonate":
+      return `A friendly unit and every friendly unit within ${e.range}" of it recharge 1 shield per model.`;
+    case "expose":
+      return `An enemy unit within ${e.range}" that one of your models can see gets nothing from cover, hunkering or digging in against shooting this round.`;
+    case "silence":
+      return `An enemy unit within ${e.range}" of your models can't use active abilities, and its reactions don't trigger, this round.`;
+    case "overshield":
+      return `A friendly unit gets +${e.amount} shield per model, even above its maximum, until the end of the round.`;
     case "ward":
       return "Reaction: the next enemy ranged attack on one of your units this round hits one worse.";
     case "brace":

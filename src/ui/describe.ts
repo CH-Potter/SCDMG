@@ -188,6 +188,12 @@ export function abilityStatusTags(u: Unit): string[] {
   if (st.hasted) tags.push(`🍬 +${st.hasted}" move`);
   if (st.provoking) tags.push("📢 provoking (enemies near it must shoot it)");
   if (st.dugIn) tags.push(`🧱 dug in (+${st.dugIn} save against shooting)`);
+  if (st.blinded) tags.push("😵 blinded (its shooting hits one worse)");
+  if (st.exposed) tags.push("🔦 in the spotlight (no cover, hunker or dig-in bonus)");
+  if (st.smoked) tags.push(`🌫 hidden in dust (only shots from within ${st.smoked}")`);
+  if (st.silenced) tags.push("🤐 silenced (no abilities or reactions)");
+  if (st.overcharged) tags.push("⚡ overcharged (+1 damage on its shots)");
+  if (st.overwatching) tags.push("👀 on overwatch (Top Cover)");
   if (st.precisionBonus || st.trackingBonus)
     tags.push(`🔍 ${[st.precisionBonus ? `precision +${st.precisionBonus}` : "", st.trackingBonus ? `tracking +${st.trackingBonus}` : ""].filter(Boolean).join(", ")}`);
   const max = profileOf(u).shield;

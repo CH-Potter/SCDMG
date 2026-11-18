@@ -12,14 +12,14 @@ import { defaultListFor, defaultSupportsFor } from "./data/factions";
 import { CP_CAP, MERCY_LEAD } from "./constants";
 import { consumeReaction } from "./reactions";
 import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type ArmyRule } from "./openRoster";
-import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
+import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels, summon } from "./supports";
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
 import { cleanRules, CLOSE_RANKS_MOVE, OVERWATCH_HIT, REROLL_CP, ROLLED_CHARGE_MAX, rulesOf, type HouseRules } from "./houseRules";
-import { applyDamage, burstAt, evadeTarget, expectedDamage, hasTrait, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
+import { applyDamage, blastOn, burstAt, evadeTarget, expectedDamage, hasTrait, moraleCheck, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
-import { dist, segmentNearPolygon } from "./geometry";
-import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
+import { dist, pointSegmentDistance, segmentNearPolygon } from "./geometry";
+import { hasAbility, hasKeyword, isFlying, profileFor, profileOf, reacts } from "./profile";
 import { nextRandom, rollD6 } from "./rng";
 import {
   aliveModels,
@@ -30,6 +30,7 @@ import {
   engagedWith,
   ENGAGE_RANGE,
   disengageOdds,
+  modelsInReach,
   isEngaged,
   meleeCanHit,
   modelGap,
@@ -414,6 +415,8 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (friend && misses > 0 && friend.onBoard && aliveModels(friend).length) {
         pushAttack(events, (ev) => resolveAttack(s, unit, friend, `${w.name} (stray)`, strayPlan(friend, plan, misses), "shoot", ev));
       }
+      // Return Fire: a target the shot hurt (but didn't finish) shoots back.
+      if (report.damage > 0 && !target.destroyed) returnFire(s, target, unit, events);
       break;
     }
     case "fight": {
@@ -521,6 +524,8 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   const declared = planCharge(s, unit, target, rules.rolledCharges ? ROLLED_CHARGE_MAX + bonus : undefined);
   if (typeof declared === "string") return declared;
   // Declared: from here on dice are rolled, so the charge happens (or fails) and can't be taken back.
+  // Pirouette: the target steps away before the charge is rolled.
+  const dodged = pirouette(s, target, unit, events);
   if (rules.overwatch) chargeOverwatch(s, target, unit, events);
   if (unit.destroyed) return false;
   let plan: UnitMovePlan | string = declared;
@@ -532,6 +537,9 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
     if (!made) return false;
     plan = planCharge(s, unit, target, roll[0] + roll[1] + bonus);
     if (typeof plan === "string") plan = planCharge(s, unit, target, need! + bonus);
+  } else if (dodged) {
+    // The target moved: plan the charge again from scratch, with the same reach it was declared with.
+    plan = planCharge(s, unit, target, rules.rolledCharges ? ROLLED_CHARGE_MAX + bonus : undefined);
   } else if (unit.models.some((m) => !m.alive && declared.placements.some((p) => p.modelId === m.id))) {
     // Overwatch took down models the route was planned for: plan again with whoever is left.
     plan = planCharge(s, unit, target);
@@ -544,10 +552,29 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   const reached = dive ? unitGap(unit, target) <= ENGAGE_RANGE + 1e-6 : unitsEngage(unit, target);
   if (!reached) return "Couldn't reach base contact";
   unit.status.charged = true;
+  // Phase Out: the target vanishes before any blows land; the charger is left where it stopped.
+  if (phaseOut(s, target, unit, events)) return null;
   if (consumeReaction(s, target.owner, "enemyCharges", events)) target.status.braced = true;
+  // Riposte: the target's duellists strike first.
+  if (reacts(target, "riposte") && !target.reactionsUsed.includes("riposte")) {
+    const rp = planRiposte(target, unit);
+    if (rp) {
+      target.reactionsUsed.push("riposte");
+      events.push({ type: "ability", uid: target.uid, ability: "riposte", text: `${profileOf(target).name} ripostes!` });
+      pushAttack(events, (ev) => resolveAttack(s, target, unit, ABILITIES.riposte.name, rp, "fight", ev));
+      if (unit.destroyed) return null;
+    }
+  }
   // Impact on charge: slam into the target before the combat phase (for a flyer, that's the whole dive).
   const impact = dive || rules.impact ? planImpact(unit, target, rules) : null;
-  if (impact) pushAttack(events, (ev) => resolveAttack(s, unit, target, dive ? "Dive" : "Impact", impact, "impact", ev));
+  if (impact) {
+    const report = pushAttack(events, (ev) => resolveAttack(s, unit, target, dive ? "Dive" : "Impact", impact, "impact", ev));
+    // Eye Peck: a dive that draws blood leaves the target squinting.
+    if (dive && report.damage > 0 && reacts(unit, "eye-peck") && !target.destroyed && !target.status.blinded) {
+      target.status.blinded = true;
+      events.push({ type: "ability", uid: unit.uid, ability: "eye-peck", text: `${profileOf(unit).name} peck at ${profileOf(target).name}'s eyes: its shooting hits one worse this round.` });
+    }
+  }
   return null;
 }
 
@@ -710,6 +737,7 @@ function useAbility(
   const used = unit.abilityUses[id] ?? 0;
   if (def.usesPerGame !== undefined && used >= def.usesPerGame) return `${def.name} is used up`;
   if (unit.status.abilityUsed) return "This unit has already used an ability this phase";
+  if (unit.status.silenced) return "Silenced: it can't use abilities this round";
   const cpCost = def.cp ?? 0;
   if (s.players[unit.owner].cp < cpCost) return `${def.name} needs ${cpCost} CP (you have ${s.players[unit.owner].cp})`;
   if (isEngaged(s, unit) && id !== "patch-up") return "Can't do that while engaged";
@@ -900,6 +928,55 @@ function useAbility(
       pushAttack(events, (ev) => resolveAttack(s, unit, t, def.name, plan, "shoot", ev));
       break;
     }
+    case "crop-dust": {
+      if (!point) return "Pick a point";
+      const leader = aliveModels(unit)[0]!;
+      const from = { ...leader.pos };
+      if (dist(from, point) > (def.range ?? 10) + 1e-6) return `Too far (${def.range}")`;
+      const e = moveUnit(s, unit, leader.id, point, 0, true);
+      if (e) return e;
+      if (isEngaged(s, unit)) return "Can't land in base contact";
+      say(`${name} swoops low and dusts the field!`);
+      cropDust(s, unit, from, { ...leader.pos }, events);
+      events.push({ type: "moved", uid: unit.uid, kind: "advance" });
+      react(s, unit, events);
+      break;
+    }
+    case "bale-out": {
+      if (!point) return "Pick a point";
+      const reach = (def.range ?? 6) + profileOf(unit).baseRadius;
+      if (!aliveModels(unit).some((m) => dist(m.pos, point) <= reach + 1e-6)) return `Must be within ${def.range}" of this unit`;
+      for (const en of onBoard(s)) {
+        if (en.owner === unit.owner) continue;
+        const r = profileOf(en).baseRadius;
+        if (aliveModels(en).some((m) => dist(m.pos, point) - r < BALE_OUT.minEnemyDistance)) return `Must be at least ${BALE_OUT.minEnemyDistance}" from enemies`;
+      }
+      const made = summon(s, unit.owner, BALE_OUT.profileId, point);
+      if (typeof made === "string") return made;
+      events.push({ type: "summoned", uid: made.uid });
+      say(`${name} kicks a stack of hay bales out of the hatch!`);
+      break;
+    }
+    case "overcharge": {
+      if (unit.status.overcharged) return "Already overcharged";
+      if (!profileOf(unit).weapons.some((w) => !w.melee)) return "This unit has no gun to overcharge";
+      const ms = aliveModels(unit);
+      if (!ms.some((m) => m.shield > 0)) return "No shields left to drain";
+      for (const m of ms) m.shield = 0;
+      unit.status.overcharged = true;
+      say(`${name} pours its shields into its guns: +1 damage this round.`);
+      break;
+    }
+    case "spotlight": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (t.status.exposed) return "That unit is already in the light";
+      if (unitGap(unit, t) > (def.range ?? 16)) return `Must be within ${def.range}"`;
+      if (!canSee(s, unit, t)) return "This unit can't see that one";
+      t.status.exposed = true;
+      say(`${name} turns a spotlight on ${profileOf(t).name}: no cover, hunkering or digging in will help it this round.`);
+      break;
+    }
     default:
       return "That ability can't be activated";
   }
@@ -915,7 +992,9 @@ function useAbility(
 function react(s: GameState, mover: Unit, events: GameEvent[]): void {
   if (mover.destroyed) return;
   for (const w of onBoard(s, other(mover.owner))) {
-    if (!hasAbility(w, "overwatch") || w.reactionsUsed.includes("overwatch")) continue;
+    // Overwatch from the unit's own ability or from Top Cover; a silenced unit holds its fire.
+    const watching = reacts(w, "overwatch") || (!!w.status.overwatching && !w.status.silenced);
+    if (!watching || w.reactionsUsed.includes("overwatch")) continue;
     if (isEngaged(s, w) || unitGap(w, mover) > 10) continue;
     const idx = profileOf(w).weapons.findIndex((x) => !x.melee);
     const weapon = profileOf(w).weapons[idx];
@@ -930,7 +1009,7 @@ function react(s: GameState, mover: Unit, events: GameEvent[]): void {
   }
   if (isFlying(mover)) return;
   for (const w of onBoard(s, other(mover.owner))) {
-    if (!hasAbility(w, "lurk") || w.reactionsUsed.includes("lurk")) continue;
+    if (!reacts(w, "lurk") || w.reactionsUsed.includes("lurk")) continue;
     if (engagedWith(s, w).some((e) => e.uid !== mover.uid)) continue;
     const plan = planLurk(w, mover);
     if (!plan) continue;
@@ -953,6 +1032,126 @@ export const HATCH_MODELS = 2;
 export const LURK = { dice: 2, hit: 4, damage: 1, ap: 1 };
 /** Demo Charge: dice, hit, damage and AP, and the damage against structures and mechs. */
 export const DEMO = { dice: 3, hit: 3, damage: 2, ap: 1, vsHard: 3 };
+
+/** Crop Dust: how close to the flight path a model must be (edge to edge), and the spray's hit, damage and AP. A cloud of dust can't be dodged. */
+export const CROP_DUST = { width: 1, hit: 4, damage: 1, ap: 0, noEvade: true };
+/** Bale Out: what drops, and how far from enemies it must land. */
+export const BALE_OUT = { profileId: "mil-junk", minEnemyDistance: 2 };
+/** Riposte: dice per model in base contact, hit, damage and AP. */
+export const RIPOSTE = { dice: 1, hit: 3, damage: 1, ap: 1 };
+
+/** Enemy ground models a flight from `from` to `to` passes within Crop Dust's reach of, by unit. */
+export function cropDustCaught(s: GameState, flyer: Unit, from: Vec, to: Vec): { unit: Unit; models: Model[] }[] {
+  const out: { unit: Unit; models: Model[] }[] = [];
+  const ra = profileOf(flyer).baseRadius;
+  for (const t of onBoard(s)) {
+    if (t.owner === flyer.owner || isFlying(t)) continue;
+    const rt = profileOf(t).baseRadius;
+    const models = aliveModels(t).filter((m) => pointSegmentDistance(m.pos, from, to) - ra - rt <= CROP_DUST.width + 1e-6);
+    if (models.length) out.push({ unit: t, models });
+  }
+  return out;
+}
+
+/** Crop Dust's spray: every enemy ground model near the path rolls to be hit, like a blast but with no evade (saves, no cover). */
+function cropDust(s: GameState, flyer: Unit, from: Vec, to: Vec, events: GameEvent[]): void {
+  for (const { unit: t, models } of cropDustCaught(s, flyer, from, to)) {
+    if (!t.onBoard) continue;
+    const at = events.length; // the attack is logged ahead of the damage and morale it causes
+    const rolled = blastOn(s, t, models, CROP_DUST, events);
+    if (rolled.damage > 0) moraleCheck(s, t, events);
+    events.splice(at, 0, {
+      type: "attack",
+      report: { uid: flyer.uid, target: t.uid, weapon: ABILITIES["crop-dust"].name, kind: "barrage", attackers: 1, hitOn: CROP_DUST.hit, ...rolled, unitDestroyed: t.destroyed },
+    });
+  }
+}
+
+/** Return Fire: the gun (and plan) `w` would shoot back at `shooter` with, hitting one worse, or null. */
+export function returnFirePlan(s: GameState, w: Unit, shooter: Unit): { weapon: Weapon; plan: AttackPlan } | null {
+  if (w.destroyed || !w.onBoard || shooter.destroyed || !shooter.onBoard || isEngaged(s, w)) return null;
+  let best: { weapon: Weapon; plan: AttackPlan; value: number } | null = null;
+  for (const weapon of profileOf(w).weapons) {
+    if (weapon.melee || hasTrait(weapon, "indirect")) continue;
+    // Planned as an overwatch shot: hasty, so it hits one worse.
+    const plan = planShooting(s, w, shooter, weapon, "overwatch");
+    if (typeof plan === "string") continue;
+    const value = expectedDamage(s, w, shooter, plan, false);
+    if (!best || value > best.value) best = { weapon, plan, value };
+  }
+  return best && { weapon: best.weapon, plan: best.plan };
+}
+
+/** Return Fire: a unit whose shot just damaged `target` gets shot back at (once per round). */
+function returnFire(s: GameState, target: Unit, shooter: Unit, events: GameEvent[]): void {
+  if (!reacts(target, "return-fire") || target.reactionsUsed.includes("return-fire")) return;
+  const rf = returnFirePlan(s, target, shooter);
+  if (!rf) return;
+  target.reactionsUsed.push("return-fire");
+  if (consumeReaction(s, shooter.owner, "enemyShoots", events)) rf.plan.hitOn = Math.min(6, rf.plan.hitOn + 1);
+  events.push({ type: "ability", uid: target.uid, ability: "return-fire", text: `${profileOf(target).name} returns fire!` });
+  pushAttack(events, (ev) => resolveAttack(s, target, shooter, rf.weapon.name, rf.plan, "shoot", ev));
+}
+
+/** Riposte: the charged unit's models in base contact with the charger, 1 die each. Null if none can strike. */
+export function planRiposte(t: Unit, charger: Unit): AttackPlan | null {
+  if (isFlying(charger)) return null; // a dive never stays in reach of a blade
+  const attackers: AttackPlan["attackers"] = [];
+  const targets = new Set<Model>();
+  for (const tm of aliveModels(t)) {
+    const touching = aliveModels(charger).filter((cm) => modelsInReach(t, tm, charger, cm));
+    if (!touching.length) continue;
+    touching.forEach((cm) => targets.add(cm));
+    attackers.push({ model: tm, dice: RIPOSTE.dice });
+  }
+  if (!attackers.length) return null;
+  const ap = hasKeyword(charger, "armoured") ? Math.max(0, RIPOSTE.ap - 1) : RIPOSTE.ap;
+  return { attackers, targets: [...targets], hitOn: RIPOSTE.hit, damage: RIPOSTE.damage, ap };
+}
+
+/**
+ * Step (or teleport) `u` straight away from `from` by up to `max` inches: the whole unit slides,
+ * keeping its shape, never ending in base contact. Tries shorter steps if the full one is blocked.
+ * Doesn't count as the unit moving (it keeps Steady Aim). Returns the distance moved (0 if it couldn't).
+ */
+function stepAway(s: GameState, u: Unit, from: Unit, max: number, teleport: boolean): number {
+  const centre = (x: Unit): Vec => {
+    const ms = aliveModels(x);
+    return { x: ms.reduce((n, m) => n + m.pos.x, 0) / ms.length, y: ms.reduce((n, m) => n + m.pos.y, 0) / ms.length };
+  };
+  const c = centre(u);
+  const f = centre(from);
+  const len = dist(c, f);
+  if (len < 1e-6) return 0;
+  return slideUnit(s, u, { x: (c.x - f.x) / len, y: (c.y - f.y) / len }, max, teleport);
+}
+
+/** Pirouette: a charge was just declared at `t`; it steps away first (once per round). Returns whether it moved. */
+function pirouette(s: GameState, t: Unit, charger: Unit, events: GameEvent[]): boolean {
+  if (!reacts(t, "pirouette") || t.reactionsUsed.includes("pirouette") || isEngaged(s, t) || isStructure(t)) return false;
+  const k = stepAway(s, t, charger, ABILITIES.pirouette.range ?? 3, false);
+  if (!k) return false;
+  t.reactionsUsed.push("pirouette");
+  events.push({ type: "ability", uid: t.uid, ability: "pirouette", text: `${profileOf(t).name} pirouettes ${k}" out of reach!` });
+  events.push({ type: "moved", uid: t.uid, kind: "move" });
+  return true;
+}
+
+/** Phase Out: a charge just reached `t`; it teleports away before any blows land (once per game). Returns whether it went. */
+function phaseOut(s: GameState, t: Unit, charger: Unit, events: GameEvent[]): boolean {
+  const def = ABILITIES["phase-out"];
+  if (!reacts(t, "phase-out") || (t.abilityUses["phase-out"] ?? 0) >= (def.usesPerGame ?? 1) || isStructure(t)) return false;
+  // Only out of a fresh fight: a unit already locked in another melee can't slip away.
+  if (engagedWith(s, t).some((e) => e.uid !== charger.uid)) return false;
+  const k = stepAway(s, t, charger, def.range ?? 6, true);
+  if (!k) return false;
+  t.abilityUses["phase-out"] = (t.abilityUses["phase-out"] ?? 0) + 1;
+  dropCarriedFlag(s, t, events, "phases out");
+  events.push({ type: "ability", uid: t.uid, ability: "phase-out", text: `${profileOf(t).name} phases out, ${k}" away from ${profileOf(charger).name}!` });
+  events.push({ type: "moved", uid: t.uid, kind: "teleport" });
+  react(s, t, events);
+  return true;
+}
 
 /** Can any model of `a` see any model of `t`? */
 export function canSee(s: GameState, a: Unit, t: Unit): boolean {
@@ -1012,11 +1211,20 @@ function dragToward(s: GameState, t: Unit, toward: Unit, max: number): number {
   const anchor = aliveModels(toward).reduce((a, b) => (dist(a.pos, c) < dist(b.pos, c) ? a : b));
   const len = dist(c, anchor.pos);
   if (len < 1e-6) return 0;
-  const dir = { x: (anchor.pos.x - c.x) / len, y: (anchor.pos.y - c.y) / len };
+  return slideUnit(s, t, { x: (anchor.pos.x - c.x) / len, y: (anchor.pos.y - c.y) / len }, max, false);
+}
+
+/**
+ * Slide every model of `t` the same distance along the unit vector `dir`, up to `max` inches, keeping
+ * each model's level and never ending in base contact. Solid terrain in the way stops it unless
+ * `through` (a teleport). Tries shorter slides if the full one is blocked. Returns the distance moved.
+ */
+function slideUnit(s: GameState, t: Unit, dir: Vec, max: number, through: boolean): number {
+  const ms = aliveModels(t);
   const r = profileOf(t).baseRadius;
   const others = allPlaced(s).filter((p) => p.uid !== t.uid);
-  const blocked = (from: Vec, to: Vec, elev: Elevation): boolean => pathBlocked(s, from, to, elev, r);
-  for (let k = max; k >= 0.5; k -= 0.5) {
+  const blocked = (from: Vec, to: Vec, elev: Elevation): boolean => !through && pathBlocked(s, from, to, elev, r);
+  for (let k = max; k >= 0.5 - 1e-9; k -= 0.5) {
     const placed: Placed[] = [...others];
     const moves: { m: Model; to: Vec }[] = [];
     let ok = true;

@@ -64,9 +64,23 @@ export type AbilityId =
   | "sugar-rush" // +2 move this round, one model takes 1 damage
   | "provoke" // enemy units within 18" must shoot this unit if they can
   | "demo-charge" // throw a charge at an enemy within 4"; extra damage vs structures and mechs
+  | "crop-dust" // assault: fly up to 10" in a line, spraying every enemy ground model near the path
+  | "bale-out" // movement, once per game: drop a Junk Barricade near this unit
+  | "overcharge" // assault: drain the unit's shields for +1 damage on its shots this round
+  | "spotlight" // assault: an enemy unit in sight gets no cover this round
+  // reactive (added in the ability pass)
+  | "return-fire" // once per round: shoot back at an enemy whose shot damaged this unit
+  | "riposte" // once per round: when charged, models in base contact strike first
+  | "pirouette" // once per round: when a charge is declared at it, step 3" away before the roll
+  | "phase-out" // once per game: when a charge reaches it, teleport 6" away before any blows land
+  // passive (added in the ability pass)
+  | "eye-peck" // a dive that deals damage leaves the target's shooting one worse this round
+  | "twirl-away" // always disengages cleanly
+  | "radio-spotting" // shells count as spotted when any friendly unit can see the aim point
   // structures
   | "burrow-exit" // your reserves may deploy within 3" of this structure
-  | "ward-aura"; // enemy ranged attacks on friendly units within 4" hit one worse
+  | "ward-aura" // enemy ranged attacks on friendly units within 4" hit one worse
+  | "scrap-cover"; // friendly models within 2" of this structure count as in cover against shooting
 
 /**
  * Weapon traits:
@@ -238,6 +252,24 @@ export type SupportEffect =
   | { kind: "dugIn"; save: number }
   /** A friendly, unengaged unit teleports up to `range`" (its leader), ignoring terrain; it can still act afterwards. */
   | { kind: "teleport"; range: number }
+  /** An enemy unit within `range`" of your models is spotted: your shots at it hit one better this round. */
+  | { kind: "spot"; range: number }
+  /** A friendly unit is hidden in dust: it can't be shot from more than `range`" away this round. */
+  | { kind: "smoke"; range: number }
+  /** A friendly unit gains Overwatch until the end of the round. */
+  | { kind: "overwatch" }
+  /** A friendly unit gets +`move`" move this round. */
+  | { kind: "haste"; move: number }
+  /** An enemy unit within `range`" of your models: its shooting hits one worse this round. */
+  | { kind: "blind"; range: number }
+  /** A friendly unit and every friendly unit within `range`" of it recharge 1 shield per model. */
+  | { kind: "resonate"; range: number }
+  /** An enemy unit within `range`" that one of your models can see gets nothing from cover, hunkering or digging in against shooting this round. */
+  | { kind: "expose"; range: number }
+  /** An enemy unit within `range`" of your models can't use active abilities, and its reactive ones don't trigger, this round. */
+  | { kind: "silence"; range: number }
+  /** A friendly unit gets +`amount` shield per model, even above its maximum, until the end of the round. */
+  | { kind: "overshield"; amount: number }
   // reactions: armed on your turn, fire automatically on the trigger, expire at the end of the round
   | { kind: "ward" }
   | { kind: "brace" }
@@ -343,6 +375,18 @@ export interface UnitStatus {
   trackingBonus?: number;
   /** Dug in (support): this much better saves against shooting and barrages until the end of the round. */
   dugIn?: number;
+  /** Eye Peck / Eye-Watering Reek: this unit's shooting hits one worse until the end of the round. */
+  blinded?: boolean;
+  /** Spotlight / Glaring Light: cover, hunkering and digging in don't help its saves against shooting until the end of the round. */
+  exposed?: boolean;
+  /** Dust Cloud: can't be shot from further than this many inches until the end of the round (0 = no smoke). */
+  smoked?: number;
+  /** Withering Review: no active abilities, and its reactive abilities don't trigger, until the end of the round. */
+  silenced?: boolean;
+  /** Overcharge: +1 damage on its ranged attacks until the end of the round. */
+  overcharged?: boolean;
+  /** Top Cover: has Overwatch until the end of the round. */
+  overwatching?: boolean;
 }
 
 export interface Unit {

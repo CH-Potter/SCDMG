@@ -44,6 +44,8 @@ export const profileOf = (u: Unit): UnitProfile => profileFor(u.profileId, u.upg
 export const hasKeyword = (u: Unit, k: Keyword): boolean => profileOf(u).keywords.includes(k);
 export const hasAbility = (u: Unit, a: AbilityId): boolean => profileOf(u).abilities.includes(a);
 export const isFlying = (u: Unit): boolean => hasKeyword(u, "flying");
+/** A reactive (or passive-triggered) ability that fires right now: the unit has it and isn't silenced (Withering Review). */
+export const reacts = (u: Unit, a: AbilityId): boolean => !u.status.silenced && hasAbility(u, a);
 
 /** Forget cached effective profiles (call after custom factions are re-registered). */
 export function clearProfileCache(): void {

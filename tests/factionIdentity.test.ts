@@ -95,9 +95,9 @@ describe("faction pillars in the data", () => {
 
   it("each signature ability belongs to one faction only", () => {
     const own: Record<string, AbilityId[]> = {
-      militia: ["overwatch", "entrenched", "steady-aim", "spotter", "barrage", "demo-charge", "patch-up", "steadying", "rocket-hop"],
-      munch: ["regen", "regrow", "hatch", "lurk", "sticky-goo", "rampage", "sugar-rush", "brood-call", "mending-aura", "tunnel", "burrow-exit", "pop", "grapple", "bombs-away"],
-      concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura"],
+      militia: ["overwatch", "entrenched", "steady-aim", "spotter", "barrage", "demo-charge", "patch-up", "steadying", "rocket-hop", "return-fire", "crop-dust", "bale-out", "radio-spotting", "scrap-cover"],
+      munch: ["regen", "regrow", "hatch", "lurk", "sticky-goo", "rampage", "sugar-rush", "brood-call", "mending-aura", "tunnel", "burrow-exit", "pop", "grapple", "bombs-away", "eye-peck"],
+      concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura", "overcharge", "spotlight", "riposte", "pirouette", "phase-out", "twirl-away"],
     };
     for (const [f, ids] of Object.entries(own)) for (const a of ids) expect(factionsWith(a), `${a}`).toEqual([f]);
     // Every ability in the library has a home.
@@ -111,16 +111,25 @@ describe("faction pillars in the data", () => {
       dugIn: "militia",
       ward: "militia",
       heal: "militia",
+      spot: "militia",
+      smoke: "militia",
+      overwatch: "militia",
       meleeBuff: "munch",
       regrow: "munch",
       rattle: "munch",
       slow: "munch",
       retaliate: "munch",
+      haste: "munch",
+      blind: "munch",
       recharge: "concord",
       aimBuff: "concord",
       teleport: "concord",
       brace: "concord",
       blast: "concord",
+      resonate: "concord",
+      expose: "concord",
+      silence: "concord",
+      overshield: "concord",
     };
     for (const f of BUILT_IN_FACTION_IDS)
       for (const e of effects(f)) if (e.kind !== "summon" && e.kind !== "airdrop") expect(owner[e.kind], `${f}: ${e.kind}`).toBe(f);
