@@ -2,6 +2,10 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { FACTIONS, PROFILES, SUPPORTS, registerCustomFactions } from "../src/engine/data/factions";
 import { factionProblems } from "../src/engine/data/factionValidation";
 import type { Faction } from "../src/engine/types";
+import { priceUnit, upgradeCost } from "../src/engine/pricing";
+import { factionSlots, supportSlots } from "../src/engine/data/unitClasses";
+import { MODES } from "../src/engine/data/modes";
+import { listCostIn } from "../src/engine/data/factionValidation";
 import {
   addProfile,
   addSupport,
@@ -10,6 +14,7 @@ import {
   removeUpgrade,
   removeWeapon,
   setProfileKind,
+  fitStarterLists,
 } from "../src/forge/model";
 import {
   blankFaction,
@@ -189,7 +194,7 @@ describe("importing factions", () => {
     expect(f.look).toBe("plain");
     expect(f.color).toBe(0xff0000);
     expect("onload" in f).toBe(false);
-    expect(f.profiles[0]!.cost).toBe(4);
+    expect(f.profiles[0]!.cost).toBe(priceUnit(f.profiles[0]!).cost); // typed-in costs are recomputed
     expect(Number.isNaN(f.profiles[0]!.hp)).toBe(true);
     expect(f.profiles[0]!.keywords).toEqual(["infantry"]);
     expect("extra" in f.profiles[0]!).toBe(false);
@@ -252,5 +257,104 @@ describe("custom faction storage", () => {
     const ok = copyFaction(FACTIONS.concord!, "Good");
     g.localStorage!.setItem("scdmg.customFactions.v1", JSON.stringify([{ id: "custom-bad" }, 42, ok]));
     expect(listCustomFactions().map((x) => x.id)).toEqual([ok.id]);
+  });
+});
+
+describe("computed costs in custom factions", () => {
+  const computedOk = (f: Faction) => {
+    for (const p of f.profiles) {
+      expect(p.cost, p.name).toBe(priceUnit(p).cost);
+      expect(p.supply, p.name).toBe(priceUnit(p).supply);
+      for (const u of p.upgrades) expect(u.cost, `${p.name}: ${u.name}`).toBe(upgradeCost(p, u));
+    }
+  };
+
+  it("copies, blank factions and imports get computed costs", () => {
+    for (const id of ["militia", "munch", "concord"]) computedOk(copyFaction(FACTIONS[id]!, "Priced"));
+    computedOk(blankFaction("Blank"));
+    const raw = JSON.parse(JSON.stringify(exportable(copyFaction(FACTIONS.militia!, "Cheap")))) as { faction: Faction };
+    for (const p of raw.faction.profiles) p.cost = 0;
+    computedOk(importFaction(raw, []).faction!);
+  });
+
+  it("round-trips through export and import with costs following the stats", () => {
+    const f = copyFaction(FACTIONS.munch!, "Trip");
+    f.profiles[0]!.hp += 2; // edit a stat: the cost follows once the faction is cleaned
+    const back = importFaction(JSON.parse(JSON.stringify(exportable(f))), []);
+    computedOk(back.faction!);
+    expect(back.faction!.profiles[0]!.hp).toBe(f.profiles[0]!.hp);
+    expect(importFaction(JSON.parse(JSON.stringify(exportable(back.faction!))), []).faction).toEqual(back.faction);
+  });
+
+  it("recomputes stored costs on load, so typed-in values never stick", () => {
+    const f = copyFaction(FACTIONS.concord!, "Stored cheap");
+    expect(saveCustomFaction(f)).toEqual([]);
+    const stored = JSON.parse(g.localStorage!.getItem("scdmg.customFactions.v1")!) as Faction[];
+    stored[0]!.profiles[0]!.cost = 1;
+    stored[0]!.profiles[0]!.supply = 0;
+    stored[0]!.supports[0]!.fizz = 0;
+    g.localStorage!.setItem("scdmg.customFactions.v1", JSON.stringify(stored));
+    const loaded = listCustomFactions()[0]!;
+    computedOk(loaded);
+    expect(loaded.supports[0]!.fizz).toBeGreaterThan(0);
+  });
+
+  it("keeps a faction saved before computed pricing loadable, trimming starter lists that no longer fit", () => {
+    // An old save: units typed in at 1 resource each, which at their computed costs go over the Skirmish limit.
+    const f = copyFaction(FACTIONS.concord!, "Old save");
+    const strider = f.profiles.find((p) => p.id.endsWith(":con-facet"))!;
+    const guard = f.profiles.find((p) => p.id.endsWith(":con-guard"))!;
+    f.defaultList = [guard, guard, guard, strider, strider].map((p) => ({ profileId: p.id, upgrades: [] }));
+    for (const p of f.profiles) p.cost = 1;
+    g.localStorage!.setItem("scdmg.customFactions.v1", JSON.stringify([{ ...f, custom: true }]));
+    const loaded = listCustomFactions();
+    expect(loaded.map((x) => x.id)).toEqual([f.id]);
+    expect(listCostIn(loaded[0]!, loaded[0]!.defaultList)).toBeLessThanOrEqual(MODES.skirmish.rosterLimit);
+    expect(loaded[0]!.defaultList.length).toBeGreaterThan(0);
+  });
+
+  it("fitStarterLists drops Assault extras before Skirmish units", () => {
+    const f = copyFaction(FACTIONS.munch!, "Trim");
+    const mama = f.profiles.find((p) => p.id.endsWith(":munch-mama"))!;
+    f.assaultExtras = Array.from({ length: 12 }, () => ({ profileId: mama.id, upgrades: [] }));
+    const before = f.defaultList.length;
+    expect(fitStarterLists(f).length).toBeGreaterThan(0);
+    expect(f.defaultList.length).toBe(before);
+    expect(factionProblems(f).filter((p) => p.includes("costs ⚙"))).toEqual([]);
+  });
+});
+
+describe("army slots in custom factions", () => {
+  it("copies a built-in's resolved faction and support slots into the copy", () => {
+    for (const id of ["militia", "munch", "concord"]) {
+      const src = FACTIONS[id]!;
+      const f = copyFaction(src, "Slots");
+      expect(f.slots).toEqual(factionSlots(src));
+      src.supports.forEach((s, i) => expect(f.supports[i]!.slots).toEqual(supportSlots(s)));
+      expect(factionProblems(f)).toEqual([]);
+    }
+  });
+
+  it("cleans slots: known classes only, numbers coerced, survives export and import", () => {
+    const f = copyFaction(FACTIONS.militia!, "Slot clean");
+    const raw = JSON.parse(JSON.stringify(exportable(f))) as { faction: Record<string, unknown> };
+    raw.faction.slots = { base: "2", wizard: 1 };
+    (raw.faction.supports as Record<string, unknown>[])[0]!.slots = { flyer: 1, "<b>": 2 };
+    const r = importFaction(raw, []);
+    expect(r.faction!.slots).toEqual({ base: 2 });
+    expect(r.faction!.supports[0]!.slots).toEqual({ flyer: 1 });
+    expect(r.notes.filter((n) => n.includes("unknown unit class"))).toHaveLength(2);
+    expect(r.problems).toEqual([]);
+  });
+
+  it("gives blank factions and new supports empty slots, and leaves built-ins' slots to the tables", () => {
+    const f = blankFaction("Empty");
+    expect(f.slots).toEqual({});
+    expect(addSupport(f).slots).toEqual({});
+    for (const id of ["militia", "munch", "concord"]) {
+      const clean = cleanFaction(JSON.parse(JSON.stringify(FACTIONS[id])));
+      expect(clean.slots).toBeUndefined();
+      expect(clean.supports.every((s) => s.slots === undefined)).toBe(true);
+    }
   });
 });

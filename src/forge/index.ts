@@ -8,6 +8,8 @@ import { BUILT_IN_FACTION_IDS, FACTIONS } from "../engine/data/factions";
 import { showLore } from "../ui/loreLinks";
 import { EFFECT_KINDS, entryCostIn, factionProblems, KEYWORDS, LIMITS, TRAITS, starterStats, type StarterStats, EVADE_CONDITIONS } from "../engine/data/factionValidation";
 import type { ModeId } from "../engine/data/modes";
+import { CLASS_INFO, factionSlots, supportSlots, UNIT_CLASSES, unitClassOf, type Slots } from "../engine/data/unitClasses";
+import { applyComputedCosts, priceSupport, priceUnit, upgradeBreakdown } from "../engine/pricing";
 import type { Faction, Keyword, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, UpgradeDef, Weapon } from "../engine/types";
 import {
   blankFaction,
@@ -128,6 +130,12 @@ class FactionForge {
   }
 
   private open(f: Faction, readOnly: boolean, saved: boolean, notes: string[] = []): void {
+    if (!readOnly) {
+      // Editable factions keep their own army slots, and their costs are always worked out from the stats.
+      f.slots ??= {};
+      for (const s of f.supports) s.slots ??= {};
+      applyComputedCosts(f);
+    }
     this.f = f;
     this.readOnly = readOnly;
     this.savedJson = saved ? JSON.stringify(f) : "";
@@ -311,9 +319,10 @@ class FactionForge {
 
   private startCopy(src: Faction): void {
     if (!this.confirmLeave()) return;
-    const f = copyFaction(src, `${src.name} copy`.slice(0, 40));
-    this.open(f, false, false);
-    this.toast(`Copied "${src.name}". Rename it, change what you like, then save.`);
+    const notes: string[] = [];
+    const f = copyFaction(src, `${src.name} copy`.slice(0, 40), notes);
+    this.open(f, false, false, notes);
+    this.toast(`Copied "${src.name}". Costs are worked out from the stats. Rename it, change what you like, then save.`);
   }
 
   private async importFile(): Promise<void> {
@@ -430,6 +439,7 @@ class FactionForge {
   /** Update everything that doesn't hold focus: title, nav, problems, previews. Cheap enough to run on every keystroke. */
   private refreshLive(): void {
     const f = this.f!;
+    if (!this.readOnly) applyComputedCosts(f); // costs follow the stats as they're edited
     const problems = factionProblems(f, { others: this.otherFactions });
     this.root.querySelector("#ff-title")!.innerHTML = `${tokenSvg(f.color, f.look, 30)} ${esc(f.name || "Untitled")}`;
     const saved = this.root.querySelector("#ff-saved");
@@ -458,6 +468,13 @@ class FactionForge {
       const v = getPath(f, path);
       if (kind === "weapon" && v) el.textContent = weaponLine(v as Weapon);
       if (kind === "effect" && v) el.textContent = effectSummary(v as SupportEffect, f);
+      if (kind === "unit" && v) el.textContent = unitPriceText(v as UnitProfile, this.readOnly);
+      if (kind === "unitwhy" && v) el.textContent = unitWhyText(v as UnitProfile);
+      if (kind === "upgrade" && v) {
+        const p = getPath(f, path.replace(/\.upgrades\.\d+$/, "")) as UnitProfile | undefined;
+        if (p) el.textContent = upgradeBreakdown(p, v as UpgradeDef);
+      }
+      if (kind === "support" && v) el.textContent = supportPriceText(v as SupportDef, f, this.readOnly);
     });
     if (this.dirty) saveFactionDraft(f);
   }
@@ -493,7 +510,7 @@ class FactionForge {
           item(
             { kind: "profile", id: p.id },
             `${miniImg(f.id, p.id, 30, "ff-navmini")}${esc(p.name || `Unit #${i + 1}`)}`,
-            `<span class="ff-kind ${kindOf(p)}">${KIND_NAMES[kindOf(p)]}</span>`,
+            `<span class="ff-kind ${kindOf(p)}" title="${esc(CLASS_INFO[unitClassOf({ ...p, keywords: p.keywords ?? [] })].name)} class · ⚙${nv(p.cost)}">${CLASS_INFO[unitClassOf({ ...p, keywords: p.keywords ?? [] })].icon} ${KIND_NAMES[kindOf(p)]}</span>`,
             count(p.name || `Unit #${i + 1}`),
           ),
         )
@@ -521,7 +538,7 @@ class FactionForge {
             ? `${shown.map((p) => `<div class="problem">⚠ ${esc(p)}</div>`).join("")}${problems.length > shown.length ? `<p class="hint">…and ${problems.length - shown.length} more.</p>` : ""}`
             : `<div class="ok">✓ Ready to ${this.readOnly ? "play" : "save and play"}</div>`
         }
-        ${this.notes.length ? `<h3>Import notes</h3>${this.notes.slice(0, 20).map((n) => `<div class="hint">• ${esc(n)}</div>`).join("")}` : ""}
+        ${this.notes.length ? `<h3>Notes</h3>${this.notes.slice(0, 20).map((n) => `<div class="hint">• ${esc(n)}</div>`).join("")}` : ""}
       </section>`;
     let preview = "";
     if (this.sel.kind === "profile") {
@@ -589,6 +606,7 @@ class FactionForge {
             .join("")}
         </div>
       </div>
+      ${slotsHtml("slots", this.readOnly ? factionSlots(f) : (f.slots ?? {}), "Army slots every list of this faction gets on top of the game mode's. Each unit's class is worked out from its stats.")}
       <p class="hint">Faction id: <code>${esc(f.id)}</code></p>`;
   }
 
@@ -621,8 +639,7 @@ class FactionForge {
       ${artSectionHtml(f, p, { crop: this.crop?.profileId === p.id ? this.crop.state : null, canAdjust: this.uploads.has(p.id) })}
       <div class="ff-grid">
         ${textField("Name", `${base}.name`, p.name, LIMITS.nameLength, "span2")}
-        ${numField("Cost ⚙", `${base}.cost`, p.cost, LIMITS.cost)}
-        ${numField("Supply ◆", `${base}.supply`, p.supply, LIMITS.supply)}
+        <div class="ff-field span2 ff-price" title="Worked out from the stats, weapons, keywords and abilities. Class decides which army slot it takes."><span>Cost · supply · class</span><output data-preview="unit|${base}">${esc(unitPriceText(p, false))}</output></div>
         ${numField("Models", `${base}.models`, p.models, LIMITS.models)}
         ${numField("Move", `${base}.move`, p.move, LIMITS.move, { step: 0.5, disabled: isStructure, title: isStructure ? "Structures can't move" : "" })}
         ${numField("HP / model", `${base}.hp`, p.hp, LIMITS.hp)}
@@ -637,6 +654,7 @@ class FactionForge {
             : ""
         }
       </div>
+      <p class="hint ff-breakdown" data-preview="unitwhy|${base}">${esc(unitWhyText(p))}</p>
       <h3>Keywords</h3>
       <div class="ff-chips">${KEYWORDS.map((k) => {
         const locked = k === "structure" || (isStructure && (k === "flying" || k === "jump"));
@@ -754,7 +772,7 @@ class FactionForge {
       </div>
       <div class="ff-grid">
         ${textField("Name", `${path}.name`, u.name, LIMITS.nameLength, "span2")}
-        ${numField("Cost ⚙", `${path}.cost`, u.cost, LIMITS.upgradeCost)}
+        <div class="ff-field ff-price" title="What the unit is worth with the upgrade, minus without it (at least 1 if it helps)"><span>Cost</span><output data-preview="upgrade|${path}">${esc(upgradeBreakdown(p, u))}</output></div>
         ${numField("+ Models", `${path}.addModels`, u.addModels, LIMITS.addModels, { opt: true })}
         ${isStructure ? "" : numField("+ Move", `${path}.move`, u.move, LIMITS.upgradeMove, { opt: true, step: 0.5 })}
       </div>
@@ -793,9 +811,10 @@ class FactionForge {
       <p class="hint">An off-board support: bought with Fizz ✦ in the list. It adds CP to your pool every round, and its abilities spend that CP. Playing an ability is a free action.</p>
       <div class="ff-grid">
         ${textField("Name", `${base}.name`, s.name, LIMITS.nameLength, "span2")}
-        ${numField("Fizz cost ✦", `${base}.fizz`, s.fizz, LIMITS.fizz)}
         ${numField("CP per round", `${base}.cp`, s.cp, LIMITS.cp)}
+        <div class="ff-field span2 ff-price" title="Worked out from the CP it adds, its abilities' effects and CP costs, and its army slots"><span>Fizz cost</span><output data-preview="support|${base}">${esc(supportPriceText(s, f, this.readOnly))}</output></div>
       </div>
+      ${slotsHtml(`${base}.slots`, this.readOnly ? supportSlots(s) : (s.slots ?? {}), "Army slots this card adds to a list that takes it.")}
       ${areaField("Blurb", `${base}.blurb`, s.blurb, "One funny line about it.")}
       <h3>Abilities</h3>
       ${s.abilities.map((a, i) => this.supportAbilityHtml(f, `${base}.abilities.${i}`, a, i)).join("") || `<p class="hint">Add at least one ability.</p>`}
@@ -1482,6 +1501,33 @@ function statsLine(s: StarterStats): string {
   const m = s.mode;
   const over = s.cost > m.rosterLimit || s.units > m.maxUnits || (s.maxCopies?.count ?? 0) > m.maxCopies || s.fizz > s.fizzLimit;
   return `<div class="ff-stat ${over ? "over" : ""}"><b>${esc(m.name)}</b> ⚙${s.cost}/${m.rosterLimit} · ${s.units}/${m.maxUnits} units · ✦${s.fizz}/${s.fizzLimit} · +${s.cpPerRound} CP/round</div>`;
+}
+
+/** "⚙5 · ◆2 · 🛡 Base" for a profile. Built-ins (read only) show their hand-set costs and what the formula makes of them. */
+function unitPriceText(p: UnitProfile, builtIn: boolean): string {
+  const cls = CLASS_INFO[unitClassOf({ ...p, keywords: p.keywords ?? [] })];
+  const price = priceUnit(p);
+  const computed = builtIn && (price.cost !== p.cost || price.supply !== p.supply) ? ` (formula: ⚙${price.cost} · ◆${price.supply})` : "";
+  return `⚙${nv(p.cost)} · ◆${nv(p.supply)} · ${cls.icon} ${cls.name}${computed}`;
+}
+
+/** The cost breakdown, e.g. "⚙7 = body 3 + guns 3 + abilities 1". */
+function unitWhyText(p: UnitProfile): string {
+  return p.structure?.summonOnly ? `Summon-only: free, no supply. Worth ${priceUnit(p).breakdown.replace(/^⚙\d+ = /, "")} to the card that summons it.` : priceUnit(p).breakdown;
+}
+
+function supportPriceText(s: SupportDef, f: Faction, builtIn: boolean): string {
+  const price = priceSupport(s, (id) => f.profiles.find((p) => p.id === id));
+  return builtIn ? `✦${nv(s.fizz)}${price.fizz !== s.fizz ? ` (formula: ✦${price.fizz})` : ""} · ${price.breakdown}` : price.breakdown;
+}
+
+/** Small number inputs for extra army slots by unit class (0 to 2 each). */
+function slotsHtml(path: string, slots: Slots, hint: string): string {
+  return `<h3>Army slots</h3>
+    <p class="hint">${esc(hint)}</p>
+    <div class="ff-grid ff-slots">${UNIT_CLASSES.map((c) =>
+      numField(`${CLASS_INFO[c].icon} ${CLASS_INFO[c].name}`, `${path}.${c}`, slots[c], LIMITS.slots, { opt: true, placeholder: "0", title: CLASS_INFO[c].text }),
+    ).join("")}</div>`;
 }
 
 function supportCard(s: SupportDef, f: Faction): string {

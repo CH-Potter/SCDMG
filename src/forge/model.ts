@@ -3,6 +3,8 @@
 
 import type { Faction, ListEntry, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, Weapon } from "../engine/types";
 import { slug } from "../ui/files";
+import { listCostIn } from "../engine/data/factionValidation";
+import { MODES } from "../engine/data/modes";
 
 export type ProfileKind = "unit" | "structure" | "summon";
 
@@ -167,6 +169,22 @@ export function removeUpgrade(f: Faction, p: UnitProfile, upgradeId: string): vo
   f.assaultExtras.forEach(strip);
 }
 
+/**
+ * Drop starter-list entries (Assault extras first, then the Skirmish list's last units, always keeping one)
+ * until both modes' rosters fit their resource limit. For factions saved before costs were computed,
+ * whose recomputed costs may no longer fit. Returns the names of the units dropped.
+ */
+export function fitStarterLists(f: Faction): string[] {
+  const dropped: string[] = [];
+  const nameOf = (e: ListEntry | undefined) => (e ? (f.profiles.find((p) => p.id === e.profileId)?.name ?? e.profileId) : "");
+  const over = (mode: "skirmish" | "assault") =>
+    listCostIn(f, mode === "assault" ? [...f.defaultList, ...f.assaultExtras] : f.defaultList) > MODES[mode].rosterLimit;
+  while (over("skirmish") && f.defaultList.length > 1) dropped.push(nameOf(f.defaultList.pop()));
+  while (over("assault") && f.assaultExtras.length) dropped.push(nameOf(f.assaultExtras.pop()));
+  while (over("assault") && f.defaultList.length > 1) dropped.push(nameOf(f.defaultList.pop()));
+  return dropped;
+}
+
 export function defaultEffect(kind: SupportEffect["kind"], f: Faction): SupportEffect {
   switch (kind) {
     case "resources":
@@ -209,7 +227,7 @@ export function newSupportAbility(s: SupportDef, f: Faction): SupportAbilityDef 
 }
 
 export function addSupport(f: Faction): SupportDef {
-  const s: SupportDef = { id: supportId(f, "New support"), name: "New support", faction: f.id, fizz: 2, cp: 1, blurb: "", abilities: [] };
+  const s: SupportDef = { id: supportId(f, "New support"), name: "New support", faction: f.id, fizz: 2, cp: 1, blurb: "", abilities: [], slots: {} };
   s.abilities.push(newSupportAbility(s, f));
   f.supports.push(s);
   return s;

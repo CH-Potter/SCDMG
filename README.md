@@ -86,7 +86,7 @@ The **map builder** draws battlefields from platforms, buildings, walls, barrica
 
 ![The faction forge showing the Munch codex: every unit with its miniature, stats and keywords](docs/images/faction-forge.webp)
 
-The **faction forge** shows every built-in faction's codex, and lets you copy one or start from scratch to make your own, with custom unit art.
+The **faction forge** shows every built-in faction's codex, and lets you copy one or start from scratch to make your own, with custom unit art. Costs, supply, upgrade costs and Fizz are worked out from what you build, with a breakdown (e.g. "⚙5 = body 2.4 + guns 1.2 + abilities 1"), so you can see what each stat, weapon and ability is worth.
 
 ### Mouse or touch, browser or desktop
 

@@ -9,6 +9,7 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 - **Deploying** a unit costs its resource cost (base cost plus upgrades) and needs free supply. Free supply is the cap minus the supply of your units on the board.
 - Destroyed units are gone for good, but they free up their supply, so you can bring in more reserves.
 - Upgrades are chosen in the list. They can add models, move, keywords, abilities, or change weapons.
+- Built-in units have hand-tuned costs. **Faction Forge** factions have computed ones (`src/engine/pricing.ts`): cost from body (wounds through saves, evade and nerve), guns (expected damage against a spread of targets), speed and abilities; supply 1 for structures, 2 for squads (3 at 6+ models) and 1 to 4 for single models by cost; upgrades cost the difference they make (at least 1); Fizz from the card's CP, its abilities' effects and CP costs, and its slots. The weights are fitted to the built-in costs (`tests/pricing.test.ts`, `PRICING_REPORT=1` prints the comparison).
 
 ### Unit classes and army slots
 

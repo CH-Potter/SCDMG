@@ -8,6 +8,7 @@ import { ABILITIES } from "./abilities";
 import { BUILT_IN_FACTION_IDS, FACTIONS } from "./factions";
 import { MODES, type GameModeDef, type ModeId } from "./modes";
 import { artProblems, factionArtProblems } from "./unitArt";
+import { CLASS_INFO, UNIT_CLASSES, type UnitClass } from "./unitClasses";
 
 // Records (not arrays) so the compiler flags any keyword or trait added to types.ts but missing here.
 const KEYWORD_SET: Record<Keyword, true> = {
@@ -96,6 +97,7 @@ export const LIMITS = {
   fieldDeploy: [0, 24],
   fizz: [0, 10],
   cp: [0, MAX_CP],
+  slots: [0, 2],
 } as const;
 
 /** Fizz budget for a mode (uses `fizzLimit` once modes.ts has it). */
@@ -219,6 +221,15 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
     for (const k of v) if (!isKeyword(k)) errs.push(`${where}: unknown keyword "${String(k)}"`);
     if (new Set(v).size !== v.length) errs.push(`${where}: a keyword is listed twice`);
   };
+  /** Extra army slots by unit class (optional): known classes, whole numbers in LIMITS.slots. */
+  const slotProblems = (where: string, v: unknown) => {
+    if (v === undefined) return;
+    if (!isObj(v)) return void errs.push(`${where}: army slots must be a set of numbers by unit class`);
+    for (const [k, n] of Object.entries(v)) {
+      if (!(UNIT_CLASSES as readonly string[]).includes(k)) errs.push(`${where}: unknown unit class "${k}" in army slots`);
+      else if (n !== undefined) int(where, `${CLASS_INFO[k as UnitClass].name} slots`, n, LIMITS.slots);
+    }
+  };
   const abilities = (where: string, v: unknown) => {
     if (!array(where, "abilities", v)) return;
     for (const a of v) if (!isAbility(a)) errs.push(`${where}: unknown ability "${String(a)}"`);
@@ -236,6 +247,7 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
   text("Faction", "blurb", f.blurb);
   if (!isInt(f.color) || f.color < 0 || f.color > 0xffffff) errs.push("Faction: colour must be an RGB number (0 to 0xffffff)");
   if (!LOOKS.includes(f.look as (typeof LOOKS)[number])) errs.push(`Faction: token look must be one of ${LOOKS.join(", ")}`);
+  slotProblems("Faction", f.slots);
 
   const others = (opts.others ?? Object.values(FACTIONS)).filter((o) => o.id !== fid);
   const takenProfiles = new Map<string, string>();
@@ -430,6 +442,7 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
       text(where, "blurb", raw.blurb);
       int(where, "Fizz cost", raw.fizz, LIMITS.fizz);
       int(where, "CP per round", raw.cp, LIMITS.cp);
+      slotProblems(where, raw.slots);
       if (!array(where, "abilities", raw.abilities, LIMITS.supportAbilities)) return;
       if (!raw.abilities.length) errs.push(`${where}: add at least one ability`);
       const seenA = new Set<string>();
