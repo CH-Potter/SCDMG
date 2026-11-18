@@ -6,7 +6,7 @@ import { CLASSIC_RULES, cleanRules, HOUSE_RULES, rulesOf, rulesSummary, STANDARD
 import { planUnitMove } from "../src/engine/formation";
 import { rect } from "../src/engine/geometry";
 import { profileOf } from "../src/engine/profile";
-import { eligibleUnits, modelsEngage, unitById } from "../src/engine/rules";
+import { eligibleUnits, isEngaged, modelsEngage, unitById } from "../src/engine/rules";
 import type { GameEvent, GameState, ListEntry, Unit, Vec } from "../src/engine/types";
 import { registerMunch } from "./helpers/munch";
 
@@ -289,10 +289,18 @@ describe("house rules: evade in the scrum", () => {
     expect(planOff.evadeOn).toBeNull();
   });
 
-  it("gives nothing to an engaged unit with no evade on its card", () => {
-    const { s, grunts } = scrum({});
-    expect(profileOf(grunts).evade).toBeUndefined();
-    expect(evadeVsShot(s, grunts, ["ranged"])).toBeNull(); // engaged, but no evade to roll
+  it("gives nothing to an engaged unit with no evade on its card (big, slow units can't dodge)", () => {
+    const { s, grunts, bugs } = scrum({});
+    // Swap the Grunts for Big Bertha in the same melee: heavy, so no evade at all.
+    const bertha = createGame({ factions: ["militia", "swarm"], seed: 4, lists: [[{ profileId: "mil-bertha", upgrades: [] }], []] }).units[0]!;
+    bertha.uid = "bertha";
+    s.units.push(bertha);
+    grunts.onBoard = false;
+    const reach = profileOf(bertha).baseRadius + profileOf(bugs).baseRadius + 0.3;
+    place(s, bertha, { x: bugs.models[0]!.pos.x, y: bugs.models[0]!.pos.y - reach });
+    expect(profileOf(bertha).evade).toBeUndefined();
+    expect(isEngaged(s, bertha)).toBe(true);
+    expect(evadeVsShot(s, bertha, ["ranged"])).toBeNull(); // engaged, but no evade to roll
   });
 });
 

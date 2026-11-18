@@ -262,6 +262,7 @@ const militia: Faction = {
       armor: 4,
       baseRadius: 0.55,
       keywords: ["infantry"],
+      evade: { target: 6, against: ["pointBlank"] }, // small and drilled: they duck
       // No bonus against armoured targets: it made massed rifles the Phase Guard's main killer.
       // Armour-cracking is Big Bertha's and the marksman's job.
       weapons: [ranged("Rivet Rifle", 22, 1, 4), melee("Trench Spade", 1, 5)],
@@ -455,6 +456,7 @@ const militia: Faction = {
       armor: 4,
       baseRadius: 0.55,
       keywords: ["infantry", "fearless"],
+      evade: { target: 6, against: ["pointBlank"] },
       weapons: [
         ranged("Rock-Salt Scattergun", 10, 2, 4, { traits: ["blast", "pistol"] }),
         melee("Pick Haft", 2, 4, { bonuses: [{ vs: "beast", dice: 1 }] }),
@@ -754,6 +756,7 @@ const swarm: Faction = {
       armor: 4,
       baseRadius: 0.6,
       keywords: ["infantry", "beast"],
+      evade: { target: 6, against: ["pointBlank"] },
       nerve: 7,
       weapons: [melee("Crusher Mandibles", 2, 4, { ap: 1 })],
       abilities: ["corrode", "regen"],
@@ -775,6 +778,7 @@ const swarm: Faction = {
       armor: 5,
       baseRadius: 0.7,
       keywords: ["beast", "jump"],
+      evade: { target: 5, against: ["pointBlank"] }, // it springs clear
       nerve: 7,
       weapons: [melee("Trapjaw", 3, 3, { ap: 1 })],
       abilities: ["lurk", "tunnel"],
@@ -874,6 +878,7 @@ const swarm: Faction = {
       armor: 6,
       baseRadius: 0.55,
       keywords: ["infantry", "beast"],
+      evade: { target: 6, against: ["pointBlank"] },
       nerve: 6,
       weapons: [ranged("Grub Toss", 8, 1, 4), melee("Nursing Pincers", 1, 4)],
       abilities: ["hatch", "mending-aura"],

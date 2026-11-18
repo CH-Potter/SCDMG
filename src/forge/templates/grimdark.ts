@@ -1079,7 +1079,7 @@ const cult = template({
       ],
     },
   ],
-  skirmish: ["zealots", "zealots", ["champions", "spikes"], "squirmers", ["prophet", "sermon"], "brute", "imps", "idol"],
+  skirmish: ["zealots", "zealots", "champions", "squirmers", ["prophet", "sermon"], "brute", "imps", "idol"],
   assault: [["zealots", "more"], "champions", "squirmers", "brute", "imps", "zealots"],
   skirmishSupports: ["altar", "chorus"],
   assaultSupports: ["bargain"],

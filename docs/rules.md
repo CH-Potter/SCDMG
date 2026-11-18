@@ -118,6 +118,7 @@ Every attack, ranged or melee, runs the same sequence:
   - **blast:** blast weapons and barrages.
   - Nimble infantry tend to dodge point-blank shots, flyers dodge shooting, and small swarms dodge blasts.
   - Evade numbers are 2+ to 6+. Buffs and debuffs move it by one for the round.
+- **Only small, agile units evade** (`src/engine/data/agility.ts`). Structures, heavy units and monsters can't, nor can ground units on bases over 1" or that move under 5"; flyers can, whatever their size, because they dodge by flying. Every small (base up to 0.75"), quick, unarmoured ground unit has at least a basic evade: 6+ against point-blank shots, 5+ if it's light or can jump. Armour is the other way to survive: armoured units don't get the basic evade. The Faction Forge enforces this, and its templates add the basic evade where a unit has none.
 - **Saves:** the defender saves on armour + AP, adjusted as follows, with a minimum of 2+. A save worse than 6+ means no save.
   - −1 for cover.
   - −1 for hunkering (−2 with Entrenched).

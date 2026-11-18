@@ -3,6 +3,7 @@
 // at 0 here and computed by engine/pricing.ts (the forge recomputes them whenever a faction is opened).
 
 import { applyComputedCosts } from "../../engine/pricing";
+import { defaultEvade } from "../../engine/data/agility";
 import type {
   AbilityId,
   EvadeDef,
@@ -181,7 +182,12 @@ export function template(s: TemplateSpec): FactionTemplate {
       p.art = { kind: "parts", recipe: { body, head, headgear, weapon, back, secondary, scale: scale ?? 1, ...(primary !== undefined ? { primary } : {}) } };
     }
     if (u.nerve !== undefined) p.nerve = u.nerve;
+    // Evade is for small, agile units: one without its own gets the basic one (see data/agility.ts).
     if (u.evade) p.evade = structuredClone(u.evade);
+    else {
+      const ev = defaultEvade(p);
+      if (ev) p.evade = ev;
+    }
     if (u.impact) p.impact = { ...u.impact };
     if (u.structure) p.structure = { ...u.structure };
     return p;

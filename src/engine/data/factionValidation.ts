@@ -4,6 +4,7 @@ import { CP_CAP } from "../constants";
 // computed from the faction object itself, so it works for factions that aren't registered yet.
 
 import type { Faction, Keyword, ListEntry, UnitProfile, WeaponTrait, EvadeCondition } from "../types";
+import { evadeProblem } from "./agility";
 import { ABILITIES } from "./abilities";
 import { BUILT_IN_FACTION_IDS, FACTIONS } from "./factions";
 import { MODES, type GameModeDef, type ModeId } from "./modes";
@@ -360,11 +361,14 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
     }
     const summonOnly = isObj(s) && s.summonOnly === true;
 
-    // evade
+    // evade: only small, agile units can dodge (data/agility.ts)
     if (p.evade !== undefined) {
       const ev = p.evade;
       if (!isObj(ev)) errs.push(`${where}: the evade settings aren't valid`);
       else {
+        const body = { structure: p.structure as UnitProfile["structure"], keywords: Array.isArray(p.keywords) ? (p.keywords as UnitProfile["keywords"]) : [], baseRadius: Number(p.baseRadius), move: Number(p.move) };
+        const why = evadeProblem(body);
+        if (why) errs.push(`${where}: can't have an evade (${why})`);
         int(where, "evade", ev.target, LIMITS.evade);
         if (array(where, "evade conditions", ev.against)) {
           if (!ev.against.length) errs.push(`${where}: evade needs at least one situation it applies in`);
