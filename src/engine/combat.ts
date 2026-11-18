@@ -3,7 +3,7 @@
 import { BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT } from "./constants";
 import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
-import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
+import { hasAbility, hasKeyword, isFlying, profileOf, reacts } from "./profile";
 import { nextRandom, rollD6 } from "./rng";
 import { aliveModels, AURA_RANGE, ENGAGE_RANGE, engagedWith, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, modelsInReach, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
 import { rulesOf, STANDARD_RULES, type HouseRules } from "./houseRules";
@@ -184,10 +184,18 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
   const attackers: AttackPlan["attackers"] = [];
   const targets = new Set<Model>();
   let inRange = false;
+  let hidden = false;
+  // Dust Cloud: only shots from close by find a unit hidden in the dust.
+  const reach = t.status.smoked ? Math.min(w.range, t.status.smoked) : w.range;
   for (const am of aliveModels(a)) {
     let any = false;
     for (const tm of aliveModels(t)) {
-      if (dist(am.pos, tm.pos) - ra - rt > w.range + 1e-6) continue;
+      const gap = dist(am.pos, tm.pos) - ra - rt;
+      if (gap > w.range + 1e-6) continue;
+      if (gap > reach + 1e-6) {
+        hidden = true;
+        continue;
+      }
       inRange = true;
       // Lobbed shells need no line of sight.
       if (!indirect && !lineOfSight(s, am.pos, am.elevation, tm.pos, tm.elevation)) continue;
@@ -201,7 +209,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
       attackers.push({ model: am, dice: Math.max(1, dice) });
     }
   }
-  if (!attackers.length) return inRange ? "No line of sight" : `Out of range (${w.range}")`;
+  if (!attackers.length) return inRange ? "No line of sight" : hidden ? `Hidden in dust: only shots from within ${t.status.smoked}" find it` : `Out of range (${w.range}")`;
   // Overwatch fires hastily; a friendly Glimmer-style ward near the target makes shots one worse.
   // Torrent weapons hit automatically (shaken, hasty or warded shooters still lose the easy hits).
   let hitOn = Math.min(
@@ -210,7 +218,8 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
       (kind === "overwatch" ? 1 : 0) +
       (wardedAgainst(s, t) ? 1 : 0) +
       (hasTrait(w, "heavy") && a.status.moved ? 1 : 0) +
-      (a.status.shaken ? 1 : 0),
+      (a.status.shaken ? 1 : 0) +
+      (a.status.blinded ? 1 : 0),
   );
   // A spotted target is easier to hit, but never better than 2+.
   if (t.status.spotted && hitOn > 2) hitOn -= 1;
@@ -219,7 +228,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     attackers,
     targets: [...targets],
     hitOn,
-    damage: w.damage + bonus.damage,
+    damage: w.damage + bonus.damage + (a.status.overcharged ? 1 : 0),
     ap: effectiveAp(w, t, bonus.ap),
     rending: hasTrait(w, "rending"),
     precision: precisionOf(a, w),
@@ -284,13 +293,28 @@ export function planMelee(a: Unit, t: Unit, w: Weapon, rules: Readonly<HouseRule
   };
 }
 
+/** Scrap Cover: is this model within reach of a friendly structure that gives cover? (Flyers and heavy units never take cover.) */
+export function scrapCovered(s: GameState, t: Unit, tm: Model): boolean {
+  if (isFlying(t) || hasKeyword(t, "heavy")) return false;
+  const reach = SCRAP_COVER_RANGE;
+  return onBoard(s, t.owner).some(
+    (w) => w.uid !== t.uid && hasAbility(w, "scrap-cover") && aliveModels(w).some((wm) => wm.elevation === tm.elevation && modelGap(w, wm, t, tm) <= reach + 1e-6),
+  );
+}
+/** Scrap Cover's reach. */
+export const SCRAP_COVER_RANGE = 2;
+
 /** The save roll a model needs (null = no save). */
 export function saveNeeded(s: GameState, a: Unit, t: Unit, tm: Model, ap: number, melee: boolean, from?: Model): number | null {
   let save = profileOf(t).armor + ap + (t.status.reckless ? 1 : 0);
   if (!melee) {
-    if (from && hasCover(s, from.pos, from.elevation, t, tm, a.uid)) save -= 1;
-    if (t.status.hunkered) save -= hasAbility(t, "entrenched") ? 2 : 1;
-    save -= t.status.dugIn ?? 0;
+    // Spotlit (exposed) units get nothing from cover, hunkering or digging in. A friendly Scrap Cover
+    // structure gives cover like terrain does.
+    if (!t.status.exposed) {
+      if (from && (hasCover(s, from.pos, from.elevation, t, tm, a.uid) || scrapCovered(s, t, tm))) save -= 1;
+      if (t.status.hunkered) save -= hasAbility(t, "entrenched") ? 2 : 1;
+      save -= t.status.dugIn ?? 0;
+    }
   } else if (t.status.braced) {
     save -= 1;
   }
@@ -307,10 +331,10 @@ export function blastOn(
   s: GameState,
   t: Unit,
   caught: Model[],
-  e: { hit: number; damage: number; ap: number },
+  e: { hit: number; damage: number; ap: number; noEvade?: boolean },
   events: GameEvent[],
 ): Pick<AttackReport, "hitRolls" | "evadeRolls" | "evadeOn" | "saveRolls" | "saveOn" | "damage" | "modelsKilled"> {
-  const evadeOn = rulesOf(s).evade ? evadeTarget(t, defaultConditions("barrage")) : null;
+  const evadeOn = rulesOf(s).evade && !e.noEvade ? evadeTarget(t, defaultConditions("barrage")) : null;
   const hitRolls: number[] = [];
   const evadeRolls: number[] = [];
   const saveRolls: number[] = [];
@@ -363,7 +387,7 @@ export function expectedDamage(s: GameState, a: Unit, t: Unit, plan: AttackPlan,
   const unsaved = (hits - skipped) * pFail + skipped;
   let total = unsaved * perHit;
   // Refraction (unused this round) takes 1 off the first unsaved ranged wound: a whole wound for a 1-damage weapon.
-  if (!melee && dice > 0 && hasAbility(t, "refraction") && !t.reactionsUsed.includes("refraction")) {
+  if (!melee && dice > 0 && reacts(t, "refraction") && !t.reactionsUsed.includes("refraction")) {
     const perDie = Math.min(1, unsaved / dice);
     total -= 1 - (1 - perDie) ** dice;
   }
@@ -460,7 +484,7 @@ export function resolveAttack(
       report.saveRolls.push(0);
     }
     let dmg = plan.damage;
-    if (!melee && !refracted && hasAbility(t, "refraction") && !t.reactionsUsed.includes("refraction")) {
+    if (!melee && !refracted && reacts(t, "refraction") && !t.reactionsUsed.includes("refraction")) {
       t.reactionsUsed.push("refraction");
       refracted = true;
       dmg = Math.max(0, dmg - 1);
@@ -470,7 +494,7 @@ export function resolveAttack(
     if (!tm.alive) report.modelsKilled += 1;
     if (t.destroyed) break;
   }
-  if (report.damage > 0 && !melee && hasAbility(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
+  if (report.damage > 0 && !melee && reacts(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
   if (report.damage > 0) moraleCheck(s, t, events);
   report.unitDestroyed = t.destroyed;
   return report;
@@ -493,7 +517,7 @@ function killModel(s: GameState, t: Unit, tm: Model, events: GameEvent[], fromPo
   tm.hp = 0;
   tm.shield = 0;
   concedeSupply(s, t, events);
-  if (hasAbility(t, "pop") && !fromPop) {
+  if (reacts(t, "pop") && !fromPop) {
     for (const e of onBoard(s)) {
       if (e.owner === t.owner) continue;
       for (const em of aliveModels(e)) {
@@ -577,10 +601,14 @@ export function shellAim(t: Unit): Vec {
   return ms.reduce((best, m) => (dist(m.pos, c) < dist(best.pos, c) ? m : best)).pos;
 }
 
-/** Can any of the firing unit's models see the spot? Then a miss drifts only half as far. */
+/**
+ * Can any of the firing unit's models see the spot? Then a miss drifts only half as far. With Radio
+ * Spotter, any friendly unit's eyes on the spot count.
+ */
 export function shellSpotted(s: GameState, a: Unit, aim: Vec): boolean {
   const elev = platformAt(s, aim) ? 1 : 0;
-  return aliveModels(a).some((m) => lineOfSight(s, m.pos, m.elevation, aim, elev));
+  const lookers = hasAbility(a, "radio-spotting") ? onBoard(s, a.owner) : [a];
+  return lookers.some((u) => aliveModels(u).some((m) => lineOfSight(s, m.pos, m.elevation, aim, elev)));
 }
 
 /** The odds for one shell: the chance it lands on target, and the furthest it can drift if it doesn't. */
@@ -625,7 +653,7 @@ export function burstAt(s: GameState, a: Unit, weapon: string, p: Vec, e: { hit:
     const rolled = blastOn(s, t, caught, e, events);
     if (rolled.damage > 0) moraleCheck(s, t, events);
     // Sticky Goo slows whoever the burst hurt, friend or foe.
-    if (rolled.damage > 0 && hasAbility(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
+    if (rolled.damage > 0 && reacts(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
     events.splice(at, 0, {
       type: "attack",
       report: { uid: a.uid, target: t.uid, weapon, kind: "barrage", attackers: 1, hitOn: e.hit, ...rolled, unitDestroyed: t.destroyed },

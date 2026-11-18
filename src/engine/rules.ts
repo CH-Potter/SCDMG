@@ -113,7 +113,8 @@ export const controlWeight = currentSupply;
 export function disengageOdds(s: GameState, u: Unit): { mine: number; theirs: number; clean: boolean } {
   const mine = currentSupply(u);
   const theirs = engagedWith(s, u).reduce((n, e) => n + currentSupply(e), 0);
-  return { mine, theirs, clean: mine > theirs };
+  // Twirl Away: some units always break away cleanly.
+  return { mine, theirs, clean: mine > theirs || hasAbility(u, "twirl-away") };
 }
 
 /** Forward-deploy tricks (Tunnel, Gopher Holes) can't land this close to the enemy's home objective. */

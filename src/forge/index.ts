@@ -868,6 +868,24 @@ class FactionForge {
       case "teleport":
         params = numField("Range ″", `${ep}.range`, e.range, [1, 24], { step: 0.5 });
         break;
+      case "spot":
+      case "blind":
+      case "silence":
+      case "expose":
+        params = numField("Range ″", `${ep}.range`, e.range, LIMITS.range, { step: 0.5 });
+        break;
+      case "smoke":
+        params = numField("Shots only from within ″", `${ep}.range`, e.range, [1, 24], { step: 0.5 });
+        break;
+      case "resonate":
+        params = numField("Range ″", `${ep}.range`, e.range, [0, 24], { step: 0.5 });
+        break;
+      case "haste":
+        params = numField("Extra move ″", `${ep}.move`, e.move, [1, 6]);
+        break;
+      case "overshield":
+        params = numField("Shield per model", `${ep}.amount`, e.amount, [1, 3]);
+        break;
       default:
         params = `<p class="hint span2">No settings.</p>`;
     }

@@ -48,6 +48,15 @@ export const EFFECT_KINDS = [
   "regrow",
   "dugIn",
   "teleport",
+  "spot",
+  "smoke",
+  "overwatch",
+  "haste",
+  "blind",
+  "resonate",
+  "expose",
+  "silence",
+  "overshield",
 ] as const;
 
 /** The CP pool cap (mirrors CP_CAP in engine/supports.ts): an ability costing more could never be played. */
@@ -506,8 +515,21 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
         return int(where, "save bonus", e.save, [1, 2]);
       case "teleport":
         return real(where, "teleport range", e.range, [1, 24]);
+      case "spot":
+      case "blind":
+      case "silence":
+      case "expose":
+        return real(where, `${e.kind} range`, e.range, LIMITS.range);
+      case "smoke":
+        return real(where, "smoke range", e.range, [1, 24]);
+      case "resonate":
+        return real(where, "resonance range", e.range, [0, 24]);
+      case "haste":
+        return int(where, "extra move", e.move, [1, 6]);
+      case "overshield":
+        return int(where, "shield per model", e.amount, [1, 3]);
       default:
-        return; // recharge, ward, brace: no parameters
+        return; // recharge, overwatch, ward, brace: no parameters
     }
   }
 

@@ -20,10 +20,10 @@ import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, 
 import { evadeTarget, expectedDamage, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
 import { SHELL_BURST } from "./constants";
-import { applyCommand, chargeBonus, chargeNeed, closeRanksPreview, overwatchPlan, planDemoCharge, RALLY_CP, twoDiceAtLeast } from "./game";
+import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, twoDiceAtLeast } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
-import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
+import { hasAbility, hasKeyword, isFlying, profileFor, profileOf, reacts } from "./profile";
 import {
   aliveModels,
   controlWeight,
@@ -38,6 +38,7 @@ import {
   onBoard,
   presenceController,
   unitGap,
+  ENGAGE_RANGE,
   reserves,
 } from "./rules";
 import { platformAt, planRoute } from "./terrain";
@@ -657,7 +658,7 @@ function attackCandidates(s: GameState, u: Unit): Candidate[] {
       const exp = expectedDamage(s, u, e, plan, false);
       const stray = expectedStray(s, u, e, w, plan);
       const risk = stray ? stray.damage * valuePerWound(stray.friend) * 2 : 0;
-      out.push({ cmd: { type: "shoot", uid: u.uid, target: e.uid, weapon: i }, bonus: attackValue(s, e, exp) - risk });
+      out.push({ cmd: { type: "shoot", uid: u.uid, target: e.uid, weapon: i }, bonus: attackValue(s, e, exp) - risk - returnFireRisk(s, u, e, exp) });
     }
   });
   return out;
@@ -677,8 +678,11 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
     const base = evaluate(s, u.owner);
     return chargeCandidatesIn(sure, u).map((c): Candidate | null => {
       const e = s.units.find((x) => c.cmd.type === "charge" && x.uid === c.cmd.target)!;
-      const need = rules.rolledCharges ? chargeNeed(s, u, e) : 0;
-      if (need === null) return null;
+      const raw = rules.rolledCharges ? chargeNeed(s, u, e) : 0;
+      // Pirouette: the target steps up to 3" away before the roll (the "sure" look-ahead can't show it).
+      const dodge = rules.rolledCharges && reacts(e, "pirouette") && !e.reactionsUsed.includes("pirouette") && !isEngaged(s, e) ? (ABILITIES.pirouette.range ?? 3) : 0;
+      const need = raw === null ? null : raw + dodge;
+      if (need === null || need > ROLLED_CHARGE_MAX) return null;
       const odds = rules.rolledCharges ? twoDiceAtLeast(need) : 1;
       const after = simulate(sure, c.cmd);
       const position = after ? evaluate(after, u.owner) - base : 0;
@@ -710,7 +714,10 @@ function chargeCandidatesIn(s: GameState, u: Unit): Candidate[] {
     }
     if (dive) {
       const imp = planImpact(me, them, rulesOf(after));
-      out.push({ cmd, bonus: imp ? attackValue(after, them, expectedDamage(after, me, them, imp, true)) : 0 });
+      const exp = imp ? expectedDamage(after, me, them, imp, true) : 0;
+      // Eye Peck: a dive on a gun that hasn't fired yet this round puts it off its aim.
+      const peck = exp > 0 && reacts(u, "eye-peck") && !e.status.blinded && !e.status.acted && rangedWeapons(e).length ? Math.min(2.5, firepower(e) * 0.8) * Math.min(1, exp) : 0;
+      out.push({ cmd, bonus: imp ? attackValue(after, them, exp) + peck : 0 });
       continue;
     }
     let best = 0;
@@ -866,6 +873,40 @@ function chargeDamage(u: Unit, e: Unit, extra: number): number {
 const chargeable = (s: GameState, u: Unit): Unit[] =>
   u.status.disengaged || u.status.shaken ? [] : onBoard(s, other(u.owner)).filter((e) => meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)) && unitGap(u, e) <= likelyChargeRange(s, u) + 1);
 
+/**
+ * How much better the shots player `me`'s ready shooters can take at enemy `targetUid` get from
+ * `before` to `after` (a debuff such as Spotlight, a spot or an exposed target): the sum, over each
+ * shooter, of its best attack value at the target.
+ */
+function shotGain(before: GameState, after: GameState, me: PlayerId, targetUid: string): number {
+  const best = (st: GameState, f: Unit, t: Unit): number => {
+    let v = 0;
+    for (const w of rangedWeapons(f)) {
+      const plan = planShooting(st, f, t, w);
+      if (typeof plan === "string") continue;
+      v = Math.max(v, attackValue(st, t, expectedDamage(st, f, t, plan, false)));
+    }
+    return v;
+  };
+  const t0 = before.units.find((x) => x.uid === targetUid);
+  const t1 = after.units.find((x) => x.uid === targetUid);
+  if (!t0 || !t1) return 0;
+  let gain = 0;
+  for (const f of eligibleUnits(before, me)) {
+    if (!rangedWeapons(f).length) continue;
+    const f1 = after.units.find((x) => x.uid === f.uid);
+    if (f1) gain += Math.max(0, best(after, f1, t1) - best(before, f, t0));
+  }
+  return gain;
+}
+
+/** Return Fire: what shooting `e` (for `exp` expected damage) is likely to cost `u` when `e` shoots back. */
+function returnFireRisk(s: GameState, u: Unit, e: Unit, exp: number): number {
+  if (!reacts(e, "return-fire") || e.reactionsUsed.includes("return-fire") || exp <= 0 || exp >= wounds(e)) return 0;
+  const rf = returnFirePlan(s, e, u);
+  return rf ? expectedDamage(s, e, u, rf.plan, false) * valuePerWound(u) * Math.min(1, exp) : 0;
+}
+
 type AbilityAi = (s: GameState, u: Unit) => Candidate[];
 
 const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
@@ -1014,6 +1055,102 @@ const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
     }
     return out;
   },
+  // Fly a line over as many enemy ground models as possible, ending where the guns can still shoot.
+  "crop-dust"(s, u) {
+    const def = ABILITIES["crop-dust"];
+    const range = def.range ?? 10;
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    const from = aliveModels(u)[0]!.pos;
+    const out: Candidate[] = [];
+    const seen: Vec[] = [];
+    for (const e of onBoard(s, other(u.owner))) {
+      if (isFlying(e)) continue;
+      const c = centroid(e);
+      const d = dist(from, c);
+      if (d < 1e-6 || d > range + 4) continue;
+      // Through the unit and out the other side, as far as the flight allows.
+      const ends = [towards(from, { x: from.x + ((c.x - from.x) / d) * range, y: from.y + ((c.y - from.y) / d) * range }, range), towards(from, c, Math.min(range, d + 2))];
+      for (const p of ends) {
+        if (seen.some((q) => dist(p, q) < 1)) continue;
+        seen.push(p);
+        let v = 0;
+        // No evade against the dust, and no cover; digging in still helps.
+        for (const { unit: t, models } of cropDustCaught(s, u, from, p)) {
+          v += attackValue(s, t, models.length * pAtLeast(CROP_DUST.hit) * failChance(profileOf(t).armor + CROP_DUST.ap - (t.status.dugIn ?? 0)) * CROP_DUST.damage);
+        }
+        if (v <= 0) continue;
+        out.push({ cmd: { type: "ability", uid: u.uid, ability: "crop-dust", point: p }, bonus: v - CP_VALUE - 0.3, follow: u.uid, stack: true, expected: true });
+      }
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 6);
+  },
+  // Drop hay bales across the path of a melee unit that's about to charge one of ours.
+  "bale-out"(s, u) {
+    const def = ABILITIES["bale-out"];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    const reachOf = (def.range ?? 6) + profileOf(u).baseRadius;
+    const out: Candidate[] = [];
+    const friends = onBoard(s, u.owner).filter((f) => !isFlying(f) && !profileOf(f).structure);
+    // The bales must land clear of base contact with the enemy (they're a big base).
+    const clear = profileFor(BALE_OUT.profileId, []).baseRadius + ENGAGE_RANGE + 0.4;
+    for (const e of onBoard(s, other(u.owner))) {
+      if (isFlying(e) || !meleeWeapons(e).length || isEngaged(s, e)) continue; // it may still charge in the assault phase, moved or not
+      for (const f of friends) {
+        if (unitGap(e, f) > likelyChargeRange(s, e) + 2 || isEngaged(s, f)) continue;
+        const fc = centroid(f);
+        const front = aliveModels(e).reduce((a, b) => (dist(a.pos, fc) < dist(b.pos, fc) ? a : b));
+        // Roughly the charge it may spoil, at the odds that the bales are in its way.
+        const v = attackValue(s, f, chargeDamage(e, f, 0)) * 0.35 - CP_VALUE;
+        if (v <= 0) continue;
+        // Right in front of the charger, or a little to either side (the bomber's own base may be in the way).
+        const mid = towards(front.pos, fc, profileOf(e).baseRadius + clear);
+        const d = dist(front.pos, mid);
+        const side = d > 1e-6 ? { x: -(mid.y - front.pos.y) / d, y: (mid.x - front.pos.x) / d } : { x: 1, y: 0 };
+        for (const k of [0, 1.6, -1.6]) {
+          const p = { x: mid.x + side.x * k, y: mid.y + side.y * k };
+          if (!aliveModels(u).some((m) => dist(m.pos, p) <= reachOf)) continue;
+          out.push({ cmd: { type: "ability", uid: u.uid, ability: "bale-out", point: p }, bonus: v - Math.abs(k) * 0.1, stack: true, expected: true });
+        }
+      }
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 6);
+  },
+  // Burn the shields for a harder shot when a big target is in the sights and little can shoot back.
+  overcharge(s, u) {
+    const def = ABILITIES.overcharge;
+    if (s.players[u.owner].cp < (def.cp ?? 0) || u.status.overcharged) return [];
+    const shields = aliveModels(u).reduce((n, m) => n + m.shield, 0);
+    if (!shields) return [];
+    let gain = 0;
+    for (const e of onBoard(s, other(u.owner))) {
+      for (const w of rangedWeapons(u)) {
+        const plan = planShooting(s, u, e, w);
+        if (typeof plan === "string") continue;
+        const before = attackValue(s, e, expectedDamage(s, u, e, plan, false));
+        const after = attackValue(s, e, expectedDamage(s, u, e, { ...plan, damage: plan.damage + 1 }, false));
+        gain = Math.max(gain, after - before);
+      }
+    }
+    if (gain <= 0) return [];
+    const exposure = threatOn(s, u) > 0 ? 0.6 : 0.2;
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "overcharge" }, bonus: gain - shields * valuePerWound(u) * exposure - CP_VALUE, stack: true, expected: true }];
+  },
+  // Light up the enemy unit in cover that our shooters most want to hit.
+  spotlight(s, u) {
+    const def = ABILITIES.spotlight;
+    const out: Candidate[] = [];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return out;
+    for (const e of onBoard(s, other(u.owner))) {
+      if (e.status.exposed || unitGap(u, e) > (def.range ?? 16)) continue;
+      const cmd: Command = { type: "ability", uid: u.uid, ability: "spotlight", target: e.uid };
+      const after = simulate(s, cmd);
+      if (!after) continue;
+      const gain = shotGain(s, after, u.owner, e.uid);
+      if (gain <= 0) continue;
+      out.push({ cmd, bonus: gain * 0.6 - CP_VALUE, stack: true, expected: true });
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  },
   // A once-per-game bomb: save it for a juicy target (structures and mechs especially).
   "demo-charge"(s, u) {
     const def = ABILITIES["demo-charge"];
@@ -1149,7 +1286,10 @@ export function aiSupportCommand(s: GameState): Command | null {
   const mine = onBoard(s, me);
   const theirs = onBoard(s, other(me));
   let best: { cmd: Command; value: number } | null = null;
-  const consider = (cmd: Command, value: number) => {
+  // What the card's other abilities are likely worth later this round, lost if this one exhausts it.
+  let reserve = 0;
+  const consider = (cmd: Command, raw: number) => {
+    const value = raw - reserve;
     if (value < SUPPORT_THRESHOLD || (best && value <= best.value)) return;
     if (!simulate(s, cmd)) return;
     best = { cmd, value };
@@ -1159,6 +1299,7 @@ export function aiSupportCommand(s: GameState): Command | null {
   for (const card of pl.supports) {
     for (const a of abilityOfCard(card.id)) {
       if (canPlaySupport(s, me, card.id, a.id)) continue;
+      reserve = a.exhaust ? cardReserve(s, me, card.id, a.id) : 0;
       const cpLeft = pl.cp - a.cp;
       const base = { type: "support" as const, player: me, support: card.id, ability: a.id };
       const e = a.effect;
@@ -1227,25 +1368,31 @@ export function aiSupportCommand(s: GameState): Command | null {
           consider({ ...base, target: u.uid }, t > 1 ? Math.min(3.5, 0.9 + t * 0.25 * e.save) + holding : 0);
         }
       } else if (e.kind === "teleport") {
-        if (s.phase !== "movement") continue;
+        // Gate Step in the movement phase, Flash Step in the assault phase (then shoot or charge).
+        if (s.phase === "combat") continue;
         const evalBase = evaluate(s, me);
         for (const u of mine) {
           if (profileOf(u).structure || isEngaged(s, u) || u.status.acted) continue;
           const leader = aliveModels(u)[0]!;
-          for (const g of goals(s, u).slice(0, 5)) {
+          // In the assault phase the unit shoots or charges straight after, so count that in full,
+          // and also try stepping straight toward each enemy (into range of something).
+          const assault = s.phase === "assault";
+          const aims = [...goals(s, u).slice(0, 5), ...(assault ? theirs.map(centroid) : [])];
+          for (const g of aims) {
             const cmd = { ...base, target: u.uid, point: towards(leader.pos, g, e.range - 0.3) };
             const after = simulate(s, cmd);
             const au = after?.units.find((x) => x.uid === u.uid);
             if (!after || !au) continue;
-            const gain = evaluate(after, me) - evalBase + FOLLOW_UP * (followUp(after, au) - followUp(s, u));
+            const gain = evaluate(after, me) - evalBase + (assault ? 1 : FOLLOW_UP) * (followUp(after, au) - followUp(s, u));
             consider(cmd, gain - a.cp * CP_VALUE);
           }
         }
       } else if (e.kind === "slow") {
         for (const t of theirs) {
           if (t.status.slowedRounds > 0 || profileOf(t).move === 0) continue;
-          const close = mine.some((u) => unitGap(u, t) <= 14);
-          consider({ ...base, target: t.uid }, close ? (isMeleeUnit(t) ? 2.4 : 1.6) : 0);
+          const close = mine.some((u) => unitGap(u, t) <= e.range);
+          const early = s.phase === "movement" && !t.status.acted ? 0.6 : 0;
+          consider({ ...base, target: t.uid }, close ? (isMeleeUnit(t) ? 2.4 : 1.6) + early : 0);
         }
       } else if (e.kind === "blast") {
         for (const t of theirs) {
@@ -1322,6 +1469,144 @@ export function aiSupportCommand(s: GameState): Command | null {
             }
           }
         }
+      } else if (e.kind === "spot" || e.kind === "expose") {
+        // Mark the target our ready shooters gain the most against.
+        if (s.phase !== "assault") continue;
+        for (const t of theirs) {
+          if ((e.kind === "spot" && t.status.spotted) || (e.kind === "expose" && t.status.exposed)) continue;
+          const cmd = { ...base, target: t.uid };
+          const after = simulate(s, cmd);
+          if (after) consider(cmd, shotGain(s, after, me, t.uid) * 1.5);
+        }
+      } else if (e.kind === "smoke") {
+        // Hide a unit from the guns that would shoot it from further away than the smoke lets them.
+        if (s.phase === "combat") continue;
+        for (const u of mine) {
+          if (u.status.smoked || profileOf(u).structure) continue;
+          let blocked = 0;
+          for (const t of theirs) {
+            if (t.status.acted || !rangedWeapons(t).length) continue;
+            const gap = unitGap(t, u);
+            if (gap <= e.range) continue;
+            const reachIt = Math.max(...rangedWeapons(t).map((w) => (isFlying(u) ? (w.targets === "ground" ? 0 : w.range) : w.targets === "air" ? 0 : w.range)));
+            const closing = s.phase === "movement" ? effectiveMove(s, t) : 0;
+            if (gap > reachIt + closing) continue;
+            blocked += firepower(t) * (closing ? 0.6 : 1);
+          }
+          if (!blocked) continue;
+          consider({ ...base, target: u.uid }, Math.min(blocked, wounds(u)) * valuePerWound(u) * 1.6 + (onObjective(s, u) ? 0.6 : 0));
+        }
+      } else if (e.kind === "overwatch") {
+        // Overwatch on a gun that enemy units still have to walk past this round.
+        if (s.phase === "combat") continue;
+        for (const u of mine) {
+          if (hasAbility(u, "overwatch") || u.status.overwatching || isEngaged(s, u)) continue;
+          const guns = rangedWeapons(u).filter((w) => !w.traits?.includes("indirect"));
+          if (!guns.length) continue;
+          let best = 0;
+          for (const t of theirs) {
+            if (t.status.acted || profileOf(t).structure || unitGap(u, t) > 10 + effectiveMove(s, t)) continue;
+            const tp = profileOf(t);
+            for (const w of guns) {
+              if (isFlying(t) ? w.targets === "ground" : w.targets === "air") continue;
+              const exp = aliveModels(u).length * w.dice * pAtLeast(Math.min(6, w.hit + 1)) * failChance(tp.armor + w.ap) * Math.min(w.damage, tp.hp + tp.shield);
+              // A melee unit has to come close; a gunline might stay out of the 10".
+              best = Math.max(best, attackValue(s, t, exp) * (isMeleeUnit(t) ? 2 : 1));
+            }
+          }
+          consider({ ...base, target: u.uid }, best);
+        }
+      } else if (e.kind === "haste") {
+        // Extra reach for a charge just out of range, or onto an objective just out of reach.
+        if (s.phase === "combat") continue;
+        for (const u of eligibleUnits(s, me)) {
+          if (profileOf(u).structure || u.status.hasted || isEngaged(s, u)) continue;
+          const mv = effectiveMove(s, u);
+          let gain = 0;
+          if (!u.status.shaken && !u.status.disengaged && meleeWeapons(u).length) {
+            for (const t of theirs) {
+              if (isFlying(t) || !meleeWeapons(u).some((w) => meleeCanHit(u, t, w.targets))) continue;
+              const strike = attackValue(s, t, chargeDamage(u, t, 0));
+              if (s.phase === "assault" && rulesOf(s).rolledCharges) {
+                const need = chargeNeed(s, u, t);
+                const gap = unitGap(u, t);
+                if (need === null && gap > ROLLED_CHARGE_MAX + chargeBonus(s, u) + e.move) continue;
+                const before = need === null ? 0 : twoDiceAtLeast(need);
+                const after = need === null ? twoDiceAtLeast(Math.max(2, Math.ceil(gap - chargeBonus(s, u) - e.move))) : twoDiceAtLeast(Math.max(2, need - e.move));
+                gain = Math.max(gain, (after - before) * strike);
+              } else {
+                const gap = unitGap(u, t);
+                const reachNow = s.phase === "assault" ? mv : mv + likelyChargeRange(s, u);
+                if (gap > reachNow && gap <= reachNow + e.move) gain = Math.max(gain, strike * (s.phase === "assault" ? 1 : 0.4));
+              }
+            }
+          }
+          if (s.phase === "movement" && !isFlying(u)) {
+            for (const o of s.objectives) {
+              const d = dist(centroid(u), o.pos) - o.radius;
+              if (d > mv && d <= mv + e.move && controlOf(s, o) !== me) gain = Math.max(gain, objectiveWorth(s, o, me) * 0.5);
+            }
+          }
+          consider({ ...base, target: u.uid }, gain);
+        }
+      } else if (e.kind === "blind") {
+        // Put off the gun about to do the most damage to us this round.
+        if (s.phase === "combat") continue;
+        for (const t of theirs) {
+          if (t.status.blinded || t.status.acted || !rangedWeapons(t).length) continue;
+          if (!aliveModels(t).some((m) => mine.some((u) => aliveModels(u).some((f) => dist(f.pos, m.pos) <= e.range)))) continue;
+          let loss = 0;
+          for (const u of mine) {
+            for (const w of rangedWeapons(t)) {
+              const plan = planShooting(s, t, u, w);
+              if (typeof plan === "string") continue;
+              const now = attackValue(s, u, expectedDamage(s, t, u, plan, false));
+              const worse = attackValue(s, u, expectedDamage(s, t, u, { ...plan, hitOn: Math.min(6, plan.hitOn + 1) }, false));
+              loss = Math.max(loss, now - worse);
+            }
+          }
+          consider({ ...base, target: t.uid }, loss * (s.phase === "movement" ? 1.5 : 2.5));
+        }
+      } else if (e.kind === "resonate") {
+        for (const centre of mine) {
+          let v = 0;
+          for (const u of mine) {
+            if (u.uid !== centre.uid && unitGap(u, centre) > e.range) continue;
+            const max = profileOf(u).shield;
+            v += aliveModels(u).filter((m) => m.shield < max).length * valuePerWound(u);
+          }
+          consider({ ...base, target: centre.uid }, v * 1.2);
+        }
+      } else if (e.kind === "overshield") {
+        for (const u of mine) {
+          const soak = Math.min(threatened(u) * 0.6, aliveModels(u).length * e.amount);
+          consider({ ...base, target: u.uid }, soak * valuePerWound(u) * 1.6);
+        }
+      } else if (e.kind === "silence") {
+        // Switch off the reaction or trick that stands in the way of what we're about to do.
+        for (const t of theirs) {
+          if (t.status.silenced) continue;
+          const ready = mine.filter((u) => !u.status.acted && !isEngaged(s, u));
+          let v = 0;
+          const watching = (hasAbility(t, "overwatch") || t.status.overwatching) && !t.reactionsUsed.includes("overwatch");
+          if (watching && ready.some((u) => unitGap(u, t) <= 10 + effectiveMove(s, u))) v += 0.8 + firepower(t);
+          if (hasAbility(t, "lurk") && !t.reactionsUsed.includes("lurk") && ready.some((u) => !isFlying(u) && unitGap(u, t) <= 3 + effectiveMove(s, u))) v += 1.5;
+          const shooters = ready.filter((u) => rangedWeapons(u).some((w) => typeof planShooting(s, u, t, w) !== "string"));
+          if (shooters.length && hasAbility(t, "return-fire") && !t.reactionsUsed.includes("return-fire")) v += 0.5 + firepower(t) * 0.6;
+          if (shooters.length && hasAbility(t, "refraction") && !t.reactionsUsed.includes("refraction")) v += 0.8;
+          const chargers = ready.filter((u) => meleeWeapons(u).length && unitGap(u, t) <= chargeRange(s, u));
+          if (chargers.length) {
+            if (hasAbility(t, "riposte") && !t.reactionsUsed.includes("riposte")) v += 1.2;
+            if (hasAbility(t, "pirouette") && !t.reactionsUsed.includes("pirouette")) v += 1.2;
+            if (hasAbility(t, "phase-out") && !(t.abilityUses["phase-out"] ?? 0)) v += 2;
+          }
+          const tricks = !t.status.acted && profileOf(t).abilities.some((a) => {
+            const d = ABILITIES[a];
+            return d.kind === "active" && (d.usesPerGame === undefined || (t.abilityUses[a] ?? 0) < d.usesPerGame) && s.players[t.owner].cp >= (d.cp ?? 0) && (d.cp ?? 0) > 0;
+          });
+          if (tricks) v += 1 + profileOf(t).cost * 0.1;
+          consider({ ...base, target: t.uid }, v);
+        }
       } else if (need === "none") {
         // Reactions: arm them when the enemy is close and we can spare the CP.
         const contact = theirs.some((t) => mine.some((u) => unitGap(u, t) <= 18));
@@ -1329,6 +1614,7 @@ export function aiSupportCommand(s: GameState): Command | null {
       }
     }
   }
+  reserve = 0;
   // Rally: every army can spend CP to steady a Shaken unit.
   if (pl.cp >= RALLY_CP) {
     for (const u of mine) {
@@ -1431,6 +1717,31 @@ function anywhereDrops(
     }
   }
   return out.sort((a, b) => b.value - a.value).slice(0, 6);
+}
+
+/**
+ * Two abilities on one card: using an exhausting one rules out the other for the rest of the round.
+ * A rough value of the card's other buffs that would still come up this round (Feeding Frenzy in
+ * the combat phase, Crate of Rivets in the assault phase), so a cheap play doesn't burn the card first.
+ */
+function cardReserve(s: GameState, me: PlayerId, cardId: string, abilityId: string): number {
+  let v = 0;
+  const mine = onBoard(s, me);
+  const theirs = onBoard(s, other(me));
+  for (const b of abilityOfCard(cardId)) {
+    if (b.id === abilityId) continue;
+    const e = b.effect;
+    if (e.kind === "meleeBuff" && s.phase !== "combat") {
+      for (const u of mine) {
+        if (!meleeWeapons(u).length) continue;
+        const fighting = isEngaged(s, u) || theirs.some((t) => !isFlying(t) && unitGap(u, t) <= likelyChargeRange(s, u) + 1);
+        if (fighting) v = Math.max(v, aliveModels(u).length * e.dice * 0.7 * 0.6);
+      }
+    } else if (e.kind === "rangedBuff" && s.phase === "movement") {
+      for (const u of mine) if (rangedWeapons(u).length) v = Math.max(v, aliveModels(u).length * e.dice * 0.6 * 0.5);
+    }
+  }
+  return v;
 }
 
 function abilityOfCard(id: string) {

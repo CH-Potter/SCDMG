@@ -230,6 +230,36 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 - **New optional rules:** breach dice, overwatch against charges, command re-roll, chargers strike first, whole-army turns and random activation order.
 - Checked by AI-vs-AI simulation (one seed, Skirmish): every pairing scored within a few points of v0.9.
 
+**Added in the ability pass:** every unit now has at least two abilities (structures at least one), and every support card at least two. A card's abilities share the card: most exhaust it, so playing one rules out the other that round.
+- **New unit abilities:**
+  - **Return Fire** (reactive; Big Bertha, Hay Bomber): once per round, when an enemy shot damages this unit and it isn't engaged, it shoots back at the shooter with its best gun, hitting one worse. Only direct shots trigger it (not mortars, barrages, overwatch or other return fire).
+  - **Crop Dust** (Sky Rustler; assault phase, 1 CP, twice per game): fly up to 10" in a straight line. Every enemy ground model within 1" of the path is hit on a 4+ for 1 damage, with saves but no cover, and a cloud of dust can't be evaded. The unit can still shoot afterwards.
+  - **Bale Out** (Hay Bomber; movement phase, 1 CP, once per game): drop a Junk Barricade within 6" of the bomber, at least 2" from enemies, until the end of the round.
+  - **Scrap Cover** (passive; Junk Barricade): friendly models within 2" of it count as in cover against shooting (not against blasts; never for flyers or heavy units).
+  - **Radio Spotter** (passive; Spud Mortar): its shells drift half as far when any friendly unit can see the aim point, not just the mortar.
+  - **Eye Peck** (passive; Steel-Jaw Crows): when their dive deals damage, the target's shooting hits one worse until the end of the round.
+  - **Overcharge** (Ray Lancer, Jetwing Scouts, Sunray Tower; assault phase, 1 CP): drain every model's shields to 0; until the end of the round the unit's ranged attacks deal +1 damage.
+  - **Spotlight** (Jetwing Scouts; assault phase, 1 CP): an enemy unit within 16" that this unit can see gets nothing from cover, hunkering or digging in against shooting until the end of the round.
+  - **Riposte** (reactive; Phase Guard): once per round, when an enemy unit charges this unit, each of its models in base contact strikes first with 1 die, hitting on a 3+ for 1 damage, AP1. Not against a flyer's dive.
+  - **Pirouette** (reactive; Blink Dancers): once per round, when an enemy declares a charge at this unit, the whole unit steps up to 3" straight away from the charger before the charge is rolled (so the charge needs more).
+  - **Twirl Away** (passive; Blink Dancers): always disengages cleanly, so it's never exhausted and can still shoot or charge in the assault phase.
+  - **Phase Out** (reactive; Ray Lancer): once per game, when an enemy charge reaches this unit, it teleports up to 6" straight away from the charger before any blows land (no impact). The charger stays where it stopped. Enemy Overwatch and Lurk react to where it lands.
+  - The Tumbleweed Riders also get **Rocket Hop** (ramp jumps).
+- **Silenced** units (Withering Review) can't use active abilities, and their reactive abilities (Overwatch, Lurk, Return Fire, Riposte, Pirouette, Phase Out, Refraction, Sticky Goo, Pop!) don't trigger, until the end of the round. Passive auras keep working.
+- **New support abilities:**
+  - Grange Hall Radio, **Call It In** (1 CP, assault, exhausts): an enemy unit within 24" of your models is spotted, so your shots at it hit one better this round.
+  - Weather Vane, **Dust Cloud** (1 CP, any phase, exhausts): a friendly unit can't be shot from more than 12" away this round.
+  - Dirt Airstrip, **Top Cover** (1 CP, any phase, exhausts): a friendly unit with a gun gains Overwatch until the end of the round.
+  - Rust Bucket Drop-Ship, **Sandbag Drop** (1 CP, any phase, exhausts): a friendly unit digs in (+1 save against shooting and barrages this round). Playable from round 1, when Bumpy Landing isn't.
+  - Brood Nest, **Overmind Pulse** (1 CP, any phase, exhausts): a friendly unit gets +2" move this round, which also adds to a rolled charge. It exhausts the nest, so no Feeding Frenzy that round.
+  - Tunnel Network, **Undermine** (1 CP, movement phase, exhausts): an enemy unit within 12" of your models is slowed (-2 move) this round and next.
+  - Stink Gland, **Eye-Watering Reek** (1 CP, any phase, exhausts): an enemy unit with a gun within 10" of your models hits one worse with its shooting this round. Unlike Awful Whiff it works with morale switched off.
+  - Choir of Light, **Resonance** (1 CP, any phase, exhausts): a friendly unit and every friendly unit within 6" of it recharge 1 shield per model (up to their maximum).
+  - Star Lens, **Glaring Light** (1 CP, assault, exhausts): an enemy unit within 24" that one of your models can see gets nothing from cover, hunkering or digging in against shooting this round.
+  - Court of Disdain, **Withering Review** (2 CP, any phase, exhausts): an enemy unit within 12" of your models is silenced this round (see above).
+  - Light Gate, **Flash Step** (2 CP, assault, exhausts): one of your unengaged units teleports up to 4", ignoring terrain, and can still shoot or charge.
+  - Grand Portal, **Afterglow** (2 CP, any phase, exhausts): a friendly unit gets +1 shield per model, even above its maximum, until the end of the round.
+
 ### Flyers
 
 - **No melee engagement.** A flyer is never engaged with anything, so it can always move and shoot freely, and nothing is ever stuck fighting it. Flyers and ground units can still shoot each other (if their weapons can hit the other).
@@ -316,12 +346,14 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
 | Structure | Faction | Kind | What it does |
 | --- | --- | --- | --- |
 | Scrap Turret | Militia | permanent | Rifle turret with Overwatch |
-| Junk Barricade | Militia | temporary | Big base that blocks enemy paths, e.g. a ramp |
+| Junk Barricade | Militia | temporary | Big base that blocks enemy paths, e.g. a ramp; Scrap Cover gives friends within 2" cover (Tractor Depot, or the Hay Bomber's Bale Out) |
 | Mutagen Vat | Munch | permanent | Short-range spores; Regen and Brood Call |
 | Gopher Hole | Munch | temporary | Your reserves can deploy within 3" of it |
 | The Sett Lab | Munch | permanent | A Burrow Exit that stays, with Lurk and Regen |
 | Trapdoor Pit | Munch | temporary | Lurks: bites the first enemy ground unit to end a move within 3" |
 | Shield Pylon | Concord | permanent | Shielded beam emplacement with Radiance |
+| Spud Mortar | Militia | permanent | Lobbed potatoes; Radio Spotter (drifts less when friends can see the spot) |
+| Sunray Tower | Concord | permanent | Long-range beam; Overcharge (burn its shields for +1 damage) |
 | Glimmer Dome | Concord | temporary | Enemy shots at friendly units within 4" of it hit one worse |
 
 ## Off-board supports, Fizz and CP
@@ -337,7 +369,7 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
   - **Grand Portal** (Concord, 3 ✦, +1 CP): *Step Through* (2 CP, movement phase, exhausts, from round 2) lands the unit within 4" of one of your units and at least 3" from enemies, with +1 shield per model (even above its maximum) until the end of the round. It's in the Concord's Skirmish and Assault starter supports.
   - The Munch don't airdrop: they tunnel. *Dig Through* (Tunnel Network) opens a Gopher Hole for the round, and the Sett Lab is a permanent one.
 - **Teleports:** *Gate Step* (Light Gate, Concord, 3 CP, movement phase, exhausts) moves one of your unengaged units on the table up to 8". Click the unit, then where it goes.
-- Effects are data-driven, so custom factions can combine them: gain resources, heal or revive, recharge shields, blast a point, summon a structure, give melee or ranged buffs, give precision and tracking, regrow lost models, dig a unit in, teleport a unit, slow an enemy, airdrop a reserve unit (near your models or anywhere, optionally from a later round), rattle an enemy's nerve, and the ward, brace and retaliate reactions.
+- Effects are data-driven, so custom factions can combine them: gain resources, heal or revive, recharge shields, blast a point, summon a structure, give melee or ranged buffs, give precision and tracking, regrow lost models, dig a unit in, teleport a unit, slow an enemy, airdrop a reserve unit (near your models or anywhere, optionally from a later round), rattle an enemy's nerve, spot an enemy (hit one better), blind an enemy (its shooting hits one worse), expose an enemy (no cover, hunker or dig-in bonus), silence an enemy, hide a unit in smoke, grant Overwatch, give extra move, ring a shield recharge round a group, add overshields, and the ward, brace and retaliate reactions.
 
 ## Objectives and missions
 

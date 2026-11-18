@@ -102,7 +102,7 @@ function moveSfx(info?: UnitInfo): SfxName {
   return "shuffle";
 }
 
-const TELEPORT_ABILITIES = new Set(["blink", "recall", "tunnel"]);
+const TELEPORT_ABILITIES = new Set(["blink", "recall", "tunnel", "phase-out"]);
 
 export interface CueOpts {
   /** prefers-reduced-motion: one shot instead of a rattling burst, no ricochet flourishes. */

@@ -322,7 +322,17 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
       case "dugIn":
         return { kind, save: num(o.save) };
       case "teleport":
+      case "spot":
+      case "smoke":
+      case "blind":
+      case "resonate":
+      case "expose":
+      case "silence":
         return { kind, range: num(o.range) };
+      case "haste":
+        return { kind, move: num(o.move) };
+      case "overshield":
+        return { kind, amount: num(o.amount) };
       default:
         return { kind };
     }
