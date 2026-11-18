@@ -170,4 +170,28 @@ describe("factionProblems", () => {
     (sun as unknown as { effect: unknown }).effect = { kind: "nuke" };
     expect(has(factionProblems(f), "unknown effect")).toBe(true);
   });
+
+  it("accepts army slots: known classes, whole numbers from 0 to 2", () => {
+    const f = builtIn("munch");
+    f.slots = { base: 2, elite: 0 };
+    f.supports[0]!.slots = { flyer: 1, static: 2 };
+    expect(factionProblems(f)).toEqual([]);
+    delete f.slots;
+    delete f.supports[0]!.slots;
+    expect(factionProblems(f)).toEqual([]); // optional: built-ins use the tables
+  });
+
+  it("rejects bad army slots", () => {
+    const f = builtIn("munch");
+    (f as unknown as { slots: unknown }).slots = { base: 3, flyer: -1, elite: 1.5, wizard: 1 };
+    (f.supports[0] as unknown as { slots: unknown }).slots = "lots";
+    (f.supports[1] as unknown as { slots: unknown }).slots = { support: "1" };
+    const p = factionProblems(f);
+    expect(has(p, "Faction: Base slots must be a whole number from 0 to 2")).toBe(true);
+    expect(has(p, "Faction: Flyer slots must be")).toBe(true);
+    expect(has(p, "Faction: Elite slots must be")).toBe(true);
+    expect(has(p, `Faction: unknown unit class "wizard"`)).toBe(true);
+    expect(has(p, `${f.supports[0]!.name}: army slots must be a set of numbers`)).toBe(true);
+    expect(has(p, `${f.supports[1]!.name}: Support slots must be`)).toBe(true);
+  });
 });

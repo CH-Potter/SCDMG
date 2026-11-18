@@ -366,6 +366,21 @@
 .ff-field.block {
   margin: 8px 0;
 }
+/* Computed costs: read-only, so they look like a value rather than an input. */
+.ff-price output {
+  display: block;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  border: 1px dashed var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.ff-breakdown {
+  margin: 0 0 6px;
+  font-variant-numeric: tabular-nums;
+}
 .ff .span2 {
   grid-column: span 2;
 }

@@ -6,8 +6,10 @@ import { BUILT_IN_FACTION_IDS, FACTIONS, isBuiltInFaction, registerCustomFaction
 import { CUSTOM_PREFIX, EFFECT_KINDS, factionProblems, KEYWORDS, LIFETIMES, LOOKS, TARGETS, TIMINGS, TRAITS, EVADE_CONDITIONS } from "../engine/data/factionValidation";
 import { ABILITIES } from "../engine/data/abilities";
 import { cleanArt } from "../engine/data/unitArt";
+import { factionSlots, supportSlots, UNIT_CLASSES, type Slots } from "../engine/data/unitClasses";
+import { applyComputedCosts } from "../engine/pricing";
 import type { AbilityId, Faction, ImpactDef, Keyword, ListEntry, StructureDef, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, UpgradeDef, Weapon, WeaponBonus, WeaponTrait, EvadeCondition } from "../engine/types";
-import { fixStructures, newProfile } from "../forge/model";
+import { fitStarterLists, fixStructures, newProfile } from "../forge/model";
 import { loadJson, newId, saveJson, slug } from "./files";
 
 const KEY = "scdmg.customFactions.v1";
@@ -27,7 +29,10 @@ export function listCustomFactions(): Faction[] {
   for (const raw of storedRaw()) {
     const f = cleanFaction(raw);
     if (isBuiltInFaction(f.id) || out.some((x) => x.id === f.id)) continue;
-    if (factionProblems(f, { others: [...builtIns(), ...out] }).length) continue;
+    const others = [...builtIns(), ...out];
+    // Costs are recomputed on load (cleanFaction), so a faction saved before computed pricing may now
+    // have a starter list over the mode's limit: trim it rather than lose the faction.
+    if (factionProblems(f, { others }).length && (!fitStarterLists(f).length || factionProblems(f, { others }).length)) continue;
     out.push({ ...f, custom: true });
   }
   return out;
@@ -99,14 +104,28 @@ export function rekeyFaction(src: Faction, factionId: string): Faction {
   return f;
 }
 
-/** A custom copy of any faction (built-in or custom), with fresh ids throughout. */
-export function copyFaction(src: Faction, name = `${src.name} copy`): Faction {
+/** Fit the starter lists to the mode limits after costs were recomputed, noting any units dropped. */
+function trimNote(f: Faction, notes: string[]): void {
+  const dropped = fitStarterLists(f);
+  if (dropped.length) notes.push(`Starter lists trimmed to fit their limits at the computed costs: dropped ${dropped.join(", ")}`);
+}
+
+/**
+ * A custom copy of any faction (built-in or custom), with fresh ids throughout and computed costs.
+ * If the computed costs push a starter list over its limit, units are dropped from it (listed in `notes`).
+ */
+export function copyFaction(src: Faction, name = `${src.name} copy`, notes: string[] = []): Faction {
   const clean = cleanFaction(src);
+  // Built-ins take their army slots from tables; a copy keeps them as its own editable values.
+  clean.slots = { ...factionSlots(src) };
+  for (const s of clean.supports) s.slots = { ...supportSlots(s) };
   clean.name = name.slice(0, 40);
   delete clean.custom;
   // Copies use the plain "Skirmish set plus Assault extras" starter supports, which the forge edits.
   delete clean.assaultStarter;
-  return rekeyFaction(clean, newFactionId(clean.name));
+  const out = applyComputedCosts(rekeyFaction(clean, newFactionId(clean.name)));
+  trimNote(out, notes);
+  return out;
 }
 
 /** A new faction with one simple squad to start from. */
@@ -123,11 +142,12 @@ export function blankFaction(name = "New faction"): Faction {
     supports: [],
     defaultSupports: [],
     assaultSupports: [],
+    slots: {},
   };
   const squad = newProfile(f, "unit", "Basic squad");
   f.profiles.push(squad);
   f.defaultList.push({ profileId: squad.id, upgrades: [] });
-  return f;
+  return applyComputedCosts(f);
 }
 
 // ---------- coercion ----------
@@ -179,6 +199,20 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
       if (!ok) notes.push(`${where}: dropped unknown weapon trait "${str(t)}"`);
       return ok;
     });
+  /** Extra army slots by unit class: known classes only, numbers coerced (validation checks the range). */
+  const slots = (v: unknown, where: string): Slots | undefined => {
+    if (v === undefined || v === null) return undefined;
+    const out: Slots = {};
+    if (!isObj(v)) {
+      notes.push(`${where}: dropped army slots that weren't valid`);
+      return out;
+    }
+    for (const [k, n] of Object.entries(v)) {
+      if (!(UNIT_CLASSES as readonly string[]).includes(k)) notes.push(`${where}: dropped slots for unknown unit class "${k}"`);
+      else if (n !== undefined && n !== null) out[k as keyof Slots] = num(n);
+    }
+    return out;
+  };
   const objects = (v: unknown, where: string): Obj[] =>
     list(v).filter((x): x is Obj => {
       if (!isObj(x)) notes.push(`${where}: dropped an entry that wasn't an object`);
@@ -341,7 +375,7 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
   };
   const support = (s: Obj, i: number): SupportDef => {
     const where = str(s.name) || `Support #${i + 1}`;
-    return {
+    const out: SupportDef = {
       id: str(s.id),
       name: str(s.name),
       faction: str(s.faction),
@@ -350,10 +384,15 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
       blurb: str(s.blurb),
       abilities: objects(s.abilities, where).map((a) => ability(a, where)),
     };
+    const sl = slots(s.slots, `${where} slots`) ?? (custom ? {} : undefined);
+    if (sl) out.slots = sl;
+    return out;
   };
   const entries = (v: unknown, where: string): ListEntry[] =>
     objects(v, where).map((e) => ({ profileId: str(e.profileId), upgrades: list(e.upgrades).map(str) }));
 
+  // Custom factions keep their own slots (and computed costs); built-ins use the tables in unitClasses.ts.
+  const custom = !isBuiltInFaction(str(r.id));
   const out: Faction = {
     id: str(r.id),
     name: str(r.name),
@@ -369,7 +408,11 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
   };
   if (Array.isArray(r.assaultStarter)) out.assaultStarter = list(r.assaultStarter).map(str);
   if (r.custom === true) out.custom = true;
-  return out;
+  const fs = slots(r.slots, "Faction slots") ?? (custom ? {} : undefined);
+  if (fs) out.slots = fs;
+  // Costs, supply, upgrade costs and Fizz are worked out from the stats (engine/pricing.ts), so stored
+  // or imported values never fight the computed ones. Built-ins keep their hand-tuned costs.
+  return custom ? applyComputedCosts(out) : out;
 }
 
 // ---------- files ----------
@@ -416,6 +459,8 @@ export function importFaction(raw: unknown, takenIds?: Iterable<string>): Factio
   const out = rekeyFaction(f, fid);
   const fixed = fixStructures(out);
   if (fixed.length) notes.push(`Structures fixed (move 0, structure keyword): ${fixed.join(", ")}`);
+  applyComputedCosts(out);
+  trimNote(out, notes);
   const problems = factionProblems(out, { others: [...builtIns(), ...saved.filter((x) => x.id !== fid)] });
   return { faction: out, problems, notes, renamed };
 }
