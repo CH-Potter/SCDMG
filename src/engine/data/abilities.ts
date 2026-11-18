@@ -107,7 +107,9 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
   },
   tunnel: {
     id: "tunnel",
-    cp: 2,
+    // 1 CP (was 2, v0.12 balance pass): supports spent the swarm's CP first, so at 2 it came up about
+    // once in 30 Skirmish games.
+    cp: 1,
     name: "Tunnel",
     kind: "active",
     phase: "movement",

@@ -71,26 +71,28 @@ describe("calibration against the built-in factions", () => {
   // balance pass took the computed Fizz for every card and the computed cost for upgrades no starter
   // list uses, but kept hand-set unit costs where the sims back them (see the comments in
   // data/factions.ts and docs/rules.md): MAE 0.38 units, 0.21 supply, 0.19 upgrades, 0 supports.
+  // The v0.12 balance pass (three base factions): MAE 0.30 units (9 of 30 off by one: the Patch Medic,
+  // Sky Rustler, Outriders, Old Guard, Lurker, Ray Lancer, Shimmer Saucer, Grand Strider and Blink
+  // Dancers; docs/rules.md says why each stays hand-set), 0.23 supply (7 off by one: Tunnel at 1 CP made the Lurker and Deep
+  // Borer worth more), and every upgrade and card at its computed price.
   it("lands unit costs close to the hand-set ones", () => {
-    expect(mean(unitErr.map(Math.abs))).toBeLessThanOrEqual(0.4);
+    expect(mean(unitErr.map(Math.abs))).toBeLessThanOrEqual(0.31);
     expect(Math.max(...unitErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 
   it("derives supply close to the hand-set one", () => {
-    expect(mean(supplyErr.map(Math.abs))).toBeLessThanOrEqual(0.22);
+    expect(mean(supplyErr.map(Math.abs))).toBeLessThanOrEqual(0.24);
     expect(Math.max(...supplyErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 
-  it("prices upgrades close to the hand-set costs", () => {
-    expect(mean(upgradeErr.map(Math.abs))).toBeLessThanOrEqual(0.2);
-    // None is off by more than 1. (Tunnel Claws, hand-priced at 4, was the one outlier; it left the
-    // built-ins with the Munch, and the Munch template prices it like any other upgrade.)
-    expect(upgradeErr.filter((e) => Math.abs(e) > 1)).toEqual([]);
+  it("prices upgrades at the hand-set costs", () => {
+    // (Tunnel Claws, hand-priced at 4, was the last outlier; it left the built-ins with the Munch, and
+    // the Munch template prices it like any other upgrade.)
+    expect(upgradeErr.filter((e) => e !== 0)).toEqual([]);
   });
 
   it("prices support cards at the hand-set Fizz", () => {
-    expect(mean(fizzErr.map(Math.abs))).toBeLessThanOrEqual(0.05);
-    expect(Math.max(...fizzErr.map(Math.abs))).toBeLessThanOrEqual(1);
+    expect(fizzErr.filter((e) => e !== 0)).toEqual([]);
   });
 
   it("never changes the built-in factions", () => {
