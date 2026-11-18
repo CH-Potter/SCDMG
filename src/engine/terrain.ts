@@ -16,8 +16,10 @@ import {
   segmentNearPolygon,
   segmentPolygonDistance,
   polyBounds,
+  type Bounds,
 } from "./geometry";
 import { rulesOf } from "./houseRules";
+import { NumKeyMap } from "./numKey";
 import { hasKeyword, isFlying, profileOf } from "./profile";
 import type { AccessPoint, Elevation, GameState, Model, PlayerId, Terrain, Unit, Vec } from "./types";
 
@@ -179,7 +181,6 @@ function firstObstruction(s: GameState, from: Vec, target: Unit, tm: Model, shoo
 }
 
 export interface Placed {
-  key: string; // `${uid}:${modelId}`
   uid: string;
   owner: PlayerId;
   pos: Vec;
@@ -196,7 +197,7 @@ export function allPlaced(s: GameState): Placed[] {
     if (!u.onBoard) continue;
     const r = profileOf(u).baseRadius;
     for (const m of u.models) {
-      if (m.alive) out.push({ key: modelKey(u, m), uid: u.uid, owner: u.owner, pos: m.pos, elevation: m.elevation, radius: r });
+      if (m.alive) out.push({ uid: u.uid, owner: u.owner, pos: m.pos, elevation: m.elevation, radius: r });
     }
   }
   return out;
@@ -239,28 +240,40 @@ export interface Route {
   via?: string;
 }
 
-function legError(s: GameState, unit: Unit, leg: Leg, enemies: Placed[], jump: boolean): string | null {
-  const r = profileOf(unit).baseRadius;
-  const { from, to, elevation } = leg;
+/**
+ * Can a base of radius `r` walk this leg past the terrain (and stay on its platform)? The terrain
+ * half of a leg check; `levelEnemies` (the enemy models on the leg's level) are the other half.
+ */
+function terrainLegError(s: GameState, from: Vec, to: Vec, elevation: Elevation, r: number, jump: boolean, blocks = boxedBlockers(s, elevation, jump)): string | null {
   if (elevation === 1 && !jump) {
     const plat = platformAt(s, from);
     if (!plat || !pointInPolygon(to, plat.poly)) return "That path leaves the platform";
   }
-  for (const t of s.terrain) {
-    let blocks = false;
-    if (t.kind === "building") blocks = true;
-    else if (t.kind === "platform") blocks = elevation === 0 && !jump;
-    else if (t.kind === "wall") blocks = t.level === elevation;
-    else if (t.kind === "barricade") blocks = t.level === elevation && !jump;
-    if (blocks && segmentNearPolygon(from, to, t.poly, r - EPS)) {
+  for (const { t, bb } of blocks) {
+    if (segmentNearPolygon(from, to, t.poly, r - EPS, bb)) {
       return t.kind === "platform" ? "Path runs into a cliff" : "Path blocked by terrain";
     }
   }
-  for (const e of enemies) {
-    if (e.elevation !== elevation) continue;
-    if (pointSegmentDistance(e.pos, from, to) < r + e.radius - EPS) return "Path blocked by an enemy";
-  }
   return null;
+}
+
+/** Does an enemy base (on the leg's level) stand in the way of this leg? */
+function enemyLegClear(from: Vec, to: Vec, r: number, levelEnemies: Placed[]): boolean {
+  const x0 = Math.min(from.x, to.x);
+  const x1 = Math.max(from.x, to.x);
+  const y0 = Math.min(from.y, to.y);
+  const y1 = Math.max(from.y, to.y);
+  for (const e of levelEnemies) {
+    const reach = r + e.radius;
+    // Further than `reach` from the leg's bounding box: further than that from the leg, so clear.
+    if (e.pos.x < x0 - reach || e.pos.x > x1 + reach || e.pos.y < y0 - reach || e.pos.y > y1 + reach) continue;
+    if (pointSegmentDistance(e.pos, from, to) < r + e.radius - EPS) return false;
+  }
+  return true;
+}
+
+function legError(s: GameState, from: Vec, to: Vec, elevation: Elevation, r: number, levelEnemies: Placed[], jump: boolean): string | null {
+  return terrainLegError(s, from, to, elevation, r, jump) ?? (enemyLegClear(from, to, r, levelEnemies) ? null : "Path blocked by an enemy");
 }
 
 
@@ -352,9 +365,9 @@ export function difficultExtra(s: GameState, a: Vec, b: Vec, elevation: Elevatio
   const len = dist(a, b);
   if (len < EPS) return 0;
   let extra = 0;
-  for (const t of s.terrain) {
-    if (t.kind !== "cover" || t.level !== elevation) continue;
-    const bb = polyBounds(t.poly);
+  const idx = pathIndex(s);
+  const covers = (idx.covers[elevation] ??= s.terrain.filter((t) => t.kind === "cover" && t.level === elevation).map((t) => ({ t, bb: polyBounds(t.poly) })));
+  for (const { t, bb } of covers) {
     if (Math.max(a.x, b.x) < bb.x0 || Math.min(a.x, b.x) > bb.x1 || Math.max(a.y, b.y) < bb.y0 || Math.min(a.y, b.y) > bb.y1) continue;
     let inside = 0;
     for (let i = 0; i < DIFFICULT_SAMPLES; i++) {
@@ -367,18 +380,76 @@ export function difficultExtra(s: GameState, a: Vec, b: Vec, elevation: Elevatio
 }
 
 const NODE_MARGIN = 0.15;
-/** Path nodes per terrain list (shared by every state of one game; a new game or edited map gets a new list). */
-const staticNodeCache = new WeakMap<Terrain[], Map<string, Vec[]>>();
+/** Enemy waypoints sit on a hexagon around the base: this far out per inch of clearance. */
+const HEX_K = 1 / Math.cos(Math.PI / 6);
+
+/**
+ * Pathfinding data per terrain list, shared by every state of one game (a new game or edited map
+ * gets a new list). Everything in it is derived from the terrain alone, or (the route memo) keyed
+ * on every other input, so it never changes what a search returns, only how fast.
+ */
+interface PathIndex {
+  board: GameState["board"];
+  /** Features that block a path, per `${elevation}|${jump}`. */
+  blockers: Map<string, Terrain[]>;
+  /** The same with their bounding boxes, per elevation * 2 + jump. */
+  boxed: { t: Terrain; bb: Bounds }[][];
+  /** Area cover (difficult terrain) per elevation, with bounding boxes. */
+  covers: { t: Terrain; bb: Bounds }[][];
+  /**
+   * Terrain-only leg checks between one other point (an end point or an enemy waypoint, keyed by
+   * its coordinates and `${elevation}|${r}|${jump}`) and each corner waypoint, one row per direction
+   * (`>` from the point, `<` to it). Same encoding as `clear`. Units stand still for most of the
+   * game, so the same points come up again and again.
+   */
+  rows: NumKeyMap<Uint8Array>;
+  /** Corner waypoints per `${elevation}|${r}|${jump}`. */
+  nodes: Map<string, Vec[]>;
+  /**
+   * Terrain-only leg checks between two corner waypoints, per `${elevation}|${r}|${jump}`, indexed
+   * `from * n + to` (0 = not checked yet, 1 = clear, 2 = blocked).
+   */
+  clear: Map<string, Uint8Array>;
+  /** Finished searches, keyed on everything a search reads (see `findPath`). */
+  routes: NumKeyMap<Route | string>;
+}
+const pathIndexes = new WeakMap<Terrain[], PathIndex>();
+/** Routes remembered per game before the memo starts over (bounds memory on long games). */
+const ROUTE_MEMO_MAX = 60_000;
+const ROW_MEMO_MAX = 60_000;
+
+function pathIndex(s: GameState): PathIndex {
+  let idx = pathIndexes.get(s.terrain);
+  if (!idx || idx.board.width !== s.board.width || idx.board.height !== s.board.height) {
+    idx = { board: { ...s.board }, blockers: new Map(), boxed: [], covers: [], rows: new NumKeyMap(ROW_MEMO_MAX), nodes: new Map(), clear: new Map(), routes: new NumKeyMap(ROUTE_MEMO_MAX) };
+    pathIndexes.set(s.terrain, idx);
+  }
+  return idx;
+}
+
+/** `blockers` with each feature's bounding box. */
+function boxedBlockers(s: GameState, elevation: Elevation, jump: boolean): { t: Terrain; bb: Bounds }[] {
+  const idx = pathIndex(s);
+  const k = elevation * 2 + (jump ? 1 : 0);
+  return (idx.boxed[k] ??= blockers(s, elevation, jump).map((t) => ({ t, bb: polyBounds(t.poly) })));
+}
 
 /** Features that block a path at this elevation (mirrors legError). */
 function blockers(s: GameState, elevation: Elevation, jump: boolean): Terrain[] {
-  return s.terrain.filter((t) => {
-    if (t.kind === "building") return true;
-    if (t.kind === "platform") return elevation === 0 && !jump;
-    if (t.kind === "wall") return t.level === elevation;
-    if (t.kind === "barricade") return t.level === elevation && !jump;
-    return false;
-  });
+  const idx = pathIndex(s);
+  const key = `${elevation}|${jump}`;
+  let hit = idx.blockers.get(key);
+  if (!hit) {
+    hit = s.terrain.filter((t) => {
+      if (t.kind === "building") return true;
+      if (t.kind === "platform") return elevation === 0 && !jump;
+      if (t.kind === "wall") return t.level === elevation;
+      if (t.kind === "barricade") return t.level === elevation && !jump;
+      return false;
+    });
+    idx.blockers.set(key, hit);
+  }
+  return hit;
 }
 
 /** Waypoints just outside each convex corner, far enough that a base of radius `r` clears both edges. */
@@ -411,11 +482,7 @@ function cornerNodes(poly: Vec[], r: number): Vec[] {
 }
 
 function staticNodes(s: GameState, elevation: Elevation, r: number, jump: boolean): Vec[] {
-  let perMap = staticNodeCache.get(s.terrain);
-  if (!perMap) {
-    perMap = new Map();
-    staticNodeCache.set(s.terrain, perMap);
-  }
+  const perMap = pathIndex(s).nodes;
   const key = `${elevation}|${r}|${jump}`;
   const hit = perMap.get(key);
   if (hit) return hit;
@@ -430,12 +497,10 @@ function staticNodes(s: GameState, elevation: Elevation, r: number, jump: boolea
   return nodes;
 }
 
-function enemyNodes(enemies: Placed[], elevation: Elevation, r: number): Vec[] {
+function enemyNodes(levelEnemies: Placed[], r: number): Vec[] {
   const out: Vec[] = [];
-  const k = 1 / Math.cos(Math.PI / 6);
-  for (const e of enemies) {
-    if (e.elevation !== elevation) continue;
-    const d = (r + e.radius + NODE_MARGIN) * k;
+  for (const e of levelEnemies) {
+    const d = (r + e.radius + NODE_MARGIN) * HEX_K;
     for (let i = 0; i < 6; i++) {
       const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
       out.push({ x: e.pos.x + Math.cos(a) * d, y: e.pos.y + Math.sin(a) * d });
@@ -444,7 +509,16 @@ function enemyNodes(enemies: Placed[], elevation: Elevation, r: number): Vec[] {
   return out;
 }
 
-/** Shortest legal path on one level: straight if clear, otherwise A* over corner waypoints. */
+/**
+ * Shortest legal path on one level: straight if clear, otherwise A* over corner waypoints.
+ *
+ * Searches are remembered per game (the AI asks for the same routes over and over). The memo key is
+ * everything the search reads: the level, base radius, jump, difficult terrain, the end points, the
+ * length limit, and the enemy bases on this level that could matter. An enemy matters only if it is
+ * near the ellipse of points within `maxLen` of both ends (every leg the search can try lies inside
+ * it, and so do all the waypoints it keeps); one further off neither blocks a leg nor adds a
+ * waypoint, so leaving it out of the key can't change the answer.
+ */
 function findPath(
   s: GameState,
   unit: Unit,
@@ -455,63 +529,159 @@ function findPath(
   maxLen: number,
   jump: boolean,
 ): Route | string {
-  const direct = legError(s, unit, { from, to, elevation }, enemies, jump);
+  const r = profileOf(unit).baseRadius;
   const straight = dist(from, to);
+  const reach = Math.max(maxLen + EPS, straight);
+  const level: Placed[] = [];
+  const idx = pathIndex(s);
+  const key = idx.routes.reset().push(elevation).push(jump ? 1 : 0).push(r).push(rulesOf(s).difficultTerrain ? 1 : 0);
+  key.push(from.x).push(from.y).push(to.x).push(to.y).push(maxLen);
+  for (const e of enemies) {
+    if (e.elevation !== elevation) continue;
+    const d = (r + e.radius + NODE_MARGIN) * HEX_K;
+    if (dist(from, e.pos) + dist(e.pos, to) > reach + 2 * d + 1e-3) continue;
+    level.push(e);
+    key.push(e.pos.x).push(e.pos.y).push(e.radius);
+  }
+  const hit = key.get();
+  if (hit !== undefined) return hit;
+  const found = searchPath(s, idx, from, to, elevation, level, maxLen, jump, r, straight);
+  key.set(found);
+  return found;
+}
+
+function searchPath(
+  s: GameState,
+  idx: PathIndex,
+  from: Vec,
+  to: Vec,
+  elevation: Elevation,
+  level: Placed[],
+  maxLen: number,
+  jump: boolean,
+  r: number,
+  straight: number,
+): Route | string {
+  const direct = legError(s, from, to, elevation, r, level, jump);
   const directExtra = direct ? 0 : difficultExtra(s, from, to, elevation, jump);
   // A clear, easy straight line is always best.
   if (!direct && directExtra === 0) return { legs: [{ from, to, elevation }], length: straight };
   if (straight > maxLen + EPS) return direct ?? `Too far: ${(straight + directExtra).toFixed(1)}" of ${maxLen}"`;
   if (direct === "That path leaves the platform") return direct;
 
-  const r = profileOf(unit).baseRadius;
   const plat = elevation === 1 && !jump ? platformAt(s, from) : undefined;
   const W = s.board.width;
   const H = s.board.height;
-  const waypoints = [...staticNodes(s, elevation, r, jump), ...enemyNodes(enemies, elevation, r)].filter(
-    (p) =>
-      dist(from, p) + dist(p, to) <= maxLen + EPS &&
-      (!plat || pointInPolygon(p, plat.poly)) &&
-      p.x - r >= 0 &&
-      p.y - r >= 0 &&
-      p.x + r <= W &&
-      p.y + r <= H,
-  );
-  const pts = [from, to, ...waypoints];
+  const keep = (p: Vec) =>
+    dist(from, p) + dist(p, to) <= maxLen + EPS &&
+    (!plat || pointInPolygon(p, plat.poly)) &&
+    p.x - r >= 0 &&
+    p.y - r >= 0 &&
+    p.x + r <= W &&
+    p.y + r <= H;
+  const nodeKey = `${elevation}|${r}|${jump}`;
+  const corners = staticNodes(s, elevation, r, jump);
+  const pts: Vec[] = [from, to];
+  /** Each point's index among the corner waypoints (-1: an end point or an enemy waypoint). */
+  const corner: number[] = [-1, -1];
+  corners.forEach((p, i) => {
+    if (!keep(p)) return;
+    pts.push(p);
+    corner.push(i);
+  });
+  for (const p of enemyNodes(level, r)) {
+    if (!keep(p)) continue;
+    pts.push(p);
+    corner.push(-1);
+  }
+  const nc = corners.length;
+  let cornerClear = idx.clear.get(nodeKey);
+  if (!cornerClear || cornerClear.length !== nc * nc) {
+    cornerClear = new Uint8Array(nc * nc);
+    idx.clear.set(nodeKey, cornerClear);
+  }
   const n = pts.length;
-  const g = new Array<number>(n).fill(Infinity);
-  const prev = new Array<number>(n).fill(-1);
-  const closed = new Array<boolean>(n).fill(false);
+  const g = new Float64Array(n).fill(Infinity);
+  const prev = new Int32Array(n).fill(-1);
+  const closed = new Uint8Array(n);
+  /** Straight-line distance from each point to the goal (the A* heuristic). */
+  const h = new Float64Array(n);
+  for (let i = 0; i < n; i++) h[i] = dist(pts[i]!, to);
   g[0] = 0;
-  const seen = new Map<number, boolean>();
+  /** Leg checks done in this search (symmetric: the first direction asked decides). 0 = not yet, 1 = clear, 2 = blocked. */
+  const seen = new Uint8Array(n * n);
+  const blocks = boxedBlockers(s, elevation, jump);
+  /** Point `i`'s row of checks to (`>`) or from (`<`) every corner waypoint. */
+  const rowsOut: (Uint8Array | undefined)[] = [];
+  const rowsIn: (Uint8Array | undefined)[] = [];
+  const rowOf = (i: number, dir: ">" | "<"): Uint8Array => {
+    const p = pts[i]!;
+    const key = idx.rows.reset().push(p.x).push(p.y).push(elevation).push(r).push(jump ? 1 : 0).push(dir === ">" ? 1 : 0);
+    let row = key.get();
+    if (!row || row.length !== nc) {
+      row = new Uint8Array(nc);
+      key.set(row);
+    }
+    return row;
+  };
+  /**
+   * The terrain half of a leg check (`i` to `j`, in that direction). It depends on the two points
+   * alone, so checks that involve a corner waypoint are kept for the rest of the game.
+   */
+  const terrainClear = (i: number, j: number): boolean => {
+    const a = corner[i]!;
+    const b = corner[j]!;
+    let row: Uint8Array;
+    let k: number;
+    if (a >= 0 && b >= 0) {
+      row = cornerClear;
+      k = a * nc + b;
+    } else if (b >= 0) {
+      row = rowsOut[i] ??= rowOf(i, ">");
+      k = b;
+    } else if (a >= 0) {
+      row = rowsIn[j] ??= rowOf(j, "<");
+      k = a;
+    } else return terrainLegError(s, pts[i]!, pts[j]!, elevation, r, jump, blocks) === null;
+    let v = row[k]!;
+    if (v === 0) {
+      v = terrainLegError(s, pts[i]!, pts[j]!, elevation, r, jump, blocks) === null ? 1 : 2;
+      row[k] = v;
+    }
+    return v === 1;
+  };
   const clear = (i: number, j: number): boolean => {
     const key = i < j ? i * n + j : j * n + i;
-    let v = seen.get(key);
-    if (v === undefined) {
-      v = legError(s, unit, { from: pts[i]!, to: pts[j]!, elevation }, enemies, jump) === null;
-      seen.set(key, v);
+    let v = seen[key]!;
+    if (v === 0) {
+      v = terrainClear(i, j) && enemyLegClear(pts[i]!, pts[j]!, r, level) ? 1 : 2;
+      seen[key] = v;
     }
-    return v;
+    return v === 1;
   };
+  const limit = maxLen + EPS;
   for (let iter = 0; iter < n; iter++) {
     let cur = -1;
     let best = Infinity;
     for (let i = 0; i < n; i++) {
       if (closed[i] || g[i] === Infinity) continue;
-      const f = g[i]! + dist(pts[i]!, to);
+      const f = g[i]! + h[i]!;
       if (f < best) {
         best = f;
         cur = i;
       }
     }
-    if (cur === -1 || best > maxLen + EPS || cur === 1) break;
-    closed[cur] = true;
+    if (cur === -1 || best > limit || cur === 1) break;
+    closed[cur] = 1;
+    const pc = pts[cur]!;
+    const gc = g[cur]!;
     for (let j = 0; j < n; j++) {
       if (closed[j] || j === cur) continue;
-      const base = g[cur]! + dist(pts[cur]!, pts[j]!);
-      if (base >= g[j]! || base + dist(pts[j]!, to) > maxLen + EPS) continue;
+      const base = gc + dist(pc, pts[j]!);
+      if (base >= g[j]! || base + h[j]! > limit) continue;
       if (!clear(cur, j)) continue;
-      const cand = base + difficultExtra(s, pts[cur]!, pts[j]!, elevation, jump);
-      if (cand >= g[j]! || cand + dist(pts[j]!, to) > maxLen + EPS) continue;
+      const cand = base + difficultExtra(s, pc, pts[j]!, elevation, jump);
+      if (cand >= g[j]! || cand + h[j]! > limit) continue;
       g[j] = cand;
       prev[j] = cur;
     }

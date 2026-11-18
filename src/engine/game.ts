@@ -578,7 +578,52 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   return null;
 }
 
-export function planCharge(s: GameState, unit: Unit, target: Unit, allowance = effectiveMove(s, unit)): UnitMovePlan | string {
+/**
+ * Every model on the table that a charge plan can depend on (all on-board units' living models,
+ * with their unit's owner and profile), as a string. Equal strings mean equal plans for a given
+ * charger, target and reach. Dead models are listed by id only.
+ */
+export function tableKey(s: GameState): string {
+  let key = rulesOf(s).difficultTerrain ? "d" : "-";
+  for (const u of s.units) {
+    if (!u.onBoard) continue;
+    key += `|${u.uid}:${u.owner}:${u.profileId}:${u.upgrades.join(",")}:${u.destroyed ? 1 : 0}`;
+    for (const m of u.models) key += m.alive ? `;${m.id},${m.pos.x},${m.pos.y},${m.elevation}` : `;${m.id}x`;
+  }
+  return key;
+}
+
+/**
+ * Charge plans per game (keyed by the terrain list, which each game has its own copy of). The AI
+ * plans the same charges again and again (rolled charges try several reaches, and nothing moves
+ * between most assault-phase activations), so finished plans are remembered against the whole
+ * table (`tableKey`). Plans are never edited by their users.
+ */
+const chargeMemo = new WeakMap<object, Map<string, UnitMovePlan | string>>();
+const CHARGE_MEMO_MAX = 4000;
+
+function chargePlans(s: GameState): Map<string, UnitMovePlan | string> {
+  let m = chargeMemo.get(s.terrain);
+  if (!m) {
+    m = new Map();
+    chargeMemo.set(s.terrain, m);
+  }
+  return m;
+}
+
+export function planCharge(s: GameState, unit: Unit, target: Unit, allowance = effectiveMove(s, unit), table = tableKey(s)): UnitMovePlan | string {
+  // The charger needn't be on the table yet in a UI preview: its models are part of the key anyway.
+  const key = `${unit.uid}>${target.uid}|${allowance}|${unit.onBoard ? "" : unit.models.map((m) => `${m.id},${m.alive},${m.pos.x},${m.pos.y},${m.elevation}`).join(";")}|${table}`;
+  const memo = chargePlans(s);
+  const hit = memo.get(key);
+  if (hit !== undefined) return hit;
+  const plan = planChargeNow(s, unit, target, allowance);
+  if (memo.size >= CHARGE_MEMO_MAX) memo.clear();
+  memo.set(key, plan);
+  return plan;
+}
+
+function planChargeNow(s: GameState, unit: Unit, target: Unit, allowance: number): UnitMovePlan | string {
   const ra = profileOf(unit).baseRadius;
   const rt = profileOf(target).baseRadius;
   const flying = isFlying(unit);
@@ -617,14 +662,15 @@ export function chargeBonus(s: GameState, unit: Unit): number {
 
 /**
  * Rolled charges: the lowest 2d6 total that gets this unit into base contact (null if even 12 can't).
- * Starts from the route length, so it usually takes one or two tries.
+ * Starts from the route length, so it usually takes one or two tries. `table`: `tableKey(s)`, if the
+ * caller already has it (it costs a pass over every model).
  */
-export function chargeNeed(s: GameState, unit: Unit, target: Unit): number | null {
+export function chargeNeed(s: GameState, unit: Unit, target: Unit, table = tableKey(s)): number | null {
   const bonus = chargeBonus(s, unit);
-  const best = planCharge(s, unit, target, ROLLED_CHARGE_MAX + bonus);
+  const best = planCharge(s, unit, target, ROLLED_CHARGE_MAX + bonus, table);
   if (typeof best === "string") return null;
   for (let n = Math.max(2, Math.floor(best.leaderDistance - bonus)); n <= ROLLED_CHARGE_MAX; n++) {
-    if (typeof planCharge(s, unit, target, n + bonus) !== "string") return n;
+    if (typeof planCharge(s, unit, target, n + bonus, table) !== "string") return n;
   }
   return ROLLED_CHARGE_MAX;
 }
@@ -656,7 +702,7 @@ export function planCloseRanks(s: GameState, unit: Unit, target: Unit): { id: nu
   for (const m of mine.filter((x) => !inContact(x)).sort((a, b) => nearest(a) - nearest(b))) {
     const obstacles: Placed[] = [
       ...others,
-      ...mine.filter((x) => x.id !== m.id).map((x) => ({ key: `${unit.uid}:${x.id}`, uid: unit.uid, owner: unit.owner, pos: posOf.get(x.id)!, elevation: x.elevation, radius: ra })),
+      ...mine.filter((x) => x.id !== m.id).map((x) => ({ uid: unit.uid, owner: unit.owner, pos: posOf.get(x.id)!, elevation: x.elevation, radius: ra })),
     ];
     const rings: { centre: Vec; r: number; rank: number }[] = tms.filter((tm) => tm.elevation === m.elevation).map((tm) => ({ centre: tm.pos, r: ra + rt + 0.05, rank: 0 }));
     if (support) for (const f of mine) if (f.id !== m.id && f.elevation === m.elevation && inContact(f)) rings.push({ centre: posOf.get(f.id)!, r: 2 * ra + 0.05, rank: 1 });
@@ -1234,7 +1280,7 @@ function slideUnit(s: GameState, t: Unit, dir: Vec, max: number, through: boolea
         ok = false;
         break;
       }
-      placed.push({ key: `${t.uid}:${m.id}`, uid: t.uid, owner: t.owner, pos: to, elevation: m.elevation, radius: r });
+      placed.push({ uid: t.uid, owner: t.owner, pos: to, elevation: m.elevation, radius: r });
       moves.push({ m, to });
     }
     if (!ok) continue;

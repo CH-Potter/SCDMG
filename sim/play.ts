@@ -55,10 +55,20 @@ export interface GameResult {
   /** Wounds each side got back on the table: shields recharged, HP healed, models revived or regrown. */
   restored: [Restored, Restored];
   profiles: Record<string, ProfileStat>;
-  /** Per side: charges made, short and blocked, and damage by attack kind ("dmg shoot", "dmg impact"...). */
+  /**
+   * Per side: charges made, short and blocked, damage by attack kind ("dmg shoot", "dmg impact"...),
+   * and ability use as in `counts` ("ab:" unit abilities, "sp:" support plays, "ev:" abilities that went off).
+   */
   sides?: [Record<string, number>, Record<string, number>];
   /** Role missions: the role ids of side A (player 1) and side B (player 2). */
   roles?: [string, string];
+  /**
+   * Fingerprints for checking that engine/AI changes play the same games (sim/golden.ts): `hash`
+   * covers every command the AIs chose, in order; `stateHash` the final state's units, players,
+   * objectives, snacks and mission bookkeeping.
+   */
+  hash?: string;
+  stateHash?: string;
   error?: string;
 }
 
@@ -69,6 +79,19 @@ export interface Restored {
 }
 
 const MAX_CMDS = 3000;
+
+/** 32-bit FNV-1a, continued from `h`. */
+function fnv(str: string, h = 0x811c9dc5): number {
+  for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193) >>> 0;
+  return h;
+}
+const hex = (h: number) => h.toString(16).padStart(8, "0");
+
+/** A fingerprint of the parts of a state that the game plays out on (not the static terrain). */
+function stateFingerprint(s: GameState): string {
+  const { units, players, objectives, flags, missionState, rng, round, phase, over, winner } = s;
+  return hex(fnv(JSON.stringify({ units, players, objectives, flags, missionState, rng, round, phase, over, winner })));
+}
 
 /** Each on-board model's alive/hp/shield, keyed by unit uid, to spot wounds coming back between commands. */
 function woundSnapshot(s: GameState): Map<string, { alive: boolean; hp: number; shield: number }[]> {
@@ -174,15 +197,19 @@ export function playGame(job: Job): GameResult {
   let mercy = false;
   const peakLead: [number, number] = [0, 0];
   let error: string | undefined;
+  let cmdHash = 0x811c9dc5;
   while (!s.over && n++ < MAX_CMDS) {
     const t0 = performance.now();
     const cmd = aiCommand(s);
     const ms = performance.now() - t0;
     maxMs = Math.max(maxMs, ms);
     totalMs += ms;
+    cmdHash = fnv(JSON.stringify(cmd), cmdHash);
     const key = cmd.type === "ability" ? `ab:${cmd.ability}` : cmd.type === "support" ? `sp:${cmd.ability}` : cmd.type;
     counts[key] = (counts[key] ?? 0) + 1;
     if (cmd.type === "support") counts.support = (counts.support ?? 0) + 1;
+    // Per side too, so ability use can be read per faction (sim/summary.mjs).
+    if (cmd.type === "ability" || cmd.type === "support") bump(cmd.type === "support" ? cmd.player : s.activePlayer, key);
     const before = woundSnapshot(s);
     const r = applyCommand(s, cmd);
     if (!r.ok) {
@@ -191,7 +218,11 @@ export function playGame(job: Job): GameResult {
     }
     for (const e of r.events) {
       // Every ability that went off (active or reactive), so new abilities' usage shows up in the results.
-      if (e.type === "ability") counts[`ev:${e.ability}`] = (counts[`ev:${e.ability}`] ?? 0) + 1;
+      if (e.type === "ability") {
+        counts[`ev:${e.ability}`] = (counts[`ev:${e.ability}`] ?? 0) + 1;
+        const u = s.units.find((x) => x.uid === e.uid) ?? r.state.units.find((x) => x.uid === e.uid);
+        if (u) bump(u.owner, `ev:${e.ability}`);
+      }
       if (e.type === "chargeRoll" || e.type === "chargeFailed") {
         const u = r.state.units.find((x) => x.uid === e.uid);
         if (u) bump(u.owner, e.type === "chargeRoll" ? (e.made ? "charge made" : "charge short") : "charge blocked");
@@ -264,6 +295,8 @@ export function playGame(job: Job): GameResult {
     profiles,
     sides,
     roles: rolesOf(missionId),
+    hash: hex(cmdHash),
+    stateHash: stateFingerprint(s),
     error,
   };
 }

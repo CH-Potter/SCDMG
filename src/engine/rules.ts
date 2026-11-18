@@ -24,8 +24,14 @@ export function modelGap(a: Unit, am: Model, b: Unit, bm: Model): number {
 
 /** Closest edge-to-edge gap between any models of two units. */
 export function unitGap(a: Unit, b: Unit): number {
+  // modelGap for every pair of living models, with the radii looked up once (a hot path for the AI).
+  const ra = radiusOf(a);
+  const rb = radiusOf(b);
   let best = Infinity;
-  for (const am of aliveModels(a)) for (const bm of aliveModels(b)) best = Math.min(best, modelGap(a, am, b, bm));
+  for (const am of a.models) {
+    if (!am.alive) continue;
+    for (const bm of b.models) if (bm.alive) best = Math.min(best, dist(am.pos, bm.pos) - ra - rb);
+  }
   return best;
 }
 
@@ -46,11 +52,24 @@ export function modelsEngage(a: Unit, am: Model, b: Unit, bm: Model): boolean {
 
 export function unitsEngage(a: Unit, b: Unit): boolean {
   if (a.owner === b.owner || !a.onBoard || !b.onBoard) return false;
-  return aliveModels(a).some((am) => aliveModels(b).some((bm) => modelsEngage(a, am, b, bm)));
+  // modelsEngage for every pair of living models, with the radii looked up once.
+  const ra = radiusOf(a);
+  const rb = radiusOf(b);
+  for (const am of a.models) {
+    if (!am.alive || am.elevation === 2) continue;
+    for (const bm of b.models) {
+      if (!bm.alive || bm.elevation === 2 || am.elevation !== bm.elevation) continue;
+      if (dist(am.pos, bm.pos) - ra - rb <= ENGAGE_RANGE + EPS) return true;
+    }
+  }
+  return false;
 }
 
 export const engagedWith = (s: GameState, u: Unit): Unit[] => onBoard(s).filter((e) => unitsEngage(u, e));
-export const isEngaged = (s: GameState, u: Unit): boolean => engagedWith(s, u).length > 0;
+export function isEngaged(s: GameState, u: Unit): boolean {
+  for (const e of s.units) if (e.onBoard && !e.destroyed && unitsEngage(u, e)) return true;
+  return false;
+}
 
 export function supplyUsed(s: GameState, p: PlayerId): number {
   return onBoard(s, p).reduce((sum, u) => sum + profileOf(u).supply, 0);
@@ -134,6 +153,23 @@ export function objectivePresence(s: GameState, o: Objective): [number, number] 
     }
   }
   return v;
+}
+
+/** `objectivePresence` for every objective at once (one pass over the units; the same sums). */
+export function allObjectivePresence(s: GameState): [number, number][] {
+  const out = s.objectives.map((): [number, number] => [0, 0]);
+  for (const u of s.units) {
+    if (!u.onBoard || u.destroyed || isFlying(u) || profileOf(u).structure || u.status.shaken) continue;
+    const r = radiusOf(u);
+    let weight: number | undefined;
+    s.objectives.forEach((o, i) => {
+      if (aliveModels(u).some((m) => m.elevation === o.elevation && dist(m.pos, o.pos) <= o.radius + r + EPS)) {
+        weight ??= controlWeight(u);
+        out[i]![u.owner] += weight;
+      }
+    });
+  }
+  return out;
 }
 
 /** Who holds an objective right now (more supply on it), or null if empty/tied. */

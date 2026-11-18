@@ -13,6 +13,9 @@ release/
 .eslintcache
 coverage/
 
+# Balance sim results (sim/run.mjs)
+sim/out/
+
 # Logs
 *.log
 npm-debug.log*
