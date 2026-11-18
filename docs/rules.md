@@ -25,7 +25,7 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 - **Who goes first:** both players roll off at the start, and the winner **chooses** who goes first in round 1. Before each later round, the player with fewer VP chooses; on a VP tie, roll off again and the winner chooses.
 - **Passing early:** in the movement or combat phase, the first player to pass while they still had units to act claims the initiative: they go first in the next phase (the assault phase, or the next round).
 - In the **assault** phase, hunkered units and non-light units exhausted from disengaging sit out. Engaged units can only shoot the unit they're fighting (see *Engagement and shooting*).
-- In the **combat** phase, units that **charged** fight first. After that, everyone else alternates.
+- In the **combat** phase, players alternate too, starting with the player who has the initiative. Each player must fight with their units that **charged** before their other units. (The *Chargers strike first* house rule brings back the old order: every charging unit, from both sides, fights before anyone else.)
 
 ## Multi-model units
 
@@ -97,8 +97,10 @@ Every attack, ranged or melee, runs the same sequence:
   - −1 for hunkering (−2 with Entrenched).
   - Cover and hunkering don't apply in melee.
 - **Damage:** each failed save deals the weapon's damage to one model. Shields soak damage first, and extra damage doesn't carry over to other models.
-- **Charge:** the engine routes the closest model into base contact (within 1"), and the rest pile in.
+- **Charge:** declare a charge at an enemy within 12" (plus any move buffs or debuffs, such as Sugar Rush or Sticky Goo), then roll 2d6 and add the same buffs or debuffs. If the total reaches base contact, the engine routes the closest model into base contact (within 1") and the rest pile in. If it's short, the unit stays where it is and its activation is spent. The charge preview shows the roll you need and the odds. (House rule *Rolled charges* off: a charge reaches up to the unit's move, and always arrives.)
   - Charging models get +1 die each in that round's combat.
+- **Close ranks:** when a unit fights, each of its models that isn't in base contact first steps up to 3" (straight, not through solid terrain): into base contact with the target if it can, or else into base contact with a squad-mate who is. Models that can't reach either stay put.
+- **Supporting rank:** a model fights if it's in base contact with an enemy model of the target, *or* in base contact with a squad-mate who is (base to base to base). Supporting models get the charge bonus too.
   - Only a charge can end in base contact. Normal moves, deploys and teleports can't.
 - **Engaged** units can't move (only disengage) and fight in the combat phase.
 - **Disengage:** move out of contact. Compare the unit's current **supply** with the total supply of the enemies it was engaged with. If it's worth **more**, it breaks away cleanly with no penalty. If it's worth the **same or less**, it's **exhausted** for the next phase: it sits out the assault phase and can't charge, though **light** units may still shoot.
@@ -252,7 +254,7 @@ Weapons with the **indirect** trait, and the Barrage ability, lob a shell instea
 | pistol | point-blank shots (at a unit you're engaged with) can't be evaded |
 | indirect | lobbed shells (the Spud Lobber and Stink Shell): see *Indirect fire* below |
 
-- **Morale:**
+- **Morale** (a house rule, off in the standard game):
   - When a unit at half strength or less (counting wounds) takes damage, it rolls 2d6 against its **nerve** (default 7; Munch critters 6, Concord 8–9). If the roll is above its nerve, the unit is **Shaken**.
   - Shaken units hit one worse, won't charge and can't hold objectives.
   - At the end of each round, each Shaken unit recovers on a 4+.
@@ -262,6 +264,35 @@ Weapons with the **indirect** trait, and the Barrage ability, lob a shell instea
 - **Obscured:** other units' models standing in the line of fire, at the target's level, give the target cover. Shooting down from higher ground still ignores cover.
 - **Measuring tape and line-of-sight checker:** press **M**, then click a model or spot and point anywhere. You get the distance, the edge-to-edge distance between models, and whether sight is clear. It works even during the AI's turn.
 - **Undo:** press **Ctrl+Z** to take back your last action, and anything the AI did after it. The dice are seeded, so doing the same thing again rolls the same.
+
+## House rules
+
+Pick these in the main menu (step 5, *House rules*). They're saved in your browser and apply to every battle, the campaign's included. The AI plays by them too. The numbers live in `src/engine/houseRules.ts`. The game is balanced and simulated with the standard rules.
+
+**Core rules you can switch off:**
+
+| Rule | Off means |
+| --- | --- |
+| Rolled charges | A charge reaches up to the unit's move and always arrives. |
+| Close ranks | Models fight from where they stand. |
+| Supporting rank | Only models in base contact with the enemy fight. |
+| Evade rolls | Every hit goes straight to a save. |
+| Stray shots into melee | You can shoot into a melee freely: misses never hit your own side. |
+| Impact on charge | Ground units roll no impact dice when a charge lands. A flyer's dive still strikes, since it's the flyer's whole attack. |
+| Difficult terrain | Area cover costs normal movement. It still gives cover. |
+| Units block shots | Only terrain gives cover: other units' models in the line of fire don't. |
+| Shell scatter | Lobbed shells and barrages always land where they're aimed. |
+
+**Optional staples you can switch on:**
+
+- **Morale and Shaken:** nerve tests and Shaken, as described under *Tabletop staples*. Off, nobody is ever Shaken, and Rally and nerve-rattling supports aren't used.
+- **Chargers strike first:** in the combat phase every unit that charged, from both sides, fights before anyone else; then the rest alternate.
+- **Random activation order:** the player with the initiative takes each phase's first activation. After that, each activation is drawn at random, like pulling order dice from a bag: each side's chance is its share of the activations left (units that can still act, plus reserves it can afford to deploy in the movement phase). A side with nothing left is skipped. The log shows each draw. It can't be on with whole-army turns.
+
+- **Breach dice:** keyword bonuses become breach dice. Against a target with the matching keyword, the weapon gets no bonus dice, damage or AP. Instead, roll one breach die with the attack: a **d3** for a bonus worth 1 (one die, damage or AP), or a **d6** for a bigger one (the Chain Popper with its Flak Kit, against flyers). Only the best matching bonus counts. After evades, that many of the hits (never more than there are) skip the save and go straight to damage; the rest save as normal. Armoured targets still ignore 1 AP from weapons without an anti-armour bonus. Lobbed shells don't breach.
+- **Overwatch:** when a unit is charged, before the charge moves, it shoots the charger with its best ranged weapon, hitting only on 6s. It can't if it's already in a melee, and lobbed weapons can't fire overwatch. It fires each time it's charged.
+- **Command re-roll:** after one of your attacks, you may spend 1 CP to re-roll all its misses, once. The dice are seeded, so the first roll is the same and only the misses roll again. Lobbed shells can't be re-rolled. The AI re-rolls when about 1.5 or more hits would come back, keeping a CP for a Rally if it needs one.
+- **Whole-army turns:** in the movement, assault and combat phases, the player with the initiative activates all their units (or passes), then the other player does. In the combat phase each side still fights with its chargers first. It can't be on with random activation order.
 
 ## Structures
 

@@ -6,6 +6,7 @@ import { FACTIONS, isBuiltInFaction, listCost, factionOf, supportsCost } from ".
 import type { MapDef } from "../engine/data/maps";
 import { economyOf, missionMapProblem, MISSIONS, swapMapSides, swapMissionSides, type MissionDef } from "../engine/data/missions";
 import { MODES, type ModeId } from "../engine/data/modes";
+import { cleanRules, HOUSE_RULES, isCoreRule, isStandard, rulesSummary, STANDARD_RULES, type HouseRules } from "../engine/houseRules";
 import type { StartBonus } from "../engine/game";
 import type { FactionId, ListEntry } from "../engine/types";
 import { mapsForMode } from "./customMaps";
@@ -52,6 +53,12 @@ interface Prefs {
 }
 
 const PREFS_KEY = "scdmg.menu.v1";
+const HOUSE_KEY = "scdmg.houseRules.v1";
+
+/** The house rules chosen in the menu (every battle uses them, the campaign's too). */
+export function loadHouseRules(): HouseRules {
+  return cleanRules(loadJson<unknown>(HOUSE_KEY, {}));
+}
 const hex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
 
 function defaults(): Prefs {
@@ -87,6 +94,8 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
   if (typeof prefs.side !== "object" || prefs.side === null) prefs.side = {};
   if (prefs.army !== "open") prefs.army = "list";
   const save = () => saveJson(PREFS_KEY, prefs);
+  let house = loadHouseRules();
+  const saveHouse = () => saveJson(HOUSE_KEY, house);
 
   const render = () => {
     audio.setMenuFaction(prefs.faction[0]); // [audio] menu music follows your faction
@@ -187,11 +196,14 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
           ${[0, 1].map((p) => armyPicker(p as 0 | 1, mode)).join("")}
         </div>
 
+        <h2 class="step"><span>5</span> House rules</h2>
+        ${houseRulesPanel()}
+
         <p class="legal">SCDMG © 2026 Craig Potter and SCDMG contributors. Free software under the GNU General Public License v3 or later, with ABSOLUTELY NO WARRANTY. You may share and change it under that licence, keeping these credits: see LICENSE, and the source, at github.com/CH-Potter/SCDMG.</p>
 
         <div class="row start-row">
           <button id="m-start" class="big" ${mapOk ? "" : "disabled"}>To battle!</button>
-          <span class="hint">${esc(mission.name)}${mission.roles ? ` (as ${esc(mission.roles[side].name)})` : ""} · ${esc(map?.name ?? "no battlefield")} · ${esc(MODES[mode].name)}${prefs.army === "open" ? " · open roster" : ""}</span>
+          <span class="hint">${esc(mission.name)}${mission.roles ? ` (as ${esc(mission.roles[side].name)})` : ""} · ${esc(map?.name ?? "no battlefield")} · ${esc(MODES[mode].name)}${prefs.army === "open" ? " · open roster" : ""}${isStandard(house) ? "" : ` · ${rulesSummary(house).length} house rule${rulesSummary(house).length === 1 ? "" : "s"}`}</span>
         </div>
       </div>`;
     host.classList.add("show");
@@ -213,6 +225,30 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
       if (nextScroller) nextScroller.scrollTop = scrollTop;
     });
     bind(mission, map, side);
+  };
+
+  const houseRulesPanel = () => {
+    const box = (group: "core" | "optional") =>
+      HOUSE_RULES.filter((r) => isCoreRule(r.id) === (group === "core"))
+        .map(
+          (r) => `<label class="house-rule">
+            <input type="checkbox" data-house="${r.id}" ${house[r.id] ? "checked" : ""}>
+            <span><b>${esc(r.name)}</b>${house[r.id] !== STANDARD_RULES[r.id] ? ` <span class="tag">changed</span>` : ""}<br><small>${esc(r.text)}</small></span>
+          </label>`,
+        )
+        .join("");
+    const changed = rulesSummary(house);
+    return `<details class="house-rules panel" ${changed.length ? "open" : ""}>
+        <summary>${changed.length ? `<b>${changed.length} house rule${changed.length === 1 ? "" : "s"}:</b> ${esc(changed.join(", "))}` : "<b>Standard rules.</b> Open to switch mechanics off, or tabletop staples on."}</summary>
+        <div class="house-grid">
+          <fieldset><legend>Core rules: untick to switch off</legend>${box("core")}</fieldset>
+          <fieldset><legend>Optional rules: tick to switch on</legend>${box("optional")}</fieldset>
+        </div>
+        <div class="row">
+          <button type="button" class="mini secondary" id="m-house-reset" ${changed.length ? "" : "disabled"}>Back to standard rules</button>
+          <span class="hint">House rules apply to every battle, the campaign's too, and the AI plays by them. The game was balanced with the standard rules.</span>
+        </div>
+      </details>`;
   };
 
   const armyPicker = (p: 0 | 1, mode: ModeId) => {
@@ -312,6 +348,20 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
         opts.onListBuilder(prefs.faction[p], prefs.mode, prefs.list[p] || undefined);
       }),
     );
+    host.querySelectorAll<HTMLInputElement>("[data-house]").forEach((box) =>
+      box.addEventListener("change", () => {
+        const id = box.dataset.house as keyof HouseRules;
+        house = cleanRules({ ...house, ...Object.fromEntries((box.checked ? (HOUSE_RULES.find((r) => r.id === id)?.excludes ?? []) : []).map((x) => [x, false])), [id]: box.checked });
+        saveHouse();
+        render();
+        host.querySelector<HTMLElement>(`[data-house="${id}"]`)?.focus({ preventScroll: true });
+      }),
+    );
+    $("#m-house-reset").addEventListener("click", () => {
+      house = { ...STANDARD_RULES };
+      saveHouse();
+      render();
+    });
     $("#m-start").addEventListener("click", () => {
       if (!map) return;
       const chosen = (p: 0 | 1) => (prefs.list[p] && findList(prefs.list[p])) || listsFor(prefs.faction[p], prefs.mode)[0]!;

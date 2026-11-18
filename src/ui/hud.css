@@ -301,7 +301,8 @@
 }
 
 /* ---------- who goes first? ---------- */
-.order-choice {
+.order-choice,
+.reroll-prompt {
   position: absolute;
   z-index: 9;
   left: 50%;
@@ -316,17 +317,20 @@
   text-align: center;
 }
 
-.order-choice h3 {
+.order-choice h3,
+.reroll-prompt h3 {
   margin: 0 0 4px;
   font-family: var(--font-display, inherit);
   text-transform: uppercase;
 }
 
-.order-choice p {
+.order-choice p,
+.reroll-prompt p {
   margin: 0 0 10px;
 }
 
-.order-choice .row {
+.order-choice .row,
+.reroll-prompt .row {
   justify-content: center;
 }
 

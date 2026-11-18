@@ -1,3 +1,4 @@
+import { CLASSIC_RULES } from "../src/engine/houseRules";
 import { describe, expect, it } from "vitest";
 import { playAiTurn } from "../src/engine/ai";
 import { planMelee, planShooting } from "../src/engine/combat";
@@ -32,7 +33,7 @@ const uidOf = (s: GameState, owner: 0 | 1, profileId: string, nth = 0): string =
   s.units.filter((u) => u.owner === owner && u.profileId === profileId)[nth]!.uid;
 
 function game(setup: Partial<GameSetup> = {}): GameState {
-  const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed: 7, ...setup });
+  const s = createGame({ map: CLASSIC_DUSTBOWL, rules: CLASSIC_RULES, factions: ["militia", "munch"], seed: 7, ...setup });
   s.initiative = 0;
   s.activePlayer = 0;
   return s;

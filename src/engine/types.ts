@@ -1,6 +1,8 @@
 // Core data types for the rules engine. All distances are in inches.
 // The engine is pure: no DOM, no Pixi, no Math.random — only GameState in, GameState out.
 
+import type { HouseRules } from "./houseRules";
+
 export type PlayerId = 0 | 1;
 
 export interface Vec {
@@ -478,6 +480,10 @@ export interface GameState {
    * Treat as immutable: replace the object rather than editing it (cloneState shares it).
    */
   openRoster?: { cap?: number; seq: number };
+  /** House rules this game is played with (see houseRules.ts). Absent: the standard game. Treat as immutable. */
+  rules?: HouseRules;
+  /** AI look-ahead only: rolled charges skip the roll and always reach (the AI weighs the odds itself). */
+  aiAssumeChargesLand?: boolean;
 }
 
 export type Command =
@@ -486,8 +492,9 @@ export type Command =
   | { type: "disengage"; uid: string; leader: number; to: Vec }
   | { type: "advance"; uid: string; leader: number; to: Vec }
   | { type: "charge"; uid: string; target: string }
-  | { type: "shoot"; uid: string; target: string; weapon: number }
-  | { type: "fight"; uid: string; target: string; weapon: number }
+  /** `reroll`: the Command re-roll house rule, spend 1 CP to re-roll the attack's misses. */
+  | { type: "shoot"; uid: string; target: string; weapon: number; reroll?: boolean }
+  | { type: "fight"; uid: string; target: string; weapon: number; reroll?: boolean }
   | { type: "hunker"; uid: string }
   | { type: "hold"; uid: string }
   | { type: "ability"; uid: string; ability: AbilityId; target?: string; point?: Vec }
@@ -507,6 +514,8 @@ export interface AttackReport {
   attackers: number; // models contributing
   hitRolls: number[];
   hitOn: number;
+  /** Command re-roll: the misses' first rolls (`hitRolls` holds the dice after the re-roll). */
+  rerolledFrom?: number[];
   /** Missed dice moved into the hits by precision. */
   precisionMoved?: number;
   /** The defender's evade dice (one per hit) and the target they needed; absent when the attack allowed no evade. */
@@ -514,6 +523,8 @@ export interface AttackReport {
   evadeOn?: number;
   /** Successful evades cancelled by tracking. */
   evadesCancelled?: number;
+  /** Breach dice house rule: the breach die's size and roll, and how many hits skipped the save. */
+  breach?: { die: 3 | 6; roll: number; vs: string; skipped: number };
   saveRolls: number[];
   saveOn: (number | null)[];
   damage: number;
@@ -523,8 +534,14 @@ export interface AttackReport {
 
 export type GameEvent =
   | { type: "deployed"; uid: string }
-  | { type: "moved"; uid: string; kind: "move" | "disengage" | "advance" | "charge" | "teleport"; /** Disengage only: it didn't outnumber the enemy in supply. */ exhausted?: boolean }
+  | { type: "moved"; uid: string; kind: "move" | "disengage" | "advance" | "charge" | "teleport" | "closeRanks"; /** Disengage only: it didn't outnumber the enemy in supply. */ exhausted?: boolean }
   | { type: "attack"; report: AttackReport }
+  /** Rolled charges house rule: the 2d6 rolled for a charge, the distance it needed, and whether it made it. */
+  | { type: "chargeRoll"; uid: string; target: string; roll: [number, number]; need: number; made: boolean }
+  /** Random activation order house rule: who was drawn to go next, and how many activations each side had left. */
+  | { type: "orderDraw"; player: PlayerId; left: [number, number] }
+  /** A declared charge that could no longer reach (overwatch took down the models it was routed for). */
+  | { type: "chargeFailed"; uid: string; target: string; reason: string }
   /** An indirect shell (mortar, Barrage) aimed at `aim` landed at `landed`: on target if `roll` >= `need`, else it drifted `drift` inches (halved when a firing model could see the spot). */
   | { type: "scatter"; uid: string; weapon: string; aim: Vec; landed: Vec; roll: number; need: number; drift: number; spotted: boolean }
   | { type: "hunkered"; uid: string }

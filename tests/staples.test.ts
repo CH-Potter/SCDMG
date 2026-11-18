@@ -1,3 +1,4 @@
+import { CLASSIC_RULES } from "../src/engine/houseRules";
 import { describe, expect, it } from "vitest";
 import { moraleCheck, planShooting, saveNeeded } from "../src/engine/combat";
 import { applyCommand, createGame, RALLY_CP } from "../src/engine/game";
@@ -22,7 +23,7 @@ const uidOf = (s: GameState, owner: 0 | 1, profileId: string, nth = 0): string =
   s.units.filter((u) => u.owner === owner && u.profileId === profileId)[nth]!.uid;
 
 const game = (factions: [string, string] = ["militia", "munch"], seed = 2): GameState => {
-  const s = createGame({ map: CLASSIC_DUSTBOWL, factions, seed });
+  const s = createGame({ map: CLASSIC_DUSTBOWL, rules: CLASSIC_RULES, factions, seed });
   s.initiative = 0;
   s.activePlayer = 0;
   return s;
@@ -145,7 +146,7 @@ describe("terrain staples", () => {
 describe("initiative roll-off", () => {
   it("rolls a d6 each, re-rolls ties, and the higher roll goes first", () => {
     for (let seed = 1; seed < 40; seed++) {
-      const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed });
+      const s = createGame({ map: CLASSIC_DUSTBOWL, rules: CLASSIC_RULES, factions: ["militia", "munch"], seed });
       const rolls = s.initiativeRolls!;
       expect(rolls.length).toBeGreaterThan(0);
       rolls.slice(0, -1).forEach(([a, b]) => expect(a).toBe(b));

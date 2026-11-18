@@ -93,6 +93,8 @@ const diceHtml = (rolls: number[], need: (number | null)[] | number): string =>
   rolls
     .map((r, i) => {
       const n = typeof need === "number" ? need : need[i];
+      // A hit with no save (none possible, or breached) shows as a dash rather than a 0.
+      if (n === null && typeof need !== "number") return "–";
       return n !== null && n !== undefined && r >= n ? `<b>${r}</b>` : `${r}`;
     })
     .join(" ");
@@ -109,12 +111,14 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
         r.evadeRolls && r.evadeOn !== undefined
           ? ` Evade ${r.evadeOn}+: [${diceHtml(r.evadeRolls, r.evadeOn)}]${r.evadesCancelled ? `, ${r.evadesCancelled} tracked` : ""}.`
           : "";
+      const rerolled = r.rerolledFrom?.length ? ` Re-rolled ${r.rerolledFrom.length} miss${r.rerolledFrom.length === 1 ? "" : "es"} [${r.rerolledFrom.join(" ")}].` : "";
+      const breach = r.breach ? ` Breach d${r.breach.die} vs ${esc(r.breach.vs)}: ${r.breach.roll}, ${r.breach.skipped} skip the save.` : "";
       const saves = r.saveRolls.length ? ` Saves: [${diceHtml(r.saveRolls, r.saveOn)}].` : "";
       const result = r.unitDestroyed
         ? ` <b>${esc(unitName(s, r.target))} is wiped out!</b>`
         : ` ${r.damage} damage${r.modelsKilled ? `, ${r.modelsKilled} model${r.modelsKilled > 1 ? "s" : ""} down` : ""}.`;
       const verb = r.kind === "impact" ? "slams into" : r.kind === "fight" ? "fights" : r.kind === "overwatch" ? "overwatches" : r.kind === "barrage" ? "shells" : "shoots";
-      return `${esc(unitName(s, r.uid))} ${verb} ${esc(unitName(s, r.target))} (${esc(r.weapon)}, ${r.attackers} model${r.attackers > 1 ? "s" : ""}): [${diceHtml(r.hitRolls, r.hitOn)}]${precise}${evades} = ${hits} hit${hits === 1 ? "" : "s"}.${saves}${result}`;
+      return `${esc(unitName(s, r.uid))} ${verb} ${esc(unitName(s, r.target))} (${esc(r.weapon)}, ${r.attackers} model${r.attackers > 1 ? "s" : ""}): [${diceHtml(r.hitRolls, r.hitOn)}]${rerolled}${precise}${evades} = ${hits} hit${hits === 1 ? "" : "s"}.${breach}${saves}${result}`;
     }
     case "deployed": {
       // Open roster games: every arrival is a fresh recruit, paid for on the spot.
@@ -124,7 +128,16 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
         : `${esc(unitName(s, e.uid))} arrives.`;
     }
     case "moved":
+      if (e.kind === "closeRanks") return `👣 ${esc(unitName(s, e.uid))} closes ranks.`;
       return e.kind === "charge" ? `${esc(unitName(s, e.uid))} charges!` : e.kind === "disengage" ? `${esc(unitName(s, e.uid))} disengages.` : null;
+    case "chargeRoll":
+      return e.made
+        ? `🎲 ${esc(unitName(s, e.uid))} rolls ${e.roll[0]}+${e.roll[1]} for the charge: ${e.roll[0] + e.roll[1]}", enough (needed ${e.need}").`
+        : `🎲 ${esc(unitName(s, e.uid))} rolls ${e.roll[0]}+${e.roll[1]} for the charge: ${e.roll[0] + e.roll[1]}", too short (needed ${e.need}"). It stays put.`;
+    case "orderDraw":
+      return `🎲 Order draw: ${e.player === 0 ? "you go" : "the AI goes"} next (${e.left[e.player]} of ${e.left[0] + e.left[1]} activations left).`;
+    case "chargeFailed":
+      return `${esc(unitName(s, e.uid))}'s charge at ${esc(unitName(s, e.target))} falls apart (${esc(e.reason)}).`;
     case "hunkered":
       return `${esc(unitName(s, e.uid))} hunkers down.`;
     case "scatter":

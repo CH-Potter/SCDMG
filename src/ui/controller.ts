@@ -27,10 +27,17 @@ import { airdropNoGo } from "./fx/dropship";
 import { MAPS } from "../engine/data/maps";
 import { MISSIONS } from "../engine/data/missions";
 import { coverRating, planUnitMove } from "../engine/formation";
+import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf, rulesSummary } from "../engine/houseRules";
 import {
   applyCommand,
+  chargeBonus,
+  chargeNeed,
+  closeRanksPreview,
   createGame,
+  overwatchPlan,
   planCharge,
+  planCloseRanks,
+  twoDiceAtLeast,
   mercyLead,
   type GameSetup,
   RALLY_CP,
@@ -140,6 +147,8 @@ export class Controller {
   private aiRunning = false;
   /** States before each of your commands, for Undo. */
   private history: GameState[] = [];
+  /** The command re-roll prompt is up (the AI waits for your answer). */
+  private rerollOpen = false;
   /** Nobody acts until the opening initiative roll-off has been shown. */
   private started = false;
   private tray: DiceTray;
@@ -276,7 +285,7 @@ export class Controller {
       if (gen !== this.generation) return;
       // Only once the dice are down (in Throw mode, after you've thrown yours).
       this.log(
-        `🎲 Initiative roll-off: you ${last[0]}, AI ${last[1]}${ties ? ` (after ${ties} tie${ties > 1 ? "s" : ""})` : ""}. ${this.state.initiative === HUMAN ? "You" : "The AI"} won and ${this.state.orderChoice ? "chooses who goes first" : "goes first"}.`,
+        `🎲 Initiative roll-off: you ${last[0]}, AI ${last[1]}${ties ? ` (after ${ties} tie${ties > 1 ? "s" : ""})` : ""}. ${this.state.initiative === HUMAN ? `You won and ${this.state.orderChoice ? "choose who goes first" : "go first"}` : `The AI won and ${this.state.orderChoice ? "chooses who goes first" : "goes first"}`}.`,
       );
     }
     this.started = true;
@@ -304,6 +313,9 @@ export class Controller {
         out.push({
           title: `${unitName(s, r.uid)} → ${unitName(s, r.target)} · ${r.weapon}`,
           groups: [
+            ...(r.rerolledFrom?.length
+              ? [{ label: "Missed", rolls: r.rerolledFrom, need: r.hitOn, side: side(r.uid), result: `${r.rerolledFrom.length} re-rolled` }]
+              : []),
             {
               label,
               rolls: r.hitRolls,
@@ -322,9 +334,19 @@ export class Controller {
                   },
                 ]
               : []),
+            ...(r.breach
+              ? [{ label: `Breach d${r.breach.die}`, rolls: [r.breach.roll], need: null, side: side(r.uid), result: `${r.breach.skipped} skip the save` }]
+              : []),
             { label: "Saves", rolls: saves, need: needs, side: side(r.target), result: `${r.damage} dmg` },
           ],
           verdict: r.unitDestroyed ? "Wiped out!" : r.modelsKilled ? `${r.modelsKilled} down!` : noHarmVerdict(r),
+        });
+      } else if (e.type === "chargeRoll") {
+        const total = e.roll[0] + e.roll[1];
+        out.push({
+          title: `${unitName(s, e.uid)} charges ${unitName(s, e.target)}`,
+          groups: [{ label: "2d6\"", rolls: e.roll, need: null, side: side(e.uid), result: `${total}" (needs ${e.need}")` }],
+          verdict: e.made ? "Charge!" : "Falls short!",
         });
       } else if (e.type === "scatter") {
         out.push({
@@ -472,7 +494,8 @@ export class Controller {
     const s = this.state;
     const aim = shellAim(t);
     const spotted = shellSpotted(s, a, aim);
-    const { onTarget, maxDrift } = shellOdds(plan.hitOn, spotted);
+    const scatter = rulesOf(s).scatter;
+    const { onTarget, maxDrift } = shellOdds(plan.hitOn, spotted, scatter);
     view.blast = { center: aim, radius: SHELL_BURST };
     view.drift = { center: aim, radius: maxDrift + SHELL_BURST };
     const from = plan.attackers.reduce((x, y) => (dist(y.model.pos, aim) < dist(x.model.pos, aim) ? y : x)).model;
@@ -483,7 +506,7 @@ export class Controller {
     const exp = expectedDamage(s, a, t, plan, false);
     const shells = plan.attackers.length;
     return ok(
-      `💣 Lob ${w.name}${shells > 1 ? ` ×${shells}` : ""}: lands on target on ${plan.hitOn}+ (${Math.round(onTarget * 100)}%), else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"} · ${SHELL_BURST}" burst rolls ${plan.hitOn}+ for every model under it, AP${plan.ap} · ≈${exp.toFixed(1)} damage${risky.length ? ` · ⚠ could hit your ${risky.map((u) => profileOf(u).name).join(", ")}` : ""}`,
+      `💣 Lob ${w.name}${shells > 1 ? ` ×${shells}` : ""}: ${scatter ? `lands on target on ${plan.hitOn}+ (${Math.round(onTarget * 100)}%), else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"}` : "lands where aimed (no scatter)"} · ${SHELL_BURST}" burst rolls ${plan.hitOn}+ for every model under it, AP${plan.ap} · ≈${exp.toFixed(1)} damage${risky.length ? ` · ⚠ could hit your ${risky.map((u) => profileOf(u).name).join(", ")}` : ""}`,
       "target",
     );
   }
@@ -556,7 +579,7 @@ export class Controller {
         err = why;
         return;
       }
-      const plan = melee ? planMelee(a, t, w) : planShooting(this.state, a, t, w);
+      const plan = melee ? planMelee(closeRanksPreview(this.state, a, t), t, w, rulesOf(this.state)) : planShooting(this.state, a, t, w);
       if (typeof plan === "string") {
         err = plan;
         return;
@@ -823,7 +846,10 @@ export class Controller {
     const keepLeader = this.leader;
     this.clearSelection();
     const gen = this.generation;
-    void this.present(before, r.state, r.events).then(() => {
+    void this.present(before, r.state, r.events).then(async () => {
+      if (gen !== this.generation) return;
+      // Command re-roll: after seeing the dice, you may pay to re-roll the misses (the same first dice, then the misses again).
+      if (await this.offerReroll(before, cmd, r.events, gen)) return;
       if (gen !== this.generation) return;
       // An ability is a free action inside the unit's activation: keep it selected for its main action.
       const keep = keepUid ? unitById(this.state, keepUid) : undefined;
@@ -835,6 +861,80 @@ export class Controller {
       void this.runAi();
     });
     return true;
+  }
+
+/**
+   * Command re-roll house rule: after one of your attacks with misses, offer to re-roll them for
+   * 1 CP. Re-rolling replays the attack from before it (the same first dice) with the misses rolled
+   * again. Returns true if it took over (it then carries on with the AI turn itself).
+   */
+  private async offerReroll(before: GameState, cmd: Command, events: GameEvent[], gen: number): Promise<boolean> {
+    if ((cmd.type !== "shoot" && cmd.type !== "fight") || cmd.reroll || !rulesOf(before).reroll) return false;
+    if (before.players[HUMAN].cp < REROLL_CP) return false;
+    const a = events.find((e) => e.type === "attack" && e.report.uid === cmd.uid && e.report.target === cmd.target);
+    if (a?.type !== "attack" || a.report.unitDestroyed) return false;
+    const misses = a.report.hitRolls.filter((x) => x < a.report.hitOn).length;
+    if (!misses) return false;
+    const again: Command = { ...cmd, reroll: true };
+    if (commandProblem(before, again)) return false;
+    const yes = await this.askReroll(misses, before.players[HUMAN].cp);
+    if (!yes || gen !== this.generation) return false;
+    const r = applyCommand(before, again);
+    if (!r.ok) return false;
+    this.log(`↻ You spend ${REROLL_CP} CP to re-roll ${misses} miss${misses === 1 ? "" : "es"}.`, HUMAN);
+    this.state = before;
+    this.declareCommand(before, r.state, again);
+    void this.present(before, r.state, r.events).then(() => {
+      if (gen !== this.generation) return;
+      this.refresh();
+      void this.runAi();
+    });
+    return true;
+  }
+
+  /** "Re-roll N misses for 1 CP?" Resolves true for re-roll, false to keep the dice. */
+  private askReroll(misses: number, cp: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const el = document.createElement("div");
+      el.className = "reroll-prompt";
+      el.setAttribute("role", "dialog");
+      const title = document.createElement("h3");
+      title.textContent = "Command re-roll?";
+      const sub = document.createElement("p");
+      sub.textContent = `Spend ${REROLL_CP} CP (you have ${cp}) to re-roll your ${misses} miss${misses === 1 ? "" : "es"}.`;
+      const row = document.createElement("div");
+      row.className = "row";
+      this.rerollOpen = true;
+      this.refresh();
+      const done = (v: boolean) => {
+        this.rerollOpen = false;
+        el.remove();
+        window.removeEventListener("keydown", onKey, true);
+        resolve(v);
+      };
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          e.stopPropagation();
+          done(false);
+        }
+      };
+      for (const [label, v] of [
+        [`↻ Re-roll (${REROLL_CP} CP)`, true],
+        ["Keep the dice", false],
+      ] as const) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = label;
+        if (!v) b.className = "secondary";
+        b.addEventListener("click", () => done(v));
+        row.appendChild(b);
+      }
+      el.append(title, sub, row);
+      window.addEventListener("keydown", onKey, true);
+      this.els.stage.appendChild(el);
+      (row.firstElementChild as HTMLButtonElement | null)?.focus({ preventScroll: true });
+    });
   }
 
   /** Take back your last command (and anything the AI did after it). Dice are seeded, so redoing it rolls the same. */
@@ -879,7 +979,10 @@ export class Controller {
               ? e.player
               : undefined;
       if (text) this.log(text, owner);
-      if (e.type === "scatter") {
+      if (e.type === "chargeRoll" && !e.made) {
+        const at = centre(e.uid);
+        if (at) this.renderer.floatText(at, "Too short!", 0xffd2a0);
+      } else if (e.type === "scatter") {
         this.renderer.floatText(e.landed, e.drift ? `Drifted ${e.drift}"` : "On target!", e.drift ? 0xffd2a0 : 0xffffff);
       } else if (e.type === "attack") {
         const at = centre(e.report.target);
@@ -1442,14 +1545,23 @@ export class Controller {
         const w = profileOf(sel).weapons[b.index]!;
         if (b.plan.indirect) return this.previewShell(view, sel, hit.unit, w, b.plan);
         const terrain = melee ? [] : this.aimLines(view, sel, hit.unit, w, new Set(b.plan.attackers.map((a) => a.model)));
+        if (melee && rulesOf(s).closeRanks) {
+          // Close ranks: show where models will step before they strike.
+          const steps = planCloseRanks(s, sel, hit.unit);
+          if (steps.length) {
+            view.ghosts = steps.map((x) => ({ pos: x.pos, radius: r }));
+            terrain.push(`👣 close ranks: ${steps.length} model${steps.length === 1 ? " steps" : "s step"} up to 3" in first`);
+          }
+        }
         const dice = b.plan.attackers.reduce((n, a) => n + a.dice, 0);
         const exp = expectedDamage(s, sel, hit.unit, b.plan, melee);
         // What stands between a hit and a wound, so armour and dodges don't read as bad luck.
         const tm = b.plan.targets[0]!;
         const from = b.plan.attackers.reduce((x, y) => (dist(y.model.pos, tm.pos) < dist(x.model.pos, tm.pos) ? y : x)).model;
         const save = saveNeeded(s, sel, hit.unit, tm, b.plan.ap, melee, from);
-        const evade = b.plan.evadeOn === undefined ? evadeTarget(hit.unit, melee ? ["melee"] : ["ranged"]) : b.plan.evadeOn;
+        const evade = !rulesOf(s).evade ? null : b.plan.evadeOn === undefined ? evadeTarget(hit.unit, melee ? ["melee"] : ["ranged"]) : b.plan.evadeOn;
         const defence = `${evade ? `they dodge on ${evade}+${b.plan.tracking ? ` (tracking ${b.plan.tracking})` : ""}, ` : ""}${save === null ? "no save" : `save on ${save}+`}`;
+        if (b.plan.breach) terrain.unshift(`💥 breach d${b.plan.breach.die} vs ${b.plan.breach.vs}: that many hits skip the save`);
         const stray = melee ? null : expectedStray(s, sel, hit.unit, w, b.plan);
         if (stray) terrain.push(`⚠ into a melee: every miss rolls again at your ${profileOf(stray.friend).name} (≈${stray.damage.toFixed(1)} damage)`);
         return ok(
@@ -1465,7 +1577,8 @@ export class Controller {
     }
 
     if (mode.kind === "charge") {
-      const mv = effectiveMove(s, sel);
+      const rolled = rulesOf(s).rolledCharges;
+      const mv = rolled ? ROLLED_CHARGE_MAX + chargeBonus(s, sel) : effectiveMove(s, sel);
       view.moveRing = { center: leader.pos, radius: mv + r };
       for (const c of actionTargets(s, sel.uid, { kind: "charge" })) view.targets.push({ uid: c.uid, ok: !c.problem });
       if (own) return ownCue();
@@ -1473,15 +1586,23 @@ export class Controller {
         const why = commandProblem(s, { type: "charge", uid: sel.uid, target: hit.unit.uid });
         // In auto mode, a target nobody can shoot or charge: say why it can't be shot as well.
         if (why) return bad(this.mode.kind === "auto" ? `${why} (and ${this.shootReason(sel, hit.unit)})` : why);
-        const plan = planCharge(s, sel, hit.unit);
+        const plan = planCharge(s, sel, hit.unit, rolled ? mv : undefined);
         if (typeof plan !== "string") view.ghosts = plan.placements.map((p) => ({ pos: p.pos, radius: r }));
+        const notes: string[] = [];
+        if (rolled) {
+          const need = chargeNeed(s, sel, hit.unit);
+          const bonus = chargeBonus(s, sel);
+          if (need !== null) notes.push(`🎲 needs ${need}+ on 2d6${bonus ? ` (${bonus > 0 ? "+" : ""}${bonus}" from buffs)` : ""}: ${Math.round(twoDiceAtLeast(need) * 100)}% to make it, else it stays put`);
+        }
+        const ow = rulesOf(s).overwatch ? overwatchPlan(s, hit.unit, sel) : null;
+        if (ow) notes.push(`⚠ overwatch: they fire ${ow.weapon.name} first, hitting on 6s (≈${expectedDamage(s, hit.unit, sel, ow.plan, false).toFixed(1)} damage)`);
         return ok(
-          `💥 Charge ${profileOf(hit.unit).name}${typeof plan === "string" ? "" : ` (${plan.leaderDistance.toFixed(1)}")`}. Chargers get +1 die per model in combat.`,
+          `💥 Charge ${profileOf(hit.unit).name}${typeof plan === "string" || rolled ? "" : ` (${plan.leaderDistance.toFixed(1)}")`}. Chargers get +1 die per model in combat.${notes.length ? ` · ${notes.join(" · ")}` : ""}`,
           "target",
         );
       }
       const pre = actionProblem(s, sel.uid, { kind: "charge" });
-      return pre ? bad(pre) : info(`Click a marked enemy within ${mv}" to charge`);
+      return pre ? bad(pre) : info(`Click a marked enemy within ${mv}" to charge${rolled ? " (then roll 2d6 for the distance)" : ""}`);
     }
 
     if (mode.kind === "ability") {
@@ -1523,12 +1644,12 @@ export class Controller {
       const why = commandProblem(s, { type: "ability", uid: sel.uid, ability: mode.id, point: hp, target: this.abilityTarget ?? undefined });
       if (mode.id === "barrage") {
         const spotted = shellSpotted(s, sel, hp);
-        const { maxDrift } = shellOdds(4, spotted);
+        const { maxDrift } = shellOdds(4, spotted, rulesOf(s).scatter);
         view.blast = { center: hp, radius: SHELL_BURST };
         view.drift = { center: hp, radius: maxDrift + SHELL_BURST };
         return why
           ? bad(`${def.name}: ${why}`)
-          : ok(`Barrage: lands here on a 4+, else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"} · hits every ground model under the blast, yours too`, "target");
+          : ok(`Barrage: ${maxDrift ? `lands here on a 4+, else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"}` : "lands here"} · hits every ground model under the blast, yours too`, "target");
       }
       const mr = profileOf(mover).baseRadius;
       const plan = planUnitMove(s, mover, aliveModels(mover)[0]!.id, hp, { allowance: 0, teleport: true });
@@ -1637,6 +1758,8 @@ export class Controller {
         ? s.orderChoice.player === HUMAN
           ? "Choose who goes first"
           : "The AI is choosing who goes first…"
+      : this.rerollOpen
+        ? "Re-roll your misses?"
       : this.aiRunning || s.activePlayer === AI
         ? "AI is thinking…"
         : s.phase === "movement"
@@ -1656,6 +1779,10 @@ export class Controller {
         <small class="mercy" title="A lead of more than ${mercyLead(s)} VP wins the game on the spot">lead by ${mercyLead(s) + 1}+ VP wins</small>
       </span>
       <span class="status">${esc(status)}</span>
+      ${(() => {
+        const house = rulesSummary(rulesOf(s));
+        return house.length ? `<span class="chip house-rules" title="House rules this game: ${esc(house.join(", "))}">🏠 ${house.length} house rule${house.length === 1 ? "" : "s"}</span>` : "";
+      })()}
       <span class="spacer"></span>
       <button class="secondary" id="btn-fit" title="Fit the board to the screen (0)">⤢ Fit</button>
       <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" aria-pressed="${this.mode.kind === "measure"}" title="${this.mode.kind === "measure" ? "Stop measuring (M or Esc)" : "Measure distances and check line of sight (M)"}">📏 Measure</button>
@@ -1848,7 +1975,10 @@ export class Controller {
         if (w.melee) return;
         out.push(btn("shoot", `🎯 ${esc(w.name)} (${w.range}")`, m.kind === "shoot" && m.weapon === i, `data-w="${i}"`, why({ kind: "shoot", weapon: i })));
       });
-      if (p.weapons.some((w) => w.melee)) out.push(btn("charge", `💥 Charge (up to ${mv}")`, m.kind === "charge", "", why({ kind: "charge" })));
+      if (p.weapons.some((w) => w.melee)) {
+        const reach = rulesOf(s).rolledCharges ? `2d6", declare within ${ROLLED_CHARGE_MAX + chargeBonus(s, sel)}"` : `up to ${mv}"`;
+        out.push(btn("charge", `💥 Charge (${reach})`, m.kind === "charge", "", why({ kind: "charge" })));
+      }
       out.push(btn("advance", `🏃 Advance (up to ${mv}")`, m.kind === "advance", "", why({ kind: "advance" })));
       out.push(...abilityButtons());
       out.push(btn("hunker", `🧱 Hunker down<span class="key-hint"> [H]</span>`, false, "", why({ kind: "hunker" })));
@@ -2280,7 +2410,7 @@ export function showRules(): void {
       <ol>
         <li><b>Movement:</b> deploy a unit from reserves into your zone (costs ⚙ resources and ◆ supply), move, disengage from melee, hunker down, or use a movement ability.</li>
         <li><b>Assault:</b> shoot, charge into base contact, advance, hunker, or use an assault ability. Engaged units can only shoot the unit they're fighting.</li>
-        <li><b>Combat:</b> engaged units fight. Units that charged fight first and get +1 die per model.</li>
+        <li><b>Combat:</b> engaged units fight, players alternating; each side's chargers fight before its other units and get +1 die per model. A fighting unit first <b>closes ranks</b> (each model steps up to 3" in), and models behind a squad-mate in base contact fight too (<b>supporting rank</b>).</li>
         <li><b>Scoring:</b> the mission awards VP. Shields recharge, regenerating critters heal, you gain resources and your supply cap grows.</li>
       </ol>
       <ul>
@@ -2291,13 +2421,15 @@ export function showRules(): void {
         <li><b>Supply:</b> destroyed units free their supply, so you can bring in more from reserves.</li>
       </ul>
       <ul>
-        <li><b>Morale:</b> battered units test their nerve and can become Shaken (they hit worse, won't charge, can't hold objectives). Rally them for 1 CP.</li>
+        <li><b>Charges</b> are declared at an enemy within 12", then 2d6" is rolled for the distance: too short, and the unit stays put. Hover the target to see the odds.</li>
+        <li><b>Morale</b> (a house rule, off unless you switch it on): battered units test their nerve and can become Shaken (they hit worse, won't charge, can't hold objectives). Rally them for 1 CP.</li>
         <li><b>Terrain:</b> scrub and craters are difficult terrain (double cost to cross). Models in the line of fire give the target cover.</li>
         <li><b>Weapon traits:</b> blast, torrent, heavy, rending and pistol. Some units also deal impact damage when their charge lands.</li>
         <li><b>Attacks:</b> roll to hit; <b>precision</b> turns some misses into hits. Then the target may roll <b>evade</b> (only in the situations its card lists: point-blank, shooting, melee or blasts); <b>tracking</b> cancels evades. Whatever gets through rolls armour saves.</li>
         <li><b>Melee and shooting:</b> you can shoot into a melee, but without precision every miss rolls again at your own units in it; engaged units can only shoot what they're fighting. Point-blank pistol shots can't be evaded.</li>
         <li><b>Supports:</b> spend CP on your support cards as free actions; reactions arm now and fire later.</li>
         <li><b>Unit abilities</b> are free actions during that unit's activation (one per phase): Blink then move, Recall then shoot. Some cost CP from the same pool as supports.</li>
+        <li><b>House rules</b> (main menu, step 5) switch mechanics off, or tabletop staples on: morale, breach dice, overwatch, command re-rolls, random activation order and whole-army turns. The AI plays by them too.</li>
       </ul>
       <p class="hint">Keys: Esc cancels, H hunkers, P passes the rest of the phase, M measures, Ctrl+Z undoes. Hover enemies with a unit selected to see the odds.</p>
       <p class="hint">The pointer tells you what a click will do: a green ✓, crosshair or + means it works, a red no-entry sign means it won't, and the tip next to it says why. Greyed-out buttons say why they're off. Before any attack's dice, the board marks the attacker, the target and the weapon.</p>

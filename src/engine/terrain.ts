@@ -17,6 +17,7 @@ import {
   segmentPolygonDistance,
   polyBounds,
 } from "./geometry";
+import { rulesOf } from "./houseRules";
 import { hasKeyword, isFlying, profileOf } from "./profile";
 import type { AccessPoint, Elevation, GameState, Model, PlayerId, Terrain, Unit, Vec } from "./types";
 
@@ -63,7 +64,7 @@ export function hasCover(s: GameState, from: Vec, fromElev: Elevation, target: U
   if (isFlying(target) || hasKeyword(target, "heavy")) return false;
   if (fromElev > tm.elevation) return false; // plunging fire
   if (tm.elevation === 1 && fromElev === 0) return true; // shooting uphill at a ledge
-  if (shooterUid && obscured(s, from, target, tm, shooterUid)) return true;
+  if (shooterUid && rulesOf(s).obscuring && obscured(s, from, target, tm, shooterUid)) return true;
   return terrainCovers(s.terrain, from, tm.pos, tm.elevation);
 }
 
@@ -159,6 +160,7 @@ export function shotLine(s: GameState, from: Vec, fromElev: Elevation, target: U
 
 /** How far along the shot (0..1) the first other model it passes through stands (see `obscured`). */
 function firstObstruction(s: GameState, from: Vec, target: Unit, tm: Model, shooterUid: string): number | null {
+  if (!rulesOf(s).obscuring) return null;
   let best: number | null = null;
   const dx = tm.pos.x - from.x;
   const dy = tm.pos.y - from.y;
@@ -346,7 +348,7 @@ const DIFFICULT_SAMPLES = 12;
 
 /** Extra movement a leg costs because it crosses difficult terrain (0 for jumpers). */
 export function difficultExtra(s: GameState, a: Vec, b: Vec, elevation: Elevation, jump: boolean): number {
-  if (jump || elevation === 2) return 0;
+  if (jump || elevation === 2 || !rulesOf(s).difficultTerrain) return 0;
   const len = dist(a, b);
   if (len < EPS) return 0;
   let extra = 0;

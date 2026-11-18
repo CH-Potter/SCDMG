@@ -725,6 +725,7 @@ summary {
   .actions button,
   .deploy-menu button,
   .order-choice button,
+  .reroll-prompt button,
   .log-tab,
   .float-pass,
   #overlay .modal button:not(.linkish) {

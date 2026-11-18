@@ -1,6 +1,7 @@
 // Read-only rule queries shared by the reducer, the AI and the UI.
 
 import { dist } from "./geometry";
+import { rulesOf } from "./houseRules";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
 import type { GameState, Model, Objective, PlayerId, Unit, UnitProfile, Vec } from "./types";
 
@@ -163,7 +164,9 @@ export function eligibleUnits(s: GameState, p: PlayerId): Unit[] {
       );
     case "combat": {
       const engaged = (x: Unit) => !x.status.fought && isEngaged(s, x) && canFightAnyone(s, x);
-      const chargersLeft = onBoard(s).some((x) => x.status.charged && engaged(x));
+      // Chargers first: every side's (the Chargers strike first house rule), or within each side as players alternate.
+      const pool = rulesOf(s).chargersFirst ? onBoard(s) : units;
+      const chargersLeft = pool.some((x) => x.status.charged && engaged(x));
       return units.filter((u) => engaged(u) && (!chargersLeft || u.status.charged));
     }
     default:

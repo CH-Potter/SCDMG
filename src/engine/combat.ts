@@ -6,6 +6,7 @@ import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
 import { nextRandom, rollD6 } from "./rng";
 import { aliveModels, AURA_RANGE, ENGAGE_RANGE, engagedWith, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, modelsInReach, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
+import { rulesOf, STANDARD_RULES, type HouseRules } from "./houseRules";
 import { consumeReaction } from "./reactions";
 import { hasCover, lineOfSight, platformAt } from "./terrain";
 import type { AttackReport, EvadeCondition, GameEvent, GameState, Model, Unit, Vec, Weapon } from "./types";
@@ -31,6 +32,10 @@ export interface AttackPlan {
    * drift, then bursts on every model under it (scatterShell, burstAt). The dice counts don't apply.
    */
   indirect?: boolean;
+  /** Breach dice house rule: against a matching target, roll this die with the attack; that many hits skip the save. */
+  breach?: { die: 3 | 6; vs: string };
+  /** Command re-roll house rule: re-roll the misses once (the CP is paid by the caller). */
+  reroll?: boolean;
 }
 
 export const hasTrait = (w: Weapon, t: NonNullable<Weapon["traits"]>[number]): boolean => !!w.traits?.includes(t);
@@ -58,6 +63,7 @@ export function moraleCheck(s: GameState, t: Unit, events: GameEvent[]): void {
 
 /** Roll 2d6 against the unit's nerve (less `penalty`); above it, the unit is Shaken. Returns whether it was. */
 export function nerveTest(s: GameState, t: Unit, events: GameEvent[], penalty = 0): boolean {
+  if (!rulesOf(s).morale) return false;
   const roll: [number, number] = [rollD6(s), rollD6(s)];
   const nerve = nerveOf(t, s) - penalty;
   const shaken = roll[0] + roll[1] > nerve;
@@ -82,6 +88,28 @@ export function weaponBonus(w: Weapon, target: Unit): { dice: number; damage: nu
     b.ap += x.ap ?? 0;
   }
   return b;
+}
+
+const NO_BONUS = { dice: 0, damage: 0, ap: 0 };
+
+/**
+ * Breach dice house rule: a weapon's keyword bonus against this target, as a breach die instead.
+ * A bonus worth 1 (one die, damage or AP) is a d3; a bigger one is a d6. The best match counts.
+ */
+export function breachFor(w: Weapon, target: Unit): { die: 3 | 6; vs: string } | null {
+  let best: { die: 3 | 6; vs: string; size: number } | null = null;
+  for (const x of w.bonuses ?? []) {
+    if (!hasKeyword(target, x.vs)) continue;
+    const size = (x.dice ?? 0) + (x.damage ?? 0) + (x.ap ?? 0);
+    if (size <= 0 || (best && best.size >= size)) continue;
+    best = { die: size >= 2 ? 6 : 3, vs: x.vs, size };
+  }
+  return best ? { die: best.die, vs: best.vs } : null;
+}
+
+/** The keyword bonus (or, with breach dice, no bonus and a breach die) a weapon gets against a target. */
+function bonusUnder(rules: Readonly<HouseRules>, w: Weapon, t: Unit): { bonus: { dice: number; damage: number; ap: number }; breach: { die: 3 | 6; vs: string } | null } {
+  return rules.breach ? { bonus: NO_BONUS, breach: breachFor(w, t) } : { bonus: weaponBonus(w, t), breach: null };
 }
 
 /** Armour shrugs off 1 AP unless the weapon is specifically built to crack armour. */
@@ -149,7 +177,8 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     const blocked = engagementBlock(s, a, t);
     if (blocked) return blocked;
   }
-  const bonus = weaponBonus(w, t);
+  const rules = rulesOf(s);
+  const { bonus, breach } = bonusUnder(rules, w, t);
   const ra = radiusOf(a);
   const rt = radiusOf(t);
   const attackers: AttackPlan["attackers"] = [];
@@ -195,8 +224,9 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     rending: hasTrait(w, "rending"),
     precision: precisionOf(a, w),
     tracking: trackingOf(a, w),
-    evadeOn: conditions ? evadeTarget(t, conditions) : null,
+    evadeOn: conditions && rules.evade ? evadeTarget(t, conditions) : null,
     ...(indirect ? { indirect: true } : {}),
+    ...(breach && !indirect ? { breach } : {}),
   };
 }
 
@@ -204,7 +234,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
  * Impact on charge: every charging model in base contact rolls the unit's impact dice.
  * Ground units can't impact flyers. Returns null if there's no impact to roll.
  */
-export function planImpact(a: Unit, t: Unit): AttackPlan | null {
+export function planImpact(a: Unit, t: Unit, rules: Readonly<HouseRules> = STANDARD_RULES): AttackPlan | null {
   const imp = profileOf(a).impact;
   if (!imp || !meleeCanHit(a, t, "ground")) return null;
   const attackers: AttackPlan["attackers"] = [];
@@ -217,17 +247,24 @@ export function planImpact(a: Unit, t: Unit): AttackPlan | null {
   }
   if (!attackers.length) return null;
   const asWeapon: Weapon = { name: "Impact", melee: true, range: 0, dice: imp.dice, hit: imp.hit, damage: imp.damage, ap: imp.ap, targets: "ground" };
-  return { attackers, targets: [...targets], hitOn: imp.hit, damage: imp.damage, ap: effectiveAp(asWeapon, t, 0), evadeOn: evadeTarget(t, ["melee"]) };
+  return { attackers, targets: [...targets], hitOn: imp.hit, damage: imp.damage, ap: effectiveAp(asWeapon, t, 0), evadeOn: rules.evade ? evadeTarget(t, ["melee"]) : null };
 }
 
-export function planMelee(a: Unit, t: Unit, w: Weapon): AttackPlan | string {
+export function planMelee(a: Unit, t: Unit, w: Weapon, rules: Readonly<HouseRules> = STANDARD_RULES): AttackPlan | string {
   if (!w.melee) return "That's not a melee weapon";
   if (!meleeCanHit(a, t, w.targets)) return `${w.name} can't reach flyers`;
-  const bonus = weaponBonus(w, t);
+  const { bonus, breach } = bonusUnder(rules, w, t);
   const attackers: AttackPlan["attackers"] = [];
   const targets = new Set<Model>();
-  for (const am of aliveModels(a)) {
-    const touching = aliveModels(t).filter((tm) => modelsEngage(a, am, t, tm));
+  const mine = aliveModels(a);
+  const front = new Map(mine.map((am) => [am, aliveModels(t).filter((tm) => modelsEngage(a, am, t, tm))]));
+  for (const am of mine) {
+    let touching = front.get(am)!;
+    // Supporting rank: in base contact with a squad-mate who's in base contact with the enemy.
+    if (!touching.length && rules.supportingRank) {
+      const backed = mine.filter((fm) => fm !== am && fm.elevation === am.elevation && front.get(fm)!.length && dist(fm.pos, am.pos) - 2 * radiusOf(a) <= ENGAGE_RANGE + 1e-6);
+      touching = [...new Set(backed.flatMap((fm) => front.get(fm)!))];
+    }
     if (!touching.length) continue;
     touching.forEach((tm) => targets.add(tm));
     attackers.push({ model: am, dice: Math.max(1, w.dice + bonus.dice + (a.status.charged ? 1 : 0) + a.status.meleeBonus) });
@@ -242,7 +279,8 @@ export function planMelee(a: Unit, t: Unit, w: Weapon): AttackPlan | string {
     rending: hasTrait(w, "rending"),
     precision: precisionOf(a, w),
     tracking: trackingOf(a, w),
-    evadeOn: evadeTarget(t, ["melee"]),
+    evadeOn: rules.evade ? evadeTarget(t, ["melee"]) : null,
+    ...(breach ? { breach } : {}),
   };
 }
 
@@ -272,7 +310,7 @@ export function blastOn(
   e: { hit: number; damage: number; ap: number },
   events: GameEvent[],
 ): Pick<AttackReport, "hitRolls" | "evadeRolls" | "evadeOn" | "saveRolls" | "saveOn" | "damage" | "modelsKilled"> {
-  const evadeOn = evadeTarget(t, defaultConditions("barrage"));
+  const evadeOn = rulesOf(s).evade ? evadeTarget(t, defaultConditions("barrage")) : null;
   const hitRolls: number[] = [];
   const evadeRolls: number[] = [];
   const saveRolls: number[] = [];
@@ -318,9 +356,11 @@ export function expectedDamage(s: GameState, a: Unit, t: Unit, plan: AttackPlan,
   const cap = plan.targets.reduce((sum, m) => sum + m.hp + m.shield, 0);
   const pHit = pAtLeast(plan.hitOn);
   let hits = dice * pHit + Math.min(plan.precision ?? 0, dice * (1 - pHit));
-  const evadeOn = plan.evadeOn === undefined ? evadeTarget(t, melee ? ["melee"] : ["ranged"]) : plan.evadeOn;
+  const evadeOn = !rulesOf(s).evade ? null : plan.evadeOn === undefined ? evadeTarget(t, melee ? ["melee"] : ["ranged"]) : plan.evadeOn;
   if (evadeOn !== null) hits -= Math.max(0, hits * pAtLeast(evadeOn) - (plan.tracking ?? 0));
-  const unsaved = hits * pFail;
+  // Breach dice: on average min(die, hits) hits skip the save.
+  const skipped = plan.breach ? expectedBreach(plan.breach.die, hits) : 0;
+  const unsaved = (hits - skipped) * pFail + skipped;
   let total = unsaved * perHit;
   // Refraction (unused this round) takes 1 off the first unsaved ranged wound: a whole wound for a 1-damage weapon.
   if (!melee && dice > 0 && hasAbility(t, "refraction") && !t.reactionsUsed.includes("refraction")) {
@@ -329,6 +369,16 @@ export function expectedDamage(s: GameState, a: Unit, t: Unit, plan: AttackPlan,
   }
   return Math.max(0, Math.min(cap, total));
 }
+
+/** The average number of hits a breach die lets skip the save, out of `hits` (which may be fractional). */
+export function expectedBreach(die: 3 | 6, hits: number): number {
+  let n = 0;
+  for (let f = 1; f <= die; f++) n += Math.min(f, hits);
+  return n / die;
+}
+
+/** Roll a breach die: a d6, or a d3 (a d6 halved, rounding up). */
+const rollBreach = (s: GameState, die: 3 | 6): number => (die === 6 ? rollD6(s) : Math.ceil(rollD6(s) / 2));
 
 /** Pick which model takes the next hit: finish off wounded models first, then the closest. */
 function allocate(plan: AttackPlan, t: Unit): Model | undefined {
@@ -352,12 +402,18 @@ export function resolveAttack(
   const melee = kind === "fight" || kind === "impact";
   const dice = plan.attackers.reduce((sum, x) => sum + x.dice, 0);
   const hitRolls = Array.from({ length: dice }, () => rollD6(s));
+  // Command re-roll: every miss rolls again, once.
+  let rerolledFrom: number[] | undefined;
+  if (plan.reroll) {
+    rerolledFrom = hitRolls.filter((r) => r < plan.hitOn);
+    for (let i = 0; i < hitRolls.length; i++) if (hitRolls[i]! < plan.hitOn) hitRolls[i] = rollD6(s);
+  }
   let hits = hitRolls.filter((r) => r >= plan.hitOn).length;
   // Precision: move missed dice into the hits.
   const precisionMoved = Math.min(plan.precision ?? 0, dice - hits);
   hits += precisionMoved;
   // Evade: the defender rolls one die per hit; tracking cancels successful evades.
-  const evadeOn = plan.evadeOn === undefined ? evadeTarget(t, defaultConditions(kind)) : plan.evadeOn;
+  const evadeOn = !rulesOf(s).evade ? null : plan.evadeOn === undefined ? evadeTarget(t, defaultConditions(kind)) : plan.evadeOn;
   let evadeRolls: number[] | undefined;
   let evadesCancelled = 0;
   if (evadeOn !== null && hits > 0) {
@@ -367,6 +423,9 @@ export function resolveAttack(
     hits -= evaded - evadesCancelled;
   }
   let crits = plan.rending ? Math.min(hits, hitRolls.filter((r) => r === 6).length) : 0;
+  // Breach dice: rolled with the attack; that many of the hits that got through skip the save (the last ones, so rending AP isn't wasted).
+  const breachRoll = plan.breach && hits > 0 ? rollBreach(s, plan.breach.die) : 0;
+  const skipped = Math.min(breachRoll, hits);
   const report: AttackReport = {
     uid: a.uid,
     target: t.uid,
@@ -375,8 +434,10 @@ export function resolveAttack(
     attackers: plan.attackers.length,
     hitRolls,
     hitOn: plan.hitOn,
+    ...(rerolledFrom?.length ? { rerolledFrom } : {}),
     ...(precisionMoved ? { precisionMoved } : {}),
     ...(evadeRolls ? { evadeRolls, evadeOn: evadeOn!, evadesCancelled } : {}),
+    ...(plan.breach && hits > 0 ? { breach: { die: plan.breach.die, roll: breachRoll, vs: plan.breach.vs, skipped } } : {}),
     saveRolls: [],
     saveOn: [],
     damage: 0,
@@ -389,7 +450,7 @@ export function resolveAttack(
     if (!tm) break;
     const ap = plan.ap + (crits > 0 ? 1 : 0);
     if (crits > 0) crits -= 1;
-    const st = saveNeeded(s, a, t, tm, ap, melee, nearestAttacker(plan, tm));
+    const st = i >= hits - skipped ? null : saveNeeded(s, a, t, tm, ap, melee, nearestAttacker(plan, tm));
     report.saveOn.push(st);
     if (st !== null) {
       const roll = rollD6(s);
@@ -523,7 +584,8 @@ export function shellSpotted(s: GameState, a: Unit, aim: Vec): boolean {
 }
 
 /** The odds for one shell: the chance it lands on target, and the furthest it can drift if it doesn't. */
-export function shellOdds(need: number, spotted: boolean): { onTarget: number; maxDrift: number } {
+export function shellOdds(need: number, spotted: boolean, scatter = true): { onTarget: number; maxDrift: number } {
+  if (!scatter) return { onTarget: 1, maxDrift: 0 };
   return { onTarget: Math.max(0, Math.min(1, (7 - need) / 6)), maxDrift: spotted ? Math.ceil(SHELL_DRIFT / 2) : SHELL_DRIFT };
 }
 
@@ -532,6 +594,7 @@ export function shellOdds(need: number, spotted: boolean): { onTarget: number; m
  * up, when a firing model can see the spot) in a random direction, staying on the table.
  */
 export function scatterShell(s: GameState, a: Unit, weapon: string, aim: Vec, need: number, events: GameEvent[]): Vec {
+  if (!rulesOf(s).scatter) return aim; // house rule: shells always land where aimed
   const spotted = shellSpotted(s, a, aim);
   const roll = rollD6(s);
   let landed = aim;
@@ -574,9 +637,9 @@ export function burstAt(s: GameState, a: Unit, weapon: string, p: Vec, e: { hit:
 function expectedShells(s: GameState, a: Unit, t: Unit, plan: AttackPlan): number {
   const aim = shellAim(t);
   const spotted = shellSpotted(s, a, aim);
-  const { onTarget } = shellOdds(plan.hitOn, spotted);
+  const { onTarget } = shellOdds(plan.hitOn, spotted, rulesOf(s).scatter);
   const r = radiusOf(t);
-  const evadeOn = evadeTarget(t, defaultConditions("barrage"));
+  const evadeOn = rulesOf(s).evade ? evadeTarget(t, defaultConditions("barrage")) : null;
   let burst = 0;
   for (const m of aliveModels(t)) {
     if (dist(m.pos, aim) > SHELL_BURST + r) continue;
@@ -597,7 +660,7 @@ function expectedShells(s: GameState, a: Unit, t: Unit, plan: AttackPlan): numbe
  * friends in the melee).
  */
 export function strayTarget(s: GameState, a: Unit, t: Unit, w: Weapon): Unit | null {
-  if (w.melee || precisionOf(a, w) >= 1 || hasTrait(w, "indirect")) return null;
+  if (!rulesOf(s).strays || w.melee || precisionOf(a, w) >= 1 || hasTrait(w, "indirect")) return null;
   const friends = engagedWith(s, t).filter((u) => u.owner === a.owner && u.uid !== a.uid);
   if (!friends.length) return null;
   return friends.reduce((x, y) => (unitGap(a, y) < unitGap(a, x) ? y : x));

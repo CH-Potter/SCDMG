@@ -12,6 +12,7 @@ import { lineOfSight, platformAt } from "./terrain";
 import type { Command, GameEvent, GameState, PlayerId, SupportAbilityDef, SupportEffect, Unit, UnitStatus, Vec } from "./types";
 
 import { CP_CAP } from "./constants";
+import { rulesOf } from "./houseRules";
 export { CP_CAP };
 const BURROW_EXIT_RANGE = 3;
 
@@ -88,6 +89,7 @@ export function canPlaySupport(s: GameState, player: PlayerId, supportId: string
   if (ability.timing !== "any" && ability.timing !== s.phase) return `Only in the ${ability.timing} phase`;
   const fromRound = ability.effect.kind === "airdrop" ? ability.effect.fromRound : undefined;
   if (fromRound && s.round < fromRound) return `Not before round ${fromRound}`;
+  if (ability.effect.kind === "rattle" && !rulesOf(s).morale) return "Morale is switched off in this game";
   const trigger = REACTION_TRIGGER[ability.effect.kind];
   if (trigger && pl.armed.some((a) => a.trigger === trigger)) return "A reaction like that is already armed";
   return null;

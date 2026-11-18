@@ -1,3 +1,4 @@
+import { CLASSIC_RULES } from "../src/engine/houseRules";
 import { describe, expect, it } from "vitest";
 import { aiCommand } from "../src/engine/ai";
 import { applyCommand, createGame } from "../src/engine/game";
@@ -8,7 +9,7 @@ describe("attack events come before what they cause", () => {
   it("a morale test is logged after the attack on that unit, not before it", () => {
     let checked = 0;
     for (const seed of [1, 2, 3]) {
-      let s: GameState = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed, missionId: "brawl" });
+      let s: GameState = createGame({ map: CLASSIC_DUSTBOWL, rules: CLASSIC_RULES, factions: ["militia", "munch"], seed, missionId: "brawl" });
       for (let i = 0; i < 400 && !s.over; i++) {
         const r = applyCommand(s, aiCommand(s));
         if (!r.ok) break;

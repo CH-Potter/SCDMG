@@ -15,14 +15,16 @@ import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type 
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels } from "./supports";
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
-import { applyDamage, burstAt, evadeTarget, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
+import { cleanRules, CLOSE_RANKS_MOVE, OVERWATCH_HIT, REROLL_CP, ROLLED_CHARGE_MAX, rulesOf, type HouseRules } from "./houseRules";
+import { applyDamage, burstAt, evadeTarget, expectedDamage, hasTrait, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
 import { dist, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf } from "./profile";
-import { rollD6 } from "./rng";
+import { nextRandom, rollD6 } from "./rng";
 import {
   aliveModels,
   canAffordDeploy,
+  deployable,
   effectiveMove,
   eligibleUnits,
   engagedWith,
@@ -39,6 +41,7 @@ import {
   unitsEngage,
   HOME_EXCLUSION,
   nearEnemyHome,
+  radiusOf,
 } from "./rules";
 import { cleanupRound, dropCarriedFlag, economyState, scoreRound, setupMission, updateFlags } from "./scoring";
 import { allPlaced, checkPlacement, elevationFor, lineOfSight, type Placed } from "./terrain";
@@ -89,6 +92,8 @@ export interface GameSetup {
    * normal game.
    */
   startBonus?: [StartBonus | undefined, StartBonus | undefined];
+  /** House rules (see houseRules.ts): anything left out plays as standard. */
+  rules?: Partial<HouseRules>;
 }
 
 /** Extra starting resources and CP for one side (see `GameSetup.startBonus`). */
@@ -189,6 +194,7 @@ export function createGame(setup: GameSetup): GameState {
   state.orderChoiceRule = setup.orderChoice === true;
   state.orderChoice = setup.orderChoice === true ? { player: winner, reason: "rolloff" } : null;
   state.initiativeClaim = null;
+  if (setup.rules) state.rules = cleanRules(setup.rules);
   // Per-role economy, garrisons, live objectives, salvage loads and convoy cargo (scoring.ts).
   setupMission(state);
   setup.startBonus?.forEach((b, p) => {
@@ -270,6 +276,7 @@ export function applyCommand(prev: GameState, cmd: Command): CommandResult {
     if (cmd.player !== s.activePlayer) return fail("Not your turn");
     const t = unitById(s, cmd.target);
     if (!t || !t.onBoard || t.owner !== cmd.player) return fail("Pick one of your units");
+    if (!rulesOf(s).morale) return fail("Morale is switched off in this game");
     if (!t.status.shaken) return fail("That unit isn't shaken");
     if (s.players[cmd.player].cp < RALLY_CP) return fail(`Rallying costs ${RALLY_CP} CP`);
     s.players[cmd.player].cp -= RALLY_CP;
@@ -368,7 +375,12 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       break;
     case "charge": {
       const e = charge(s, unit, cmd.target, events);
-      if (e) return e;
+      if (typeof e === "string") return e;
+      // A charge that fell short (or was shot down) doesn't move, so nothing reacts to it.
+      if (e === false) {
+        unit.status.acted = true;
+        return null;
+      }
       events.push({ type: "moved", uid: unit.uid, kind: "charge" });
       break;
     }
@@ -382,6 +394,10 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (typeof plan === "string") return plan;
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
       if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
+      if (cmd.reroll) {
+        const e = payReroll(s, unit, plan);
+        if (e) return e;
+      }
       if (consumeReaction(s, target.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
       if (plan.indirect) {
         // Lobbed: one shell per firing model, aimed at the target; it may drift, then bursts on everyone under it.
@@ -405,8 +421,18 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const w = profileOf(unit).weapons[cmd.weapon];
       if (!target || !target.onBoard || !unitsEngage(unit, target)) return "Not engaged with that unit";
       if (!w) return "No such weapon";
-      const plan = planMelee(unit, target, w);
+      // Close ranks: before striking, each model may step up to 3" into the fight.
+      if (rulesOf(s).closeRanks) {
+        const moves = planCloseRanks(s, unit, target);
+        for (const mv of moves) unit.models.find((m) => m.id === mv.id)!.pos = mv.pos;
+        if (moves.length) events.push({ type: "moved", uid: unit.uid, kind: "closeRanks" });
+      }
+      const plan = planMelee(unit, target, w, rulesOf(s));
       if (typeof plan === "string") return plan;
+      if (cmd.reroll) {
+        const e = payReroll(s, unit, plan);
+        if (e) return e;
+      }
       unit.status.fought = true;
       pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "fight", ev));
       break;
@@ -421,6 +447,16 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
   if (cmd.type === "move" || cmd.type === "advance" || cmd.type === "charge" || cmd.type === "disengage") {
     react(s, unit, events);
   }
+  return null;
+}
+
+/** Command re-roll house rule: check it's allowed, pay its CP and mark the plan. Returns an error, or null. */
+function payReroll(s: GameState, unit: Unit, plan: AttackPlan): string | null {
+  if (!rulesOf(s).reroll) return "Command re-rolls aren't in play in this game";
+  if (plan.indirect) return "Lobbed shells can't be re-rolled";
+  if (s.players[unit.owner].cp < REROLL_CP) return `A re-roll costs ${REROLL_CP} CP`;
+  s.players[unit.owner].cp -= REROLL_CP;
+  plan.reroll = true;
   return null;
 }
 
@@ -460,8 +496,12 @@ function deploy(s: GameState, unit: Unit, to: Vec, events: GameEvent[]): string 
   return null;
 }
 
-/** Charge: auto-route the closest model into base contact with the target; the rest pile in. */
-function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]): string | null {
+/**
+ * Charge: auto-route the closest model into base contact with the target; the rest pile in.
+ * Returns an error (nothing happened), null (it charged home) or false (declared, but it fell short
+ * or was shot down: the unit stays put and its activation is spent).
+ */
+function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]): string | null | false {
   const target = unitById(s, targetUid);
   if (!target || !target.onBoard || target.owner === unit.owner) return "Pick an enemy unit to charge";
   if (unit.status.disengaged) return "Exhausted from disengaging: it can't charge";
@@ -476,23 +516,44 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   } else if (!profileOf(unit).weapons.some((w) => w.melee && meleeCanHit(unit, target, w.targets))) {
     return "This unit has no melee weapon";
   }
-  const plan = planCharge(s, unit, target);
-  if (typeof plan === "string") return plan;
+  const rules = rulesOf(s);
+  const bonus = chargeBonus(s, unit);
+  const declared = planCharge(s, unit, target, rules.rolledCharges ? ROLLED_CHARGE_MAX + bonus : undefined);
+  if (typeof declared === "string") return declared;
+  // Declared: from here on dice are rolled, so the charge happens (or fails) and can't be taken back.
+  if (rules.overwatch) chargeOverwatch(s, target, unit, events);
+  if (unit.destroyed) return false;
+  let plan: UnitMovePlan | string = declared;
+  if (rules.rolledCharges && !s.aiAssumeChargesLand) {
+    const roll: [number, number] = [rollD6(s), rollD6(s)];
+    const need = chargeNeed(s, unit, target);
+    const made = need !== null && roll[0] + roll[1] >= need;
+    events.push({ type: "chargeRoll", uid: unit.uid, target: target.uid, roll, need: need ?? ROLLED_CHARGE_MAX + 1, made });
+    if (!made) return false;
+    plan = planCharge(s, unit, target, roll[0] + roll[1] + bonus);
+    if (typeof plan === "string") plan = planCharge(s, unit, target, need! + bonus);
+  } else if (unit.models.some((m) => !m.alive && declared.placements.some((p) => p.modelId === m.id))) {
+    // Overwatch took down models the route was planned for: plan again with whoever is left.
+    plan = planCharge(s, unit, target);
+  }
+  if (typeof plan === "string") {
+    events.push({ type: "chargeFailed", uid: unit.uid, target: target.uid, reason: plan });
+    return false;
+  }
   applyPlan(unit, plan);
   const reached = dive ? unitGap(unit, target) <= ENGAGE_RANGE + 1e-6 : unitsEngage(unit, target);
   if (!reached) return "Couldn't reach base contact";
   unit.status.charged = true;
   if (consumeReaction(s, target.owner, "enemyCharges", events)) target.status.braced = true;
   // Impact on charge: slam into the target before the combat phase (for a flyer, that's the whole dive).
-  const impact = planImpact(unit, target);
+  const impact = dive || rules.impact ? planImpact(unit, target, rules) : null;
   if (impact) pushAttack(events, (ev) => resolveAttack(s, unit, target, dive ? "Dive" : "Impact", impact, "impact", ev));
   return null;
 }
 
-export function planCharge(s: GameState, unit: Unit, target: Unit): UnitMovePlan | string {
+export function planCharge(s: GameState, unit: Unit, target: Unit, allowance = effectiveMove(s, unit)): UnitMovePlan | string {
   const ra = profileOf(unit).baseRadius;
   const rt = profileOf(target).baseRadius;
-  const allowance = effectiveMove(s, unit);
   const flying = isFlying(unit);
   const pairs = aliveModels(unit)
     .flatMap((am) => aliveModels(target).map((tm) => ({ am, tm, d: dist(am.pos, tm.pos) })))
@@ -520,6 +581,117 @@ export function planCharge(s: GameState, unit: Unit, target: Unit): UnitMovePlan
     }
   }
   return best ?? lastErr;
+}
+
+/** Rolled charges: what's added to the 2d6 (the unit's move buffs and debuffs: Sugar Rush, Sticky Goo...). */
+export function chargeBonus(s: GameState, unit: Unit): number {
+  return effectiveMove(s, unit) - profileOf(unit).move;
+}
+
+/**
+ * Rolled charges: the lowest 2d6 total that gets this unit into base contact (null if even 12 can't).
+ * Starts from the route length, so it usually takes one or two tries.
+ */
+export function chargeNeed(s: GameState, unit: Unit, target: Unit): number | null {
+  const bonus = chargeBonus(s, unit);
+  const best = planCharge(s, unit, target, ROLLED_CHARGE_MAX + bonus);
+  if (typeof best === "string") return null;
+  for (let n = Math.max(2, Math.floor(best.leaderDistance - bonus)); n <= ROLLED_CHARGE_MAX; n++) {
+    if (typeof planCharge(s, unit, target, n + bonus) !== "string") return n;
+  }
+  return ROLLED_CHARGE_MAX;
+}
+
+/** Chance that 2d6 rolls `need` or more. */
+export function twoDiceAtLeast(need: number): number {
+  let n = 0;
+  for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) if (a + b >= need) n += 1;
+  return n / 36;
+}
+
+/**
+ * Close ranks: where each model of `unit` steps (up to 3") before it fights `target`. Models
+ * already in base contact stay. The rest, nearest first, take the closest free spot in base contact
+ * with the target, or failing that (with Supporting rank) in base contact with a squad-mate who is.
+ * Models that can't reach either stay put. Returns only the models that move.
+ */
+export function planCloseRanks(s: GameState, unit: Unit, target: Unit): { id: number; pos: Vec }[] {
+  const ra = radiusOf(unit);
+  const rt = radiusOf(target);
+  const tms = aliveModels(target);
+  const mine = aliveModels(unit);
+  const support = rulesOf(s).supportingRank;
+  const posOf = new Map(mine.map((m) => [m.id, m.pos]));
+  const inContact = (m: Model): boolean => tms.some((tm) => tm.elevation === m.elevation && dist(posOf.get(m.id)!, tm.pos) - ra - rt <= ENGAGE_RANGE + 1e-6);
+  const others = allPlaced(s).filter((p) => p.uid !== unit.uid);
+  const nearest = (m: Model) => Math.min(...tms.map((tm) => dist(m.pos, tm.pos)));
+  const moves: { id: number; pos: Vec }[] = [];
+  for (const m of mine.filter((x) => !inContact(x)).sort((a, b) => nearest(a) - nearest(b))) {
+    const obstacles: Placed[] = [
+      ...others,
+      ...mine.filter((x) => x.id !== m.id).map((x) => ({ key: `${unit.uid}:${x.id}`, uid: unit.uid, owner: unit.owner, pos: posOf.get(x.id)!, elevation: x.elevation, radius: ra })),
+    ];
+    const rings: { centre: Vec; r: number; rank: number }[] = tms.filter((tm) => tm.elevation === m.elevation).map((tm) => ({ centre: tm.pos, r: ra + rt + 0.05, rank: 0 }));
+    if (support) for (const f of mine) if (f.id !== m.id && f.elevation === m.elevation && inContact(f)) rings.push({ centre: posOf.get(f.id)!, r: 2 * ra + 0.05, rank: 1 });
+    let best: { pos: Vec; rank: number; d: number } | null = null;
+    for (const ring of rings) {
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        const pos = { x: ring.centre.x + Math.cos(a) * ring.r, y: ring.centre.y + Math.sin(a) * ring.r };
+        const d = dist(m.pos, pos);
+        if (d > CLOSE_RANKS_MOVE + 1e-6) continue;
+        if (best && (ring.rank > best.rank || (ring.rank === best.rank && d >= best.d))) continue;
+        if (elevationFor(s, unit, pos) !== m.elevation || checkPlacement(s, unit, pos, m.elevation, obstacles)) continue;
+        if (pathBlocked(s, m.pos, pos, m.elevation, ra)) continue;
+        best = { pos, rank: ring.rank, d };
+      }
+    }
+    if (!best) continue;
+    posOf.set(m.id, best.pos);
+    moves.push({ id: m.id, pos: best.pos });
+  }
+  return moves;
+}
+
+/** A copy of `unit` with its models where Close ranks would put them (for previews and the AI). */
+export function closeRanksPreview(s: GameState, unit: Unit, target: Unit): Unit {
+  if (!rulesOf(s).closeRanks) return unit;
+  const moves = planCloseRanks(s, unit, target);
+  if (!moves.length) return unit;
+  return { ...unit, models: unit.models.map((m) => {
+    const mv = moves.find((x) => x.id === m.id);
+    return mv ? { ...m, pos: mv.pos } : m;
+  }) };
+}
+
+/** Does a straight step from `from` to `to` (for a base of radius `r`) run into solid terrain at this level? */
+function pathBlocked(s: GameState, from: Vec, to: Vec, elev: Elevation, r: number): boolean {
+  return s.terrain.some((x) => {
+    const solid = x.kind === "building" || ((x.kind === "wall" || x.kind === "barricade") && x.level === elev) || (x.kind === "platform" && elev === 0);
+    return solid && segmentNearPolygon(from, to, x.poly, r - 1e-6);
+  });
+}
+
+/** Overwatch house rule: the unit being charged shoots the charger with its best gun, hitting only on 6s. */
+export function overwatchPlan(s: GameState, target: Unit, charger: Unit): { weapon: Weapon; plan: AttackPlan } | null {
+  if (target.destroyed || !target.onBoard || isEngaged(s, target)) return null;
+  let best: { weapon: Weapon; plan: AttackPlan; value: number } | null = null;
+  for (const w of profileOf(target).weapons) {
+    if (w.melee || hasTrait(w, "indirect")) continue;
+    const plan = planShooting(s, target, charger, w, "overwatch");
+    if (typeof plan === "string") continue;
+    plan.hitOn = OVERWATCH_HIT;
+    const value = expectedDamage(s, target, charger, plan, false);
+    if (!best || value > best.value) best = { weapon: w, plan, value };
+  }
+  return best && { weapon: best.weapon, plan: best.plan };
+}
+
+function chargeOverwatch(s: GameState, target: Unit, charger: Unit, events: GameEvent[]): void {
+  const ow = overwatchPlan(s, target, charger);
+  if (!ow) return;
+  events.push({ type: "ability", uid: target.uid, ability: "overwatch", text: `${profileOf(target).name} fires on the charging ${profileOf(charger).name}!` });
+  pushAttack(events, (ev) => resolveAttack(s, target, charger, ow.weapon.name, ow.plan, "overwatch", ev));
 }
 
 // ---------- abilities ----------
@@ -843,11 +1015,7 @@ function dragToward(s: GameState, t: Unit, toward: Unit, max: number): number {
   const dir = { x: (anchor.pos.x - c.x) / len, y: (anchor.pos.y - c.y) / len };
   const r = profileOf(t).baseRadius;
   const others = allPlaced(s).filter((p) => p.uid !== t.uid);
-  const blocked = (from: Vec, to: Vec, elev: Elevation): boolean =>
-    s.terrain.some((x) => {
-      const solid = x.kind === "building" || ((x.kind === "wall" || x.kind === "barricade") && x.level === elev) || (x.kind === "platform" && elev === 0);
-      return solid && segmentNearPolygon(from, to, x.poly, r - 1e-6);
-    });
+  const blocked = (from: Vec, to: Vec, elev: Elevation): boolean => pathBlocked(s, from, to, elev, r);
   for (let k = max; k >= 0.5; k -= 0.5) {
     const placed: Placed[] = [...others];
     const moves: { m: Model; to: Vec }[] = [];
@@ -899,7 +1067,28 @@ function checkWipeout(s: GameState, events: GameEvent[]): void {
   events.push({ type: "gameOver", winner: s.winner, reason: "An army was wiped out" });
 }
 
+/** Random activation order: how many activations a player has left this phase (units that can act, and reserves they can afford to deploy). */
+export function activationsLeft(s: GameState, p: PlayerId): number {
+  if (!playerHasOptions(s, p)) return 0;
+  return Math.max(1, eligibleUnits(s, p).length + (s.phase === "movement" ? deployable(s, p).length : 0));
+}
+
 function advanceTurn(s: GameState, events: GameEvent[]): void {
+  const rules = rulesOf(s);
+  // Whole-army turns: a player keeps going until they've done everything (or passed).
+  if (rules.wholeArmy && playerHasOptions(s, s.activePlayer)) return;
+  // Random activation order: draw who goes next, weighted by the activations each side has left.
+  if (rules.randomOrder && !rules.wholeArmy) {
+    const left: [number, number] = [activationsLeft(s, 0), activationsLeft(s, 1)];
+    if (left[0] && left[1]) {
+      const [v, next] = nextRandom(s.rng);
+      s.rng = next;
+      const p: PlayerId = v * (left[0] + left[1]) < left[0] ? 0 : 1;
+      s.activePlayer = p;
+      events.push({ type: "orderDraw", player: p, left });
+      return;
+    }
+  }
   const o = other(s.activePlayer);
   if (playerHasOptions(s, o)) {
     s.activePlayer = o;

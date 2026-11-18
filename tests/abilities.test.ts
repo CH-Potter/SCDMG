@@ -1,6 +1,7 @@
 // New unit abilities (Reel In, Rocket Hop, Rampage, Spotter, Bubble Shield, Sugar Rush, Provoke,
 // Demo Charge, Lurk, Steadying Presence, Mending Spores) and the airdrop / rattle support effects.
 
+import { CLASSIC_RULES } from "../src/engine/houseRules";
 import { describe, expect, it } from "vitest";
 import { aiCommand } from "../src/engine/ai";
 import { nerveOf, planShooting, saveNeeded } from "../src/engine/combat";
@@ -23,7 +24,7 @@ const ok = (r: ReturnType<typeof applyCommand>): GameState => {
 const L = (...ids: string[]): ListEntry[] => ids.map((profileId) => ({ profileId, upgrades: [] }));
 
 function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {}): GameState {
-  const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed: 7, lists, supports: [[], []], ...extra });
+  const s = createGame({ map: CLASSIC_DUSTBOWL, rules: CLASSIC_RULES, factions: ["militia", "munch"], seed: 7, lists, supports: [[], []], ...extra });
   s.initiative = 0;
   s.activePlayer = 0;
   s.orderChoice = null; // skip the opening go-first/go-second choice

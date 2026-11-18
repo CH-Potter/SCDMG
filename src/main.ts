@@ -7,7 +7,7 @@ import { Controller, showRules, type ControllerHooks } from "./ui/controller";
 import type { CampaignReturn } from "./ui/campaign/index";
 import { openListBuilder } from "./ui/listbuilder";
 import { maybeGameIntro } from "./ui/loreLinks";
-import { openMenu, type MenuChoice } from "./ui/menu";
+import { loadHouseRules, openMenu, type MenuChoice } from "./ui/menu";
 import "./ui/menu.css";
 import { BoardRenderer } from "./ui/renderer";
 import { audio } from "./audio"; // [audio]
@@ -88,6 +88,7 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
     missionId: choice.mission.id,
     armyRule: choice.armyRule,
     startBonus: choice.startBonus,
+    rules: loadHouseRules(),
   }, hooks);
 }
 

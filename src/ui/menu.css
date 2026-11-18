@@ -416,3 +416,45 @@ button.mini.support-btn {
   color: var(--muted);
   line-height: 1.35;
 }
+
+/* ---------- house rules ---------- */
+.modal.menu .house-rules {
+  padding: 10px 14px;
+}
+.modal.menu .house-rules summary {
+  cursor: pointer;
+  padding: 4px 0;
+}
+.modal.menu .house-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin: 10px 0;
+}
+.modal.menu .house-grid fieldset {
+  border: 2px solid var(--ink, #2b2140);
+  border-radius: 10px;
+  padding: 6px 10px 10px;
+  margin: 0;
+  min-width: 0;
+}
+.modal.menu .house-grid legend {
+  font-weight: 700;
+  padding: 0 4px;
+}
+.modal.menu .house-rule {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 6px 0;
+  cursor: pointer;
+}
+.modal.menu .house-rule input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.modal.menu .house-rule small {
+  opacity: 0.8;
+}

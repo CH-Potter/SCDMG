@@ -17,9 +17,10 @@ import { airdropSpotProblem, canPlaySupport, deployZones, supportTarget } from "
 import { abilityOf } from "./reactions";
 import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
-import { evadeTarget, expectedDamage, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
+import { evadeTarget, expectedDamage, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
+import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
 import { SHELL_BURST } from "./constants";
-import { applyCommand, planDemoCharge, RALLY_CP } from "./game";
+import { applyCommand, chargeBonus, chargeNeed, closeRanksPreview, overwatchPlan, planDemoCharge, RALLY_CP, twoDiceAtLeast } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
@@ -662,7 +663,34 @@ function attackCandidates(s: GameState, u: Unit): Candidate[] {
   return out;
 }
 
+/** How far this unit can charge: its move, or with rolled charges the best 2d6 roll. */
+const chargeRange = (s: GameState, u: Unit): number => (rulesOf(s).rolledCharges ? ROLLED_CHARGE_MAX + chargeBonus(s, u) : effectiveMove(s, u));
+/** How far this unit usually charges (for positioning): its move, or with rolled charges an average roll. */
+const likelyChargeRange = (s: GameState, u: Unit): number => (rulesOf(s).rolledCharges ? 7 + chargeBonus(s, u) : effectiveMove(s, u));
+
 function chargeCandidates(s: GameState, u: Unit): Candidate[] {
+  const rules = rulesOf(s);
+  // Rolled charges and overwatch roll dice the AI mustn't peek at: judge the charge as if it lands,
+  // then weigh it by the odds of the roll and the overwatch it will face.
+  if (rules.rolledCharges || rules.overwatch) {
+    const sure: GameState = { ...s, rules: { ...rules, overwatch: false }, aiAssumeChargesLand: true };
+    const base = evaluate(s, u.owner);
+    return chargeCandidatesIn(sure, u).map((c): Candidate | null => {
+      const e = s.units.find((x) => c.cmd.type === "charge" && x.uid === c.cmd.target)!;
+      const need = rules.rolledCharges ? chargeNeed(s, u, e) : 0;
+      if (need === null) return null;
+      const odds = rules.rolledCharges ? twoDiceAtLeast(need) : 1;
+      const after = simulate(sure, c.cmd);
+      const position = after ? evaluate(after, u.owner) - base : 0;
+      const ow = rules.overwatch ? overwatchPlan(s, e, u) : null;
+      const shot = ow ? expectedDamage(s, e, u, ow.plan, false) * valuePerWound(u) : 0;
+      return { cmd: c.cmd, bonus: odds * (c.bonus + position) - shot, expected: true };
+    }).filter((c): c is Candidate => c !== null);
+  }
+  return chargeCandidatesIn(s, u);
+}
+
+function chargeCandidatesIn(s: GameState, u: Unit): Candidate[] {
   const out: Candidate[] = [];
   // A flyer's charge is a dive: its impact, with no melee afterwards (flyers never engage).
   const dive = isFlying(u);
@@ -670,7 +698,7 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
   for (const e of onBoard(s, other(u.owner))) {
     if (isFlying(e)) continue; // flyers can't be charged
     if (!dive && !meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets))) continue;
-    if (unitGap(u, e) > effectiveMove(s, u) + 1) continue;
+    if (unitGap(u, e) > chargeRange(s, u) + 1) continue;
     const cmd: Command = { type: "charge", uid: u.uid, target: e.uid };
     const after = simulate(s, cmd);
     if (!after) continue;
@@ -681,19 +709,22 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
       continue;
     }
     if (dive) {
-      const imp = planImpact(me, them);
+      const imp = planImpact(me, them, rulesOf(after));
       out.push({ cmd, bonus: imp ? attackValue(after, them, expectedDamage(after, me, them, imp, true)) : 0 });
       continue;
     }
     let best = 0;
+    // Both sides close ranks before they strike (if that rule is on).
+    const meIn = closeRanksPreview(after, me, them);
+    const themIn = closeRanksPreview(after, them, me);
     for (const w of meleeWeapons(me)) {
-      const plan = planMelee(me, them, w);
+      const plan = planMelee(meIn, them, w, rulesOf(after));
       if (typeof plan !== "string") best = Math.max(best, expectedDamage(after, me, them, plan, true));
     }
     // What they hit back with (after our hits land, so a bit less).
     let back = 0;
     for (const w of meleeWeapons(them)) {
-      const plan = planMelee(them, me, w);
+      const plan = planMelee(themIn, me, w, rulesOf(after));
       if (typeof plan !== "string") back = Math.max(back, expectedDamage(after, them, me, plan, true));
     }
     const survive = 1 - Math.min(1, best / Math.max(1, wounds(them)));
@@ -721,7 +752,7 @@ function barrageCandidates(s: GameState, u: Unit, range: number): Candidate[] {
     let v = 0;
     // The shell may drift (see scatterShell): count the enemy part at its odds of landing near the
     // mark, but keep the full risk to our own units, so it isn't dropped next to friends.
-    const { onTarget } = shellOdds(4, shellSpotted(s, u, p));
+    const { onTarget } = shellOdds(4, shellSpotted(s, u, p), rulesOf(s).scatter);
     const accuracy = onTarget + (1 - onTarget) * 0.2;
     for (const t of onBoard(s)) {
       if (isFlying(t)) continue;
@@ -730,7 +761,7 @@ function barrageCandidates(s: GameState, u: Unit, range: number): Candidate[] {
       if (!caught.length) continue;
       const save = profileOf(t).armor + 1 - (t.status.hunkered ? 1 : 0);
       const pFail = save > 6 ? 1 : 1 - pAtLeast(Math.max(2, save));
-      const evadeOn = evadeTarget(t, ["ranged", "blast"]);
+      const evadeOn = rulesOf(s).evade ? evadeTarget(t, ["ranged", "blast"]) : null;
       const exp = caught.length * 0.5 * pFail * (evadeOn === null ? 1 : 1 - pAtLeast(evadeOn));
       v += t.owner === u.owner ? -exp * valuePerWound(t) * 2 : attackValue(s, t, exp * accuracy);
     }
@@ -833,7 +864,7 @@ function chargeDamage(u: Unit, e: Unit, extra: number): number {
 
 /** Enemies `u` could charge from where it stands this phase. */
 const chargeable = (s: GameState, u: Unit): Unit[] =>
-  u.status.disengaged || u.status.shaken ? [] : onBoard(s, other(u.owner)).filter((e) => meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)) && unitGap(u, e) <= effectiveMove(s, u) + 1);
+  u.status.disengaged || u.status.shaken ? [] : onBoard(s, other(u.owner)).filter((e) => meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)) && unitGap(u, e) <= likelyChargeRange(s, u) + 1);
 
 type AbilityAi = (s: GameState, u: Unit) => Candidate[];
 
@@ -976,7 +1007,7 @@ const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
         hitOn: 3,
         damage: 1,
         ap: 1,
-        evadeOn: evadeTarget(e, ["blast"]),
+        evadeOn: rulesOf(s).evade ? evadeTarget(e, ["blast"]) : null,
       };
       const v = attackValue(s, e, expectedDamage(s, u, e, plan, false)) - own;
       out.push({ cmd: { type: "ability", uid: u.uid, ability: "bombs-away", target: e.uid }, bonus: v - 1, stack: true, expected: true });
@@ -1065,7 +1096,7 @@ function meleeChoice(s: GameState, u: Unit): Candidate[] {
   profileOf(u).weapons.forEach((w, i) => {
     if (!w.melee) return;
     for (const e of engagedWith(s, u)) {
-      const plan = planMelee(u, e, w);
+      const plan = planMelee(closeRanksPreview(s, u, e), e, w, rulesOf(s));
       if (typeof plan === "string") continue;
       const exp = expectedDamage(s, u, e, plan, true);
       out.push({ cmd: { type: "fight", uid: u.uid, target: e.uid, weapon: i }, bonus: attackValue(s, e, exp) + 1 });
@@ -1221,7 +1252,7 @@ export function aiSupportCommand(s: GameState): Command | null {
           if (isFlying(t)) continue;
           const c = centroid(t);
           const caught = aliveModels(t).filter((m) => dist(m.pos, c) <= e.radius + profileOf(t).baseRadius).length;
-          const evadeOn = evadeTarget(t, ["ranged", "blast"]);
+          const evadeOn = rulesOf(s).evade ? evadeTarget(t, ["ranged", "blast"]) : null;
           const dodge = evadeOn === null ? 1 : 1 - pAtLeast(evadeOn);
           consider({ ...base, point: c }, caught * pAtLeast(e.hit) * dodge * e.damage * valuePerWound(t) * 0.9);
         }
@@ -1266,7 +1297,7 @@ export function aiSupportCommand(s: GameState): Command | null {
         for (const t of theirs) {
           if (isFearless(t) || t.status.shaken) continue;
           if (!aliveModels(t).some((m) => mine.some((u) => aliveModels(u).some((f) => dist(f.pos, m.pos) <= e.range)))) continue;
-          const p = shakeChance(nerveOf(t, s) - e.penalty);
+          const p = rulesOf(s).morale ? shakeChance(nerveOf(t, s) - e.penalty) : 0;
           const stakes = 1.5 + profileOf(t).cost * 0.5 + (onObjective(s, t) ? 3 : 0) + (s.flags.some((f) => f.carrier === t.uid) ? 3 : 0);
           consider({ ...base, target: t.uid }, p * stakes);
         }
@@ -1452,8 +1483,26 @@ export function aiCommand(s: GameState): Command {
     const score = own !== undefined ? raw + Math.max(0, own) : raw;
     if (!best || score > best.score + TIE || (score >= best.score - TIE && tieKey(s, me, c.cmd) < tieKey(s, me, best.cmd))) best = { cmd: c.cmd, score };
   }
-  if (best) return best.cmd;
+  if (best) return withReroll(s, best.cmd);
   return { type: "pass", player: me };
+}
+
+/**
+ * Command re-roll house rule: like a player looking at the dice, see how the attack went and pay
+ * 1 CP to re-roll the misses when enough of them would come good to be worth it.
+ */
+function withReroll(s: GameState, cmd: Command): Command {
+  if (!rulesOf(s).reroll || (cmd.type !== "shoot" && cmd.type !== "fight")) return cmd;
+  if (s.players[s.activePlayer].cp < REROLL_CP) return cmd;
+  const r = applyCommand(s, cmd);
+  if (!r.ok) return cmd;
+  const report = r.events.find((e) => e.type === "attack" && e.report.uid === cmd.uid && e.report.target === cmd.target);
+  if (!report || report.type !== "attack" || report.report.unitDestroyed) return cmd;
+  const regained = reportMisses(report.report) * pAtLeast(report.report.hitOn);
+  // Keep a CP for a Rally while anyone is Shaken; otherwise re-roll when about 1.5 hits would come back.
+  const shaken = onBoard(s, s.activePlayer).some((u) => u.status.shaken);
+  const spare = s.players[s.activePlayer].cp - REROLL_CP >= (shaken ? RALLY_CP : 0);
+  return spare && regained >= 1.5 ? { ...cmd, reroll: true } : cmd;
 }
 
 /** Apply one AI activation (used by tests and AI-vs-AI simulation). */
