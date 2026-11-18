@@ -2,22 +2,27 @@
 //   footprint: the flat base layer (goes under every figure on the board),
 //   figure:    the posed rig: a silhouette (ink) sprite behind a colour sprite for every part and
 //              limb segment, all from one baked atlas page, re-posed each frame with matrices only,
-//   effects:   muzzle flash, compressor exhaust, the flyer's stem and glow, riding the figure.
+//   effects:   muzzle flash, exhaust and spore puffs, the flyer's stem and glow, riding the figure.
 // Side view (Ink Rig) mirrors to face left/right; top view (Overhead) turns freely to face.
+// The frame type (lean, insect, walker, vehicle, hover, structure) picks the clip set; the walk
+// cycle advances with the distance actually walked, so planted feet don't skate.
 
 import { ColorMatrixFilter, Container, Graphics, Matrix, Sprite, Texture } from "pixi.js";
 import { tierFor, type AtlasEntry } from "./atlas";
-import { skinNow, type Skin } from "./bake";
-import { addClip, channels, CLIPS, statusPose } from "./clips";
+import { releaseSkin, retainSkin, skinNow, skinReady, type Skin } from "./bake";
+import { addClip, channels, clipsFor, hunkerPose, resetChannels, statusPose } from "./clips";
+import { hexToNum } from "./color";
 import { Footprint } from "./footprint";
-import { drawOrder, poseRig, type Pose } from "./pose";
+import { drawOrder, poseRig, strideOf, type Pose } from "./pose";
 import type { UnitRigs } from "./registry";
 import { readPart } from "./svg";
-import type { Channels, ClipId, Mat, Pt, RigDef, RigView, Status, Tier } from "./types";
+import type { Channel, Channels, Clip, ClipId, Mat, Pt, RigDef, RigView, Status, Tier } from "./types";
 import { NO_STATUS } from "./types";
 
 const INK = 0x141414;
 const TAU = Math.PI * 2;
+const LAMP = 0xffe28a;
+const PUFF = 0xd8d0c0;
 
 /** Every "pulse" the board renderer sends (recoil, flinch...) is an object: a new object = a new pulse. */
 export interface MiniDrive {
@@ -51,7 +56,11 @@ interface Playing {
   t: number;
 }
 
+type Weights = { hurt: number; engaged: number; shaken: number; hunkered: number; flying: number };
+type PoseList = [Channel, number][];
+
 const blend = (cur: number, target: number, dt: number, ms: number) => cur + (target - cur) * Math.min(1, dt / ms);
+const entries = (p: Partial<Channels>): PoseList => Object.entries(p) as PoseList;
 
 export class RigMini {
   readonly footprint: Container;
@@ -72,12 +81,15 @@ export class RigMini {
   private tier: Tier | null = null;
   private status: Status = { ...NO_STATUS };
   /** Status pose weights, eased in and out. */
-  private w = { hurt: 0, engaged: 0, shaken: 0, hunkered: 0, flying: 0 };
+  private w: Weights = { hurt: 0, engaged: 0, shaken: 0, hunkered: 0, flying: 0 };
   private hunkered = false;
   private playing: Playing[] = [];
   private time = Math.random() * 2400;
-  private walkT = 0;
+  /** Walk cycle position in cycles (advanced by distance walked). */
+  private walkPhase = 0;
   private wasWalking = false;
+  private lastX = NaN;
+  private lastY = NaN;
   private facing = -Math.PI / 2;
   private facingTarget = -Math.PI / 2;
   /** Direction of travel while walking (radians), or null. */
@@ -93,6 +105,13 @@ export class RigMini {
   private tmp = new Matrix();
   private dead = false;
   private muzzleDir: Pt = { x: -1, y: 0 };
+  // made once per mini: the clip set, the stride, the status poses, the exhaust points
+  private clips: Record<ClipId, Clip>;
+  private stride: number;
+  private poses: { hurt: PoseList; engaged: PoseList; shaken: PoseList; hunkered: PoseList };
+  private exhausts: { part: string; at: Pt }[] = [];
+  private muzzleColour: number;
+  private puffColour: number;
 
   constructor(
     private rigs: UnitRigs,
@@ -102,20 +121,34 @@ export class RigMini {
   ) {
     this.view = view;
     this.rig = view === "side" ? rigs.side : rigs.top;
-    const upi = this.rig.unitsPerInch;
+    const rig = this.rig;
+    const upi = rig.unitsPerInch;
+    this.clips = clipsFor(rig);
+    this.stride = strideOf(rig);
+    const f = rig.frame;
+    this.poses = {
+      hurt: entries(statusPose(view, { hp: 0, hpMax: 1, engaged: false, shaken: false }, f)),
+      engaged: entries(statusPose(view, { hp: 1, hpMax: 1, engaged: true, shaken: false }, f)),
+      shaken: entries(statusPose(view, { hp: 1, hpMax: 1, engaged: false, shaken: true }, f)),
+      hunkered: entries(hunkerPose(view, f)),
+    };
+    for (const p of rig.parts)
+      for (const [id, at] of Object.entries(readPart(p.src).anchors)) if (id.startsWith("exhaust")) this.exhausts.push({ part: p.id, at });
+    this.muzzleColour = rig.fx?.muzzle ? hexToNum(rig.fx.muzzle) : LAMP;
+    this.puffColour = rig.fx?.puff ? hexToNum(rig.fx.puff) : PUFF;
     this.foot = new Footprint({
       r: baseR,
       team,
-      ground: this.rig.ground,
+      ground: rig.ground,
       view,
-      shadow: this.rig.shadow ? { x: this.rig.shadow.x / upi, y: this.rig.shadow.y / upi, r: this.rig.shadow.r / upi } : undefined,
+      shadow: rig.shadow ? { x: rig.shadow.x / upi, y: rig.shadow.y / upi, r: rig.shadow.r / upi } : undefined,
     });
     this.footprint = this.foot.root;
     this.body.scale.set(1 / upi);
     this.body.addChild(this.inkLayer, this.colourLayer, this.fx);
     this.facer.addChild(this.body);
     this.figure.addChild(this.facer);
-    for (const d of drawOrder(this.rig)) {
+    for (const d of drawOrder(rig)) {
       const ink = new Sprite(Texture.EMPTY);
       ink.tint = INK;
       const colour = new Sprite(Texture.EMPTY);
@@ -142,7 +175,7 @@ export class RigMini {
 
   play(id: ClipId, delay = 0): void {
     if (id === "death") this.dead = true;
-    this.playing = this.playing.filter((p) => p.id !== id);
+    for (let i = this.playing.length - 1; i >= 0; i--) if (this.playing[i]!.id === id) this.playing.splice(i, 1);
     this.playing.push({ id, t: -delay });
     if (id === "recoil") this.emitPuff();
   }
@@ -167,8 +200,8 @@ export class RigMini {
     const pose = this.lastPose ?? poseRig(this.rig, this.c);
     const upi = this.rig.unitsPerInch;
     const m = { x: pose.muzzle.x / upi, y: pose.muzzle.y / upi };
-    if (this.view === "side") return { x: m.x * -(face ?? this.side), y: m.y };
-    const a = this.facingTarget + Math.PI / 2;
+    if (this.view === "side") return { x: m.x * -(this.rig.fixed ? 1 : (face ?? this.side)), y: m.y };
+    const a = (this.rig.fixed ? -Math.PI / 2 : this.facingTarget) + Math.PI / 2;
     return { x: m.x * Math.cos(a) - m.y * Math.sin(a), y: m.x * Math.sin(a) + m.y * Math.cos(a) };
   }
 
@@ -214,7 +247,7 @@ export class RigMini {
       for (const p of [a, b]) g.circle(p.x, p.y, 2.2).fill(0x41e0ff);
     }
     const w = this.rig.parts.find((p) => p.id === this.rig.weapon);
-    const wm = pose.mats.get(this.rig.weapon);
+    const wm = w ? pose.mats.get(w.id) : undefined;
     if (w && wm) {
       for (const [id, p] of Object.entries(readPart(w.src).anchors)) {
         const q = { x: wm[0] * p.x + wm[2] * p.y + wm[4], y: wm[1] * p.x + wm[3] * p.y + wm[5] };
@@ -239,6 +272,16 @@ export class RigMini {
     return this.tier;
   }
 
+  private addPose(p: PoseList, w: number): void {
+    if (w < 1e-3) return;
+    const c = this.c;
+    for (let i = 0; i < p.length; i++) {
+      const [ch, v] = p[i]!;
+      if (ch === "gaitW") c.gaitW = Math.max(c.gaitW, v * w);
+      else c[ch] += v * w;
+    }
+  }
+
   update(dt: number, d: MiniDrive): void {
     // ---- placement ----
     const flying = this.status.flying;
@@ -247,17 +290,18 @@ export class RigMini {
     this.footprint.visible = d.visible;
     this.footprint.alpha = d.alpha;
     if (!d.visible) return;
+    const rig = this.rig;
 
     // ---- zoom tier: swap to the new page once it's baked (bakes are queued, one at a time) ----
-    const s = d.ppi / this.rig.unitsPerInch;
+    const s = d.ppi / rig.unitsPerInch;
     const want = tierFor(s, this.tier ?? undefined);
     if (want !== this.tier || !this.skin) {
-      const sk = skinNow(this.rig, this.rigs.colourway, this.team, want);
+      const sk = skinNow(rig, this.rigs.colourway, this.team, want);
       if (sk) this.applySkin(sk);
       else if (!this.skin) {
-        // nothing yet: try any tier that's already baked
+        // nothing yet: show any tier that's already in memory (without baking the others)
         for (const t of ["token", "sheet", "tiny"] as Tier[]) {
-          const any = skinNow(this.rig, this.rigs.colourway, this.team, t);
+          const any = skinReady(rig, this.rigs.colourway, this.team, t);
           if (any) {
             this.applySkin(any);
             break;
@@ -268,49 +312,51 @@ export class RigMini {
 
     // ---- clips ----
     const reduced = !!d.reduced;
+    const clips = this.clips;
     this.time += dt;
-    if (d.walking && !this.wasWalking) this.walkT = 0;
+    if (d.walking && !this.wasWalking) this.walkPhase = 0;
     this.wasWalking = d.walking;
-    if (d.walking) this.walkT += dt;
-    const c = (this.c = channels());
+    if (d.walking) {
+      // planted feet: one walk cycle per stride of ground actually covered (time only if it isn't moving)
+      const moved = Number.isFinite(this.lastX) ? Math.hypot(d.x - this.lastX, d.y - this.lastY) : 0;
+      this.walkPhase += moved > 1e-5 ? (moved * rig.unitsPerInch) / this.stride : dt / clips.step.dur;
+    }
+    this.lastX = d.x;
+    this.lastY = d.y;
+    const c = resetChannels(this.c);
     const view = this.view;
     if (!reduced && !this.dead) {
-      if (d.walking) addClip(c, CLIPS[view].step, this.walkT);
-      else addClip(c, CLIPS[view].idle, this.time);
-      if (flying) addClip(c, CLIPS[view].bob, this.time);
+      if (d.walking) addClip(c, clips.step, this.walkPhase * clips.step.dur);
+      else addClip(c, clips.idle, this.time);
+      if (flying) addClip(c, clips.bob, this.time);
     }
     // held status poses, eased in and out
     const st = this.status;
     const k = reduced ? 1e9 : 160;
-    this.w.hurt = blend(this.w.hurt, st.hp < st.hpMax ? 1 : 0, dt, k);
-    this.w.engaged = blend(this.w.engaged, st.engaged && !d.walking ? 1 : 0, dt, k);
-    this.w.shaken = blend(this.w.shaken, st.shaken ? 1 : 0, dt, k * 1.5);
-    this.w.hunkered = blend(this.w.hunkered, this.hunkered ? 1 : 0, dt, k);
-    this.w.flying = blend(this.w.flying, flying ? 1 : 0, dt, k * 2);
-    const add = (p: Partial<Channels>, w: number) => {
-      if (w < 1e-3) return;
-      for (const [ch, v] of Object.entries(p) as [keyof Channels, number][]) {
-        if (ch === "gaitW") c.gaitW = Math.max(c.gaitW, v * w);
-        else c[ch] += v * w;
-      }
-    };
-    add(statusPose(view, { hp: 0, hpMax: 1, engaged: false, shaken: false }), this.w.hurt);
-    add(statusPose(view, { hp: 1, hpMax: 1, engaged: true, shaken: false }), this.w.engaged);
-    add(statusPose(view, { hp: 1, hpMax: 1, engaged: false, shaken: true }), this.w.shaken);
-    add(view === "side" ? { pelvisY: 7, torsoRot: -4, headRot: 3 } : { rootSX: -0.06, rootSY: -0.06 }, this.w.hunkered);
+    const w = this.w;
+    w.hurt = blend(w.hurt, st.hp < st.hpMax ? 1 : 0, dt, k);
+    w.engaged = blend(w.engaged, st.engaged && !d.walking ? 1 : 0, dt, k);
+    w.shaken = blend(w.shaken, st.shaken ? 1 : 0, dt, k * 1.5);
+    w.hunkered = blend(w.hunkered, this.hunkered ? 1 : 0, dt, k);
+    w.flying = blend(w.flying, flying ? 1 : 0, dt, k * 2);
+    this.addPose(this.poses.hurt, w.hurt);
+    this.addPose(this.poses.engaged, w.engaged);
+    this.addPose(this.poses.shaken, w.shaken);
+    this.addPose(this.poses.hunkered, w.hunkered);
     // one-shot clips (recoil, flinch, death) on top
-    for (const p of this.playing) {
+    for (let i = this.playing.length - 1; i >= 0; i--) {
+      const p = this.playing[i]!;
       p.t += dt;
-      if (p.t >= 0) addClip(c, CLIPS[view][p.id], p.t);
+      if (p.t >= 0) addClip(c, clips[p.id], p.t);
+      if (p.id !== "death" && p.t >= clips[p.id].dur) this.playing.splice(i, 1);
     }
-    this.playing = this.playing.filter((p) => p.id === "death" || p.t < CLIPS[view][p.id].dur);
-    if (view === "side" && flying) c.lift += (d.lift * this.rig.unitsPerInch) * this.w.flying;
+    if (view === "side" && flying) c.lift += d.lift * rig.unitsPerInch * w.flying;
 
     // ---- facing ----
     if (view === "side") {
-      this.side = d.face ?? this.side;
+      this.side = rig.fixed ? -1 : (d.face ?? this.side);
       // the wedge shows the exact facing; keep it on the side the figure faces
-      if (Math.cos(this.facingTarget) * this.side < 0) this.facingTarget = Math.PI - this.facingTarget;
+      if (!rig.fixed && Math.cos(this.facingTarget) * this.side < 0) this.facingTarget = Math.PI - this.facingTarget;
       // a quick card-flip when turning round
       this.sideTurn = reduced ? this.side : blend(this.sideTurn, this.side, dt, 45);
       this.facer.scale.x = -(Math.abs(this.sideTurn) < 0.15 ? Math.sign(this.sideTurn || 1) * 0.15 : this.sideTurn);
@@ -324,9 +370,9 @@ export class RigMini {
       const maxStep = (TAU * dt) / 1000;
       const step = reduced ? diff : Math.sign(diff) * Math.min(Math.abs(diff), Math.abs(diff) < 0.5 ? Math.abs(diff) * Math.min(1, dt / 60) + 1e-4 : maxStep);
       this.facing += step;
-      this.facer.rotation = this.facing + Math.PI / 2 + (c.yaw * Math.PI) / 180;
+      this.facer.rotation = rig.fixed ? 0 : this.facing + Math.PI / 2 + (c.yaw * Math.PI) / 180;
       this.facer.scale.x = 1;
-      this.foot.setShadow(Math.max(c.shadow, this.w.flying * 0.6), flying ? d.lift : 0);
+      this.foot.setShadow(Math.max(c.shadow, w.flying * 0.6), flying ? d.lift : 0);
     }
     this.foot.setFacing(this.facing);
     this.foot.draw(this.status, d.ppi);
@@ -337,9 +383,9 @@ export class RigMini {
     this.figure.position.set(0, 0);
     this.body.alpha = 1 - c.fade;
     // hit flash: the ink silhouette goes white and the colour falls away
-    const f = Math.max(0, Math.min(1, c.flash));
-    this.colourLayer.alpha = this.silhouette ? 0 : 1 - f * 0.92;
-    this.inkLayer.tint = f > 0.02 ? lerpColour(INK, 0xffffff, f) : INK;
+    const fl = Math.max(0, Math.min(1, c.flash));
+    this.colourLayer.alpha = this.silhouette ? 0 : 1 - fl * 0.92;
+    this.inkLayer.tint = fl > 0.02 ? lerpColour(INK, 0xffffff, fl) : INK;
     if (this.debug) this.drawDebug();
     // (lighter than Classic's spent grey: the faction paint is already dark)
     this.colourLayer.tint = st.spent ? 0xbcb7af : 0xffffff;
@@ -348,18 +394,22 @@ export class RigMini {
   }
 
   private applySkin(sk: Skin): void {
+    if (sk === this.skin) return;
+    retainSkin(sk);
+    if (this.skin) releaseSkin(this.skin);
     this.skin = sk;
     this.tier = sk.tier;
+    const byId = new Map(sk.plan.entries.map((e) => [e.id, e]));
     for (const s of this.slots) {
       s.colour.texture = sk.colour.get(s.id) ?? Texture.EMPTY;
       s.ink.texture = sk.ink.get(s.id) ?? Texture.EMPTY;
-      s.entry = sk.plan.entries.find((e) => e.id === s.id) ?? null;
+      s.entry = byId.get(s.id) ?? null;
     }
     this.figure.visible = true;
   }
 
   private place(c: Channels): void {
-    const pose = (this.lastPose = poseRig(this.rig, c));
+    const pose = (this.lastPose = poseRig(this.rig, c, this.lastPose ?? undefined));
     this.muzzleDir = pose.muzzleDir;
     const plan = this.skin!.plan;
     const inv = 1 / plan.k;
@@ -368,11 +418,17 @@ export class RigMini {
       const mat = pose.mats.get(s.id);
       const e = s.entry;
       if (!mat || !e) continue;
-      let a: Mat = mat;
+      const a0 = mat[0];
+      const a1 = mat[1];
+      let a2 = mat[2];
+      let a3 = mat[3];
       // keep a limb's shade stripe on the side away from the top-left light
-      if (s.stripe && a[2] + a[3] < 0) a = [a[0], a[1], -a[2], -a[3], a[4], a[5]];
+      if (s.stripe && a2 + a3 < 0) {
+        a2 = -a2;
+        a3 = -a3;
+      }
       // sprite = pose · translate(origin of the texture rect) · scale(1 / bake resolution)
-      m.set(a[0] * inv, a[1] * inv, a[2] * inv, a[3] * inv, a[0] * e.ox + a[2] * e.oy + a[4], a[1] * e.ox + a[3] * e.oy + a[5]);
+      m.set(a0 * inv, a1 * inv, a2 * inv, a3 * inv, a0 * e.ox + a2 * e.oy + mat[4], a1 * e.ox + a3 * e.oy + mat[5]);
       s.colour.setFromMatrix(m);
       s.ink.position.copyFrom(s.colour.position);
       s.ink.scale.copyFrom(s.colour.scale);
@@ -397,29 +453,28 @@ export class RigMini {
   }
 
   private emitPuff(): void {
-    if (this.puffs.length > 6) return;
-    const pack = this.rig.parts.find((p) => p.id === "pack");
-    if (!pack) return;
-    const a = readPart(pack.src).anchors;
+    if (this.puffs.length > 6 || !this.exhausts.length) return;
     const pose = this.lastPose;
-    const m = pose?.mats.get("pack");
-    for (const id of ["exhaust1", "exhaust2"]) {
-      const p = a[id];
-      if (!p || !m) continue;
+    if (!pose) return;
+    for (const e of this.exhausts) {
+      const m: Mat | undefined = pose.mats.get(e.part);
+      if (!m) continue;
+      const p = e.at;
       this.puffs.push({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5], t: 0 });
     }
   }
 
   private drawFx(c: Channels, dt: number, d: MiniDrive, reduced: boolean): void {
-    // compressor exhaust: a puff now and then, more while walking
-    if (!reduced && !this.dead) {
+    // exhaust (or spores): a puff now and then, more while walking
+    if (!reduced && !this.dead && this.exhausts.length) {
       this.puffClock += dt * (d.walking ? 2.2 : 1);
       if (this.puffClock > 1700) {
         this.puffClock = Math.random() * 400;
         this.emitPuff();
       }
     }
-    const busy = this.puffs.length > 0 || c.muzzle > 0.5;
+    const firing = c.muzzle > 0.5 && !!this.rig.weapon;
+    const busy = this.puffs.length > 0 || firing;
     const g = this.fx;
     if (!busy && !g.visible) return;
     g.clear();
@@ -429,10 +484,10 @@ export class RigMini {
       const k = p.t / 800;
       const up = this.view === "side" ? -18 * k : 0;
       const drift = this.view === "side" ? 6 * k : 4 * k;
-      g.circle(p.x + drift, p.y + up, 2.4 + 5 * k).fill({ color: 0xd8d0c0, alpha: 0.55 * (1 - k) });
+      g.circle(p.x + drift, p.y + up, 2.4 + 5 * k).fill({ color: this.puffColour, alpha: 0.55 * (1 - k) });
     }
-    this.puffs = this.puffs.filter((p) => p.t < 800);
-    if (c.muzzle > 0.5 && this.lastPose) {
+    for (let i = this.puffs.length - 1; i >= 0; i--) if (this.puffs[i]!.t >= 800) this.puffs.splice(i, 1);
+    if (firing && this.lastPose) {
       const { x, y } = this.lastPose.muzzle;
       const dir = this.muzzleDir;
       const nx = -dir.y;
@@ -440,7 +495,7 @@ export class RigMini {
       const L = this.view === "side" ? 16 : 10;
       const W = L * 0.45;
       g.poly([x + nx * W, y + ny * W, x + dir.x * L, y + dir.y * L, x - nx * W, y - ny * W, x + dir.x * L * 0.35, y + dir.y * L * 0.35])
-        .fill(0xffe28a)
+        .fill(this.muzzleColour)
         .stroke({ width: 1.4, color: INK, join: "round" });
       g.circle(x + dir.x * 3, y + dir.y * 3, 3).fill(0xffffff);
     }
@@ -464,6 +519,8 @@ export class RigMini {
   }
 
   destroy(): void {
+    if (this.skin) releaseSkin(this.skin);
+    this.skin = null;
     this.foot.destroy();
     this.drainFilter?.destroy();
     this.figure.destroy({ children: true });

@@ -1114,7 +1114,7 @@ export class BoardRenderer {
     if (glass) mini.addChild(glass);
     // New-engine miniature (Miniatures setting): its footprint joins the flat base layer and its
     // figure replaces the sprite; the HUD, rings and effects around it stay as they are.
-    const rig = createRigMini(prof.id, PLAYER_COLORS[u.owner], prof.baseRadius);
+    const rig = createRigMini(prof.id, PLAYER_COLORS[u.owner], prof.baseRadius, undefined, Math.max(0, u.models.indexOf(m)));
     if (rig) {
       for (const c of [base, cast, figSprite, flash, stand]) if (c) c.visible = false;
       fig.addChild(rig.figure);

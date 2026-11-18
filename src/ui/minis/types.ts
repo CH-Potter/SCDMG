@@ -27,6 +27,23 @@ export interface Place {
   y: number;
   /** Degrees, clockwise (SVG). */
   rot: number;
+  /** Uniform scale (default 1): lets a squad share one part at two sizes. */
+  scale?: number;
+}
+
+/**
+ * Per-part motion that needs no bones: driven by the `pulse`, `spin` and `flap` channels and applied
+ * about the part's own `pivot` anchor. Egg sacs and crystals pulse, wheels and rotors spin, wings flap.
+ */
+export interface PartAnim {
+  /** Scale by 1 + pulse * this (a breathing sac, a throbbing crystal). Negative: out of step. */
+  pulse?: number;
+  /** Rise and fall by pulse * this (u): a hovering crystal, a floating halo. */
+  float?: number;
+  /** Turn by spin * this (degrees per degree of the spin channel): wheels, propellers, rotors. */
+  spin?: number;
+  /** Squash across the part's y axis by flap * this (0..1): wings beating. */
+  flap?: number;
 }
 
 export interface PartUse {
@@ -39,6 +56,7 @@ export interface PartUse {
   place?: Place;
   /** Draw order (back to front). */
   z: number;
+  anim?: PartAnim;
 }
 
 /** One segment of an ink limb: a capsule the engine draws (no artwork needed). */
@@ -55,7 +73,12 @@ export interface LimbDef {
   id: string;
   kind: "arm" | "leg";
   /** The bone the limb hangs from, and the shoulder/hip on it (frame rest coords). */
-  from: { bone: "pelvis" | "torso"; at: Pt };
+  from: { bone: "pelvis" | "torso" | "head"; at: Pt };
+  /**
+   * Arms without a grip: the bone the hand follows (default: the `from` bone). "gun" makes the limb
+   * strike with the weapon channels: a bug's scythes and jaws lunge when it attacks.
+   */
+  to?: "pelvis" | "torso" | "head" | "gun";
   /** Rest elbow/knee and hand/foot. Bone lengths and bend direction are taken from these. */
   joint: Pt;
   end: Pt;
@@ -65,12 +88,20 @@ export interface LimbDef {
   lower: LimbSeg;
 }
 
+/**
+ * Frame types: which generic clip set (and status poses) drives a rig, so a Forge unit animates on
+ * day one. lean: humanoids. insect: many-legged bugs (scuttle, lunge, curl up). walker: heavy legged
+ * machines and monsters (slow stomp). vehicle: wheels (bounce, wheels spin). hover: flyers and
+ * floating hulls (sway, propellers spin, wings beat). structure: no limbs, never walks (settle, sink).
+ */
+export type FrameType = "lean" | "insect" | "walker" | "vehicle" | "hover" | "structure";
+
 export interface RigDef {
   id: string;
   name: string;
   view: RigView;
-  /** Frame type: which generic clip set drives it ("lean" humanoid). */
-  frame: string;
+  /** Frame type: which generic clip set drives it. */
+  frame: FrameType;
   /** Frame coords of the feet (side) or base centre (top). */
   origin: Pt;
   unitsPerInch: number;
@@ -82,10 +113,24 @@ export interface RigDef {
   limbs: LimbDef[];
   /** Ink edge on each side of a limb capsule (u). */
   limbInk: number;
-  /** Part id of the weapon: it declares grips g1/g2, a muzzle and a recoil length. */
-  weapon: string;
-  /** Side view: foot targets (frame coords) for each key pose of the walk cycle. */
+  /**
+   * Part id of the weapon: it declares grips g1/g2, a muzzle and a recoil length. None: the unit has
+   * nothing to aim (eggs, a barricade), and effects use the figure's top.
+   */
+  weapon?: string;
+  /**
+   * Foot targets (frame coords) for each key pose of the walk cycle, either view. The feet are
+   * planted: the cycle advances with the distance walked, one cycle per `stride` units.
+   */
   gait?: Record<string, Pt>[];
+  /** Ground covered by one walk cycle (u). Default: worked out from the gait keys. */
+  stride?: number;
+  /** Clip overrides for this rig (the brood mother's strike, the saucer's tilt). */
+  clips?: Partial<Record<ClipId, Clip>>;
+  /** Never mirrors or turns to face (symmetric structures: eggs, a hole, a barricade). */
+  fixed?: boolean;
+  /** Effect colours (#rrggbb): muzzle flash (default lamp yellow), puffs from `exhaust*` anchors. */
+  fx?: { muzzle?: string; puff?: string };
   /** Base ground colour (the faction's dirt). */
   ground: string;
   /** Top view: the figure's own drop shadow on its base (u, from the base centre). */
@@ -125,6 +170,10 @@ export interface Channels {
   drain: number;
   fade: number;
   muzzle: number;
+  /** Part motion (see PartAnim): a -1..1 breath, a spin angle (degrees), a 0..1 wing beat. */
+  pulse: number;
+  spin: number;
+  flap: number;
 }
 
 export type Channel = keyof Channels;
