@@ -67,13 +67,17 @@ describe("calibration against the built-in factions", () => {
     );
   }
 
+  // The weights were fitted at 0.28 (units) and 0.14 (supply). Since then the ability pass gave
+  // units new abilities and the medic became a team of three, without re-pricing the built-ins
+  // (that's the next balance pass's job), so the hand-set costs have drifted: every unit is still
+  // within 1. Tighten these again once the built-in costs are re-set.
   it("lands unit costs close to the hand-set ones", () => {
-    expect(mean(unitErr.map(Math.abs))).toBeLessThanOrEqual(0.35);
+    expect(mean(unitErr.map(Math.abs))).toBeLessThanOrEqual(0.45);
     expect(Math.max(...unitErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 
   it("derives supply close to the hand-set one", () => {
-    expect(mean(supplyErr.map(Math.abs))).toBeLessThanOrEqual(0.2);
+    expect(mean(supplyErr.map(Math.abs))).toBeLessThanOrEqual(0.3);
     expect(Math.max(...supplyErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 

@@ -144,6 +144,19 @@ export const ABILITY_PRICES: Partial<Record<AbilityId, AbilityPrice>> = {
   // structures
   "burrow-exit": 1.0,
   "ward-aura": 0.8,
+  // the ability pass (v0.11): first estimates, for the balance pass to check
+  "return-fire": (c) => 0.15 + 0.35 * c.ranged, // like overwatch, but only after being hit
+  "crop-dust": 1.0,
+  "bale-out": 0.6,
+  "scrap-cover": 0.6,
+  "radio-spotting": 0.3,
+  "eye-peck": 0.3,
+  overcharge: (c) => 0.4 * c.ranged, // +1 damage for a round, paid for with shields
+  spotlight: 0.9,
+  riposte: (c) => 0.1 + 0.1 * c.p.models,
+  pirouette: 0.5,
+  "phase-out": 0.5,
+  "twirl-away": 0.4,
 };
 
 /** Price of an ability the table doesn't know, by kind (unknown ids count as passive). */
@@ -206,6 +219,16 @@ export const EFFECT_PRICES: Partial<
   ward: () => 0.8,
   brace: () => 0.6,
   retaliate: (e: { hit: number; damage: number }) => 0.7 * pAtLeast(e.hit) * e.damage + 0.25,
+  // the ability pass (v0.11): first estimates, for the balance pass to check
+  spot: (e: { range: number }) => 0.6 + 0.01 * e.range,
+  smoke: () => 0.7,
+  overwatch: () => 0.8,
+  haste: (e: { move: number }) => 0.3 * e.move,
+  blind: (e: { range: number }) => 0.5 + 0.01 * e.range,
+  resonate: () => 0.6,
+  expose: (e: { range: number }) => 0.6 + 0.01 * e.range,
+  silence: (e: { range: number }) => 0.8 + 0.01 * e.range,
+  overshield: (e: { amount: number }) => 0.6 * e.amount,
 };
 
 export const DEFAULT_EFFECT_PRICE = 0.8;
