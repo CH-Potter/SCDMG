@@ -1,7 +1,7 @@
 // Faction identity (docs/factions.md), checked at the data level, plus the four support effects
 // that give each faction its own kind of buff:
 //   Dustline Militia: primarily ranged. Gunlines, artillery, overwatch, digging in, air logistics.
-//   The Munch: primarily melee and horde. Cheap bodies, impact, regrowth, lurking, tunnels.
+//   The Skitterswarm: primarily melee and swarm. Cheap bodies, acid, regrowth round the Broodmother, burrowing.
 //   Lumen Concord: few elite specialists. Shields, precision and tracking, teleporting about.
 
 import { describe, expect, it } from "vitest";
@@ -14,6 +14,7 @@ import { profileFor, profileOf } from "../src/engine/profile";
 import { aliveModels, unitById, unitGap } from "../src/engine/rules";
 import { cleanupRound } from "../src/engine/scoring";
 import { supportTarget } from "../src/engine/supports";
+import { templateByKey } from "../src/forge/templates";
 import type { AbilityId, FactionId, GameState, ListEntry, SupportEffect, UnitProfile, Vec, Weapon } from "../src/engine/types";
 
 const MODES: ModeId[] = ["skirmish", "assault"];
@@ -52,56 +53,78 @@ const factionsWith = (a: AbilityId) => BUILT_IN_FACTION_IDS.filter((f) => factio
 const effects = (f: FactionId): SupportEffect[] => factionOf(f).supports.flatMap((sp) => sp.abilities.map((a) => a.effect));
 
 describe("faction pillars in the data", () => {
-  it("Militia starter lists are mostly ranged, Munch mostly melee, Concord in between", () => {
+  it("Militia starter lists are mostly ranged, the Skitterswarm mostly melee, Concord in between", () => {
     for (const mode of MODES) {
       expect(rangedShare("militia", mode), `militia ${mode}`).toBeGreaterThan(0.6);
-      expect(rangedShare("munch", mode), `munch ${mode}`).toBeLessThan(0.4);
+      expect(rangedShare("swarm", mode), `swarm ${mode}`).toBeLessThan(0.4);
       expect(rangedShare("concord", mode), `concord ${mode}`).toBeLessThan(rangedShare("militia", mode));
-      expect(rangedShare("concord", mode), `concord ${mode}`).toBeGreaterThan(rangedShare("munch", mode));
+      expect(rangedShare("concord", mode), `concord ${mode}`).toBeGreaterThan(rangedShare("swarm", mode));
     }
   });
 
-  it("the Munch field the most models and Concord the fewest, at the highest price per model", () => {
+  it("the Skitterswarm field the most models and Concord the fewest, at the highest price per model", () => {
     for (const mode of MODES) {
-      expect(models("munch", mode)).toBeGreaterThan(models("militia", mode));
+      expect(models("swarm", mode)).toBeGreaterThan(models("militia", mode));
       expect(models("militia", mode)).toBeGreaterThan(models("concord", mode));
       expect(costPerModel("concord", mode)).toBeGreaterThan(costPerModel("militia", mode));
-      expect(costPerModel("militia", mode)).toBeGreaterThan(costPerModel("munch", mode));
+      expect(costPerModel("militia", mode)).toBeGreaterThan(costPerModel("swarm", mode));
     }
     // Across everything you can buy, Concord units cost the most on average.
     const avgCost = (f: FactionId) => buyable(f).reduce((n, p) => n + p.cost, 0) / buyable(f).length;
     expect(avgCost("concord")).toBeGreaterThan(avgCost("militia"));
-    expect(avgCost("concord")).toBeGreaterThan(avgCost("munch"));
+    expect(avgCost("concord")).toBeGreaterThan(avgCost("swarm"));
   });
 
-  it("stat bands: Concord hits best and alone has shields; Munch has the shakiest nerve and the most impact", () => {
+  it("the Militia are the drafted heavy line: their squads wear heavier armour than the swarm's bugs, in fewer, bigger-hearted bodies", () => {
+    const line = (f: FactionId) => buyable(f).filter((p) => !p.structure && p.models >= 4);
+    const avgArmour = (f: FactionId) => line(f).reduce((n, p) => n + p.armor, 0) / line(f).length;
+    expect(avgArmour("militia")).toBeLessThan(avgArmour("swarm")); // lower is better
+    expect(factionOf("militia").profiles.find((p) => p.id === "mil-grunts")!.armor).toBeLessThanOrEqual(4);
+    // No farmers' names left on the drafted roster.
+    const names = factionOf("militia").profiles.map((p) => p.name).join(" ");
+    expect(names).not.toMatch(/Grann|Porch|Spud|Hay Bomber/);
+  });
+
+  it("stat bands: Concord hits best and alone has shields; the swarm has the shakiest nerve, and alone has acid and the Brood Bond", () => {
     const avgHit = (f: FactionId) => {
       const ws = buyable(f).flatMap((p) => p.weapons);
       return ws.reduce((n, w) => n + w.hit, 0) / ws.length;
     };
     expect(avgHit("concord")).toBeLessThan(avgHit("militia"));
-    expect(avgHit("concord")).toBeLessThan(avgHit("munch"));
-    for (const f of ["militia", "munch"]) expect(factionOf(f).profiles.every((p) => p.shield === 0), f).toBe(true);
+    expect(avgHit("concord")).toBeLessThan(avgHit("swarm"));
+    for (const f of ["militia", "swarm"]) expect(factionOf(f).profiles.every((p) => p.shield === 0), f).toBe(true);
     expect(buyable("concord").filter((p) => !p.structure).every((p) => p.shield > 0)).toBe(true);
     const nerve = (f: FactionId) => {
       const ps = buyable(f).filter((p) => !p.structure && !p.keywords.includes("fearless"));
       return ps.reduce((n, p) => n + (p.nerve ?? 7), 0) / ps.length;
     };
-    expect(nerve("munch")).toBeLessThan(nerve("militia"));
+    expect(nerve("swarm")).toBeLessThan(nerve("militia"));
     expect(nerve("militia")).toBeLessThan(nerve("concord"));
-    const impact = (f: FactionId) => buyable(f).filter((p) => p.impact).length;
-    expect(impact("munch")).toBeGreaterThan(impact("militia") + impact("concord"));
+    // Unlike the Munch they replaced, the swarm's line bugs don't hit on the charge: impact is for monsters and dives.
+    const swarmImpact = buyable("swarm").filter((p) => p.impact);
+    expect(swarmImpact.every((p) => p.keywords.includes("monster") || p.keywords.includes("flying"))).toBe(true);
+    // Acid on the shooters, the bombard and the flyers; the Brood Bond on the Broodmother alone.
+    const withAbility = (a: AbilityId) => buyable("swarm").filter((p) => abilitiesOf(p).includes(a)).map((p) => p.id);
+    expect(withAbility("corrode").length).toBeGreaterThanOrEqual(4);
+    expect(withAbility("brood-bond")).toEqual(["swarm-mother"]);
   });
 
   it("each signature ability belongs to one faction only", () => {
     const own: Record<string, AbilityId[]> = {
       militia: ["overwatch", "entrenched", "steady-aim", "spotter", "barrage", "demo-charge", "patch-up", "steadying", "rocket-hop", "return-fire", "crop-dust", "bale-out", "radio-spotting", "scrap-cover"],
-      munch: ["regen", "regrow", "hatch", "lurk", "sticky-goo", "rampage", "sugar-rush", "brood-call", "mending-aura", "tunnel", "burrow-exit", "pop", "grapple", "bombs-away", "eye-peck"],
+      swarm: ["regen", "regrow", "hatch", "lurk", "rampage", "brood-call", "mending-aura", "tunnel", "burrow-exit", "bombs-away", "corrode", "brood-bond"],
       concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura", "overcharge", "spotlight", "riposte", "pirouette", "phase-out", "twirl-away"],
     };
+    // The Munch's own tricks left the built-ins with them: they live on in the Munch template (and any custom faction).
+    const munchOnly: AbilityId[] = ["sticky-goo", "sugar-rush", "pop", "grapple", "eye-peck"];
     for (const [f, ids] of Object.entries(own)) for (const a of ids) expect(factionsWith(a), `${a}`).toEqual([f]);
+    const munch = templateByKey("munch")!.faction;
+    for (const a of munchOnly) {
+      expect(factionsWith(a), a).toEqual([]);
+      expect(munch.profiles.some((p) => abilitiesOf(p).includes(a)), a).toBe(true);
+    }
     // Every ability in the library has a home.
-    expect(Object.values(own).flat().sort()).toEqual(Object.keys(ABILITIES).sort());
+    expect([...Object.values(own).flat(), ...munchOnly].sort()).toEqual(Object.keys(ABILITIES).sort());
   });
 
   it("support buffs follow the faction: no effect is a reskin of another faction's", () => {
@@ -114,13 +137,13 @@ describe("faction pillars in the data", () => {
       spot: "militia",
       smoke: "militia",
       overwatch: "militia",
-      meleeBuff: "munch",
-      regrow: "munch",
-      rattle: "munch",
-      slow: "munch",
-      retaliate: "munch",
-      haste: "munch",
-      blind: "munch",
+      meleeBuff: "swarm",
+      regrow: "swarm",
+      rattle: "swarm",
+      slow: "swarm",
+      retaliate: "swarm",
+      haste: "swarm",
+      blind: "swarm",
       recharge: "concord",
       aimBuff: "concord",
       teleport: "concord",
@@ -138,24 +161,28 @@ describe("faction pillars in the data", () => {
       effects(f).flatMap((e) => (e.kind === "summon" ? [profileFor(e.profileId, []).abilities.slice().sort().join(",")] : []));
     const all = BUILT_IN_FACTION_IDS.flatMap(summoned);
     expect(new Set(all).size).toBe(all.length);
-    // ...and only the Militia and Concord drop reserves in: anywhere, or beside your own, overcharged.
-    expect(effects("munch").some((e) => e.kind === "airdrop")).toBe(false);
+    // ...and each drops reserves in its own way: anywhere (Militia), beside your own and overcharged
+    // (Concord), or bursting up near the swarm, never far from it and never with a shield (swarm).
     for (const e of effects("concord")) if (e.kind === "airdrop") expect(e.arrivalShield).toBeGreaterThan(0);
     expect(effects("militia").some((e) => e.kind === "airdrop" && e.anywhere)).toBe(true);
+    const breach = effects("swarm").filter((e) => e.kind === "airdrop");
+    expect(breach.length).toBe(1);
+    for (const e of breach) if (e.kind === "airdrop") expect([e.anywhere, e.arrivalShield ?? 0, e.range > 4]).toEqual([undefined, 0, true]);
   });
 
-  it("each faction starts Skirmish with its own arrival card, and the Munch also buy a permanent tunnel", () => {
-    const arrival = { militia: "mil-dropship", munch: "munch-tunnels", concord: "con-portal" } as const;
+  it("each faction starts Skirmish with its own arrival card, and the swarm also buys a permanent burrow", () => {
+    const arrival = { militia: "mil-dropship", swarm: "swarm-tunnels", concord: "con-portal" } as const;
     for (const [f, card] of Object.entries(arrival)) expect(defaultSupportsFor(f, "skirmish")).toContain(card);
-    const hole = supportOf("munch-tunnels").abilities[0]!.effect;
-    expect(hole.kind).toBe("summon");
+    const card = supportOf("swarm-tunnels").abilities;
+    expect(card.map((a) => a.effect.kind)).toEqual(["airdrop", "summon"]);
+    const hole = card[1]!.effect;
     if (hole.kind !== "summon") return;
-    // Temporary: the Gopher Hole. Permanent: the Sett Lab, bought in the list.
+    // Temporary: the Tunnel Mouth. Permanent: the Brood Spire, bought in the list.
     expect(profileFor(hole.profileId, []).structure?.lifetime).toBe("round");
-    const warren = profileFor("munch-warren", []);
-    expect(warren.structure?.lifetime).toBe("permanent");
-    expect(warren.structure?.summonOnly).toBeFalsy();
-    for (const p of [profileFor(hole.profileId, []), warren]) expect(p.abilities).toContain("burrow-exit");
+    const spire = profileFor("swarm-spire", []);
+    expect(spire.structure?.lifetime).toBe("permanent");
+    expect(spire.structure?.summonOnly).toBeFalsy();
+    for (const p of [profileFor(hole.profileId, []), spire]) expect(p.abilities).toContain("burrow-exit");
   });
 });
 
@@ -164,7 +191,7 @@ describe("faction pillars in the data", () => {
 const L = (...ids: string[]): ListEntry[] => ids.map((profileId) => ({ profileId, upgrades: [] }));
 
 function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {}): GameState {
-  const s = createGame({ factions: ["militia", "munch"], seed: 7, lists, supports: [[], []], ...extra });
+  const s = createGame({ factions: ["militia", "swarm"], seed: 7, lists, supports: [[], []], ...extra });
   Object.assign(s, { initiative: 0, activePlayer: 0, orderChoice: null });
   // An open table: these tests are about the effects, not about finding a way round the scenery.
   Object.assign(s, { terrain: [], access: [] });
@@ -190,8 +217,8 @@ const ok = (r: ReturnType<typeof applyCommand>): GameState => {
 };
 
 describe("faction buffs", () => {
-  it("Militia Sandbag Social: a dug-in unit saves better against shooting only", () => {
-    let s = game([L("mil-grunts"), L("munch-spitter")], { supports: [["mil-wagon"], []] });
+  it("Militia Sandbag Detail: a dug-in unit saves better against shooting only", () => {
+    let s = game([L("mil-grunts"), L("swarm-spitters")], { supports: [["mil-wagon"], []] });
     const grunts = place(s, "p0-0", { x: 10, y: 26 });
     const spit = place(s, "p1-0", { x: 10, y: 14 });
     const before = saveNeeded(s, spit, grunts, grunts.models[0]!, 0, false);
@@ -204,13 +231,13 @@ describe("faction buffs", () => {
     expect(unitById(s, grunts.uid)!.status.dugIn ?? 0).toBe(0);
   });
 
-  it("Munch Cough Up and Hatchlings regrow lost bodies", () => {
-    let s = game([L("munch-nibblers", "munch-nanny"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-burrows"], []] });
+  it("Skitterswarm Quickening and Hatchlings regrow lost bodies", () => {
+    let s = game([L("swarm-skitterlings", "swarm-tenders"), L("mil-grunts")], { factions: ["swarm", "militia"], supports: [["swarm-chamber"], []] });
     const nibs = place(s, "p0-0", { x: 10, y: 26 });
     place(s, "p0-1", { x: 10, y: 29.5 });
     place(s, "p1-0", { x: 28, y: 4 });
     for (const m of nibs.models.slice(2)) m.alive = false; // two left, whatever the pack size
-    s = ok(applyCommand(s, { type: "support", player: 0, support: "munch-burrows", ability: "cough-up", target: nibs.uid }));
+    s = ok(applyCommand(s, { type: "support", player: 0, support: "swarm-chamber", ability: "quickening", target: nibs.uid }));
     expect(aliveModels(unitById(s, nibs.uid)!).length).toBe(4);
     Object.assign(s, { phase: "movement" });
     s = ok(applyCommand(s, { type: "ability", uid: "p0-1", ability: "hatch", target: nibs.uid }));
@@ -218,12 +245,12 @@ describe("faction buffs", () => {
     expect(aliveModels(unitById(s, nibs.uid)!).every((m) => m.hp === 1)).toBe(true);
   });
 
-  it("Munch Trapdoor Pit lurks for the round and bites whoever walks up to it", () => {
-    let s = game([L("munch-nibblers"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-burrows"], []] });
-    place(s, "p0-0", { x: 4, y: 26 });
+  it("Skitterswarm Egg Clutch lurks for the round and nips whoever walks up to it", () => {
+    let s = game([L("swarm-skitterlings"), L("mil-grunts")], { factions: ["swarm", "militia"], supports: [["swarm-chamber"], []] });
+    place(s, "p0-0", { x: 6, y: 24 });
     place(s, "p1-0", { x: 10, y: 8 });
-    s = ok(applyCommand(s, { type: "support", player: 0, support: "munch-burrows", ability: "gobble-pit", target: undefined, point: { x: 10, y: 16 } }));
-    const pit = s.units.find((u) => u.profileId === "munch-pit")!;
+    s = ok(applyCommand(s, { type: "support", player: 0, support: "swarm-chamber", ability: "lay-clutch", target: undefined, point: { x: 10, y: 16 } }));
+    const pit = s.units.find((u) => u.profileId === "swarm-eggs")!;
     expect(pit.onBoard).toBe(true);
     s.activePlayer = 1;
     const r = applyCommand(s, { type: "move", uid: "p1-0", leader: 0, to: { x: 10, y: 12.5 } });
@@ -232,7 +259,7 @@ describe("faction buffs", () => {
   });
 
   it("Concord Point Out Flaws adds precision, so a unit can pick a target out of a melee without hitting friends", () => {
-    let s = game([L("con-dancers", "con-guard"), L("munch-nibblers")], { factions: ["concord", "munch"], supports: [["con-court"], []] });
+    let s = game([L("con-dancers", "con-guard"), L("swarm-skitterlings")], { factions: ["concord", "swarm"], supports: [["con-court"], []] });
     const dancers = place(s, "p0-0", { x: 10, y: 24 });
     const guard = place(s, "p0-1", { x: 10, y: 15.2 });
     const nibs = place(s, "p1-0", { x: 10, y: 13.9 });
@@ -249,7 +276,7 @@ describe("faction buffs", () => {
   });
 
   it("Concord Gate Step teleports a unit on the table, which can still act", () => {
-    let s = game([L("con-guard"), L("munch-nibblers")], { factions: ["concord", "munch"], supports: [["con-gate"], []] });
+    let s = game([L("con-guard"), L("swarm-skitterlings")], { factions: ["concord", "swarm"], supports: [["con-gate"], []] });
     const guard = place(s, "p0-0", { x: 10, y: 28 });
     place(s, "p1-0", { x: 28, y: 4 });
     Object.assign(s, { phase: "movement" });
@@ -263,7 +290,7 @@ describe("faction buffs", () => {
     expect(g.status.acted).toBe(false);
     expect(r.ok && r.events.some((e) => e.type === "moved" && e.kind === "teleport")).toBe(true);
     // Only units already on the table: reserves come in through the Grand Portal.
-    const reserve = game([L("con-guard", "con-lancer"), L("munch-nibblers")], { factions: ["concord", "munch"], supports: [["con-gate"], []] });
+    const reserve = game([L("con-guard", "con-lancer"), L("swarm-skitterlings")], { factions: ["concord", "swarm"], supports: [["con-gate"], []] });
     place(reserve, "p0-0", { x: 10, y: 28 });
     Object.assign(reserve, { phase: "movement" });
     expect(applyCommand(reserve, { type: "support", player: 0, support: "con-gate", ability: "gate-step", target: "p0-1", point: { x: 10, y: 22 } }).ok).toBe(false);

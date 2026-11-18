@@ -279,7 +279,7 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     needs: "point",
     range: 6,
     usesPerGame: 1,
-    text: 'Movement phase, once per game: kick a stack of hay bales out of the hatch: a Junk Barricade lands within 6" of this unit (at least 2" from enemies) until the end of the round.',
+    text: 'Movement phase, once per game: kick a load of sandbags and scrap plate out of the hatch: a Junk Barricade lands within 6" of this unit (at least 2" from enemies) until the end of the round.',
   },
   overcharge: {
     id: "overcharge",
@@ -343,6 +343,20 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     name: "Radio Spotter",
     kind: "passive",
     text: "This unit's shells drift half as far when any friendly unit can see where they're aimed, not just this one.",
+  },
+  // ---------- the Skitterswarm ----------
+  corrode: {
+    id: "corrode",
+    name: "Corrode",
+    kind: "passive",
+    text: "When this unit's attack (shooting, a shell, melee or impact) deals damage, acid eats into the target: its saves are one worse until the end of the round. It doesn't stack.",
+  },
+  "brood-bond": {
+    id: "brood-bond",
+    name: "Brood Bond",
+    kind: "passive",
+    range: 6,
+    text: 'End of round: every other friendly unit within 6" that has lost models regrows one, even if it took damage this round (in place of its own Regrow). Not structures.',
   },
   "scrap-cover": {
     id: "scrap-cover",

@@ -14,7 +14,7 @@ export interface Vec {
 export type Elevation = 0 | 1 | 2;
 
 /** The three built-in factions. Custom factions use ids starting with "custom-". */
-export type BuiltInFactionId = "militia" | "munch" | "concord";
+export type BuiltInFactionId = "militia" | "swarm" | "concord";
 export type FactionId = string;
 
 export type Keyword =
@@ -77,6 +77,9 @@ export type AbilityId =
   | "eye-peck" // a dive that deals damage leaves the target's shooting one worse this round
   | "twirl-away" // always disengages cleanly
   | "radio-spotting" // shells count as spotted when any friendly unit can see the aim point
+  // passive (added with the Skitterswarm)
+  | "corrode" // attacks that deal damage leave the target's saves one worse this round
+  | "brood-bond" // aura: end of round, friendly units within 6" regrow a lost model even if they were hurt
   // structures
   | "burrow-exit" // your reserves may deploy within 3" of this structure
   | "ward-aura" // enemy ranged attacks on friendly units within 4" hit one worse
@@ -168,7 +171,7 @@ export interface UnitProfile {
   nerve?: number;
   /** Evade roll and the situations it applies in. Absent means no evade. */
   evade?: EvadeDef;
-  /** Custom miniature art (custom factions only). Without it the renderer picks an archetype from the profile. */
+  /** Miniature art built from parts or an uploaded image. Without it the renderer picks an archetype (or the faction's own painter) from the profile. */
   art?: UnitArt;
 }
 
@@ -363,6 +366,8 @@ export interface UnitStatus {
   shaken: boolean;
   /** Rampage: saves one worse until the end of the round. */
   reckless?: boolean;
+  /** Corrode: acid has eaten at its armour, so its saves are one worse until the end of the round. */
+  corroded?: boolean;
   /** Spotter: enemy shots at this unit hit one better until the end of the round. */
   spotted?: boolean;
   /** Sugar Rush: extra move until the end of the round. */

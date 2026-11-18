@@ -30,10 +30,10 @@ describe("intro: seen preference", () => {
     expect(markIntroSeen("game", s)).toBe(true);
     expect(hasSeenIntro("game", s)).toBe(true);
     expect(shouldAutoPlay("game", s)).toBe(false);
-    expect(hasSeenIntro("munch", s)).toBe(false);
-    markIntroSeen("munch", s);
-    markIntroSeen("munch", s);
-    expect(JSON.parse(s.data.get(INTRO_SEEN_KEY)!)).toEqual(["game", "munch"]);
+    expect(hasSeenIntro("swarm", s)).toBe(false);
+    markIntroSeen("swarm", s);
+    markIntroSeen("swarm", s);
+    expect(JSON.parse(s.data.get(INTRO_SEEN_KEY)!)).toEqual(["game", "swarm"]);
   });
 
   it("treats junk in storage as nothing seen", () => {

@@ -1,7 +1,7 @@
 // The campaign save: one campaign at a time, in localStorage behind try/catch (storage may be blocked
 // or full). Pure apart from the storage you pass in, so the tests can use a fake.
 
-import { parseCampaign, serializeCampaign, type CampaignState } from "../../engine/campaign";
+import { CAMPAIGN_FORMAT, LEGACY_SIDES, parseCampaign, serializeCampaign, type CampaignState } from "../../engine/campaign";
 
 export const CAMPAIGN_KEY = "scdmg.campaign.v1";
 
@@ -32,6 +32,22 @@ export function hasUnreadableSave(storage: StorageLike | null = defaultStorage()
     return !!raw && parseCampaign(raw) === null;
   } catch {
     return false;
+  }
+}
+
+/**
+ * The side of a saved campaign this version recognises but can't continue: "munch" for a campaign
+ * fought on the Munch's side, from before the Skitterswarm took their place in the Dustline. Null
+ * when there's no such save (none at all, a readable one, or just a corrupt file).
+ */
+export function legacySaveSide(storage: StorageLike | null = defaultStorage()): string | null {
+  try {
+    const raw = storage?.getItem(CAMPAIGN_KEY);
+    if (!raw || parseCampaign(raw) !== null) return null;
+    const d = JSON.parse(raw) as { format?: unknown; faction?: unknown } | null;
+    return d && d.format === CAMPAIGN_FORMAT && typeof d.faction === "string" && LEGACY_SIDES.includes(d.faction) ? d.faction : null;
+  } catch {
+    return null;
   }
 }
 

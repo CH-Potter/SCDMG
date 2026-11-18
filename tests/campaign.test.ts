@@ -63,6 +63,7 @@ import {
   CAMPAIGN_KEY,
   clearCampaign,
   hasUnreadableSave,
+  legacySaveSide,
   loadCampaign,
   saveCampaign,
 } from "../src/ui/campaign/store";
@@ -199,10 +200,10 @@ describe("campaign: armies", () => {
             `${f} ${mode} act ${act} keeps its priciest unit`,
           ).toBe(top);
         }
-    // Munch Act I keeps Big Mama and drops two beetle swarms instead.
-    const munch = fitList(defaultListFor("munch", "skirmish"), 24);
-    expect(munch.some((e) => e.profileId === "munch-mama")).toBe(true);
-    expect(listCost(munch)).toBe(24);
+    // Skitterswarm Act I keeps the Broodmother and drops cheaper broods instead.
+    const swarm = fitList(defaultListFor("swarm", "skirmish"), 24);
+    expect(swarm.some((e) => e.profileId === "swarm-mother")).toBe(true);
+    expect(listCost(swarm)).toBe(24);
     expect(fitList([], 10)).toEqual([]);
   });
 
@@ -232,7 +233,7 @@ describe("campaign: armies", () => {
     expect(p.some((x) => x.startsWith("At most"))).toBe(true);
     expect(
       rosterProblems(s, "skirmish", {
-        entries: [{ profileId: "munch-mama", upgrades: [] }],
+        entries: [{ profileId: "swarm-mother", upgrades: [] }],
         supports: [],
       })[0],
     ).toMatch(/isn't one of your units/);
@@ -256,9 +257,9 @@ describe("campaign: progression", () => {
     s = r.state;
     expect(r.actEnded).toBe(1);
     expect(s.act).toBe(2);
-    expect(s.holders["rattlevane-junction"]).toBe("munch");
-    // Skipped: the Munch take Dustbowl Crossing while you were away.
-    expect(s.holders["dustbowl-crossing"]).toBe("munch");
+    expect(s.holders["rattlevane-junction"]).toBe("swarm");
+    // Skipped: the Skitterswarm takes Dustbowl Crossing while you were away.
+    expect(s.holders["dustbowl-crossing"]).toBe("swarm");
     expect(r.news.some((n) => n.tone === "lost" && n.text.includes("Dustbowl Crossing"))).toBe(
       true,
     );
@@ -267,7 +268,7 @@ describe("campaign: progression", () => {
   });
 
   it("a battle that isn't on offer can't be recorded or launched", () => {
-    const s = newCampaign("munch", 3);
+    const s = newCampaign("swarm", 3);
     expect(() => recordResult(s, "spare-parts", "win", [1, 0])).toThrow();
     expect(() => battleSetup(s, "nope")).toThrow();
   });
@@ -293,9 +294,9 @@ describe("campaign: progression", () => {
     const a = end(11);
     const b = end(11);
     expect(a.state.holders).toEqual(b.state.holders);
-    // Act II's Munch-vs-Concord battles (Last Drops, Off the Rails) went one way or the other.
-    expect(["munch", "concord"]).toContain(a.state.holders["old-refinery"]);
-    expect(["munch", "concord"]).toContain(a.state.holders["gutterbend"]);
+    // Act II's Skitterswarm-vs-Concord battles (Last Drops, Off the Rails) went one way or the other.
+    expect(["swarm", "concord"]).toContain(a.state.holders["old-refinery"]);
+    expect(["swarm", "concord"]).toContain(a.state.holders["gutterbend"]);
     expect(a.news.filter((n) => n.tone === "meanwhile").length).toBe(2);
   });
 
@@ -329,7 +330,7 @@ describe("campaign: progression", () => {
   }
 
   it("a drawn finale is fought again", () => {
-    let s = newCampaign("munch", 9);
+    let s = newCampaign("swarm", 9);
     while (s.act !== 4) s = recordResult(s, availableBattles(s)[0]!.id, "win", [1, 0]).state;
     s = recordResult(s, FINALE.id, "draw", [3, 3]).state;
     expect(s.ending).toBeNull();
@@ -342,20 +343,20 @@ describe("campaign: progression", () => {
     const s = newCampaign("militia", 1);
     for (const p of Object.keys(s.holders)) s.holders[p] = null;
     expect(computeRival(s)).toBe("concord"); // a tie: the story's default
-    s.holders["old-refinery"] = "munch";
-    expect(computeRival(s)).toBe("munch");
+    s.holders["old-refinery"] = "swarm";
+    expect(computeRival(s)).toBe("swarm");
     s.holders["gutterbend"] = "concord";
     s.holders["gemhaul-road"] = "concord";
     expect(computeRival(s)).toBe("concord");
-    const fin = battleById({ ...s, act: 4, rival: "munch" }, FINALE.id)!;
-    expect(fin.enemy).toBe("munch");
-    expect(fin.brief[1].who).toBe("dr-graft");
+    const fin = battleById({ ...s, act: 4, rival: "swarm" }, FINALE.id)!;
+    expect(fin.enemy).toBe("swarm");
+    expect(fin.brief[1].who).toBe("broodmother");
     expect(fin.hook).not.toContain("{");
   });
 
   it("fills in the rival in finale and ending text", () => {
-    expect(fillStory("{rival} took it, to be {fate}. Ask {rivalLeader}.", "munch")).toBe(
-      "the Munch took it, to be pumped into Dr. Graft's vats. Ask Dr. Graft.",
+    expect(fillStory("{rival} took it, to be {fate}. Ask {rivalLeader}.", "swarm")).toBe(
+      "the Skitterswarm took it, to be filled with Mother Mandible's eggs. Ask Mother Mandible.",
     );
     expect(fillStory("{rival}", null)).toBe("{rival}");
   });
@@ -396,11 +397,11 @@ describe("campaign: perks", () => {
     s.holders["old-refinery"] = "militia"; // +1 resource
     s.holders["gutterbend"] = "militia"; // +1 resource
     s.holders["gemhaul-road"] = "militia"; // +1 resource, but resources are capped at +2
-    s.holders["mesa-ridge"] = "militia"; // a free Squinter
-    s.holders["prismwick-lawn"] = "militia"; // a free Dirt Airstrip
+    s.holders["mesa-ridge"] = "militia"; // a free Ridgeline Marksman
+    s.holders["prismwick-lawn"] = "militia"; // a free Forward Airstrip
     const l = battleSetup(s, "up-through-the-corn");
     expect(l.mode).toBe("skirmish");
-    expect(l.factions).toEqual(["militia", "munch"]);
+    expect(l.factions).toEqual(["militia", "swarm"]);
     expect(l.lists[0].length).toBe(s.army.skirmish.entries.length + 1);
     expect(l.lists[0].at(-1)!.profileId).toBe("mil-squinter");
     expect(l.supports[0]).toContain("mil-airstrip");
@@ -431,7 +432,7 @@ describe("campaign: perks", () => {
   });
 
   it("ignores junk bonuses and caps CP in the engine", () => {
-    const base = { factions: ["militia", "munch"] as ["militia", "munch"], seed: 3 };
+    const base = { factions: ["militia", "swarm"] as ["militia", "swarm"], seed: 3 };
     const plain = createGame(base);
     const odd = createGame({
       ...base,
@@ -463,6 +464,23 @@ describe("campaign: save and load", () => {
     expect(parseCampaign(serializeCampaign(s))).toEqual(s);
   });
 
+  it("keeps an old save going when the Munch held places in it: they're the Skitterswarm's now", () => {
+    const s = recordResult(newCampaign("militia", 6), "up-through-the-corn", "loss", [1, 4]).state;
+    const raw = JSON.parse(serializeCampaign(s));
+    for (const [place, who] of Object.entries(raw.holders)) if (who === "swarm") raw.holders[place] = "munch";
+    raw.holders["old-refinery"] = "munch";
+    const back = parseCampaign(raw)!;
+    expect(back).not.toBeNull();
+    expect(back.holders["dustbowl-crossing"]).toBe("swarm");
+    expect(back.holders["old-refinery"]).toBe("swarm");
+    expect(Object.values(back.holders)).not.toContain("munch");
+    expect(back.results).toEqual(s.results);
+    // A finale rival from before the swap becomes the swarm too.
+    const fin = JSON.parse(serializeCampaign({ ...s, act: 4, rival: "swarm" }));
+    fin.rival = "munch";
+    expect(parseCampaign(fin)!.rival).toBe("swarm");
+  });
+
   it("refuses corrupt, foreign and old saves", () => {
     expect(parseCampaign("{not json")).toBeNull();
     expect(parseCampaign("")).toBeNull();
@@ -473,13 +491,15 @@ describe("campaign: save and load", () => {
     expect(parseCampaign({ format: "scdmg-campaign", faction: "militia" })).toBeNull();
     expect(parseCampaign({ format: "scdmg-campaign", version: 2, faction: "militia" })).toBeNull();
     expect(parseCampaign({ format: "scdmg-campaign", version: 1, faction: "custom-x" })).toBeNull();
+    // A campaign on the Munch's side, from before the Skitterswarm took their place.
+    expect(parseCampaign({ format: "scdmg-campaign", version: 1, faction: "munch" })).toBeNull();
   });
 
   it("repairs what it can in a damaged save", () => {
-    const s = newCampaign("munch", 5);
+    const s = newCampaign("swarm", 5);
     const raw = JSON.parse(serializeCampaign(s));
     raw.holders["dustbowl-crossing"] = "aliens";
-    raw.holders["nowhere"] = "munch";
+    raw.holders["nowhere"] = "swarm";
     raw.results = [
       { battleId: "made-up", act: 1, outcome: "win", vp: [1, 1] },
       { battleId: "signal-lost", act: 1, outcome: "win", vp: ["x", 2] },
@@ -489,9 +509,9 @@ describe("campaign: save and load", () => {
       skirmish: {
         entries: [
           { profileId: "mil-grunts", upgrades: [] },
-          { profileId: "munch-mama", upgrades: ["bogus"] },
+          { profileId: "swarm-mother", upgrades: ["bogus"] },
         ],
-        supports: ["con-spire", "munch-nest", "munch-nest"],
+        supports: ["con-spire", "swarm-hum", "swarm-hum"],
       },
       assault: "junk",
     };
@@ -499,7 +519,7 @@ describe("campaign: save and load", () => {
       { act: 9, tone: "win", text: "bad" },
       { act: 1, tone: "story", text: "ok" },
     ];
-    raw.rival = "munch";
+    raw.rival = "swarm";
     raw.ending = "win";
     raw.act = 7;
     const back = parseCampaign(raw)!;
@@ -508,10 +528,10 @@ describe("campaign: save and load", () => {
     expect(back.holders["nowhere"]).toBeUndefined();
     expect(back.results).toEqual([{ battleId: "signal-lost", act: 1, outcome: "win", vp: [0, 2] }]);
     expect(back.army.skirmish).toEqual({
-      entries: [{ profileId: "munch-mama", upgrades: [] }],
-      supports: ["munch-nest"],
+      entries: [{ profileId: "swarm-mother", upgrades: [] }],
+      supports: ["swarm-hum"],
     });
-    expect(back.army.assault).toEqual(starterRoster("munch", "assault"));
+    expect(back.army.assault).toEqual(starterRoster("swarm", "assault"));
     expect(back.chronicle).toEqual([{ act: 1, tone: "story", text: "ok" }]);
     expect(back.act).toBe(1);
     expect(back.rival).toBeNull();
@@ -544,7 +564,7 @@ describe("campaign: the save slot", () => {
   it("saves, loads and clears one campaign", () => {
     const st = memory();
     expect(loadCampaign(st)).toBeNull();
-    const s = recordResult(newCampaign("munch", 8), "signal-lost", "win", [4, 1]).state;
+    const s = recordResult(newCampaign("swarm", 8), "signal-lost", "win", [4, 1]).state;
     expect(saveCampaign(s, st)).toBe(true);
     const back = loadCampaign(st)!;
     expect(typeof back.updated).toBe("number");
@@ -564,6 +584,27 @@ describe("campaign: the save slot", () => {
     );
     expect(loadCampaign(st)).toBeNull();
     expect(hasUnreadableSave(memory())).toBe(false);
+    expect(legacySaveSide(st)).toBeNull(); // old, but not a retired side
+  });
+
+  it("recognises a campaign saved on the Munch's side, which can't continue", () => {
+    const st = memory();
+    expect(legacySaveSide(st)).toBeNull();
+    const old = JSON.parse(serializeCampaign(newCampaign("militia", 3)));
+    old.faction = "munch";
+    st.setItem(CAMPAIGN_KEY, JSON.stringify(old));
+    expect(parseCampaign(old)).toBeNull();
+    expect(loadCampaign(st)).toBeNull();
+    expect(hasUnreadableSave(st)).toBe(true);
+    expect(legacySaveSide(st)).toBe("munch");
+    clearCampaign(st);
+    expect(legacySaveSide(st)).toBeNull();
+    // A readable save, a corrupt one, or blocked storage is never a legacy side.
+    saveCampaign(newCampaign("swarm", 1), st);
+    expect(legacySaveSide(st)).toBeNull();
+    st.setItem(CAMPAIGN_KEY, "{oops");
+    expect(legacySaveSide(st)).toBeNull();
+    expect(legacySaveSide(blocked)).toBeNull();
   });
 
   it("never throws when storage is blocked", () => {

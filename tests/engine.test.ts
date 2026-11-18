@@ -11,6 +11,10 @@ import { aliveModels, eligibleUnits, isEngaged, presenceController, supplyUsed, 
 import { lineOfSight, planRoute } from "../src/engine/terrain";
 import type { Command, Elevation, FactionId, GameState, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 const ok = (r: ReturnType<typeof applyCommand>): GameState => {
   if (!r.ok) throw new Error(r.error);

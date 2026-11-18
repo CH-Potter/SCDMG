@@ -5,6 +5,10 @@ import { aliveModels, isEngaged, unitGap, unitsEngage } from "../src/engine/rule
 import { allPlaced, checkPlacement, planRoute } from "../src/engine/terrain";
 import type { GameEvent, GameState, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function place(u: Unit, at: Vec, elevation: 0 | 2 = 0): Unit {
   const r = profileOf(u).baseRadius;
@@ -21,7 +25,8 @@ function setup(seed = 3): { s: GameState; grunts: Unit; crows: Unit; wasps: Unit
   s.terrain = [];
   const munch = (id: string) => s.units.find((u) => u.owner === 1 && u.profileId === id) ?? addUnit(s, id);
   const grunts = place(s.units.find((u) => u.owner === 0 && u.profileId === "mil-grunts")!, { x: 10, y: 10 });
-  const crows = place(munch("munch-flapjaw"), { x: 10, y: 18 }, 2);
+  // Five Rivet Grunts in two rows: the crows hover about 4" off their back row.
+  const crows = place(munch("munch-flapjaw"), { x: 10, y: 16.8 }, 2);
   const wasps = place(munch("munch-buzz"), { x: 22, y: 10 }, 2);
   Object.assign(s, { phase: "assault", activePlayer: 1, orderChoice: null });
   return { s, grunts, crows, wasps };

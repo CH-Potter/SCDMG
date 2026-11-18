@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { applyCommand, createGame } from "../src/engine/game";
 import type { Command, GameState } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 const ok = (s: GameState, cmd: Command): GameState => {
   const r = applyCommand(s, cmd);

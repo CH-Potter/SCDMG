@@ -39,6 +39,7 @@ import {
   onBoard,
   presenceController,
   unitGap,
+  AURA_RANGE,
   ENGAGE_RANGE,
   reserves,
 } from "./rules";
@@ -51,6 +52,8 @@ const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
 const VP = 10;
 /** Eval points per resource of unit value (material). */
 const MATERIAL = 1.5;
+/** Brood Bond: share of a model's worth credited to a hurt unit standing within reach of its Broodmother (it regrows one at the end of the round). */
+const BROOD_REFILL = 0.6;
 /** Inches closer an objective seems to the movement shaping per VP it's worth above 1. */
 const OBJECTIVE_PULL = 2.5;
 /** How much of a unit's assault-phase potential a movement-phase choice is credited with. */
@@ -319,10 +322,16 @@ export function evaluate(s: GameState, me: PlayerId): number {
   }
 
   // Material.
+  const mothers = s.units.filter((u) => u.onBoard && !u.destroyed && hasAbility(u, "brood-bond"));
   for (const u of s.units) {
     if (!u.onBoard || u.destroyed) continue;
     const sign = u.owner === me ? 1 : -1;
-    score += sign * (wounds(u) / Math.max(1, maxWounds(u))) * profileOf(u).cost * MATERIAL;
+    const prof = profileOf(u);
+    score += sign * (wounds(u) / Math.max(1, maxWounds(u))) * prof.cost * MATERIAL;
+    // Brood Bond: a hurt brood near its Broodmother gets a model back at the end of the round, so keep
+    // hurt broods close to her (and, for the other side, pull them apart or kill her).
+    if (mothers.length && !prof.structure && u.models.some((m) => !m.alive) && mothers.some((f) => f.owner === u.owner && f.uid !== u.uid && unitGap(f, u) <= AURA_RANGE))
+      score += sign * ((prof.cost * MATERIAL) / Math.max(1, prof.models)) * BROOD_REFILL;
   }
 
   // Snacks.

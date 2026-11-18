@@ -14,6 +14,10 @@ import { cleanupRound } from "../src/engine/scoring";
 import { summon } from "../src/engine/supports";
 import type { Command, GameEvent, GameState, ListEntry, Phase, PlayerId, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 const ok = (r: ReturnType<typeof applyCommand>): GameState => {
   if (!r.ok) throw new Error(r.error);
@@ -26,6 +30,8 @@ const okR = (r: ReturnType<typeof applyCommand>) => {
 const err = (r: ReturnType<typeof applyCommand>): string => (r.ok ? "" : r.error);
 
 const L = (...ids: string[]): ListEntry[] => ids.map((profileId) => ({ profileId, upgrades: [] }));
+/** Rivet Grunts at full strength (with their Second Section): seven troopers, as the squad was before the rework. */
+const GRUNTS7: ListEntry = { profileId: "mil-grunts", upgrades: ["extra"] };
 
 function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {}): GameState {
   const s = createGame({ map: CLASSIC_DUSTBOWL, rules: CLASSIC_RULES, factions: ["militia", "munch"], seed: 7, lists, supports: [[], []], ...extra });
@@ -419,7 +425,7 @@ describe("Radio Spotter", () => {
 
 describe("Scrap Cover", () => {
   it("friendly models within 2\" of a Junk Barricade count as in cover against shooting", () => {
-    const s = game([L("mil-grunts"), L("mil-grunts")], { factions: ["militia", "militia"] });
+    const s = game([L("mil-grunts"), [GRUNTS7]], { factions: ["militia", "militia"] });
     const shooter = place(s, "p0-0", { x: 0.8, y: 26 });
     const target = place(s, "p1-0", { x: 0.8, y: 14 });
     const tm = target.models[6]!; // the back row, nearest the shooters
@@ -437,7 +443,7 @@ describe("Scrap Cover", () => {
 
 // ---------- support abilities ----------
 
-describe("Call It In (Grange Hall Radio)", () => {
+describe("Call It In (Grange Hall Command)", () => {
   it("spots an enemy near your models: your shots hit one better", () => {
     const s = at(game([L("mil-grunts"), L("munch-mama")], { supports: [["mil-radio"], []] }), "assault");
     const grunts = place(s, "p0-0", { x: 0.8, y: 26 });
@@ -464,7 +470,7 @@ describe("Call It In (Grange Hall Radio)", () => {
   });
 });
 
-describe("Dust Cloud (Weather Vane)", () => {
+describe("Dust Cloud (Smoke Detail)", () => {
   it("hides a unit from shots more than 12\" away this round", () => {
     const s = at(game([L("mil-grunts"), L("mil-bertha")], { factions: ["militia", "militia"], supports: [["mil-vane"], []] }), "assault");
     place(s, "p0-0", { x: 0.8, y: 28 });
@@ -487,7 +493,7 @@ describe("Dust Cloud (Weather Vane)", () => {
   });
 });
 
-describe("Top Cover (Dirt Airstrip)", () => {
+describe("Top Cover (Forward Airstrip)", () => {
   it("gives a unit Overwatch for the round", () => {
     const s = at(game([L("mil-grunts"), L("munch-nibblers")], { supports: [["mil-airstrip"], []] }), "movement");
     place(s, "p0-0", { x: 0.8, y: 28 });
@@ -500,7 +506,7 @@ describe("Top Cover (Dirt Airstrip)", () => {
   });
 
   it("the AI covers a gun a swarm has to run at", () => {
-    const s = at(game([L("mil-grunts"), L("munch-nibblers")], { supports: [["mil-airstrip"], []] }), "movement");
+    const s = at(game([[GRUNTS7], L("munch-nibblers")], { supports: [["mil-airstrip"], []] }), "movement");
     place(s, "p0-0", { x: 0.8, y: 28 });
     place(s, "p1-0", { x: 0.8, y: 14 });
     expect(isSupport("top-cover")(aiSupportCommand(s))).toBe(true);
@@ -521,26 +527,26 @@ describe("Sandbag Drop (Rust Bucket Drop-Ship)", () => {
   });
 });
 
-describe("Overmind Pulse (Brood Nest)", () => {
+describe("Implant Jolt (the Munch template's Brood Nest)", () => {
   it("+2\" move this round, and it exhausts the nest", () => {
     const s = at(game([L("munch-nibblers"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-nest"], []] }), "movement");
     const beetles = place(s, "p0-0", { x: 0.8, y: 26 });
     place(s, "p1-0", { x: 0.8, y: 5 });
     const mv = effectiveMove(s, beetles);
-    const s2 = ok(applyCommand(s, { type: "support", player: 0, support: "munch-nest", ability: "overmind-pulse", target: "p0-0" }));
+    const s2 = ok(applyCommand(s, { type: "support", player: 0, support: "munch-nest", ability: "implant-jolt", target: "p0-0" }));
     expect(effectiveMove(s2, unitById(s2, "p0-0")!)).toBe(mv + 2);
     at(s2, "combat");
     expect(err(applyCommand(s2, { type: "support", player: 0, support: "munch-nest", ability: "frenzy", target: "p0-0" }))).toMatch(/exhausted/);
   });
 
   it("the AI pulses a swarm whose charge is just out of reach", () => {
-    const s = at(game([L("munch-nibblers"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-nest"], []] }), "assault");
+    const s = at(game([L("munch-nibblers"), [GRUNTS7]], { factions: ["munch", "militia"], supports: [["munch-nest"], []] }), "assault");
     const beetles = place(s, "p0-0", { x: 0.8, y: 26 });
     const grunts = place(s, "p1-0", { x: 0.8, y: 12.7 });
     const gap = unitGap(beetles, grunts);
     expect(gap).toBeGreaterThan(effectiveMove(s, beetles));
     expect(gap).toBeLessThan(effectiveMove(s, beetles) + 2);
-    expect(isSupport("overmind-pulse")(aiSupportCommand(s))).toBe(true);
+    expect(isSupport("implant-jolt")(aiSupportCommand(s))).toBe(true);
   });
 });
 
@@ -641,7 +647,7 @@ describe("Glaring Light (Star Lens)", () => {
 
 describe("Withering Review (Court of Disdain)", () => {
   it("a silenced unit can't use abilities and its Overwatch doesn't fire", () => {
-    let s = at(game([L("con-guard"), L("mil-grunts", "munch-mama")], { factions: ["concord", "militia"], supports: [["con-court"], []], lists: [L("con-guard"), [{ profileId: "mil-grunts", upgrades: ["overwatch"] }, { profileId: "munch-mama", upgrades: [] }]] }), "movement");
+    let s = at(game([L("con-guard"), L("mil-grunts", "munch-mama")], { factions: ["concord", "militia"], supports: [["con-court"], []], lists: [L("con-guard"), [{ profileId: "mil-grunts", upgrades: ["overwatch", "extra"] }, { profileId: "munch-mama", upgrades: [] }]] }), "movement");
     place(s, "p0-0", { x: 0.8, y: 28 });
     place(s, "p1-0", { x: 0.8, y: 14 });
     place(s, "p1-1", { x: 2.5, y: 21 });
@@ -656,7 +662,7 @@ describe("Withering Review (Court of Disdain)", () => {
   });
 
   it("the AI silences the overwatch its units are about to walk into", () => {
-    const s = at(game([L("con-guard"), L("mil-grunts")], { factions: ["concord", "militia"], supports: [["con-court"], []], lists: [L("con-guard"), [{ profileId: "mil-grunts", upgrades: ["overwatch"] }]] }), "movement");
+    const s = at(game([L("con-guard"), L("mil-grunts")], { factions: ["concord", "militia"], supports: [["con-court"], []], lists: [L("con-guard"), [{ profileId: "mil-grunts", upgrades: ["overwatch", "extra"] }]] }), "movement");
     place(s, "p0-0", { x: 0.8, y: 28 });
     place(s, "p1-0", { x: 0.8, y: 14 });
     expect(isSupport("withering-review")(aiSupportCommand(s))).toBe(true);

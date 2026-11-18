@@ -79,10 +79,10 @@ export function attackSfx(r: AttackReport, info?: UnitInfo): SfxName {
   const w = info?.weapons.find((x) => x.name === r.weapon);
   const name = r.weapon;
   const melee = r.kind === "fight" || (w?.melee ?? false);
-  if (has(/goo|glob|spit|spore|slime|acid|ooze|puff/, name)) return "goo";
+  if (has(/goo|glob|spit|spore|slime|acid|ooze|puff|bile|larva|grub/, name)) return "goo";
   if (melee) {
     if (has(/sting/, name)) return "sting";
-    if (has(/chomp|maw|bite|jaw|munch|nibbl|gnaw|fang|teeth/, name)) return "chomp";
+    if (has(/chomp|maw|bite|jaw|munch|nibbl|nip|gnaw|fang|teeth|mandible|pincer|snipper/, name)) return "chomp";
     if (info?.keywords.includes("beast") && !has(/claw|tail|stomp/, name)) return "chomp";
     return "thwack";
   }

@@ -84,3 +84,24 @@ describe("miniature recipes", () => {
     expect(cleanArt({ kind: "image", dataUrl: WEBP, zoom: 3 })).toEqual({ kind: "image", dataUrl: WEBP });
   });
 });
+
+describe("Skitterswarm miniatures", () => {
+  it("gives every bug a valid built miniature and every summon its own painter, in forge copies too", async () => {
+    const { FACTIONS } = await import("../src/engine/data/factions");
+    const { swarmPainter, swarmRecipe } = await import("../src/ui/art/factions/swarm");
+    for (const p of FACTIONS.swarm!.profiles) {
+      const recipe = swarmRecipe(p.id);
+      if (p.structure?.summonOnly) {
+        expect(swarmPainter(p.id), p.name).toBeDefined();
+        continue;
+      }
+      expect(recipe, p.name).toBeDefined();
+      expect(artProblems({ kind: "parts", recipe }, p.name)).toEqual([]);
+      expect(swarmRecipe(`custom-copy:${p.id}`)).toEqual(recipe);
+    }
+    // The Broodmother is the biggest bug on the table.
+    const mother = swarmRecipe("swarm-mother")!;
+    for (const p of FACTIONS.swarm!.profiles) if (p.id !== "swarm-mother") expect(mother.scale).toBeGreaterThanOrEqual(swarmRecipe(p.id)?.scale ?? 0);
+    expect(swarmRecipe("mil-grunts")).toBeUndefined();
+  });
+});

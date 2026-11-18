@@ -8,8 +8,8 @@ Open it from **⚔ Campaign** on the main menu.
 
 | Side | Campaign | Led by | What they want |
 | --- | --- | --- | --- |
-| Dustline Militia | *Not One Inch* | Aunt Dot Haybright | Hold the valley, get Haybright Farm back, keep the Wellspring for the people who were here first. |
-| The Munch | *One Mind, Many Mouths* | Dr. Graft (and Big Mama) | Tap the Wellspring and wire every critter in the valley into the overmind. |
+| Dustline Militia | *Not One Inch* | Marshal Dot Haybright | Hold the valley, get Haybright Farm back, keep the Wellspring for the people who were here first. |
+| The Skitterswarm | *Everything Hatches* | Mother Mandible, the Broodmother | Reach the Wellspring and lay the Great Clutch in its warmth, so the whole valley hatches. |
 | Lumen Concord | *A Tasteful Renovation* | His Radiance, the Grand Strider | Turn the valley into a pleasure garden, with the Wellspring as its fountain. |
 
 Each side fights a different set of battles (the ones its story puts it in), speaks its own lines before and after them, and has its own win and loss endings.
@@ -34,10 +34,10 @@ Every battlefield in the valley gives whoever holds it a small perk in later bat
 | Rattlevane Junction (the radio relays) | +1 CP at the start of every battle |
 | The Old Refinery, Gutterbend, The Gemhaul Road | +1 starting resource each |
 | Long Ridge Highway, Scrapyard Sprawl, Grubstake Redoubt | +2 roster budget each |
-| Mesa Ridge | A free unit in every battle: a Ridgeline Squinter (Militia), Web-Gunner Spiders (Munch) or a Ray Lancer (Concord) |
-| Wreck of the Velvet Comet | A free unit in every battle: a Sky Rustler, Bomb Wasps or a Shimmer Saucer (by side, as above) |
-| Lady Prismwick's Lawn | A free support card (no Fizz): Dirt Airstrip, Deep Burrows or Choir of Light (by side) |
-| Brinejaw Flats | A free support card (no Fizz): Rust Bucket Drop-Ship, Tunnel Network or Light Gate (by side) |
+| Mesa Ridge | A free unit in every battle: a Ridgeline Marksman (Militia), Acid Spitters (Skitterswarm) or a Ray Lancer (Concord) |
+| Wreck of the Velvet Comet | A free unit in every battle: a Sky Rustler, a Stinger Swarm or a Shimmer Saucer (by side, as above) |
+| Lady Prismwick's Lawn | A free support card (no Fizz): Forward Airstrip, Egg Chamber or Choir of Light (by side) |
+| Brinejaw Flats | A free support card (no Fizz): Rust Bucket Drop-Ship, Undertunnels or Light Gate (by side) |
 
 Perks add up, but each kind is capped per battle: at most +2 CP, +2 starting resources, +3 roster budget, one free unit and one free support card. The caps were checked with AI-vs-AI sims: the biggest start-of-battle edge (+2 CP and +2 resources) lifts the AI's Skirmish score from about 44% to 54%; an uncapped +4 resources would have made it 67%. The campaign screen lists your perks and marks any that are over the limit. Only you get perks; the AI fights with its starter army at the act's budget.
 
@@ -65,11 +65,12 @@ The campaign saves itself in the browser (or the desktop app's data folder) afte
 
 - **Export save** downloads it as a `.json` file, and **Import…** loads one back (a save from another version of the game, or a corrupt file, is refused rather than half-loaded).
 - **Abandon** deletes the campaign so you can start again, as any side.
+- **Saves from before the Skitterswarm.** The Munch used to be the third side. A campaign saved on the Militia's or the Concord's side keeps going: any place the Munch held now belongs to the Skitterswarm. A campaign saved on the Munch's own side can't continue (the Munch now live on as a Faction Forge template), so the campaign screen says so and offers **Start over** (and an export of the old file first).
 - In a battle, **⚑ Retreat** on the top bar leaves it as a defeat. Closing the game mid-battle doesn't count: the battle is still on offer when you come back.
 
 ## For developers
 
-- The war's rules are pure and deterministic, in [`src/engine/campaign.ts`](../src/engine/campaign.ts): `newCampaign`, `availableBattles`, `recordResult`, `perkTotals`, `budgetFor`, `battleSetup` (everything `createGame` needs, including the perks), and `parseCampaign` / `serializeCampaign` for saves.
+- The war's rules are pure and deterministic, in [`src/engine/campaign.ts`](../src/engine/campaign.ts): `newCampaign`, `availableBattles`, `recordResult`, `perkTotals`, `budgetFor`, `battleSetup` (everything `createGame` needs, including the perks), and `parseCampaign` / `serializeCampaign` for saves (`parseCampaign` maps places held by a retired faction to whoever replaced it; `legacySaveSide` in `src/ui/campaign/store.ts` spots a save on a retired side).
 - The campaign data (each side's battles, lines, perks, budgets) is in [`src/engine/data/campaign.ts`](../src/engine/data/campaign.ts), built on the battle seeds, places and characters in `lore.ts`.
 - Perks reach the engine through one small option, `GameSetup.startBonus` (extra starting resources and CP per side), plus the lists and supports passed to `createGame`. No rules, stats or scoring change.
 - The screen is [`src/ui/campaign/`](../src/ui/campaign/) (loaded on first use), and the story scenes reuse the intro player in `src/ui/intro/`.

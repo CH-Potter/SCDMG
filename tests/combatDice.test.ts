@@ -4,6 +4,10 @@ import { applyCommand, createGame } from "../src/engine/game";
 import { profileOf } from "../src/engine/profile";
 import { unitById, unitsEngage } from "../src/engine/rules";
 import type { GameEvent, GameState, Unit, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function place(s: GameState, uid: string, at: Vec): Unit {
   const u = unitById(s, uid)!;

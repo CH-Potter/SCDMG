@@ -7,6 +7,10 @@ import { createGame, planCharge } from "../src/engine/game";
 import { profileOf } from "../src/engine/profile";
 import { unitById } from "../src/engine/rules";
 import type { GameState, Unit, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function game(): GameState {
   const s = createGame({ factions: ["militia", "munch"], seed: 7 });

@@ -2,7 +2,7 @@
 // An army of grafted farmland critters (beetles, spiders, wasps, scorpions, foxes, a skunk, a crow)
 // led by an evil bioengineer riding his war-badger. Natural animal coats, plus clean lab grafts:
 // chrome plates held on with surgical staples, glass vials of glowing mutagen, bolted-on weapons.
-// Every critter wears the overmind implant, a chrome skull cap with a glowing faction-green lens:
+// Every critter wears the signal implant, a chrome skull cap with a glowing faction-green lens:
 // that and the green glow are the faction's shared thread. Painters live in munch-critters.ts,
 // munch-beasts.ts and munch-structures.ts; the shared kit in munch-kit.ts.
 

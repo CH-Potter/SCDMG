@@ -13,6 +13,10 @@ import type { GameEvent, GameState, ListEntry, SupportEffect, Unit, Vec } from "
 import { effectSummary } from "../src/forge/model";
 import { cleanFaction, copyFaction } from "../src/ui/customFactions";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 const CARD = "mil-dropship";
 const ABILITY = "bumpy-landing";
@@ -194,7 +198,7 @@ describe("drop-ship data", () => {
 
     // Old airdrops without the new fields stay valid.
     const old = militia();
-    const hay = old.supports.find((x) => x.name === "Dirt Airstrip")!.abilities[0]!.effect as Record<string, unknown>;
+    const hay = old.supports.find((x) => x.name === "Forward Airstrip")!.abilities[0]!.effect as Record<string, unknown>;
     expect(hay.anywhere).toBeUndefined();
     expect(hay.fromRound).toBeUndefined();
     expect(factionProblems(old)).toEqual([]);
@@ -209,7 +213,7 @@ describe("drop-ship data", () => {
       anywhere: true,
       fromRound: 2,
     });
-    expect(f.supports.find((x) => x.name === "Dirt Airstrip")!.abilities[0]!.effect).toEqual({ kind: "airdrop", range: 12, minEnemyDistance: 6 });
+    expect(f.supports.find((x) => x.name === "Forward Airstrip")!.abilities[0]!.effect).toEqual({ kind: "airdrop", range: 12, minEnemyDistance: 6 });
   });
 
   it("describes anywhere drops in the forge summary", () => {

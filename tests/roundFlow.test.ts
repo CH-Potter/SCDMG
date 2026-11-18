@@ -4,6 +4,10 @@
 import { describe, expect, it } from "vitest";
 import { applyCommand, createGame } from "../src/engine/game";
 import type { GameEvent, GameState } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function passUntil(s: GameState, done: (s: GameState) => boolean): { s: GameState; events: GameEvent[] } {
   const events: GameEvent[] = [];

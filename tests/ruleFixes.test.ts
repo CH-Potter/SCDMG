@@ -8,6 +8,10 @@ import { controlWeight, disengageOdds, isEngaged, objectivePresence, supplyFor, 
 import { scoreRound, updateFlags } from "../src/engine/scoring";
 import type { GameEvent, GameState, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function place(s: GameState, uid: string, at: Vec): Unit {
   const u = unitById(s, uid)!;
@@ -130,25 +134,25 @@ describe("the instant-win lead is set per mission", () => {
 });
 
 describe("disengaging by supply", () => {
-  /** Rivet Grunts locked in melee with a Chrome-Jaw Beetles of the same supply, Grunts to move. */
+  /** Rivet Grunts locked in melee with Acid Spitters of the same supply, Grunts to move. */
   function locked() {
-    const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed: 5 });
+    const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "swarm"], seed: 5 });
     s.orderChoice = null;
     s.phase = "movement";
     s.activePlayer = 0;
     const g = place(s, uidOf(s, 0, "mil-grunts"), { x: 26, y: 8 });
-    // The Nibblers' front row just touches the Grunts' back row (place() lays squads out 3 to a row).
+    // The Spitters' front row just touches the Grunts' back row (place() lays squads out 3 to a row).
     const gp = profileOf(g);
     const backRow = 8 + (Math.ceil(gp.models / 3) - 1) * (2 * gp.baseRadius + 0.1);
-    const nUid = uidOf(s, 1, "munch-nibblers");
-    const n = place(s, nUid, { x: 26, y: backRow + gp.baseRadius + PROFILES["munch-nibblers"]!.baseRadius + 0.2 });
+    const nUid = uidOf(s, 1, "swarm-spitters");
+    const n = place(s, nUid, { x: 26, y: backRow + gp.baseRadius + PROFILES["swarm-spitters"]!.baseRadius + 0.2 });
     expect(isEngaged(s, g)).toBe(true);
     return { s, g, n };
   }
   const away = (s: GameState, uid: string) => applyCommand(s, { type: "disengage", uid, leader: 0, to: { x: 26, y: 4 } });
 
-  it("the starter squads are worth the same supply at full strength", () => {
-    expect(PROFILES["mil-grunts"]!.supply).toBe(PROFILES["munch-nibblers"]!.supply);
+  it("a Rivet Grunt squad and an Acid Spitter brood are worth the same supply at full strength", () => {
+    expect(PROFILES["mil-grunts"]!.supply).toBe(PROFILES["swarm-spitters"]!.supply);
   });
 
   it("equal supply: the unit gets away but is exhausted for the assault phase", () => {
@@ -165,7 +169,7 @@ describe("disengaging by supply", () => {
   it("more supply than the enemy: a clean break with no penalty", () => {
     const { s, g, n } = locked();
     const np = profileOf(n);
-    // Kill Nibblers from the back until the pack is worth one supply less than the Grunts (its front row stays in contact).
+    // Kill Spitters from the back until the brood is worth one supply less than the Grunts (its front row stays in contact).
     const keep = Array.from({ length: np.models }, (_, i) => np.models - i).find((k) => supplyFor(np, k) === profileOf(g).supply - 1)!;
     n.models.slice(keep).forEach((m) => (m.alive = false));
     expect(isEngaged(s, g)).toBe(true);

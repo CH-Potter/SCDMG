@@ -1,6 +1,6 @@
 // Prints a per-round summary of one AI-vs-AI game (objective control, units on board, VP, morale).
 // Usage: node sim/trace.mjs <factionA> <factionB> <missionId> <mapId> <seed>
-//   e.g. node sim/trace.mjs concord munch grab mesa 11
+//   e.g. node sim/trace.mjs concord swarm grab mesa 11
 
 import { fileURLToPath } from "node:url";
 import { runnerImport } from "vite";

@@ -12,7 +12,7 @@ import {
   barnFront,
   creekCutaway,
   hallMast,
-  lab,
+  hollow,
   lawn,
   orbit,
   rays,
@@ -82,8 +82,8 @@ function backdrop(k: Kit, placeId: string | undefined, sky: Sky): void {
       });
       return;
     }
-    case "sett-lab":
-      k.backdrop(lab());
+    case "brood-hollow":
+      k.backdrop(hollow());
       return;
     case "haybright-farm":
       k.backdrop(barnFront());
@@ -128,7 +128,7 @@ function placeSign(k: Kit, placeId: string | undefined): void {
   );
 }
 
-/** Aunt Dot's radio set, for when she's broadcasting to somewhere other than the Grange Hall. */
+/** The Marshal's field radio, for when she's broadcasting to somewhere other than the Grange Hall. */
 const RADIO = `<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M78 40 L100 6" stroke="#1c1512" stroke-width="7" stroke-linecap="round"/><circle cx="100" cy="6" r="6" fill="#e2483d" stroke="#1c1512" stroke-width="3"/><rect x="10" y="40" width="100" height="70" rx="12" fill="#1c1512" transform="translate(5 5)"/><rect x="10" y="40" width="100" height="70" rx="12" fill="#c98a4b" stroke="#1c1512" stroke-width="5"/><circle cx="42" cy="76" r="20" fill="#3a2e26" stroke="#1c1512" stroke-width="4"/><g stroke="#8a7a66" stroke-width="3"><path d="M28 70 H56"/><path d="M28 78 H56"/><path d="M30 86 H54"/></g><rect x="70" y="56" width="30" height="14" rx="3" fill="#fff3c0" stroke="#1c1512" stroke-width="4"/><circle cx="78" cy="88" r="7" fill="#f6e3b6" stroke="#1c1512" stroke-width="4"/><circle cx="96" cy="88" r="7" fill="#f6e3b6" stroke="#1c1512" stroke-width="4"/></svg>`;
 
 /** Radio waves spreading from a point. */

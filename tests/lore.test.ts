@@ -108,10 +108,17 @@ describe("lore: characters and places", () => {
   });
 
   it("uses the pronouns the game's own text sets", () => {
-    expect(characterById("dr-graft")!.pronoun).toBe("he");
-    expect(characterById("big-mama")!.pronoun).toBe("she");
+    expect(characterById("broodmother")!.pronoun).toBe("she");
+    expect(characterById("broodmother")!.unitId).toBe("swarm-mother");
+    expect(characterById("aunt-dot")!.pronoun).toBe("she");
     expect(characterById("grand-strider")!.pronoun).toBe("he");
     expect(characterById("grand-strider")!.name).toBe(PROFILES["con-facet"]!.name);
+  });
+
+  it("keeps the Munch out of the base lore: they live on as a forge template", () => {
+    const text = JSON.stringify({ WORLD, PLACES, CHARACTERS, LORE_FACTIONS, BATTLES });
+    expect(text).not.toMatch(/munch|Dr\. Graft|Big Mama|Sett Lab|overmind/i);
+    for (const b of BATTLES) expect(b.sides).not.toContain("munch");
   });
 
   it("sets every built-in battlefield somewhere in the valley", () => {

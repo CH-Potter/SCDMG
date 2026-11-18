@@ -16,6 +16,9 @@ import {
   setProfileKind,
   fitStarterLists,
 } from "../src/forge/model";
+import { aiCommand } from "../src/engine/ai";
+import { applyCommand, createGame } from "../src/engine/game";
+import { munchFaction } from "./helpers/munch";
 import {
   blankFaction,
   cleanFaction,
@@ -55,7 +58,7 @@ afterEach(() => {
 
 describe("copying a faction", () => {
   it("re-prefixes every id and fixes internal references", () => {
-    for (const id of ["militia", "munch", "concord"]) {
+    for (const id of ["militia", "swarm", "concord"]) {
       const src = FACTIONS[id]!;
       const before = JSON.stringify(src);
       const f = copyFaction(src, "My copy");
@@ -78,7 +81,7 @@ describe("copying a faction", () => {
   });
 
   it("carries impact on charge into copies and through import", () => {
-    for (const id of ["militia", "munch"]) {
+    for (const id of ["militia", "swarm"]) {
       const src = FACTIONS[id]!;
       const f = copyFaction(src, "Impact");
       const withImpact = src.profiles.filter((p) => p.impact);
@@ -86,7 +89,7 @@ describe("copying a faction", () => {
       const back = importFaction(JSON.parse(JSON.stringify(exportable(f))), []);
       expect(back.faction).toEqual(f);
     }
-    const raw = JSON.parse(JSON.stringify(exportable(copyFaction(FACTIONS.munch!, "Coerce")))) as { faction: { profiles: Record<string, unknown>[] } };
+    const raw = JSON.parse(JSON.stringify(exportable(copyFaction(FACTIONS.swarm!, "Coerce")))) as { faction: { profiles: Record<string, unknown>[] } };
     raw.faction.profiles[0]!.impact = { dice: "2", hit: "<b>", damage: 1, ap: 0, junk: true };
     const r = importFaction(raw, []);
     expect(r.faction!.profiles[0]!.impact!.dice).toBe(2);
@@ -163,11 +166,11 @@ describe("importing factions", () => {
   });
 
   it("re-ids clashes with built-ins and taken ids", () => {
-    const r = importFaction(JSON.parse(JSON.stringify(FACTIONS.munch)), []);
+    const r = importFaction(JSON.parse(JSON.stringify(FACTIONS.swarm)), []);
     expect(r.renamed).toBe(true);
     expect(r.faction!.id.startsWith("custom-")).toBe(true);
     expect(r.problems).toEqual([]);
-    const f = copyFaction(FACTIONS.munch!, "Taken");
+    const f = copyFaction(FACTIONS.swarm!, "Taken");
     const again = importFaction(exportable(f), [f.id]);
     expect(again.renamed).toBe(true);
     expect(again.faction!.id).not.toBe(f.id);
@@ -222,7 +225,7 @@ describe("importing factions", () => {
   });
 
   it("keeps a clean faction intact through cleanFaction", () => {
-    for (const id of ["militia", "munch", "concord"]) expect(cleanFaction(JSON.parse(JSON.stringify(FACTIONS[id])))).toEqual(FACTIONS[id]);
+    for (const id of ["militia", "swarm", "concord"]) expect(cleanFaction(JSON.parse(JSON.stringify(FACTIONS[id])))).toEqual(FACTIONS[id]);
   });
 });
 
@@ -246,12 +249,33 @@ describe("custom faction storage", () => {
   });
 
   it("refuses invalid factions and built-in ids", () => {
-    const f = copyFaction(FACTIONS.munch!, "Broken");
+    const f = copyFaction(FACTIONS.swarm!, "Broken");
     f.profiles[0]!.hp = 0;
     expect(saveCustomFaction(f).length).toBeGreaterThan(0);
-    expect(saveCustomFaction(structuredClone(FACTIONS.munch!) as Faction).length).toBeGreaterThan(0);
+    expect(saveCustomFaction(structuredClone(FACTIONS.swarm!) as Faction).length).toBeGreaterThan(0);
     expect(listCustomFactions()).toEqual([]);
   });
+
+  it("keeps a custom faction copied from the old built-in Munch working: it's self-contained", () => {
+    // A save from before the Munch left the built-ins: a copy of the old faction, ids and all ("...:munch-nibblers").
+    const old = copyFaction(munchFaction(), "My Munch");
+    expect(old.profiles.some((p) => p.id.endsWith(":munch-nibblers"))).toBe(true);
+    g.localStorage!.setItem("scdmg.customFactions.v1", JSON.stringify([{ ...old, custom: true }]));
+    const [loaded] = listCustomFactions();
+    expect(loaded?.id).toBe(old.id);
+    expect(factionProblems(loaded!)).toEqual([]);
+    expect(loaded!.profiles.map((p) => p.name)).toContain("Dr. Graft and Big Mama");
+    // ...and it still plays: the AI fields it against the Skitterswarm for a while without an illegal move.
+    registerCustomFactions([{ ...loaded!, custom: true }]);
+    let s = createGame({ factions: [loaded!.id, "swarm"], mapId: "dustbowl", seed: 4, orderChoice: true });
+    for (let i = 0; i < 300 && !s.over; i++) {
+      const cmd = aiCommand(s);
+      const r = applyCommand(s, cmd);
+      if (!r.ok) throw new Error(`illegal AI move: ${JSON.stringify(cmd)}: ${r.error}`);
+      s = r.state;
+    }
+    expect(s.units.some((u) => u.owner === 0 && u.onBoard)).toBe(true);
+  }, 60_000);
 
   it("skips corrupt storage entries", () => {
     const ok = copyFaction(FACTIONS.concord!, "Good");
@@ -270,7 +294,7 @@ describe("computed costs in custom factions", () => {
   };
 
   it("copies, blank factions and imports get computed costs", () => {
-    for (const id of ["militia", "munch", "concord"]) computedOk(copyFaction(FACTIONS[id]!, "Priced"));
+    for (const id of ["militia", "swarm", "concord"]) computedOk(copyFaction(FACTIONS[id]!, "Priced"));
     computedOk(blankFaction("Blank"));
     const raw = JSON.parse(JSON.stringify(exportable(copyFaction(FACTIONS.militia!, "Cheap")))) as { faction: Faction };
     for (const p of raw.faction.profiles) p.cost = 0;
@@ -278,7 +302,7 @@ describe("computed costs in custom factions", () => {
   });
 
   it("round-trips through export and import with costs following the stats", () => {
-    const f = copyFaction(FACTIONS.munch!, "Trip");
+    const f = copyFaction(FACTIONS.swarm!, "Trip");
     f.profiles[0]!.hp += 2; // edit a stat: the cost follows once the faction is cleaned
     const back = importFaction(JSON.parse(JSON.stringify(exportable(f))), []);
     computedOk(back.faction!);
@@ -314,8 +338,8 @@ describe("computed costs in custom factions", () => {
   });
 
   it("fitStarterLists drops Assault extras before Skirmish units", () => {
-    const f = copyFaction(FACTIONS.munch!, "Trim");
-    const mama = f.profiles.find((p) => p.id.endsWith(":munch-mama"))!;
+    const f = copyFaction(FACTIONS.swarm!, "Trim");
+    const mama = f.profiles.find((p) => p.id.endsWith(":swarm-mother"))!;
     f.assaultExtras = Array.from({ length: 12 }, () => ({ profileId: mama.id, upgrades: [] }));
     const before = f.defaultList.length;
     expect(fitStarterLists(f).length).toBeGreaterThan(0);
@@ -326,7 +350,7 @@ describe("computed costs in custom factions", () => {
 
 describe("army slots in custom factions", () => {
   it("copies a built-in's resolved faction and support slots into the copy", () => {
-    for (const id of ["militia", "munch", "concord"]) {
+    for (const id of ["militia", "swarm", "concord"]) {
       const src = FACTIONS[id]!;
       const f = copyFaction(src, "Slots");
       expect(f.slots).toEqual(factionSlots(src));
@@ -351,7 +375,7 @@ describe("army slots in custom factions", () => {
     const f = blankFaction("Empty");
     expect(f.slots).toEqual({});
     expect(addSupport(f).slots).toEqual({});
-    for (const id of ["militia", "munch", "concord"]) {
+    for (const id of ["militia", "swarm", "concord"]) {
       const clean = cleanFaction(JSON.parse(JSON.stringify(FACTIONS[id])));
       expect(clean.slots).toBeUndefined();
       expect(clean.supports.every((s) => s.slots === undefined)).toBe(true);

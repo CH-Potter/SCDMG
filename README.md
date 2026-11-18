@@ -34,11 +34,11 @@ One click puts everything back to the standard rules. Every rule is explained in
 
 ### Three factions, three ways to fight
 
-![The three factions: Dustline Militia, The Munch and Lumen Concord](docs/images/factions.webp)
-
-- **Dustline Militia:** scrappy frontier farmers. Rifle gunlines, artillery, overwatch and digging in, with drop-ship and airstrip arrivals.
-- **The Munch:** farmland critters grafted with weapons and wired to the overmind of the evil bioengineer Dr. Graft. Cheap bodies, impact on the charge, regrowth, and tunnels to pop up where you least want them.
+- **Dustline Militia:** the frontier, drafted. Farm and mine hands drilled into squads and bolted into riveted work-suit armour: armoured rifle gunlines, artillery, overwatch and digging in, with drop-ship and airstrip arrivals.
+- **The Skitterswarm:** a tide of bugs from under the valley, every one of them answering to the Broodmother. Cheap bodies, acid that softens whatever it hits for the rest of the swarm, broods that keep regrowing while she lives, and tunnels to burst up where you least want them.
 - **Lumen Concord:** smug alien invaders with saucers, ray guns and shields. Few elite models with precision shooting, and blinks, gates and portals to be in the right place.
+
+The Munch, Dr. Graft's grafted critter army, fought for the valley until v0.12. They live on whole as a Faction Forge template.
 
 Each faction's design pillars are in [docs/factions.md](docs/factions.md).
 
@@ -62,14 +62,12 @@ Select a unit and hover a target to see what would happen before you commit: aim
 
 ![The campaign map of the Dustline valley, with the places each side holds and the battles on offer](docs/images/campaign-map.webp)
 
-Linked Skirmish and Assault battles on a map of the valley, told from the side you pick: _Not One Inch_ for the Militia, _One Mind, Many Mouths_ for the Munch, _A Tasteful Renovation_ for the Concord. Win and you hold the place; lose and the enemy takes it. Places give small perks, your army carries over from battle to battle, and every story ends at Fizzwater Ford, over the Wellspring. See [docs/campaign.md](docs/campaign.md).
+Linked Skirmish and Assault battles on a map of the valley, told from the side you pick: _Not One Inch_ for the Militia, _Everything Hatches_ for the Skitterswarm, _A Tasteful Renovation_ for the Concord. Win and you hold the place; lose and the enemy takes it. Places give small perks, your army carries over from battle to battle, and every story ends at Fizzwater Ford, over the Wellspring. See [docs/campaign.md](docs/campaign.md).
 
 ### A story to fight over
 
 <table>
   <tr>
-    <td><img src="docs/images/intro-militia.webp" alt="Militia intro: the whole valley turns up, with rifles, shovels and sandwiches"></td>
-    <td><img src="docs/images/intro-munch.webp" alt="Munch intro: Dr. Graft rides Big Mama, his war-badger"></td>
     <td><img src="docs/images/intro-concord.webp" alt="Concord intro: His Radiance, the Grand Strider, arrives through a portal"></td>
   </tr>
 </table>
@@ -84,9 +82,9 @@ Comic-panel intro animations, drawn live with the game's own miniatures, introdu
 
 The **map builder** draws battlefields from platforms, buildings, walls, barricades, cover, ramps, ladders, spawn zones and objectives, with snapping, mirroring for symmetric boards, built-in checks and a play test. Start from a blank board or copy a built-in map.
 
-![The faction forge showing the Munch codex: every unit with its miniature, stats and keywords](docs/images/faction-forge.webp)
+![The faction forge showing a codex: every unit with its miniature, stats and keywords](docs/images/faction-forge.webp)
 
-The **faction forge** shows every built-in faction's codex, and lets you copy one, start from one of 13 trope templates (armoured super-soldiers, an insect swarm, an undead legion, a knightly kingdom and more; see [docs/factions.md](docs/factions.md#faction-forge-templates)), or start from scratch to make your own, with custom unit art. Costs, supply, upgrade costs and Fizz are worked out from what you build, with a breakdown (e.g. "⚙5 = body 2.4 + guns 1.2 + abilities 1"), so you can see what each stat, weapon and ability is worth.
+The **faction forge** shows every built-in faction's codex, and lets you copy one, start from one of 13 trope templates (armoured super-soldiers, a scrap-built warband, an undead legion, a knightly kingdom, the Munch and more; see [docs/factions.md](docs/factions.md#faction-forge-templates)), or start from scratch to make your own, with custom unit art. Costs, supply, upgrade costs and Fizz are worked out from what you build, with a breakdown (e.g. "⚙5 = body 2.4 + guns 1.2 + abilities 1"), so you can see what each stat, weapon and ability is worth.
 
 ### Mouse or touch, browser or desktop
 

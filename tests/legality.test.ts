@@ -21,6 +21,10 @@ import { abilityOf } from "../src/engine/reactions";
 import { aliveModels, onBoard, reserves, unitById } from "../src/engine/rules";
 import { supportTarget } from "../src/engine/supports";
 import type { Command, GameState, Unit, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function actionsFor(u: Unit): UnitAction[] {
   const p = profileOf(u);

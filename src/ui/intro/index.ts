@@ -6,7 +6,7 @@ import { introLength, playIntro, type IntroHandle, type PlayOptions } from "./st
 
 export type { IntroHandle, PlayOptions };
 
-/** The game intro: the Dustline, its two invasions, and the farmers who won't leave. */
+/** The game intro: the Dustline, its two invasions, and the drafted frontier that won't leave. */
 export function playGameIntro(opts: PlayOptions = {}): IntroHandle {
   return playIntro(GAME_INTRO(), opts);
 }
@@ -20,11 +20,11 @@ export function playFactionIntro(factionId: string, opts: PlayOptions = {}): Int
 export const introLengths = (): Record<string, number> => ({
   game: introLength(GAME_INTRO()),
   militia: introLength(factionIntro("militia")),
-  munch: introLength(factionIntro("munch")),
+  swarm: introLength(factionIntro("swarm")),
   concord: introLength(factionIntro("concord")),
 });
 
-// Dev review: __scdmgIntro.play("munch", { freezeAt: 4200 }) from the console or a screenshot script.
+// Dev review: __scdmgIntro.play("swarm", { freezeAt: 4200 }) from the console or a screenshot script.
 if (import.meta.env?.DEV && typeof window !== "undefined") {
   (window as unknown as { __scdmgIntro: unknown }).__scdmgIntro = {
     play: (id: string, opts: PlayOptions = {}) => (id === "game" ? playGameIntro(opts) : playFactionIntro(id, opts)),

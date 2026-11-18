@@ -65,42 +65,37 @@ function militia(color: number, id: string): string {
   ${[[14, 17], [50, 17], [14, 37], [50, 37], [32, 55]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#c9c2b4" stroke="${INK}" stroke-width="1"/>`).join("")}`;
 }
 
-/** The Munch: a chrome-jawed beetle wearing the overmind lens, on a hive-hex plate wired with glowing nodes. */
-function munch(color: number, id: string): string {
-  const glow = css(mix(color, 0xe8ff9a, 0.35));
-  const ring = css(color);
-  const hex = (r: number, cy = 33) =>
-    Array.from({ length: 6 }, (_, i) => {
-      const a = -Math.PI / 2 + (i * Math.PI) / 3;
-      return `${(32 + Math.cos(a) * r).toFixed(1)},${(cy + Math.sin(a) * r).toFixed(1)}`;
-    }).join(" ");
-  const nodes = Array.from({ length: 6 }, (_, i) => {
-    const a = -Math.PI / 2 + (i * Math.PI) / 3;
-    return [32 + Math.cos(a) * 22.5, 33 + Math.sin(a) * 22.5] as const;
-  });
-  // three stubby legs a side, mirrored
-  const legs = "M25 33 L18 30 L16 26 M24 40 L16 41 L13 44 M25 47 L19 51 L18 55";
-  const mirror = "M39 33 L46 30 L48 26 M40 40 L48 41 L51 44 M39 47 L45 51 L46 55";
-  return `${defs(id, "rgba(28,21,18,0.4)")}
-  <polygon points="${hex(28)}" fill="${INK}" transform="translate(2 2)"/>
-  <polygon points="${hex(28)}" fill="#3b4148" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
-  <polygon points="${hex(22.5)}" fill="none" stroke="${ring}" stroke-width="2"/>
-  ${nodes.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="${glow}" stroke="${INK}" stroke-width="0.9"/>`).join("")}
-  <path d="M32 5 L56 19 L56 47 L32 61 Z" fill="url(#ht${id})" opacity="0.8"/>
-  <path d="${legs} ${mirror}" stroke="${INK}" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="${legs} ${mirror}" stroke="#6b4a33" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <ellipse cx="32" cy="43" rx="10.5" ry="12.5" fill="#5a3a26" stroke="${INK}" stroke-width="2.4"/>
-  <path d="M32 43 m-10.5 0 a10.5 12.5 0 0 0 10.5 12.5 L32 30.5 a10.5 12.5 0 0 0 -10.5 12.5" fill="#6e4830"/>
-  <path d="M25 36 Q26 32 30 31" stroke="#a7774f" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-  <path d="M32 31 L32 55" stroke="${INK}" stroke-width="1.4"/>
-  <ellipse cx="32" cy="29" rx="8.5" ry="5" fill="#4a3020" stroke="${INK}" stroke-width="2.2"/>
-  <path d="M28.5 18 C24 15 23.5 10 27.5 8 C27.5 11 29 13.5 31.5 15.5 Z" fill="#c9d0d6" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
-  <path d="M35.5 18 C40 15 40.5 10 36.5 8 C36.5 11 35 13.5 32.5 15.5 Z" fill="#c9d0d6" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
-  <circle cx="32" cy="21.5" r="6.5" fill="#aeb8c0" stroke="${INK}" stroke-width="2.2"/>
-  <path d="M27.5 19.5 A5 5 0 0 1 31 16.2" stroke="#eef2f5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <circle cx="32" cy="21.5" r="4.2" fill="${glow}" opacity="0.35"/>
-  <circle cx="32" cy="21.5" r="2.6" fill="${glow}" stroke="${INK}" stroke-width="1.2"/>
-  <circle cx="31.2" cy="20.7" r="0.8" fill="#ffffff"/>`;
+/**
+ * The Skitterswarm: a bug's head seen front-on (hooked mandibles, two glowing compound eyes, feelers)
+ * on a segmented chitin plate, over a clutch of three glowing eggs.
+ */
+function swarm(color: number, id: string): string {
+  const acid = css(color);
+  const glow = css(mix(color, 0xf4ffc0, 0.45));
+  const shell = "#3b2a33";
+  const shellLt = "#5a4250";
+  const plate = "M32 4 C46 6 56 14 57 28 C58 44 48 56 32 61 C16 56 6 44 7 28 C8 14 18 6 32 4 Z";
+  const egg = (x: number, y: number, r: number) =>
+    `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 1.25}" fill="${glow}" stroke="${INK}" stroke-width="1.6"/><ellipse cx="${x - r * 0.3}" cy="${y - r * 0.45}" rx="${r * 0.3}" ry="${r * 0.4}" fill="#ffffff" opacity="0.75"/>`;
+  return `${defs(id, "rgba(28,21,18,0.45)")}
+  <path d="${plate}" fill="${INK}" transform="translate(2 2)"/>
+  <path d="${plate}" fill="${shell}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M12 22 C24 17 40 17 52 22 M9 36 C22 31 42 31 55 36" stroke="${shellLt}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M32 61 C48 56 58 44 57 28 C56 14 46 6 32 4 L32 61 Z" fill="url(#ht${id})"/>
+  <path d="M14 14 C20 9 26 7 31 7" stroke="#8a7080" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>
+  ${egg(23, 50, 4.2)}${egg(41, 50, 4.2)}${egg(32, 53.5, 4.8)}
+  <path d="M27 17 C24 11 20 9 15 9 M37 17 C40 11 44 9 49 9" stroke="${INK}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  <path d="M27 17 C24 11 20 9 15 9 M37 17 C40 11 44 9 49 9" stroke="${acid}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M20 26 C20 18 26 15 32 15 C38 15 44 18 44 26 C44 33 39 38 32 38 C25 38 20 33 20 26 Z" fill="#5a4250" stroke="${INK}" stroke-width="2.4"/>
+  <path d="M23 21 C26 17.5 30 17 33 17.2" stroke="#8a7080" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="25.5" cy="26" rx="4.4" ry="5.2" fill="${glow}" stroke="${INK}" stroke-width="1.8" transform="rotate(-18 25.5 26)"/>
+  <ellipse cx="38.5" cy="26" rx="4.4" ry="5.2" fill="${glow}" stroke="${INK}" stroke-width="1.8" transform="rotate(18 38.5 26)"/>
+  <path d="M23 24 L28 24 M22.6 27 L28.4 27 M36 24 L41 24 M35.6 27 L41.4 27" stroke="${css(shade(color, -0.35))}" stroke-width="0.8"/>
+  <circle cx="24.4" cy="23.6" r="1" fill="#ffffff"/><circle cx="37.4" cy="23.6" r="1" fill="#ffffff"/>
+  <path d="M26 35 C21 38 20 43 24 46 C25 42 28 40 31 39.5 Z" fill="#e8dcc4" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M38 35 C43 38 44 43 40 46 C39 42 36 40 33 39.5 Z" fill="#e8dcc4" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M24.5 38.5 l1.6 1.4 M39.5 38.5 l-1.6 1.4" stroke="${INK}" stroke-width="1"/>
+  <circle cx="32" cy="41.5" r="1.4" fill="${acid}" stroke="${INK}" stroke-width="0.8"/>`;
 }
 
 /** Lumen Concord: a smug alien in a fishbowl helmet, gold collar and little crown, on a radiant medallion. */
@@ -180,7 +175,7 @@ export function factionEmblemSvg(factionId: string, size = 48): string {
   }
   const color = safeColor(f?.color);
   if (factionId === "militia") return svg(n, militia(color, id), "Dustline Militia emblem");
-  if (factionId === "munch") return svg(n, munch(color, id), "The Munch emblem");
+  if (factionId === "swarm") return svg(n, swarm(color, id), "The Skitterswarm emblem");
   if (factionId === "concord") return svg(n, concord(color, id), "Lumen Concord emblem");
   const seed = hash(String(f?.name ?? factionId));
   return svg(n, custom(color, safeLook(f?.look), seed, id), "Faction emblem");

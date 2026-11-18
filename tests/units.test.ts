@@ -14,7 +14,7 @@ import type { GameEvent, GameState, ListEntry, Unit, UnitProfile, Vec } from "..
 
 const NEW_UNITS: Record<string, string[]> = {
   militia: ["mil-squinter", "mil-riders", "mil-grannies", "mil-bomber", "mil-mortar"],
-  munch: ["munch-hoppers", "munch-lobber", "munch-flapjaw", "munch-nanny", "munch-warren"],
+  swarm: ["swarm-lurker", "swarm-borer", "swarm-stingers", "swarm-shellbacks", "swarm-mother"],
   concord: ["con-facet", "con-dancers", "con-sylph", "con-obelisk"],
 };
 
@@ -61,8 +61,8 @@ describe("new units", () => {
     for (const fid of BUILT_IN_FACTION_IDS) {
       const ps = FACTIONS[fid]!.profiles.filter(buyable);
       const has = (pred: (p: UnitProfile) => boolean) => ps.some(pred);
-      // The Munch are a melee swarm: their spit and gloop are short-ranged on purpose (see docs/factions.md).
-      if (fid !== "munch") expect(has((p) => longest(p) >= 26), `${fid} long range`).toBe(true);
+      // The Skitterswarm is a melee swarm: its spit and bile are short-ranged on purpose (see docs/factions.md).
+      if (fid !== "swarm") expect(has((p) => longest(p) >= 26), `${fid} long range`).toBe(true);
       else expect(has((p) => longest(p) >= 26), `${fid} has no long-range gun`).toBe(false);
       expect(has((p) => p.keywords.includes("flying")), `${fid} flyer`).toBe(true);
       expect(
@@ -89,8 +89,8 @@ describe("new units", () => {
 });
 
 describe("new unit mechanics", () => {
-  it("Front Porch Grannies are fearless and never get Shaken", () => {
-    const s = createGame({ factions: ["militia", "munch"], seed: 3, lists: [[entry("mil-grannies")], [entry("munch-nibblers")]] });
+  it("the Old Guard Veterans are fearless and never get Shaken", () => {
+    const s = createGame({ factions: ["militia", "swarm"], seed: 3, lists: [[entry("mil-grannies")], [entry("swarm-skitterlings")]] });
     const g = place(s, uidOf(s, 0, "mil-grannies"), { x: 10, y: 20 });
     g.models[0]!.alive = false;
     g.models[1]!.alive = false;
@@ -99,35 +99,35 @@ describe("new unit mechanics", () => {
     expect(g.status.shaken).toBe(false);
   });
 
-  it("the Hay Bomber's Fertiliser Drop auto-hits ground targets, gets blast dice, and can't hit flyers", () => {
+  it("the Haymaker Bomber's Ore-Bucket Bombs auto-hit ground targets, get blast dice, and can't hit flyers", () => {
     const s = createGame({
-      factions: ["militia", "munch"],
+      factions: ["militia", "swarm"],
       seed: 3,
-      lists: [[entry("mil-bomber")], [entry("munch-nibblers"), entry("munch-flapjaw")]],
+      lists: [[entry("mil-bomber")], [entry("swarm-skitterlings"), entry("swarm-stingers")]],
     });
     const b = place(s, uidOf(s, 0, "mil-bomber"), { x: 10, y: 20 });
     b.models[0]!.elevation = 2;
-    const nibs = place(s, uidOf(s, 1, "munch-nibblers"), { x: 10, y: 15 });
+    const nibs = place(s, uidOf(s, 1, "swarm-skitterlings"), { x: 10, y: 15 });
     const drop = profileOf(b).weapons[0]!;
     const plan = planShooting(s, b, nibs, drop);
     if (typeof plan === "string") throw new Error(plan);
-    expect(plan.attackers[0]!.dice).toBe(4); // 3 dice + blast against 6 models
-    const flap = place(s, uidOf(s, 1, "munch-flapjaw"), { x: 14, y: 20 });
+    expect(plan.attackers[0]!.dice).toBe(4); // 3 dice + blast against a big squad
+    const flap = place(s, uidOf(s, 1, "swarm-stingers"), { x: 14, y: 20 });
     flap.models[0]!.elevation = 2;
     expect(typeof planShooting(s, b, flap, drop)).toBe("string");
   });
 
-  it("the Sett Lab lets Munch reserves deploy next to it", () => {
-    const s = createGame({ factions: ["munch", "militia"], seed: 3, lists: [[entry("munch-warren"), entry("munch-hoppers")], [entry("mil-grunts")]] });
-    const mound = place(s, uidOf(s, 0, "munch-warren"), { x: 17.5, y: 17.5 });
-    const hoppers = unitById(s, uidOf(s, 0, "munch-hoppers"))!;
+  it("the Brood Spire lets the swarm's reserves deploy next to it", () => {
+    const s = createGame({ factions: ["swarm", "militia"], seed: 3, lists: [[entry("swarm-spire"), entry("swarm-shellbacks")], [entry("mil-grunts")]] });
+    const mound = place(s, uidOf(s, 0, "swarm-spire"), { x: 17.5, y: 17.5 });
+    const hoppers = unitById(s, uidOf(s, 0, "swarm-shellbacks"))!;
     const zones = deployZones(s, hoppers);
     expect(zones.length).toBeGreaterThan(s.spawn[0].length);
     void mound;
   });
 
   it("jumpers and flankers are faster than the line troops they support", () => {
-    expect(baseProfile("munch-hoppers").move).toBeGreaterThan(baseProfile("munch-spitter").move);
+    expect(baseProfile("swarm-lurker").move).toBeGreaterThan(baseProfile("swarm-spitters").move);
     expect(baseProfile("con-dancers").move).toBeGreaterThan(baseProfile("con-guard").move);
     expect(baseProfile("mil-riders").move).toBeGreaterThan(baseProfile("mil-grunts").move);
   });

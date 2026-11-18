@@ -1,6 +1,6 @@
 // Inked comic backdrops for the intros, drawn in code as SVG (viewBox 1600 × 900, the panel's 16:9).
 // Thick warm-black outlines, flat cel colours and halftone shading, matching the board and emblems.
-// All original: a frontier farming valley, Dr. Graft's burrowed lab, orbit, and a very smug lawn.
+// All original: a frontier farming valley, the Skitterswarm's Brood Hollow, orbit, and a very smug lawn.
 
 const INK = "#1c1512";
 let uid = 0;
@@ -215,8 +215,8 @@ export function valley(o: ValleyOpts = {}): string {
 
 // ---------------------------------------------------------------- barn front
 
-/** The front of the Haybright barn, close up, with an empty doorway (doors are separate elements). */
-export function barnFront(): string {
+/** The front of the Haybright barn, close up, with an empty doorway (doors are separate elements) and a sign over it. */
+export function barnFront(sign = "HAYBRIGHT FARM"): string {
   const id = `b${++uid}`;
   const defs = halftone(`ht${id}`) + vgrad(`sk${id}`, SKIES.day.stops) + rgrad(`dk${id}`, [[0, "#3a2614"], [1, "#120b07"]]);
   let planks = "";
@@ -237,7 +237,7 @@ export function barnFront(): string {
     <polygon points="-60,250 800,-80 1660,250 1660,282 800,-44 -60,282" fill="#f1e4c6" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
     <rect x="690" y="70" width="220" height="120" fill="#2a1a12" stroke="${INK}" stroke-width="7"/>
     <rect x="590" y="200" width="420" height="58" rx="6" fill="#c08a52" stroke="${INK}" stroke-width="6"/>
-    <text x="800" y="242" text-anchor="middle" font-family="'Bowlby One','Arial Black',Impact,sans-serif" font-size="38" fill="#fff3d6" stroke="${INK}" stroke-width="8" paint-order="stroke">HAYBRIGHT FARM</text>
+    <text x="800" y="242" text-anchor="middle" font-family="'Bowlby One','Arial Black',Impact,sans-serif" font-size="${sign.length > 15 ? 32 : 38}" fill="#fff3d6" stroke="${INK}" stroke-width="8" paint-order="stroke">${sign.replace(/[<>&"]/g, "")}</text>
     <rect x="440" y="290" width="720" height="560" fill="url(#dk${id})" stroke="${INK}" stroke-width="10"/>
     <path d="M440 290 L1160 290" stroke="#f1e4c6" stroke-width="14"/>
     <rect x="0" y="800" width="1600" height="100" fill="#b88a58" stroke="${INK}" stroke-width="6"/>
@@ -254,77 +254,72 @@ export function barnDoor(): string {
     <path d="M34 34 L326 526 M326 34 L34 526" stroke="#f1e4c6" stroke-width="26"/><path d="M34 34 L326 526 M326 34 L34 526" stroke="${INK}" stroke-width="4" opacity="0.5"/></svg>`;
 }
 
-// ---------------------------------------------------------------- the Sett Lab
+// ---------------------------------------------------------------- the Brood Hollow
 
-/** Dr. Graft's burrowed lab: dirt walls, roots, a steel vault door, pipes, mutagen vats and a mailbox. */
-export function lab(dim = false): string {
-  const id = `l${++uid}`;
+/** Where the egg clusters glow, in panel percent (for pulsing glows and rising spores). */
+export const HOLLOW_EGGS = [
+  { x: 230 / 16, y: 640 / 9 },
+  { x: 1370 / 16, y: 640 / 9 },
+  { x: 560 / 16, y: 770 / 9 },
+  { x: 1040 / 16, y: 770 / 9 },
+];
+
+/**
+ * The Brood Hollow, the Skitterswarm's cavern deep under the valley: dirt walls hung with roots, a
+ * great tunnel mouth in the back wall, pale silk strands, and clutches of glowing eggs on the floor.
+ */
+export function hollow(dim = false): string {
+  const id = `h${++uid}`;
   const defs =
-    vgrad(`bg${id}`, [[0, "#20140d"], [0.6, "#3a2517"], [1, "#2a1a10"]]) +
+    vgrad(`bg${id}`, [[0, "#1a1014"], [0.55, "#33222a"], [1, "#24171c"]]) +
     halftone(`ht${id}`, "rgba(0,0,0,0.35)") +
-    rgrad(`gl${id}`, [[0, "#b6ff6a", 0.55], [1, "#b6ff6a", 0]]) +
-    vgrad(`goo${id}`, [[0, "#d6ff8a"], [1, "#5fc23a"]]);
-  const r = rng(3);
+    rgrad(`gl${id}`, [[0, "#d8ff7a", 0.5], [1, "#d8ff7a", 0]]) +
+    rgrad(`egg${id}`, [[0, "#fbffd8"], [0.55, "#d6f56a"], [1, "#8fb02c"]]) +
+    rgrad(`tn${id}`, [[0, "#000000"], [0.7, "#0c0709"], [1, "#2a1a20"]]);
+  const r = rng(9);
   let rocks = "";
-  for (let i = 0; i < 26; i++) {
+  for (let i = 0; i < 30; i++) {
     const x = r() * 1600;
-    const y = r() * 700;
-    if (x > 480 && x < 1120 && y > 120 && y < 720) continue;
-    const w = 20 + r() * 40;
-    rocks += `<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${w * 0.6}" fill="#4b3121" stroke="${INK}" stroke-width="4"/>`;
+    const y = r() * 720;
+    if (x > 460 && x < 1140 && y > 140 && y < 700) continue;
+    const w = 18 + r() * 42;
+    rocks += `<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${w * 0.6}" fill="#4a3038" stroke="${INK}" stroke-width="4"/>`;
   }
   let roots = "";
-  for (let i = 0; i < 7; i++) {
-    const x = 60 + i * 240 + r() * 60;
-    const d = `M${x} -10 C${x + 30} 60 ${x - 40} 110 ${x + 10} ${170 + r() * 80}`;
+  for (let i = 0; i < 8; i++) {
+    const x = 40 + i * 210 + r() * 60;
+    const d = `M${x} -10 C${x + 30} 70 ${x - 40} 120 ${x + 10} ${180 + r() * 90}`;
     roots += `<path d="${d}" stroke="${INK}" stroke-width="18" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#7a5030" stroke-width="9" fill="none" stroke-linecap="round"/>`;
   }
-  const vat = (x: number) => `<g>
-      <rect x="${x - 70}" y="380" width="140" height="300" rx="30" fill="url(#goo${id})" stroke="${INK}" stroke-width="7"/>
-      <rect x="${x - 70}" y="380" width="140" height="70" rx="20" fill="#e8ffd0" opacity="0.4"/>
-      <path d="M${x - 40} 420 L${x - 40} 640" stroke="#ffffff" stroke-width="10" opacity="0.5" stroke-linecap="round"/>
-      <rect x="${x - 86}" y="356" width="172" height="40" rx="8" fill="#9aa3a8" stroke="${INK}" stroke-width="6"/>
-      <rect x="${x - 86}" y="668" width="172" height="44" rx="8" fill="#7d8790" stroke="${INK}" stroke-width="6"/>
-      <path d="M${x} 356 L${x} 150" stroke="${INK}" stroke-width="26"/><path d="M${x} 356 L${x} 150" stroke="#9aa3a8" stroke-width="14"/></g>`;
-  let rivets = "";
-  for (let i = 0; i < 16; i++) {
-    const a = (i / 16) * Math.PI * 2;
-    rivets += `<circle cx="${800 + Math.cos(a) * 196}" cy="${430 + Math.sin(a) * 196}" r="8" fill="#c9ced2" stroke="${INK}" stroke-width="3"/>`;
-  }
+  let silk = "";
+  for (const [x1, y1, x2, y2] of [[0, 260, 520, 330], [1600, 240, 1080, 320], [0, 520, 470, 470], [1600, 540, 1130, 480], [300, 0, 560, 300], [1300, 0, 1050, 290]] as const)
+    silk += `<path d="M${x1} ${y1} Q${(x1 + x2) / 2} ${Math.max(y1, y2) + 60} ${x2} ${y2}" stroke="#efe6d6" stroke-width="4" fill="none" opacity="0.55"/>`;
+  const clutch = (cx: number, cy: number, n: number, seed: number) => {
+    const q = rng(seed);
+    let out = `<ellipse cx="${cx}" cy="${cy + 36}" rx="${n * 34}" ry="34" fill="#3a2418" stroke="${INK}" stroke-width="6"/>`;
+    const eggs: [number, number, number][] = [];
+    for (let i = 0; i < n; i++) eggs.push([cx + (i - (n - 1) / 2) * 52 + (q() - 0.5) * 16, cy + (i % 2 ? 10 : -6), 30 + q() * 12]);
+    eggs.sort((e1, e2) => e1[1] - e2[1]);
+    for (const [x, y, s] of eggs)
+      out += `<ellipse cx="${x}" cy="${y}" rx="${s * 0.78}" ry="${s}" fill="url(#egg${id})" stroke="${INK}" stroke-width="5"/><ellipse cx="${x - s * 0.25}" cy="${y - s * 0.4}" rx="${s * 0.18}" ry="${s * 0.28}" fill="#ffffff" opacity="0.7"/><path d="M${x - s * 0.5} ${y + s * 0.3} Q${x} ${y + s * 0.55} ${x + s * 0.5} ${y + s * 0.3}" stroke="#7d9a2a" stroke-width="3" fill="none" opacity="0.6"/>`;
+    return out;
+  };
   return svg(
     `<rect width="1600" height="900" fill="url(#bg${id})"/>
     ${rocks}${roots}
     <rect width="1600" height="900" fill="url(#ht${id})" opacity="0.45"/>
-    <path d="M500 760 L500 260 Q800 60 1100 260 L1100 760 Z" fill="#4c5158" stroke="${INK}" stroke-width="9"/>
-    <path d="M520 740 L520 270 Q800 90 1080 270 L1080 740 Z" fill="#5c636b"/>
-    <circle cx="800" cy="430" r="220" fill="#7d8790" stroke="${INK}" stroke-width="10"/>
-    <circle cx="800" cy="430" r="170" fill="#9aa3a8" stroke="${INK}" stroke-width="7"/>
-    ${rivets}
-    <circle cx="800" cy="430" r="64" fill="none" stroke="${INK}" stroke-width="22"/>
-    <circle cx="800" cy="430" r="64" fill="none" stroke="#c94a3a" stroke-width="12"/>
-    <path d="M800 366 L800 494 M736 430 L864 430" stroke="${INK}" stroke-width="22" stroke-linecap="round"/><path d="M800 366 L800 494 M736 430 L864 430" stroke="#c94a3a" stroke-width="10" stroke-linecap="round"/>
-    <path d="M0 150 L1600 150" stroke="${INK}" stroke-width="34"/><path d="M0 150 L1600 150" stroke="#7d8790" stroke-width="20"/>
-    ${[160, 420, 1180, 1440].map((x) => `<rect x="${x - 14}" y="128" width="28" height="44" fill="#c9ced2" stroke="${INK}" stroke-width="4"/>`).join("")}
-    ${vat(230)}${vat(1370)}
-    <g><rect x="1150" y="560" width="22" height="200" fill="#7a5030" stroke="${INK}" stroke-width="5"/>
-      <path d="M1100 520 L1230 520 Q1250 520 1250 540 L1250 590 L1100 590 Z" fill="#6cc24a" stroke="${INK}" stroke-width="6"/>
-      <text x="1172" y="566" text-anchor="middle" font-family="'Bowlby One','Arial Black',Impact,sans-serif" font-size="24" fill="#fff3d6" stroke="${INK}" stroke-width="5" paint-order="stroke">DR. GRAFT</text>
-      <path d="M1250 540 L1270 540 L1270 506 L1296 514" stroke="${INK}" stroke-width="5" fill="#e0443a"/></g>
-    <g><rect x="340" y="640" width="130" height="120" rx="10" fill="#c9a23a" stroke="${INK}" stroke-width="6"/>
-      <polygon points="410,654 384,706 404,706 392,744 432,690 410,690 424,654" fill="#1c1512"/></g>
-    <rect x="0" y="760" width="1600" height="140" fill="#2a1a10" stroke="${INK}" stroke-width="6"/>
-    <path d="M0 800 L1600 800 M0 850 L1600 850" stroke="#3d2818" stroke-width="5"/>
-    <ellipse cx="800" cy="520" rx="760" ry="420" fill="url(#gl${id})"/>
-    ${dim ? `<rect width="1600" height="900" fill="#0a0604" opacity="0.72"/>` : ""}`,
+    <path d="M440 770 C440 420 560 170 800 170 C1040 170 1160 420 1160 770 Z" fill="#4a3038" stroke="${INK}" stroke-width="10"/>
+    <path d="M500 770 C500 450 600 240 800 240 C1000 240 1100 450 1100 770 Z" fill="url(#tn${id})" stroke="${INK}" stroke-width="7"/>
+    ${[[560, 330], [1040, 330], [610, 250], [990, 250], [800, 205]].map(([x, y]) => `<path d="M${x! - 26} ${y} L${x} ${y! + 46} L${x! + 26} ${y}" fill="#5c3c46" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>`).join("")}
+    ${silk}
+    <rect x="0" y="760" width="1600" height="140" fill="#2a1a1e" stroke="${INK}" stroke-width="6"/>
+    <path d="M0 800 L1600 800 M0 850 L1600 850" stroke="#3d2830" stroke-width="5"/>
+    ${clutch(230, 610, 4, 3)}${clutch(1370, 610, 4, 4)}${clutch(560, 740, 3, 5)}${clutch(1040, 740, 3, 6)}
+    <ellipse cx="800" cy="560" rx="780" ry="430" fill="url(#gl${id})"/>
+    ${dim ? `<rect width="1600" height="900" fill="#07040a" opacity="0.74"/>` : ""}`,
     defs,
   );
 }
-
-/** The vat and door glow positions in panel percent, for bubbles. */
-export const LAB_VATS = [
-  { x: 230 / 16, top: 380 / 9, bottom: 680 / 9 },
-  { x: 1370 / 16, top: 380 / 9, bottom: 680 / 9 },
-];
 
 // ---------------------------------------------------------------- orbit
 

@@ -51,7 +51,7 @@
   color: var(--ink);
 }
 
-/* ---------- faction accents: put data-faction="militia|munch|concord|custom-…" on a panel/card ---------- */
+/* ---------- faction accents: put data-faction="militia|swarm|concord|custom-…" on a panel/card ---------- */
 [data-faction="militia"],
 .faction-militia {
   --fc: #f28c28;
@@ -61,14 +61,14 @@
   --fc-tex: radial-gradient(circle at 6px 6px, rgba(28, 21, 18, 0.28) 1.6px, transparent 2.2px) 0 0 / 22px 22px,
     repeating-linear-gradient(90deg, rgba(28, 21, 18, 0.07) 0 2px, transparent 2px 22px);
 }
-[data-faction="munch"],
-.faction-munch {
-  --fc: #6cc24a;
-  --fc-ink: #2c5a1c;
-  --fc-soft: #e2f3d6;
-  /* bitey zigzag */
-  --fc-tex: linear-gradient(135deg, rgba(28, 21, 18, 0.1) 25%, transparent 25%) -8px 0 / 16px 16px,
-    linear-gradient(225deg, rgba(28, 21, 18, 0.1) 25%, transparent 25%) -8px 0 / 16px 16px;
+[data-faction="swarm"],
+.faction-swarm {
+  --fc: #a3c936;
+  --fc-ink: #3d4a10;
+  --fc-soft: #eef5d2;
+  /* overlapping chitin plates */
+  --fc-tex: radial-gradient(circle at 50% 100%, transparent 7px, rgba(28, 21, 18, 0.12) 7.5px 9px, transparent 9.5px) 0 0 / 18px 12px,
+    radial-gradient(circle at 50% 100%, transparent 7px, rgba(28, 21, 18, 0.08) 7.5px 9px, transparent 9.5px) 9px 6px / 18px 12px;
 }
 [data-faction="concord"],
 .faction-concord {

@@ -438,13 +438,20 @@ export function cleanupRound(s: GameState, events: GameEvent[]): void {
           events.push({ type: "ability", uid: u.uid, ability: "regen", text: `${prof.name} ${hasAbility(u, "regen") ? "regenerates" : "is mended by spores"}.` });
         }
       }
-      if (hasAbility(u, "regrow")) {
-        const dead = u.models.find((m) => !m.alive);
-        const spot = dead && reviveSpot(s, u);
-        if (dead && spot) {
-          Object.assign(dead, { alive: true, hp: prof.hp, shield: prof.shield, pos: spot.pos, elevation: spot.elevation });
-          events.push({ type: "ability", uid: u.uid, ability: "regrow", text: `${prof.name} regrows a critter.` });
-        }
+    }
+    // Regrow (only when unhurt this round), or a Brood Bond nearby (hurt or not): one lost model comes back.
+    const own = hasAbility(u, "regrow") && !u.status.hurt;
+    const mother = own || prof.structure ? undefined : onBoard(s, u.owner).find((f) => f.uid !== u.uid && hasAbility(f, "brood-bond") && unitGap(f, u) <= AURA_RANGE);
+    if (own || mother) {
+      const dead = u.models.find((m) => !m.alive);
+      const spot = dead && reviveSpot(s, u);
+      if (dead && spot) {
+        Object.assign(dead, { alive: true, hp: prof.hp, shield: prof.shield, pos: spot.pos, elevation: spot.elevation });
+        events.push(
+          mother
+            ? { type: "ability", uid: mother.uid, ability: "brood-bond", text: `${profileOf(mother).name} lays again: ${prof.name} regrows a model.` }
+            : { type: "ability", uid: u.uid, ability: "regrow", text: `${prof.name} regrows a critter.` },
+        );
       }
     }
     const radiant = onBoard(s, u.owner).some((f) => hasAbility(f, "radiance") && unitGap(f, u) <= AURA_RANGE);
@@ -465,7 +472,7 @@ export function cleanupRound(s: GameState, events: GameEvent[]): void {
   }
   for (const u of s.units) {
     const st = u.status;
-    Object.assign(st, { acted: false, moved: false, disengaged: false, hunkered: false, charged: false, fought: false, hurt: false, meleeBonus: 0, rangedBonus: 0, braced: false, abilityUsed: false, reckless: false, spotted: false, hasted: 0, provoking: false, evadeBonus: 0, precisionBonus: 0, trackingBonus: 0, dugIn: 0, blinded: false, exposed: false, smoked: 0, silenced: false, overcharged: false, overwatching: false });
+    Object.assign(st, { acted: false, moved: false, disengaged: false, hunkered: false, charged: false, fought: false, hurt: false, meleeBonus: 0, rangedBonus: 0, braced: false, abilityUsed: false, reckless: false, corroded: false, spotted: false, hasted: 0, provoking: false, evadeBonus: 0, precisionBonus: 0, trackingBonus: 0, dugIn: 0, blinded: false, exposed: false, smoked: 0, silenced: false, overcharged: false, overwatching: false });
     st.slowedRounds = Math.max(0, st.slowedRounds - 1);
     u.reactionsUsed = [];
   }

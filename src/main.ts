@@ -34,7 +34,7 @@ function showMenu(): void {
         onPlay: (map) => {
           const fits = Object.values(MISSIONS).filter((m) => missionFitsMap(m, map));
           const mission = fits.find((m) => !m.roles) ?? fits[0] ?? Object.values(MISSIONS).find((m) => m.mode === map.mode)!;
-          startGame({ mode: map.mode, mission, map, factions: ["militia", "munch"], lists: [[], []], supports: [[], []] });
+          startGame({ mode: map.mode, mission, map, factions: ["militia", "swarm"], lists: [[], []], supports: [[], []] });
         },
       }),
     onFactionForge: () =>

@@ -39,7 +39,7 @@ function badger(t: Toon, A: number, f: number, rider: boolean): void {
   graftPlateAt(t, "M 34 -130 C 76 -130 108 -110 118 -84 L 84 -70 C 72 -92 56 -106 26 -112 Z", [[30, -110], [84, -72]], 4, 4);
   graftPlateAt(t, "M -134 -98 C -112 -126 -72 -134 -40 -132 L -46 -110 C -80 -110 -104 -100 -122 -82 Z", [[-122, -84], [-46, -112]], 4, 4);
   stitches(t, "M -40 -60 Q 0 -50 40 -62", 1.6);
-  // the head: black-and-white striped, snarling, with the overmind implant
+  // the head: black-and-white striped, snarling, with the signal implant
   const head = "M 92 -104 C 120 -118 160 -102 186 -72 C 192 -64 188 -54 178 -52 C 156 -46 126 -46 106 -54 C 92 -62 86 -86 92 -104 Z";
   part(t, head, W, { s: 8, spec: [112, -106, 6, 2, -0.3] }, () => {
     fill(t, "M 90 -82 C 120 -96 152 -88 184 -66 L 186 -58 C 152 -74 120 -78 92 -66 Z", K, { s: 2, line: 0 });
@@ -107,7 +107,7 @@ function scientist(t: Toon, A: number, f: number): void {
   fill(t, ellipse(14, -224, 3.6, 3), SKIN, { s: 1, line: LINE * 0.8 });
   fill(t, `M 0 -216 Q 8 -212 14 -216 Q 12 ${st ? -206 : -209} 4 ${st ? -207 : -210} Q -1 -211 0 -216 Z`, mat(0x3c0b18), { s: 0, line: LINE * 0.8 });
   flat(t, "M 1 -215 Q 8 -212 13 -215 L 12 -213 Q 7 -211 2 -213 Z", LAB.white);
-  // the raised arm and the overmind transmitter: a chrome box, a short mast and a flat dish
+  // the raised arm and the signal transmitter: a chrome box, a short mast and a flat dish
   const lift = st ? -4 : 0;
   fill(t, tube([[8, -196], [24, -210 + lift], [32, -228 + lift]], [6, 5.6, 5.2]), COAT, { s: 2 });
   fill(t, ellipse(34, -232 + lift, 5, 5), SKIN, { s: 1.5 });

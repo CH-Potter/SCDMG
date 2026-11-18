@@ -33,22 +33,22 @@ describe("factionProblems", () => {
     f.profiles[0]!.upgrades[1]!.id = f.profiles[0]!.upgrades[0]!.id;
     const p = factionProblems(f);
     expect(has(p, "duplicate id \"mil-grunts\"")).toBe(true);
-    expect(has(p, "Grange Hall Radio: missing id")).toBe(true);
+    expect(has(p, "Grange Hall Command: missing id")).toBe(true);
     expect(has(p, "duplicate id \"extra\"")).toBe(true);
   });
 
   it("catches ids used by another faction and unprefixed custom ids", () => {
-    const f = builtIn("munch");
+    const f = builtIn("swarm");
     f.id = "custom-test";
     for (const p of f.profiles) p.faction = f.id;
     for (const s of f.supports) s.faction = f.id;
     const p = factionProblems(f);
-    expect(has(p, "already used by The Munch")).toBe(true);
+    expect(has(p, "already used by The Skitterswarm")).toBe(true);
     expect(has(p, 'id must start with "custom-test:"')).toBe(true);
-    const g = builtIn("munch");
+    const g = builtIn("swarm");
     g.id = "rogue";
     expect(has(factionProblems(g), 'must start with "custom-"')).toBe(true);
-    const h = builtIn("munch");
+    const h = builtIn("swarm");
     h.custom = true;
     expect(has(factionProblems(h), "built-in faction id")).toBe(true);
   });
@@ -149,14 +149,14 @@ describe("factionProblems", () => {
   });
 
   it("checks impact on charge", () => {
-    const f = builtIn("munch");
-    const mama = f.profiles.find((p) => p.id === "munch-mama")!;
-    mama.impact = { dice: 0, hit: 7, damage: 0, ap: -1 };
+    const f = builtIn("swarm");
+    const borer = f.profiles.find((p) => p.id === "swarm-borer")!;
+    borer.impact = { dice: 0, hit: 7, damage: 0, ap: -1 };
     const p = factionProblems(f);
-    for (const t of ["impact dice", "impact hit", "impact damage", "impact AP"]) expect(has(p, `Dr. Graft and Big Mama: ${t}`), t).toBe(true);
-    const pod = f.profiles.find((x) => x.id === "munch-pod")!;
-    pod.impact = { dice: 1, hit: 4, damage: 1, ap: 0 };
-    expect(has(factionProblems(f), "Mutagen Vat: structures can't charge")).toBe(true);
+    for (const t of ["impact dice", "impact hit", "impact damage", "impact AP"]) expect(has(p, `Deep Borer: ${t}`), t).toBe(true);
+    const spire = f.profiles.find((x) => x.id === "swarm-spire")!;
+    spire.impact = { dice: 1, hit: 4, damage: 1, ap: 0 };
+    expect(has(factionProblems(f), "Brood Spire: structures can't charge")).toBe(true);
   });
 
   it("checks effect parameters", () => {
@@ -172,7 +172,7 @@ describe("factionProblems", () => {
   });
 
   it("accepts army slots: known classes, whole numbers from 0 to 2", () => {
-    const f = builtIn("munch");
+    const f = builtIn("swarm");
     f.slots = { base: 2, elite: 0 };
     f.supports[0]!.slots = { flyer: 1, static: 2 };
     expect(factionProblems(f)).toEqual([]);
@@ -182,7 +182,7 @@ describe("factionProblems", () => {
   });
 
   it("rejects bad army slots", () => {
-    const f = builtIn("munch");
+    const f = builtIn("swarm");
     (f as unknown as { slots: unknown }).slots = { base: 3, flyer: -1, elite: 1.5, wizard: 1 };
     (f.supports[0] as unknown as { slots: unknown }).slots = "lots";
     (f.supports[1] as unknown as { slots: unknown }).slots = { support: "1" };

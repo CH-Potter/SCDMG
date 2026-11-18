@@ -4,9 +4,9 @@
 import { isBuiltInFaction } from "../engine/data/factions";
 import { shouldAutoPlay, type IntroId } from "./intro/prefs";
 
-export type LoreTab = "world" | "places" | "militia" | "munch" | "concord";
+export type LoreTab = "world" | "places" | "militia" | "swarm" | "concord";
 
-const builtIn = (id: string): id is "militia" | "munch" | "concord" => isBuiltInFaction(id);
+const builtIn = (id: string): id is "militia" | "swarm" | "concord" => isBuiltInFaction(id);
 
 /** Open the lore pages on a tab. Opening a faction's page plays its intro the first time. */
 export function showLore(tab: LoreTab | string = "world", opts: { onClose?: () => void } = {}): void {

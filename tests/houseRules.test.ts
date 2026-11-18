@@ -8,6 +8,10 @@ import { rect } from "../src/engine/geometry";
 import { profileOf } from "../src/engine/profile";
 import { eligibleUnits, modelsEngage, unitById } from "../src/engine/rules";
 import type { GameEvent, GameState, ListEntry, Unit, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function place(_s: GameState, u: Unit, at: Vec): Unit {
   const r = profileOf(u).baseRadius;

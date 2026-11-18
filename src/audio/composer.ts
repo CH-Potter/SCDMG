@@ -27,7 +27,7 @@ export type Inst =
   | "clap"
   | "hat"
   | "riser" // filtered-noise sweep
-  // The Munch: swamp bug-funk
+  // The Skitterswarm: skittering hive groove
   | "rubber" // bouncy wah bass
   | "kalimba"
   | "hand" // hand drum (midi < 50 low, < 60 high, else slap)
@@ -36,10 +36,10 @@ export type Inst =
   | "gulp"; // slurpy pitch-bend accent
 
 /** The three musical styles; custom factions map onto them by their token look. */
-export type Style = "western" | "crystal" | "munch";
+export type Style = "western" | "crystal" | "swarm";
 
 export function styleForLook(look: string | undefined): Style {
-  return look === "crystal" ? "crystal" : look === "teeth" ? "munch" : "western";
+  return look === "crystal" ? "crystal" : look === "teeth" ? "swarm" : "western";
 }
 
 export interface NoteEv {

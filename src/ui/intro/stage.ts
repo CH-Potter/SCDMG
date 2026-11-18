@@ -24,7 +24,7 @@ export interface SceneDef {
 export interface IntroDef {
   /** An intro id (remembered as seen once played), or "story" for a campaign story scene (never remembered). */
   id: IntroId | "story";
-  /** For the layer's accessible name, e.g. "The Dustline" or "The Munch". */
+  /** For the layer's accessible name, e.g. "The Dustline" or "The Skitterswarm". */
   title: string;
   /** Unit profile ids the scenes use, painted before the intro starts. */
   cast: string[];

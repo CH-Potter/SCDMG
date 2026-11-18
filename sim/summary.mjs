@@ -1,6 +1,6 @@
 // Balance-pass tables from a sim results file (SIM_OUT, or `node sim/run.mjs --out`):
 //
-//   node sim/summary.mjs <results.json> [--vs <before.json>] [--pair concord-munch] [--only pairs,seeds,units,abilities]
+//   node sim/summary.mjs <results.json> [--vs <before.json>] [--pair concord-swarm] [--only pairs,seeds,units,abilities]
 //
 //   pairs      per pairing: score, VP sources, damage, score per mission and map (with --vs: the change)
 //   seeds      per pairing: score per seed (how noisy a figure is)
