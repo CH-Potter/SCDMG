@@ -264,6 +264,8 @@ export interface SupportDef {
   cp: number;
   blurb: string;
   abilities: SupportAbilityDef[];
+  /** Extra army slots taking this card gives, by unit class (see data/unitClasses.ts; built-ins use its table). */
+  slots?: Partial<Record<"base" | "support" | "elite" | "flyer" | "static", number>>;
 }
 
 export interface Faction {
@@ -290,6 +292,8 @@ export interface Faction {
   look: "cap" | "teeth" | "crystal" | "plain";
   /** True for factions made in the faction tool. */
   custom?: boolean;
+  /** Extra army slots every list of this faction gets, by unit class (see data/unitClasses.ts; built-ins use its table). */
+  slots?: Partial<Record<"base" | "support" | "elite" | "flyer" | "static", number>>;
 }
 
 export interface ListEntry {

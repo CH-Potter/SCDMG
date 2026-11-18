@@ -4,6 +4,7 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 import { aiCommand } from "../engine/ai";
 import { evadeTarget, expectedDamage, expectedStray, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
 import { SHELL_BURST } from "../engine/constants";
+import { CLASS_INFO, unitClassOf } from "../engine/data/unitClasses";
 import { ABILITIES } from "../engine/data/abilities";
 import { factionOf, supportOf } from "../engine/data/factions";
 import { abilityOf } from "../engine/reactions";
@@ -1887,7 +1888,7 @@ export class Controller {
         <div>${p.shield || "–"}<small>Shield</small></div>
         <div>${p.armor <= 6 ? `${p.armor}+` : "–"}<small>Save</small></div>
       </div>
-      <div class="tags">${p.keywords.map((k) => `<span class="tag kw" title="${esc(KEYWORD_TEXT[k])}">${esc(k)}</span>`).join("")}</div>
+      <div class="tags"><span class="tag" title="${esc(CLASS_INFO[unitClassOf(p)].text)}">${CLASS_INFO[unitClassOf(p)].icon} ${esc(CLASS_INFO[unitClassOf(p)].name)}</span>${p.keywords.map((k) => `<span class="tag kw" title="${esc(KEYWORD_TEXT[k])}">${esc(k)}</span>`).join("")}</div>
       ${p.weapons.map((w) => `<div class="weapon">⚔ ${esc(weaponLine(w))}</div>`).join("")}
       ${p.impact ? `<div class="weapon">${esc(impactLine(p))}</div>` : ""}
       ${p.evade ? `<div class="weapon">${esc(evadeLine(p))}</div>` : ""}

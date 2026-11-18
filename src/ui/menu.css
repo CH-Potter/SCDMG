@@ -271,6 +271,29 @@ button.danger {
   width: auto;
 }
 
+.lb-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 6px 0 0;
+}
+.lb-slots .slot {
+  border: 2px solid var(--ink, #2b2140);
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--panel, #fffaf0);
+}
+.lb-slots .slot.full {
+  background: #f6e7b8;
+}
+.lb-slots .slot.over {
+  background: #f8c8c4;
+  border-color: #b3261e;
+}
 .lb-cost {
   flex: 1;
   min-width: 220px;

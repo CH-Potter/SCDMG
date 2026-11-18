@@ -73,6 +73,7 @@ import type { MenuChoice } from "../menu";
 import { playStory, type ScenePanel } from "./scenes";
 import { clearCampaign, hasUnreadableSave, loadCampaign, saveCampaign } from "./store";
 import { PIN_LABEL, PLACE_POS, valleyMapSvg } from "./valley";
+import { loadHouseRules } from "../houseRulesStore";
 
 /** A battle result coming back from the game screen. */
 export interface CampaignReturn extends BattleResult {
@@ -428,7 +429,7 @@ export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
     const roster = s.army[mode];
     const budget = budgetFor(s, mode);
     const cost = listCost(roster.entries);
-    const problems = rosterProblems(s, mode, roster);
+    const problems = rosterProblems(s, mode, roster, loadHouseRules().classLimits);
     const t = perkTotals(s);
     const role = m.roles?.[b.side];
     const perk = PLACE_PERKS[b.placeId];
@@ -653,7 +654,7 @@ export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
     const b = availableBattles(s).find((x) => x.id === selected);
     if (!b) return;
     const mode = modeOfMission(b.missionId);
-    const problems = rosterProblems(s, mode, s.army[mode]);
+    const problems = rosterProblems(s, mode, s.army[mode], loadHouseRules().classLimits);
     if (problems.length) {
       message = problems.join(" ");
       render();

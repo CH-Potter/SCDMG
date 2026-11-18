@@ -5,10 +5,13 @@ import { factionEmblemSvg } from "./art/emblems";
 import { ABILITIES } from "../engine/data/abilities";
 import { entryCost, FACTIONS, listCost, factionOf, supportsCost } from "../engine/data/factions";
 import { MODES, type ModeId } from "../engine/data/modes";
+import { CLASS_INFO, factionSlots, slotsText, supportSlots, unitClassOf, type SlotCount } from "../engine/data/unitClasses";
+import { listSlots } from "../engine/listSlots";
 import { profileFor } from "../engine/profile";
 import type { FactionId, ListEntry, SupportDef, UnitProfile } from "../engine/types";
 import { esc, KEYWORD_TEXT, weaponLine, impactLine, evadeLine } from "./describe";
 import { downloadJson, newId, pickJsonFile, slug } from "./files";
+import { loadHouseRules } from "./houseRulesStore";
 import { deleteList, exportable, fromImport, isStarter, listProblems, listsFor, saveList, starterList, type SavedList } from "./lists";
 
 export interface ListBuilderOptions {
@@ -55,6 +58,8 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
     const problems = camp ? listProblems(list, false, { limit, label: "campaign budget" }) : listProblems(list);
     const saved = camp ? [] : listsFor(list.faction, list.mode).filter((l) => !isStarter(l));
     const pct = Math.min(100, (cost / Math.max(1, limit)) * 100);
+    const classLimits = loadHouseRules().classLimits;
+    const slots = listSlots(list.faction, list.mode, list.entries, list.supports);
 
     // Re-rendering replaces the page, so keep the scroll position where the player was.
     const scroller = host.querySelector<HTMLElement>(".lb");
@@ -104,13 +109,14 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
             <div class="meter ${cost > limit ? "over" : ""}"><span style="width:${pct}%"></span></div>
             <b>⚙ ${cost}/${limit}</b> · <b>✦ ${supportsCost(list.supports)}/${m.fizzLimit} Fizz</b> · ${list.entries.length}/${m.maxUnits} units · ◆ ${list.entries.reduce((s, e) => s + profileFor(e.profileId, e.upgrades).supply, 0)} supply
           </div>
+          ${slotBar(slots, classLimits, f)}
         </div>
         <div class="lb-body">
           <section class="panel lb-catalogue">
             <h2>${factionEmblemSvg(list.faction, 24)} ${esc(f.name)} units</h2>
             ${f.profiles
               .filter((p) => !p.structure?.summonOnly)
-              .map((p) => unitCard(p, list))
+              .map((p) => unitCard(p, list, classLimits ? slots : null))
               .join("")}
           </section>
           <section class="panel lb-roster">
@@ -144,15 +150,33 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
     bind();
   };
 
-  const unitCard = (p: UnitProfile, l: SavedList) => {
+  /** Slot counters for each unit class (when the house rule is on), with what the faction adds. */
+  const slotBar = (slots: SlotCount[], on: boolean, f: ReturnType<typeof factionOf>) => {
+    if (!on) return `<p class="hint lb-slots">Unit class limits are off (house rule), so any mix of units goes.</p>`;
+    const extra = slotsText(factionSlots(f));
+    return `<div class="lb-slots" aria-label="Army slots by unit class">${slots
+      .map((c) => {
+        const info = CLASS_INFO[c.cls];
+        const bad = c.used > c.max || c.used < c.min;
+        return `<span class="slot ${bad ? "over" : c.used === c.max ? "full" : ""}" title="${esc(info.name)}: ${esc(info.text)}${c.min ? ` At least ${c.min}.` : ""}">${info.icon} ${esc(info.name)} ${c.used}/${c.max}${c.min ? ` (min ${c.min})` : ""}</span>`;
+      })
+      .join("")}${extra ? `<span class="hint">${esc(f.name)}: ${esc(extra)}</span>` : ""}</div>`;
+  };
+
+  const unitCard = (p: UnitProfile, l: SavedList, slots: SlotCount[] | null) => {
     const copies = l.entries.filter((e) => e.profileId === p.id).length;
     const m = MODES[l.mode];
+    const cls = unitClassOf(p);
+    const slot = slots?.find((c) => c.cls === cls);
+    const full = !!slot && slot.used >= slot.max;
+    const why = copies >= m.maxCopies ? `At most ${m.maxCopies} of one unit` : full ? `No ${CLASS_INFO[cls].name} slots left: take a support card that adds one` : "";
     return `
       <div class="lb-unit">
         <div class="lb-unit-head">
           <b>${esc(p.name)}</b>
+          <span class="tag" title="${esc(CLASS_INFO[cls].text)}">${CLASS_INFO[cls].icon} ${esc(CLASS_INFO[cls].name)}</span>
           <span class="hint">⚙${p.cost} · ◆${p.supply} · ${p.models} model${p.models > 1 ? "s" : ""} · ${p.move}" · ${p.hp}HP${p.shield ? `+${p.shield}🛡` : ""} · ${p.armor}+</span>
-          <button class="mini" data-add="${esc(p.id)}" ${copies >= m.maxCopies ? "disabled" : ""}>Add${copies ? ` (${copies})` : ""}</button>
+          <button class="mini" data-add="${esc(p.id)}" ${why ? `disabled title="${esc(why)}"` : ""}>Add${copies ? ` (${copies})` : ""}</button>
         </div>
         <div class="tags">${p.keywords.map((k) => `<span class="tag kw" title="${esc(KEYWORD_TEXT[k])}">${k}</span>`).join("")}</div>
         ${p.weapons.map((w) => `<div class="weapon">⚔ ${esc(weaponLine(w))}</div>`).join("")}
@@ -169,7 +193,7 @@ export function openListBuilder(host: HTMLElement, opts: ListBuilderOptions): vo
       <div class="lb-entry ${taken ? "taken" : ""}">
         <div class="lb-unit-head">
           <b>${esc(sp.name)}</b>
-          <span class="hint">✦${sp.fizz} Fizz · +${sp.cp} CP/round</span>
+          <span class="hint">✦${sp.fizz} Fizz · +${sp.cp} CP/round${slotsText(supportSlots(sp)) ? ` · ${esc(slotsText(supportSlots(sp)))} slot` : ""}</span>
           <button class="mini ${taken ? "secondary" : ""}" data-sup="${esc(sp.id)}">${taken ? "Remove" : "Take"}</button>
         </div>
         ${sp.abilities.map((a) => `<div class="ability"><b>${esc(a.name)}</b> <small>(${a.cp} CP${a.exhaust ? ", exhausts" : ""})</small>: ${esc(a.text)}</div>`).join("")}

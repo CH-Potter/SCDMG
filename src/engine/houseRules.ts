@@ -5,6 +5,8 @@
 import type { GameState } from "./types";
 
 export interface HouseRules {
+  /** Army lists must fit their class slots (Base, Support, Elite, Flyer, Static; see data/unitClasses.ts). On by default. */
+  classLimits: boolean;
   /** Nerve tests and Shaken (and Rally). Off by default. */
   morale: boolean;
   /** Evade rolls. */
@@ -43,6 +45,7 @@ export type HouseRuleId = keyof HouseRules;
 
 /** The standard game: what a new game plays unless the players change it. */
 export const STANDARD_RULES: Readonly<HouseRules> = Object.freeze({
+  classLimits: true,
   morale: false,
   evade: true,
   strays: true,
@@ -67,6 +70,7 @@ export const STANDARD_RULES: Readonly<HouseRules> = Object.freeze({
  */
 export const CLASSIC_RULES: Readonly<HouseRules> = Object.freeze({
   ...STANDARD_RULES,
+  classLimits: false,
   morale: true,
   rolledCharges: false,
   closeRanks: false,
@@ -83,6 +87,7 @@ export interface HouseRuleInfo {
 }
 
 export const HOUSE_RULES: readonly HouseRuleInfo[] = [
+  { id: "classLimits", name: "Unit class limits", text: "Army lists fill class slots: Base, Support, Elite, Flyer and Static. Your faction and each support card add slots. Off: any mix within the mode's unit and cost limits." },
   { id: "rolledCharges", name: "Rolled charges", text: "Declare a charge at a unit within 12\", then roll 2d6\" for the distance. Too short, and the charge fails where it stands. Off: charge up to the unit's move." },
   { id: "closeRanks", name: "Close ranks", text: "When a unit fights, each of its models first moves up to 3\" into base contact (or behind a squad-mate who is). Off: models fight from where they stand." },
   { id: "supportingRank", name: "Supporting rank", text: "A model in base contact with a squad-mate who's in base contact with the enemy fights too. Off: only models in base contact fight." },

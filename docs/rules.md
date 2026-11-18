@@ -10,6 +10,31 @@ This is the design reference for the engine in `src/engine/`. Every number here 
 - Destroyed units are gone for good, but they free up their supply, so you can bring in more reserves.
 - Upgrades are chosen in the list. They can add models, move, keywords, abilities, or change weapons.
 
+### Unit classes and army slots
+
+Every unit has a **class**, worked out from its stats, so units made in the Faction Forge get one too (`src/engine/data/unitClasses.ts`):
+
+| Class | Which units |
+| --- | --- |
+| 🛡 Base | Squads of several models: the backbone of the army. |
+| 🔧 Support | Single models that aren't heavy or monsters: medics, snipers, gunners, specialists. |
+| ⭐ Elite | Monsters, and heavy units with 6 or more wounds in total. |
+| 🪽 Flyer | Anything with the flying keyword. |
+| 🏰 Static | Structures. |
+
+With the **Unit class limits** house rule (on in the standard game), a list must fit its **slots**:
+
+| Mode | Base | Support | Elite | Flyer | Static |
+| --- | --- | --- | --- | --- | --- |
+| Skirmish | 2 to 6 | 2 | 1 | 1 | 1 |
+| Assault | 3 to 10 | 3 | 2 | 2 | 2 |
+
+- **Faction slots:** Dustline Militia get +1 Static (they dig in), The Munch +1 Base (there are always more of them), Lumen Concord +1 Elite (few, but fabulous).
+- **Support cards** each add a slot, shown on the card in the list builder. For example, the Airstrip adds a Flyer slot and the Tractor Depot a Static one. Taking a card for its slot is part of building a list.
+- A unit's class comes from its base profile: upgrades don't change it.
+- The list builder shows the slots used and left, and greys out units whose class is full. The menu won't start a battle with a list that breaks the slots; switch the house rule off to play any mix.
+- Open roster games have no lists, so slots don't apply.
+
 ## Round structure
 
 | Phase | What units can do |
@@ -282,6 +307,7 @@ Pick these in the main menu (step 5, *House rules*). They're saved in your brows
 
 | Rule | Off means |
 | --- | --- |
+| Unit class limits | Lists can be any mix of units within the mode's cost, unit and copy limits. |
 | Rolled charges | A charge reaches up to the unit's move and always arrives. |
 | Close ranks | Models fight from where they stand. |
 | Supporting rank | Only models in base contact with the enemy fight. |

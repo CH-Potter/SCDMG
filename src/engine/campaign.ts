@@ -50,6 +50,7 @@ import {
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS, swapMapSides, swapMissionSides, type MissionDef } from "./data/missions";
 import { MODES, type ModeId } from "./data/modes";
+import { listSlotProblems } from "./listSlots";
 import type { GameSetup, StartBonus } from "./game";
 import type { ListEntry } from "./types";
 
@@ -370,7 +371,8 @@ export function budgetFor(s: CampaignState, mode: ModeId): number {
 }
 
 /** Why a roster can't be taken into battle (empty when it can). */
-export function rosterProblems(s: CampaignState, mode: ModeId, r: Roster): string[] {
+/** Problems with a campaign roster. `classLimits`: check unit class slots too (the house rule). */
+export function rosterProblems(s: CampaignState, mode: ModeId, r: Roster, classLimits = false): string[] {
   const errs: string[] = [];
   const m = MODES[mode];
   if (!r.entries.length) errs.push("Add at least one unit");
@@ -397,6 +399,7 @@ export function rosterProblems(s: CampaignState, mode: ModeId, r: Roster): strin
   if (fizz > m.fizzLimit) errs.push(`Over the Fizz budget: ${fizz}/${m.fizzLimit}`);
   if (new Set(r.supports).size !== r.supports.length)
     errs.push("Each support can only be taken once");
+  if (classLimits) errs.push(...listSlotProblems(s.faction, mode, r.entries, r.supports));
   return errs;
 }
 

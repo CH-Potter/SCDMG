@@ -3,7 +3,9 @@
 import { baseProfile, defaultListFor, entryCost, FACTIONS, listCost, PROFILES, factionOf, defaultSupportsFor, SUPPORTS, supportsCost } from "../engine/data/factions";
 import { MODES, type ModeId } from "../engine/data/modes";
 import type { FactionId, ListEntry } from "../engine/types";
+import { listSlotProblems } from "../engine/listSlots";
 import { loadJson, newId, saveJson } from "./files";
+import { loadHouseRules } from "./houseRulesStore";
 
 export interface SavedList {
   id: string;
@@ -22,7 +24,7 @@ const FORMAT = "scdmg-list";
 export function listSavedLists(): SavedList[] {
   const lists = loadJson<SavedList[]>(KEY, []);
   return Array.isArray(lists)
-    ? lists.map((l) => ({ ...l, supports: Array.isArray(l?.supports) ? l.supports : [] })).filter((l) => listProblems(l, false).length === 0)
+    ? lists.map((l) => ({ ...l, supports: Array.isArray(l?.supports) ? l.supports : [] })).filter((l) => listProblems(l, false, undefined, false).length === 0)
     : [];
 }
 
@@ -77,9 +79,16 @@ export function findList(id: string): SavedList | undefined {
 
 /**
  * Problems that make a list unplayable. `strict` also checks the name. `budget` replaces the mode's
- * roster limit (the campaign's growing budget).
+ * roster limit (the campaign's growing budget). `classLimits` checks unit class slots (default: the
+ * house rule picked in the menu). Saved lists are loaded without it, so a list that breaks the slots
+ * still shows up, with its problems, rather than vanishing.
  */
-export function listProblems(l: Partial<SavedList>, strict = true, budget?: { limit: number; label: string }): string[] {
+export function listProblems(
+  l: Partial<SavedList>,
+  strict = true,
+  budget?: { limit: number; label: string },
+  classLimits = loadHouseRules().classLimits,
+): string[] {
   const errs: string[] = [];
   if (!l || typeof l !== "object") return ["Not a list"];
   if (strict && !l.name?.trim()) errs.push("Give the list a name");
@@ -120,6 +129,7 @@ export function listProblems(l: Partial<SavedList>, strict = true, budget?: { li
   for (const [id, n] of counts) {
     if (n > mode!.maxCopies) errs.push(`At most ${mode!.maxCopies} × ${baseProfile(id).name}`);
   }
+  if (classLimits) errs.push(...listSlotProblems(l.faction!, l.mode!, l.entries, sups));
   return errs;
 }
 

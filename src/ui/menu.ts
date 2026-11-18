@@ -10,9 +10,10 @@ import { cleanRules, HOUSE_RULES, isCoreRule, isStandard, rulesSummary, STANDARD
 import type { StartBonus } from "../engine/game";
 import type { FactionId, ListEntry } from "../engine/types";
 import { mapsForMode } from "./customMaps";
+import { loadHouseRules, saveHouseRules } from "./houseRulesStore";
 import { esc } from "./describe";
 import { loadJson, saveJson } from "./files";
-import { findList, listsFor } from "./lists";
+import { findList, listProblems, listsFor } from "./lists";
 import { recruitableProfiles, type ArmyRule } from "../engine/openRoster";
 import { drawMapPreview, drawMissionPreview } from "./previews";
 import { maybeFactionIntro, playIntro, showLore } from "./loreLinks";
@@ -53,12 +54,7 @@ interface Prefs {
 }
 
 const PREFS_KEY = "scdmg.menu.v1";
-const HOUSE_KEY = "scdmg.houseRules.v1";
-
-/** The house rules chosen in the menu (every battle uses them, the campaign's too). */
-export function loadHouseRules(): HouseRules {
-  return cleanRules(loadJson<unknown>(HOUSE_KEY, {}));
-}
+export { loadHouseRules } from "./houseRulesStore";
 const hex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
 
 function defaults(): Prefs {
@@ -95,7 +91,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
   if (prefs.army !== "open") prefs.army = "list";
   const save = () => saveJson(PREFS_KEY, prefs);
   let house = loadHouseRules();
-  const saveHouse = () => saveJson(HOUSE_KEY, house);
+  const saveHouse = () => saveHouseRules(house);
 
   const render = () => {
     audio.setMenuFaction(prefs.faction[0]); // [audio] menu music follows your faction
@@ -202,7 +198,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
         <p class="legal">SCDMG © 2026 Craig Potter and SCDMG contributors. Free software under the GNU General Public License v3 or later, with ABSOLUTELY NO WARRANTY. You may share and change it under that licence, keeping these credits: see LICENSE, and the source, at github.com/CH-Potter/SCDMG.</p>
 
         <div class="row start-row">
-          <button id="m-start" class="big" ${mapOk ? "" : "disabled"}>To battle!</button>
+          <button id="m-start" class="big" ${mapOk && armiesOk() ? "" : "disabled"} ${armiesOk() ? "" : `title="Fix the army lists first (see step 4)"`}>To battle!</button>
           <span class="hint">${esc(mission.name)}${mission.roles ? ` (as ${esc(mission.roles[side].name)})` : ""} · ${esc(map?.name ?? "no battlefield")} · ${esc(MODES[mode].name)}${prefs.army === "open" ? " · open roster" : ""}${isStandard(house) ? "" : ` · ${rulesSummary(house).length} house rule${rulesSummary(house).length === 1 ? "" : "s"}`}</span>
         </div>
       </div>`;
@@ -251,10 +247,20 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
       </details>`;
   };
 
+  /** Both chosen lists are playable under the current house rules (open roster has no lists). */
+  const armiesOk = (): boolean => {
+    if (prefs.army === "open") return true;
+    return ([0, 1] as const).every((p) => {
+      const l = listsFor(prefs.faction[p], prefs.mode).find((x) => x.id === prefs.list[p]) ?? listsFor(prefs.faction[p], prefs.mode)[0]!;
+      return listProblems(l, false).length === 0;
+    });
+  };
+
   const armyPicker = (p: 0 | 1, mode: ModeId) => {
     const fid = prefs.faction[p];
     const lists = listsFor(fid, mode);
     const chosen = lists.find((l) => l.id === prefs.list[p]) ?? lists[0]!;
+    const problems = prefs.army === "open" ? [] : listProblems(chosen, false);
     return `
       <div class="army panel" data-faction="${esc(fid)}" style="--faction-color:${hex(factionOf(fid).color)}">
         <h3>${p === 0 ? "You" : "AI opponent"}</h3>
@@ -271,7 +277,8 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
             : `<label>Army list <select data-list="${p}">${lists
                 .map((l) => `<option value="${esc(l.id)}" ${l.id === chosen.id ? "selected" : ""}>${esc(l.name)} (⚙${listCost(l.entries)} · ✦${supportsCost(l.supports)})</option>`)
                 .join("")}</select></label>
-        <button class="mini secondary" data-edit-list="${p}">Edit lists…</button>`
+        <button class="mini secondary" data-edit-list="${p}">Edit lists…</button>
+        ${problems.map((x) => `<p class="problem">⚠ ${esc(x)}</p>`).join("")}`
         }
       </div>`;
   };
