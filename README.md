@@ -114,6 +114,7 @@ npm install
 npm run dev      # http://localhost:5173
 npm test         # engine tests, including full AI-vs-AI games
 npm run sim      # AI-vs-AI simulations across missions/maps with outcome stats (balance work)
+npm run sim:quick  # a 1-seed Skirmish pass for a first look at a balance change (see CONTRIBUTING.md)
 npm run build    # typecheck + production build into dist/
 ```
 

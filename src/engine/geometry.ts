@@ -145,7 +145,16 @@ export function segmentPolygonDistance(a: Vec, b: Vec, poly: Vec[], bb: Bounds =
 /** Does the segment pass within `r` of the polygon? Same as segmentPolygonDistance(...) < r, but faster. */
 export function segmentNearPolygon(a: Vec, b: Vec, poly: Vec[], r: number, bb: Bounds = polyBounds(poly)): boolean {
   if (farFromBounds(a, b, bb, r)) return false;
-  return segmentPolygonDistance(a, b, poly, bb) < r;
+  if (segmentIntersectsPolygon(a, b, poly, bb)) return 0 < r;
+  // segmentPolygonDistance's edge loop, stopping at the first edge within `r`. No edge crosses the
+  // segment (just checked), so each edge's distance is the closest of the four end-point distances.
+  for (let i = 0, n = poly.length; i < n; i++) {
+    const p = poly[i]!;
+    const q = poly[(i + 1) % n]!;
+    const d = Math.min(pointSegmentDistance(a, p, q), pointSegmentDistance(b, p, q), pointSegmentDistance(p, a, b), pointSegmentDistance(q, a, b));
+    if (d < r) return true;
+  }
+  return false;
 }
 
 export function circleOverlapsPolygon(c: Vec, r: number, poly: Vec[]): boolean {
