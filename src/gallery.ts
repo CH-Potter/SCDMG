@@ -1,8 +1,10 @@
 // Dev-only miniature gallery (http://localhost:5173/gallery.html): every built-in unit, large and at
 // board size, in both player colours, facing both ways, with its idle and step frames. Used to review
-// the faction art. Query: ?faction=militia|munch|concord|all, &ground=<hex>, &px=<large size>.
+// the faction art. Query: ?faction=militia|munch|concord|all|templates|<template key>, &ground=<hex>,
+// &px=<large size>. "templates" shows the faction forge's trope templates (built from miniature parts).
 
 import { FACTIONS } from "./engine/data/factions";
+import { TEMPLATES } from "./forge/templates";
 import type { Faction, UnitProfile } from "./engine/types";
 import { figureDataUrl, figureSpec, paintSheet } from "./ui/art/figures";
 import { PLAYER_COLORS } from "./ui/art/palette";
@@ -18,12 +20,12 @@ const bar = document.getElementById("bar")!;
 const out = document.getElementById("out")!;
 document.body.style.setProperty("--ground", ground);
 
-for (const id of ["all", ...Object.keys(FACTIONS)]) {
+for (const id of ["all", ...Object.keys(FACTIONS), "templates"]) {
   const a = document.createElement("a");
   const u = new URLSearchParams(q);
   u.set("faction", id);
   a.href = `?${u}`;
-  a.textContent = id === "all" ? "All" : FACTIONS[id as keyof typeof FACTIONS]!.name;
+  a.textContent = id === "all" ? "All" : id === "templates" ? "Forge templates" : FACTIONS[id as keyof typeof FACTIONS]!.name;
   if (id === which) a.setAttribute("aria-current", "true");
   bar.append(a);
 }
@@ -97,8 +99,9 @@ function unitRow(p: UnitProfile, f: Faction): HTMLElement {
   return row;
 }
 
-for (const f of Object.values(FACTIONS)) {
-  if (which !== "all" && which !== f.id) continue;
+const templates = TEMPLATES.filter((t) => which === "templates" || which === t.key).map((t) => t.faction);
+for (const f of [...Object.values(FACTIONS), ...templates]) {
+  if (which !== "all" && which !== f.id && !templates.includes(f)) continue;
   const sec = document.createElement("section");
   const h = document.createElement("h2");
   h.textContent = `${f.name}`;

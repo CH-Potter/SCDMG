@@ -177,11 +177,11 @@ export type UnitArt =
   | { kind: "image"; /** Circle-cropped raster image (PNG/WebP/JPEG data URL), validated in data/unitArt.ts. */ dataUrl: string }
   | { kind: "parts"; recipe: MiniatureRecipe };
 
-export type MiniBody = "trooper" | "critter" | "brute" | "walker" | "flyer" | "structure";
-export type MiniHead = "face" | "visor" | "beast" | "gem";
-export type MiniHeadgear = "none" | "helmet" | "hat" | "goggles" | "horns" | "crown" | "antennae";
-export type MiniWeapon = "none" | "rifle" | "cannon" | "blade" | "claws" | "staff";
-export type MiniBack = "none" | "pack" | "jets" | "tank" | "banner";
+export type MiniBody = "trooper" | "critter" | "brute" | "walker" | "flyer" | "structure" | "rider";
+export type MiniHead = "face" | "visor" | "beast" | "gem" | "skull" | "bug" | "beard";
+export type MiniHeadgear = "none" | "helmet" | "hat" | "goggles" | "horns" | "crown" | "antennae" | "hood" | "plume";
+export type MiniWeapon = "none" | "rifle" | "cannon" | "blade" | "claws" | "staff" | "bow" | "shield" | "axe";
+export type MiniBack = "none" | "pack" | "jets" | "tank" | "banner" | "wings";
 
 /** A miniature built in the forge from original parts, baked like a built-in archetype. */
 export interface MiniatureRecipe {

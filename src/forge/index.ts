@@ -30,6 +30,7 @@ import { clampCrop, type CropState, decodeUpload, defaultCrop, encodeCrop, rende
 import { MINI_BACKS, MINI_BODIES, MINI_HEADGEAR, MINI_HEADS, MINI_WEAPONS } from "../engine/data/unitArt";
 import type { MiniatureRecipe } from "../engine/types";
 import { artSectionHtml, hydrateMinis, miniImg, NEUTRAL_BASE, recipeFromProfile, rosterHtml, swapHtml, unitCardHtml } from "./art";
+import { startFromTemplate, TEMPLATE_GROUPS, templateByKey, TEMPLATES, type TemplateGroup } from "./templates";
 import { esc, KEYWORD_TEXT, TRAIT_TEXT, weaponLine, EVADE_TEXT } from "../ui/describe";
 import { downloadJson, pickJsonFile, slug } from "../ui/files";
 import {
@@ -230,6 +231,36 @@ class FactionForge {
               </div>
             </div>
           </section>
+          <section class="panel ff-tropes">
+            <h2>Start from a trope</h2>
+            <p class="hint">Complete, playable factions for the classic tabletop army types: units, miniatures, supports and starter lists, ready to rename and tweak. Starting one makes your own copy; nothing shows up in the game until you save it.</p>
+            ${(Object.keys(TEMPLATE_GROUPS) as TemplateGroup[])
+              .map(
+                (g) => `<h3>${esc(TEMPLATE_GROUPS[g].name)} <small class="hint">${esc(TEMPLATE_GROUPS[g].blurb)}</small></h3>
+              <div class="ff-libgrid">${TEMPLATES.filter((t) => t.group === g)
+                .map((t) => {
+                  const f = t.faction;
+                  const units = f.profiles.filter((p) => !p.structure?.summonOnly);
+                  return `<div class="ff-libcard ff-trope">
+                    <div class="ff-libcard-head">${tokenSvg(f.color, f.look, 44)}<div><b>${esc(f.name)}</b><div class="hint">${esc(t.trope)}</div></div></div>
+                    <p>${esc(f.blurb)}</p>
+                    <div class="ff-strip">${units
+                      .slice(0, 6)
+                      .map((p) => miniImg(f.id, p.id, 40))
+                      .join("")}</div>
+                    <p class="hint ff-trope-units">${esc(
+                      units
+                        .slice(0, 4)
+                        .map((p) => p.name)
+                        .join(", "),
+                    )}${units.length > 4 ? ` and ${units.length - 4} more` : ""} · ${plural(f.supports.length, "support")}</p>
+                    <div class="row"><button class="mini" data-act="template" data-id="${esc(t.key)}">Start from this</button></div>
+                  </div>`;
+                })
+                .join("")}</div>`,
+              )
+              .join("")}
+          </section>
           ${
             draft
               ? `<section class="panel ff-draft"><b>Unsaved draft:</b> ${esc(draft.name || "Untitled")} <span class="spacer"></span>
@@ -251,7 +282,7 @@ class FactionForge {
                       ),
                     )
                     .join("")}</div>`
-                : `<p class="hint">None yet. Copy a built-in faction, start a blank one, or import a file.</p>`
+                : `<p class="hint">None yet. Copy a built-in faction, start from a trope, start a blank one, or import a file.</p>`
             }
           </section>
         </main>
@@ -285,6 +316,13 @@ class FactionForge {
       }
       case "blank":
         return this.open(blankFaction(), false, false);
+      case "template": {
+        const t = templateByKey(id);
+        if (!t || !this.confirmLeave()) return;
+        const notes: string[] = [];
+        this.open(startFromTemplate(t, t.faction.name, notes), false, false, notes);
+        return this.toast(`Started "${t.faction.name}" from the ${t.trope.split(":")[0]!.toLowerCase()} template. Rename it, change what you like, then save.`);
+      }
       case "resume": {
         const d = loadFactionDraft();
         if (!d) return;
@@ -395,7 +433,10 @@ class FactionForge {
       const bar = ref.indexOf("|");
       const fid = ref.slice(0, bar);
       const pid = ref.slice(bar + 1);
-      const f = this.f && this.f.id === fid ? this.f : (FACTIONS[fid] ?? (saved ??= listCustomFactions()).find((x) => x.id === fid));
+      const f =
+        this.f && this.f.id === fid
+          ? this.f
+          : (FACTIONS[fid] ?? TEMPLATES.find((t) => t.faction.id === fid)?.faction ?? (saved ??= listCustomFactions()).find((x) => x.id === fid));
       const p = f?.profiles.find((x) => x.id === pid);
       return f && p ? { f, p } : null;
     };

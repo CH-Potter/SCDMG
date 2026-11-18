@@ -5,11 +5,11 @@
 import type { MiniatureRecipe, MiniBack, MiniBody, MiniHead, MiniHeadgear, MiniWeapon, UnitArt } from "../types";
 
 // Records so the compiler flags any part added to types.ts but missing here.
-const BODY: Record<MiniBody, true> = { trooper: true, critter: true, brute: true, walker: true, flyer: true, structure: true };
-const HEAD: Record<MiniHead, true> = { face: true, visor: true, beast: true, gem: true };
-const HEADGEAR: Record<MiniHeadgear, true> = { none: true, helmet: true, hat: true, goggles: true, horns: true, crown: true, antennae: true };
-const WEAPON: Record<MiniWeapon, true> = { none: true, rifle: true, cannon: true, blade: true, claws: true, staff: true };
-const BACK: Record<MiniBack, true> = { none: true, pack: true, jets: true, tank: true, banner: true };
+const BODY: Record<MiniBody, true> = { trooper: true, critter: true, brute: true, walker: true, flyer: true, structure: true, rider: true };
+const HEAD: Record<MiniHead, true> = { face: true, visor: true, beast: true, gem: true, skull: true, bug: true, beard: true };
+const HEADGEAR: Record<MiniHeadgear, true> = { none: true, helmet: true, hat: true, goggles: true, horns: true, crown: true, antennae: true, hood: true, plume: true };
+const WEAPON: Record<MiniWeapon, true> = { none: true, rifle: true, cannon: true, blade: true, claws: true, staff: true, bow: true, shield: true, axe: true };
+const BACK: Record<MiniBack, true> = { none: true, pack: true, jets: true, tank: true, banner: true, wings: true };
 
 export const MINI_BODIES = Object.keys(BODY) as readonly MiniBody[];
 export const MINI_HEADS = Object.keys(HEAD) as readonly MiniHead[];
