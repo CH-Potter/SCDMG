@@ -47,9 +47,9 @@ VITEST_SIM=1 SIM_MODE=assault SIM_SEEDS=3 npx vitest run sim/ai-sim.test.ts --si
 
 ```bash
 npm run sim:quick                                   # Skirmish, 1 seed: the first look at a change
-npm run sim:quick -- --factions concord,munch       # one pairing
+npm run sim:quick -- --factions concord,swarm       # one pairing
 node sim/run.mjs --mode assault --seeds 3 --vs sim/out/<before>.json   # full run, with the change per pairing
-node sim/summary.mjs sim/out/<run>.json --pair concord-munch           # VP sources, missions, maps, seeds, units
+node sim/summary.mjs sim/out/<run>.json --pair concord-swarm           # VP sources, missions, maps, seeds, units
 ```
 
 Engine or AI changes that shouldn't change what the AI decides (refactors, speed-ups) can be checked with `npm run sim:golden`: it plays a fixed cross-section of both modes and fails if any game plays differently from `sim/golden.json` (same commands, same final state). For a bigger check, run the full sim before and after with `--tag before` / `--ref sim/out/before.json`. If a change is meant to alter the AI, rewrite the golden file with `npm run sim:golden -- --update`.

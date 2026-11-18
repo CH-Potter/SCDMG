@@ -2,59 +2,61 @@
 
 Each built-in faction has its own way of fighting. Units and supports should fall inside these pillars, with a little deliberate overlap so no faction is helpless in any situation. When you add or change content, check it against this page; `tests/factionIdentity.test.ts` checks the main pillars at the data level.
 
-| | Dustline Militia | The Munch | Lumen Concord |
+| | Dustline Militia | The Skitterswarm | Lumen Concord |
 | --- | --- | --- | --- |
-| Play style | Ranged gunline | Melee horde | Few elite specialists |
-| Wins by | Out-shooting you from cover | Drowning you in bodies | Precise strikes and being in the right place |
-| Weak at | Melee; getting caught in the open | Shooting; nerve; armour | Numbers; holding many objectives; losses hurt |
-| Arrival | Drop-ship anywhere | Gopher Hole (temporary) and The Sett Lab (permanent) | Grand Portal beside a friend, overcharged |
-| Buff family | Ranged dice, digging in, supplies | Melee dice, regrowth, swarming | Shields, precision and tracking, teleporting |
+| Play style | Drilled heavy gunline | Melee swarm round a Broodmother | Few elite specialists |
+| Wins by | Out-shooting you from cover, and not moving | Drowning you in bodies that keep coming back | Precise strikes and being in the right place |
+| Weak at | Melee; getting caught in the open | Shooting; nerve; armour; losing the Broodmother | Numbers; holding many objectives; losses hurt |
+| Arrival | Drop-ship anywhere | Surface Breach near the swarm, Tunnel Mouth (temporary) and the Brood Spire (permanent) | Grand Portal beside a friend, overcharged |
+| Buff family | Ranged dice, digging in, supplies | Melee dice, acid, regrowth, swarming | Shields, precision and tracking, teleporting |
 
-## Dustline Militia (the farmers' militia)
+## Dustline Militia (the Dustline Muster)
 
-Frontier farmers defending their homesteads with whatever the barn and the scrapyard can spare: riveted rifles, a tractor walker, crop dusters and a radio shack. Denim, canvas, brass and hay around the faction orange.
+The frontier, drafted. After the first bugs came up through the corn in '09, the Grange Hall raised the Dustline Muster: every family sends its hands, the mine and farm work-suits went to the Scrapyard to be riveted into armour, and squads drill on the Grange Hall green under numbers and markings. Still frontier people at heart (rivets, patched-up practical kit, small-town grit, farm and mine origins), but organised, disciplined and heavy. Riveted plate, canvas and brass around the faction orange.
 
 **Pillars**
-1. **Gunlines.** Rifle squads, snipers and cannons that hit on 4+ at long range and get better when they stand still (Steady Aim) or dig in.
-2. **Artillery and turrets.** Barrage, the Spud Mortar (whose Radio Spotter turns any friend's eyes into a spotter), the Scrap Turret: indirect fire and fixed guns. Return Fire makes shooting Big Bertha or the Hay Bomber a trade.
-3. **Overwatch and entrenching.** Overwatch (and Top Cover to hand it out), Entrenched, Sandbag Social and Sandbag Drop (dig in), Junk Barricades with Scrap Cover, Dust Devil and Dust Cloud.
-4. **Air support and logistics.** The drop-ship, the airstrip, the radio's resources and Call It In, field repairs, the Sky Rustler's Crop Dust and the Hay Bomber's Bale Out.
-5. **Grit.** Steadying Presence and Patch Up keep the farmers standing.
+1. **Armoured gunlines.** Five-strong rifle squads in heavy armour (armour 4), marksmen and cannons that hit on 4+ at long range and get better when they stand still (Steady Aim) or dig in.
+2. **Artillery and turrets.** Barrage, the Pipe Mortar (whose Radio Spotter turns any friend's eyes into a spotter), the Scrap Turret: indirect fire and fixed guns. Return Fire makes shooting Big Bertha or the Haymaker Bomber a trade.
+3. **Overwatch and entrenching.** Overwatch (Picket Drill, and Top Cover to hand it out), Entrenched, Sandbag Detail and Sandbag Drop (dig in), Junk Barricades with Scrap Cover, Dust Devil and Dust Cloud.
+4. **Air support and logistics.** The drop-ship, the Forward Airstrip, Grange Hall Command's supply runs and Call It In, the Motor Pool's field repairs, the Sky Rustler's Crop Dust and the Haymaker Bomber's Bale Out.
+5. **Discipline.** Steadying Presence and the Patch Medics keep the line standing.
 
-**Weak at:** melee (one die per model, hitting on 5+ for most squads), and anything that reaches its gunline. Low armour (5+) without cover.
+**Weak at:** melee (one die per model, hitting on 5+ for most squads), and anything that reaches its gunline. Fewer bodies than before, so every squad matters.
 
 **Belongs here**
-- Keywords: infantry, light, mech; a few fearless defenders.
+- Keywords: infantry, light (scouts, medics, marksmen), mech; a few fearless defenders.
 - Abilities: Overwatch, Entrenched, Steady Aim, Spotter, Barrage, Demo Charge, Patch Up, Steadying Presence, Rocket Hop, Return Fire, Crop Dust, Bale Out, Radio Spotter, Scrap Cover.
 - Supports: resources, heal (repairs, no revives), rangedBuff, dugIn, spot (hit one better), smoke (only shot from close by), grant Overwatch, the ward reaction, airdrops (near your models, or anywhere for the drop-ship), the Junk Barricade summon.
-- Stats: hit 4+ (3+ for snipers); range 20–30"; armour 5 (Bertha 3); nerve 7; 1–7 models per unit (Rivet Grunts 7, or 9 with Extra Hands; Grannies 4; Riders 3; leaders, snipers, machines and structures are single models); cost 2–5. Precision on snipers and the crop duster; tracking on auto-guns.
+- Stats: hit 4+ (3+ for marksmen); range 20–30"; armour 4 on the line (Bertha 3; light scouts 5); nerve 7; 1–7 models per unit (Rivet Grunts 5, or 7 with their Second Section; Old Guard 4; Outriders and Patch Medics 3; marksmen, machines and structures are single models); cost 2–5. Precision on marksmen and the crop duster; tracking on auto-guns.
 
-**Arrival:** the **Rust Bucket Drop-Ship** lands a reserve unit anywhere on the table from round 2, at least 8" from enemies, for just 1 CP. It's the Skirmish starter's arrival card. The **Dirt Airstrip** drops one within 12" of your models for 3 CP, and it's the Assault starter's. On the 70" board the gunline needs it to keep pace: without it the faster Munch reached the centre objectives first and the Militia scored about 15% on the lane maps (Highway, Sprawl). The drop-ship in Assault overshot to about 68%.
+**Arrival:** the **Rust Bucket Drop-Ship** lands a reserve unit anywhere on the table from round 2, at least 8" from enemies, for just 1 CP. It's the Skirmish starter's arrival card. The **Forward Airstrip** drops one within 12" of your models for 3 CP, and it's the Assault starter's.
 
-**Overlap:** the Front Porch Grannies' rolling pins and Big Bertha's stomp and ram.
+**Overlap:** the Old Guard Veterans' pick hafts and Big Bertha's stomp and ram.
 
-## The Munch (Dr. Graft's critter army)
+**Not to be confused with** two Faction Forge templates in the same space: the 88th Mudfoot Regiment is a regular trooper gunline with tanks (big unarmoured conscript squads), and the Bulwark Brotherhood are armoured super-soldier knights. The Militia are the frontier draft: tough, practical, improvised heavy kit, community roots.
 
-The farmland's own critters (beetles, spiders, wasps, scorpions, foxes, a skunk, crows and a badger) turned into weapons by Dr. Graft, an evil bioengineer who rides into battle on his war-badger, Big Mama. Every critter carries grafted weapons and a chrome overmind implant that keeps the swarm moving as one. Natural animal coats, chrome lab grafts and glowing green mutagen.
+## The Skitterswarm (the brood under the valley)
+
+Bugs that slept for ages deep under the Dustline, round the Wellspring, until the boom years' drilling and the stirring Fizz woke them. Every one of them answers to the Broodmother, Mother Mandible: she lays, they chew. Dark mauve chitin, acid-green glands and glowing eggs.
 
 **Pillars**
-1. **Horde.** Cheap 1 HP bodies in big squads (Chrome-Jaw Beetles of 9, Piston Foxes 8, Bomb Wasps 6, Web-Gunner Spiders 4; monsters and the Brood Scorpion fight alone); the Munch always field the most models, and the most per unit.
-2. **Impact on the charge.** Most melee critters roll impact dice when a charge lands; Rampage and Feeding Frenzy add more melee dice, and Overmind Pulse adds the reach to get there (at the cost of the Frenzy that round).
-3. **Regrowth.** Regen, Regrow, Mending Spores, Hatchlings and Cough Up: wounds close and lost critters come back.
-4. **Tunnels and ambushes.** Gopher Holes, the Sett Lab, Tunnel, Lurk, the Trapdoor Pit and Undermine (the ground gives way under an enemy before it moves).
-5. **Gross stuff.** Sticky Goo, Reel In, Pop!, Awful Whiff (the only nerve attack), Eye-Watering Reek and the Steel-Jaw Crows' Eye Peck (shooting one worse), Last Bite.
+1. **Swarm.** Cheap 1 HP bodies in big broods (Skitterlings of 10, the Stinger Swarm 5, Acid Spitters and Shellbacks 4); the swarm always fields the most models, and the most per unit.
+2. **The Broodmother.** Brood Bond refills every hurt brood within 6" of her each round, hurt or not, and Brood Call and Hatchlings work round her too. The army fights in a knot around her; kill her and it stops coming back.
+3. **Acid.** Corrode on the Spitters, Shellbacks, Bile Bombard, Stinger Swarm and Acid Geyser (and as upgrades on the Broodmother and the Lurker): a target that's been hit has saves one worse for the round, so the swarm hits the same thing with everything. Caustic Snare and Acid Blood on the Acid Glands card.
+4. **Regrowth and spawning.** Regrow, Regen, Mending Spores, Hatchlings, Quickening, and Egg Clutches laid on the battlefield.
+5. **Burrowing.** Tunnel on the Trapjaw Lurker, the Deep Borer and Skitterlings with Burrowers; Surface Breach and the Tunnel Mouth; the Brood Spire; Lurk.
 
-**Weak at:** shooting (nothing past 20"), armour (6+ on most bodies), and nerve (6). It loses lots of models and relies on getting them back.
+**Weak at:** shooting (nothing past 22"), armour (6+ on most bodies), nerve (6), and losing the Broodmother. Unlike the Munch it replaced, its line bugs don't hit on the charge: impact is for the Deep Borer and the flyers' dive.
 
 **Belongs here**
-- Keywords: beast, infantry, light; monsters; jumpers and flyers that bite.
-- Abilities: Regen, Regrow, Hatchlings, Lurk, Sticky Goo, Rampage, Sugar Rush, Brood Call, Mending Spores, Tunnel, Burrow Exit, Pop!, Reel In, Eye Peck.
-- Supports: meleeBuff, haste (Overmind Pulse), regrow, rattle, blind, slow (Gross Glob, Undermine), retaliate, and summons (Gopher Hole, Trapdoor Pit).
-- Stats: melee hit 4+ (Big Mama 3+); armour 6 (big beasts 4–5); nerve 6–7; cost 2–6, lowest per model; impact on most melee units: 4+ for single beasts, 5+ for the big swarms (Chrome-Jaw Beetles, Piston Foxes, Bomb Wasps). The flyers never fight in melee: the Steel-Jaw Crows dive (2 impact dice each, 4+, AP1) and the Bomb Wasps blow themselves up with Bombs Away!. Evade against blasts and point-blank shots on swarms.
+- Keywords: beast, infantry, light; monsters; a jumping ambusher; flyers that sting.
+- Abilities: Regen, Regrow, Hatchlings, Lurk, Rampage, Brood Call, Mending Spores, Tunnel, Burrow Exit, Bombs Away!, Corrode, Brood Bond.
+- Supports: meleeBuff, haste (Skitter Rush), regrow (Quickening), rattle, blind, slow (Caustic Snare), retaliate (Acid Blood), summons (Egg Clutch, Tunnel Mouth), and its own airdrop (Surface Breach).
+- Stats: melee hit 4+ (monsters 3+); armour 6 (Shellbacks and monsters 4–5); nerve 6–7; cost 2–6, lowest per model.
 
-**Arrival:** two-tier tunnelling. **Tunnel Network** opens a temporary **Gopher Hole** (gone at the end of the round) that your reserves can deploy next to. **The Sett Lab**, Dr. Graft's burrowed laboratory, is the permanent hole, bought in the list. Big Mama's **Tunnel Claws** let her burrow across the board once.
+**Arrival:** **Undertunnels** in both starter sets: *Surface Breach* bursts a reserve up within 10" of the swarm (at least 5" from enemies, from round 2), or *Open a Tunnel* opens a Tunnel Mouth for the round. **The Brood Spire** is the permanent burrow, bought in the list.
 
-**Overlap:** the Web-Gunner Spiders and the Stink Mortar shoot, but short-ranged and mostly to slow the enemy with goo so the swarm can catch them.
+**Overlap:** the Acid Spitters, Bile Bombard and Acid Geyser shoot, but short-ranged and mostly to soften a target with acid before the swarm arrives.
 
 ## Lumen Concord (alien invaders)
 
@@ -83,17 +85,17 @@ Smug aliens who have come down in saucers to claim the valley. Domed heads in fi
 
 | Faction | Card | Abilities (effect) |
 | --- | --- | --- |
-| Militia | Grange Hall Radio | Supply Run (resources), Call It In (spot) |
-| Militia | Tractor Depot | Junk Barricade (summon), Field Repairs (heal 3, no revive) |
-| Militia | Weather Vane | Dust Devil (ward reaction), Dust Cloud (smoke: only shot from within 12") |
-| Militia | Dirt Airstrip | Hay Bale Drop (airdrop near your models), Top Cover (grant Overwatch) |
+| Militia | Grange Hall Command | Supply Run (resources), Call It In (spot) |
+| Militia | Motor Pool | Junk Barricade (summon), Field Repairs (heal 3, no revive) |
+| Militia | Smoke Detail | Dust Devil (ward reaction), Dust Cloud (smoke: only shot from within 12") |
+| Militia | Forward Airstrip | Supply Drop (airdrop near your models), Top Cover (grant Overwatch) |
 | Militia | Rust Bucket Drop-Ship | Bumpy Landing (airdrop anywhere), Sandbag Drop (dig in) |
-| Militia | Ammo Wagon | Crate of Rivets (ranged dice), Sandbag Social (dig in) |
-| Munch | Brood Nest | Feeding Frenzy (melee dice), Overmind Pulse (haste +2") |
-| Munch | Tunnel Network | Dig Through (Gopher Hole), Undermine (slow, movement phase) |
-| Munch | Snack Stash | Last Bite (retaliate), Gross Glob (slow) |
-| Munch | Stink Gland | Awful Whiff (rattle), Eye-Watering Reek (blind) |
-| Munch | Deep Burrows | Trapdoor Pit (lurking summon), Cough Up (regrow 2) |
+| Militia | Ammo Wagon | Crate of Rivets (ranged dice), Sandbag Detail (dig in) |
+| Skitterswarm | Brood Hum | Gnashing Frenzy (melee dice), Skitter Rush (haste +2") |
+| Skitterswarm | Egg Chamber | Lay a Clutch (lurking Egg Clutch), Quickening (regrow 2) |
+| Skitterswarm | Undertunnels | Surface Breach (airdrop near the swarm), Open a Tunnel (Tunnel Mouth) |
+| Skitterswarm | Pheromone Cloud | Skin-Crawl (rattle), Spore Fog (blind) |
+| Skitterswarm | Acid Glands | Acid Blood (retaliate), Caustic Snare (slow) |
 | Concord | Mirror Spire | Refocus (recharge), Glimmer Dome (summon) |
 | Concord | Choir of Light | Hold Fast (brace reaction), Resonance (recharge 1 in a 6" group) |
 | Concord | Star Lens | Sunbeam (blast), Glaring Light (expose) |
@@ -111,24 +113,25 @@ Every unit has at least two abilities (structures at least one). Most cards and 
 | Militia | Patch Medic | Patch Up, Entrenched, Rocket Hop, Steadying Presence |
 | Militia | Big Bertha | Steady Aim, Return Fire (+ Barrage) |
 | Militia | Sky Rustler | Spotter, Crop Dust |
-| Militia | Ridgeline Squinter | Steady Aim, Entrenched (+ Overwatch or Spotter) |
-| Militia | Tumbleweed Riders | Demo Charge, Rocket Hop |
-| Militia | Front Porch Grannies | Entrenched, Steadying Presence (+ Overwatch) |
-| Militia | Hay Bomber | Return Fire, Bale Out |
+| Militia | Ridgeline Marksman | Steady Aim, Entrenched (+ Overwatch or Spotter) |
+| Militia | Tumbleweed Outriders | Demo Charge, Rocket Hop |
+| Militia | Old Guard Veterans | Entrenched, Steadying Presence (+ Overwatch) |
+| Militia | Haymaker Bomber | Return Fire, Bale Out |
 | Militia | Scrap Turret | Overwatch |
-| Militia | Spud Mortar | Radio Spotter (+ Barrage) |
+| Militia | Pipe Mortar | Radio Spotter (+ Barrage) |
 | Militia | Junk Barricade | Scrap Cover |
-| Munch | Chrome-Jaw Beetles | Regrow, Rampage |
-| Munch | Web-Gunner Spiders | Sticky Goo, Regen, Reel In |
-| Munch | Bomb Wasps | Pop!, Bombs Away! |
-| Munch | Dr. Graft and Big Mama | Regen, Brood Call, Sugar Rush, Lurk (+ Tunnel) |
-| Munch | Piston Foxes | Regrow, Sugar Rush |
-| Munch | Stink Mortar | Sticky Goo, Regen |
-| Munch | Steel-Jaw Crows | Regen, Eye Peck (+ Reel In) |
-| Munch | Brood Scorpion | Hatchlings, Mending Spores (+ Brood Call) |
-| Munch | Mutagen Vat | Regen, Brood Call, Mending Spores |
-| Munch | The Sett Lab | Burrow Exit, Lurk, Regen |
-| Munch | Gopher Hole / Trapdoor Pit | Burrow Exit / Lurk |
+| Skitterswarm | Skitterlings | Regrow, Rampage (+ Tunnel with Burrowers) |
+| Skitterswarm | Acid Spitters | Corrode, Regrow |
+| Skitterswarm | Shellback Brood | Corrode, Regen |
+| Skitterswarm | Trapjaw Lurker | Lurk, Tunnel (+ Corrode) |
+| Skitterswarm | The Broodmother | Brood Bond, Brood Call, Hatchlings (+ Corrode) |
+| Skitterswarm | Deep Borer | Tunnel, Rampage (+ Regen) |
+| Skitterswarm | Stinger Swarm | Corrode, Bombs Away! |
+| Skitterswarm | Bile Bombard | Corrode, Regen |
+| Skitterswarm | Brood Tenders | Hatchlings, Mending Spores |
+| Skitterswarm | Brood Spire | Burrow Exit, Regen |
+| Skitterswarm | Acid Geyser | Corrode, Regen |
+| Skitterswarm | Egg Clutch / Tunnel Mouth | Lurk / Burrow Exit |
 | Concord | Phase Guard | Blink, Riposte |
 | Concord | Ray Lancer | Overcharge, Phase Out |
 | Concord | Shimmer Saucer | Refraction, Bubble Shield |
@@ -150,7 +153,6 @@ Each template has 6 to 10 units spread over the unit classes, each with two or m
 | --- | --- | --- |
 | Grimdark sci-fi | Bulwark Brotherhood | Armoured super-soldiers: few, huge, very hard to kill |
 | Grimdark sci-fi | 88th Mudfoot Regiment | Regular troopers: a disciplined gunline, a walking tank, mortars and artillery |
-| Grimdark sci-fi | The Skitterswarm | Insectoid hive swarm: regrowing bugs, burrowing monsters, egg clutches |
 | Grimdark sci-fi | Scrapjaw Mob | Brutish green warband: loud, scrap-built, numbers and melee |
 | Grimdark sci-fi | Veilwalker Kin | Ancient psychic space-elves: fast, fragile, shields and teleporting |
 | Grimdark sci-fi | Tin Can Legion | Droid legion: fearless robots that regrow, regenerate and repair |
@@ -161,5 +163,8 @@ Each template has 6 to 10 units spread over the unit classes, each with two or m
 | Fantasy | Deepdelve Hold | Dwarf hold: stubborn, armoured, with artillery |
 | Fantasy | Brightmantle Kingdom | Knightly kingdom: a cavalry charge backed by men-at-arms and longbows |
 | Fantasy | Circle of the Mossy Stone | Druid circle: treefolk, wolves, bees and regrowth |
+| Dustline veterans | The Munch | Dr. Graft's grafted critter horde, a built-in faction until v0.12: impact charges, regrowth, goo and tunnels |
+
+The **Skitterswarm** began as a grimdark template and grew into a built-in faction (v0.12). **The Munch** took the other road: when the swarm replaced them as a base faction they moved to the forge whole (every unit, card, ability and line of flavour), in their own "Dustline veterans" group. Their units carry no parts recipes, so they're drawn with the Munch's own critter painters. Their haste ability is now the *Implant Jolt*. Sticky Goo, Sugar Rush, Pop!, Reel In and Eye Peck are theirs; they stay in the engine for the template and for any custom faction.
 
 The templates brought a few new miniature parts that any custom unit can use: a **rider** body (on a cartoon steed), **skull**, **bug** and **bearded** heads, **hood** and **plumed helm** headgear, a **bow**, **sword and shield** or **axe** to hold, and **wings** on the back. The dev gallery shows the templates' miniatures at `gallery.html?faction=templates`.

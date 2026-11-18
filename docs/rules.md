@@ -1,4 +1,4 @@
-# Super Cool Desktop Miniatures Game: rules (v0.10)
+# Super Cool Desktop Miniatures Game: rules (v0.12)
 
 This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
@@ -30,8 +30,8 @@ With the **Unit class limits** house rule (on in the standard game), a list must
 | Skirmish | 2 to 6 | 2 | 1 | 1 | 1 |
 | Assault | 3 to 10 | 3 | 2 | 2 | 2 |
 
-- **Faction slots:** Dustline Militia get +1 Static (they dig in), The Munch +1 Base (there are always more of them), Lumen Concord +1 Elite (few, but fabulous).
-- **Support cards** each add a slot, shown on the card in the list builder. For example, the Airstrip adds a Flyer slot and the Tractor Depot a Static one. Taking a card for its slot is part of building a list.
+- **Faction slots:** Dustline Militia get +1 Static (they dig in), The Skitterswarm +1 Base (there are always more of them), Lumen Concord +1 Elite (few, but fabulous).
+- **Support cards** each add a slot, shown on the card in the list builder. For example, the Forward Airstrip adds a Flyer slot and the Motor Pool a Static one. Taking a card for its slot is part of building a list.
 - A unit's class comes from its base profile: upgrades don't change it.
 - The list builder shows the slots used and left, and greys out units whose class is full. The menu won't start a battle with a list that breaks the slots; switch the house rule off to play any mix.
 - Open roster games have no lists, so slots don't apply.
@@ -55,15 +55,15 @@ With the **Unit class limits** house rule (on in the standard game), a list must
 
 ## Multi-model units
 
-- **Squad sizes:** line infantry and swarms come in big squads, and only leaders, specialists and true elites fight alone. Each faction's sizes follow its style: the Munch field the most bodies per unit, the Lumen Concord the fewest.
+- **Squad sizes:** line infantry and swarms come in big squads, and only leaders, specialists and true elites fight alone. Each faction's sizes follow its style: the Skitterswarm field the most bodies per unit, the Lumen Concord the fewest.
 
 | | Squads (models) | Single models |
 | --- | --- | --- |
-| Dustline Militia | Rivet Grunts 7, Front Porch Grannies 4, Tumbleweed Riders 3 | Patch Medic (support leader), Ridgeline Squinter (sniper), Big Bertha and the Hay Bomber (big machines), Sky Rustler (aircraft), turret, mortar, barricade |
-| The Munch | Chrome-Jaw Beetles 9, Piston Foxes 8, Bomb Wasps 6, Web-Gunner Spiders 4, Steel-Jaw Crows 2 | Dr. Graft and Big Mama and the Stink Mortar (monsters), Brood Scorpion (support leader), Mutagen Vat, The Sett Lab, holes and pits |
+| Dustline Militia | Rivet Grunts 5 (7 with their Second Section), Old Guard Veterans 4, Tumbleweed Outriders 3, Patch Medic team 3 | Ridgeline Marksman (sniper), Big Bertha and the Haymaker Bomber (big machines), Sky Rustler (aircraft), turret, mortar, barricade |
+| The Skitterswarm | Skitterlings 10, Stinger Swarm 5, Acid Spitters 4, Shellback Brood 4, Brood Tenders 2 | The Broodmother and the Deep Borer (monsters), Trapjaw Lurker, Bile Bombard, Brood Spire, Acid Geyser, egg clutches and tunnel mouths |
 | Lumen Concord | Phase Guard 3, Blink Dancers 3, Jetwing Scouts 2 | Ray Lancer (sniper), Beam Warden (support leader), Grand Strider (monster), Shimmer Saucer (vehicle), pylon, obelisk, ward |
 
-- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Rivet Grunts, Chrome-Jaw Beetles, Piston Foxes and Bomb Wasps are worth 3 supply (a squad of Chrome-Jaw Beetles loses 1 for every 3 beetles), the Phase Guard 3 (every lost duellist costs 1), and the other squads 2.
+- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Skitterlings are worth 3 supply (a brood loses 1 for every 3 or 4 bugs), the Phase Guard 3 (every lost duellist costs 1), and the other squads 2.
 - To move a unit, pick a **leader** model and move it up to the unit's Move along a legal path.
 - The rest of the squad follows and **spreads out like a real squad**, not a block. Each follower travels at most Move + 2".
   - **Snap to cover:** within about 3" of the leader's spot, followers take free spots in cover: inside scrub, craters or rubble, or tucked behind a barricade on the side away from the enemy. "The enemy" means the nearest few enemy units, or their deployment zone if none are on the table yet.
@@ -151,13 +151,13 @@ Weapons can carry **bonuses vs keywords** (extra dice, damage or AP). Examples: 
 
 ## Factions
 
-Each faction has its own play style: the **Dustline Militia** shoot, the **Munch** swarm into melee, and the **Lumen Concord** field a few elite specialists. Abilities and support effects belong to one faction's style (Overwatch and digging in for the Militia, regrowth and lurking for the Munch, shields, precision and teleporting for the Concord), with a little overlap. See `docs/factions.md` for the pillars.
+Each faction has its own play style: the **Dustline Militia** shoot, the **Skitterswarm** swarm into melee around their Broodmother, and the **Lumen Concord** field a few elite specialists. Abilities and support effects belong to one faction's style (Overwatch and digging in for the Militia, acid, regrowth and burrowing for the swarm, shields, precision and teleporting for the Concord), with a little overlap. See `docs/factions.md` for the pillars. The Munch, a built-in faction until v0.12, are a Faction Forge template now.
 
 ## Abilities
 
 **Forward-deploy limits:**
 - **Tunnel** can't be used in round 1.
-- Neither a Tunnel nor a **Gopher Hole** can land within 6" of the enemy's home objective.
+- Neither a Tunnel nor a **Tunnel Mouth** (or a forge faction's Gopher Hole) can land within 6" of the enemy's home objective.
 
 **Unit abilities and timing:**
 - Active unit abilities are **free actions within the unit's activation**. In the movement or assault phase a ready unit can use one active ability, then still take its normal action: for example, Blink and then move, or Recall a squad and then shoot.
@@ -166,7 +166,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
 
 - **Active abilities** use the unit's activation in their phase:
   - Patch Up (heal or revive)
-  - Hatchlings (Brood Scorpion: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
+  - Hatchlings (the Broodmother and the Brood Tenders: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
   - Barrage (an indirect shell at a point; it can drift, see *Indirect fire*; friendly fire happens)
   - Tunnel (pop up anywhere on the ground ≥6" from enemies)
   - Blink (teleport 10", can land on platforms)
@@ -177,6 +177,8 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
   - Brood Call (aura: +1 move to Beasts)
   - Radiance (aura: extra shield recharge)
   - Steady Aim
+  - Corrode (acid: an attack that deals damage leaves the target's saves one worse this round)
+  - Brood Bond (the Broodmother: hurt units within 6" regrow a model at the end of every round, hurt or not)
 - **Reactive abilities:**
   - Overwatch (shoots a unit that ends a move, charge, deploy or teleport within 10")
   - Sticky Goo (slows the target)
@@ -277,7 +279,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
   - Weather Vane, **Dust Cloud** (1 CP, any phase, exhausts): a friendly unit can't be shot from more than 12" away this round.
   - Dirt Airstrip, **Top Cover** (1 CP, any phase, exhausts): a friendly unit with a gun gains Overwatch until the end of the round.
   - Rust Bucket Drop-Ship, **Sandbag Drop** (1 CP, any phase, exhausts): a friendly unit digs in (+1 save against shooting and barrages this round). Playable from round 1, when Bumpy Landing isn't.
-  - Brood Nest, **Overmind Pulse** (1 CP, any phase, exhausts): a friendly unit gets +2" move this round, which also adds to a rolled charge. It exhausts the nest, so no Feeding Frenzy that round.
+  - Brood Nest, **Implant Jolt** (1 CP, any phase, exhausts): a friendly unit gets +2" move this round, which also adds to a rolled charge. It exhausts the nest, so no Feeding Frenzy that round.
   - Tunnel Network, **Undermine** (1 CP, movement phase, exhausts): an enemy unit within 12" of your models is slowed (-2 move) this round and next.
   - Stink Gland, **Eye-Watering Reek** (1 CP, any phase, exhausts): an enemy unit with a gun within 10" of your models hits one worse with its shooting this round. Unlike Awful Whiff it works with morale switched off.
   - Choir of Light, **Resonance** (1 CP, any phase, exhausts): a friendly unit and every friendly unit within 6" of it recharge 1 shield per model (up to their maximum).
@@ -287,7 +289,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
   - Grand Portal, **Afterglow** (2 CP, any phase, exhausts): a friendly unit gets +1 shield per model, even above its maximum, until the end of the round.
 
 **Added in v0.11** (a balance pass under the standard house rules, with Unit class limits on):
-- **Feeding Frenzy costs 1 CP (was 2).** The Munch spent their two CP a round on Overmind Pulse and Undermine, and the Frenzy came up about once in 25 games. Overmind Pulse still exhausts the nest.
+- **Feeding Frenzy costs 1 CP (was 2).** The Munch spent their two CP a round on the nest's haste (now the Implant Jolt) and Undermine, and the Frenzy came up about once in 25 games. The haste still exhausts the nest.
 - **The AI keeps CP for a big buff:** a cheap support play (Undermine, say) no longer spends the CP that Feeding Frenzy or Crate of Rivets on any card needs later in the round, when a unit is about to use it.
 - **New starter lists**, all within the slots:
   - *Militia, Skirmish:* three Rivet Grunt squads (one with Jump Jets), Big Bertha with Barrage Shells, two Ridgeline Squinters and a Spud Mortar; Ammo Wagon and drop-ship. The Spud Mortar replaces the Patch Medic and the Watchtower Drill (the medic team did under 1 damage a game). *Assault* adds the Sky Rustler, a second Big Bertha, the Hay Bomber, the Front Porch Grannies, a second Spud Mortar and the Tumbleweed Riders, with the Radio, Tractor Depot and Airstrip (unchanged).
@@ -295,6 +297,16 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Munch
   - *Concord, Skirmish:* two Phase Guard, three Ray Lancers, the Shimmer Saucer and Blink Dancers with Afterimage; Mirror Spire and Grand Portal. A third Lancer replaces the Beam Warden. *Assault* adds two Grand Striders, the Jetwing Scouts and a third Phase Guard, with the Court of Disdain, the Grand Portal and the Light Gate. The Court of Disdain replaces the Mirror Spire, and the second Strider replaces a fourth Lancer and Extra Guard: the Concord lost on objectives against the Militia (about 39%).
 - **Costs:** the computed Fizz (`src/engine/pricing.ts`) for the Rust Bucket Drop-Ship (4, was 3), Light Gate (4, was 3), Weather Vane (3, was 2) and Brood Nest (4, was 3), and the computed cost for upgrades no starter list uses: Sidecar, Extra-Ripe Shells and Lustre Core 1 (were 2). Unit costs stay hand-set where the sims back them. The Patch Medic stays ⚙2/◆1 (it is weak). The Grand Strider stays ⚙7 (the Concord Assault list is balanced on it). The Lancer, Saucer and Dancers stay as they are, because the Concord are balanced on them.
 - Checked by AI-vs-AI simulation at 3 seeds (684 Skirmish and 378 Assault games). Skirmish: Concord–Militia 52.4%, Concord–Munch 45.6%, Militia–Munch 49.3%. Assault: 53.6%, 53.6% and 54.0%. At 3 seeds a pairing is good to about ±3 points (Skirmish) and ±4.5 (Assault).
+
+**Added in v0.12 (the base-faction pass):** the base factions are now the **Dustline Militia**, **The Skitterswarm** and the **Lumen Concord**.
+- **The Skitterswarm replaces the Munch.** A bug tide from under the valley around one Broodmother: Skitterlings (10), Acid Spitters, Shellback Brood, the Trapjaw Lurker, the Broodmother, the Deep Borer, the Stinger Swarm, the Bile Bombard, Brood Tenders, the Brood Spire and the Acid Geyser; cards Brood Hum, Egg Chamber, Undertunnels, Pheromone Cloud and Acid Glands; faction slot +1 Base. It plays differently from the Munch: no impact on the line bugs and no goo. Instead:
+  - **Corrode** (new, passive): when the unit's attack (a shot, a shell, melee or impact) deals damage, the target's saves are one worse until the end of the round (no stacking). The acid softens a target for everything else that hits it.
+  - **Brood Bond** (new, passive; the Broodmother): at the end of the round every other friendly unit within 6" that has lost models regrows one, even if it was hurt this round (in place of its own Regrow). The army fights in a knot around her and comes apart when she falls. The AI keeps hurt broods near her.
+  - **Burrowing:** Tunnel on the Trapjaw Lurker, the Deep Borer and Skitterlings with Burrowers; Surface Breach and the Tunnel Mouth; the Brood Spire.
+  - Costs and supply are first estimates from `engine/pricing.ts`; the balance pass follows.
+- **The Munch are a Faction Forge template** ("Dustline veterans"), whole: Dr. Graft and Big Mama, every unit, card and ability, drawn with their own critters. Their haste card ability is renamed the *Implant Jolt*. Sticky Goo, Sugar Rush, Pop!, Reel In and Eye Peck stay in the engine for the template and custom factions. Saved lists for the old faction are skipped; custom factions copied from it keep working (they carry their own units); a campaign saved on the Munch's side says so and offers to start over, and other campaigns' places the Munch held pass to the swarm.
+- **The Militia are a drafted, drilled army now** (the Dustline Muster), in riveted work-suit armour. Rivet Grunts are five troopers at armour 4 (was seven at 5; the *Second Section* upgrade brings them to seven), and lose *light*; the Patch Medics and the Old Guard Veterans (were the Front Porch Grannies) wear armour 4 too. Renamed: Ridgeline Marksman (was Squinter), Tumbleweed Outriders, Haymaker Bomber, Pipe Mortar; cards Grange Hall Command, Motor Pool, Smoke Detail, Forward Airstrip; Supply Drop, Sandbag Detail. The Skirmish starter fields three five-strong squads (one with Picket Drill, one with Jump Jets, one with its Second Section) and a Patch Medic team.
+- Quick AI-vs-AI check (1 seed, standard house rules; no balance pass yet). Skirmish: Concord–Militia 38.2%, Concord–Skitterswarm 53.3%, Militia–Skitterswarm 57.2%. Assault: 47.6%, 40.5% and 26.2%. The swarm wins on objectives and regrowth but deals the least damage of the three (about 10 a Skirmish game); the Militia are short in Assault. The full rebalance comes next.
 
 ### Flyers
 
@@ -317,7 +329,7 @@ Weapons with the **indirect** trait, and the Barrage ability, lob a shell instea
 
 ## Tabletop staples
 
-- **Impact on charge:** some units (Munch melee critters, Big Bertha's ram) roll impact dice when a charge lands. Each model in base contact rolls the unit's `impact` dice at the charged unit. Hits get normal saves, and the damage happens before the combat phase.
+- **Impact on charge:** some units (the swarm's monsters, Big Bertha's ram, the Grand Strider) roll impact dice when a charge lands. Each model in base contact rolls the unit's `impact` dice at the charged unit. Hits get normal saves, and the damage happens before the combat phase.
 - **Weapon traits:**
 
 | Trait | Effect |
@@ -327,10 +339,10 @@ Weapons with the **indirect** trait, and the Barrage ability, lob a shell instea
 | heavy | hits one worse if the unit moved this round |
 | rending | natural 6s to hit get +1 AP |
 | pistol | point-blank shots (at a unit you're engaged with) can't be evaded |
-| indirect | lobbed shells (the Spud Lobber and Stink Shell): see *Indirect fire* below |
+| indirect | lobbed shells (the Mine-Charge Lobber and Bile Shell): see *Indirect fire* below |
 
 - **Morale** (a house rule, off in the standard game):
-  - When a unit at half strength or less (counting wounds) takes damage, it rolls 2d6 against its **nerve** (default 7; Munch critters 6, Concord 8–9). If the roll is above its nerve, the unit is **Shaken**.
+  - When a unit at half strength or less (counting wounds) takes damage, it rolls 2d6 against its **nerve** (default 7; swarm bugs 6, Concord 8–9). If the roll is above its nerve, the unit is **Shaken**.
   - Shaken units hit one worse, won't charge and can't hold objectives.
   - At the end of each round, each Shaken unit recovers on a 4+.
   - Any army can **Rally** a unit for 1 CP. This is a free action.
@@ -383,28 +395,28 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
 | Structure | Faction | Kind | What it does |
 | --- | --- | --- | --- |
 | Scrap Turret | Militia | permanent | Rifle turret with Overwatch |
-| Junk Barricade | Militia | temporary | Big base that blocks enemy paths, e.g. a ramp; Scrap Cover gives friends within 2" cover (Tractor Depot, or the Hay Bomber's Bale Out) |
-| Mutagen Vat | Munch | permanent | Short-range spores; Regen and Brood Call |
-| Gopher Hole | Munch | temporary | Your reserves can deploy within 3" of it |
-| The Sett Lab | Munch | permanent | A Burrow Exit that stays, with Lurk and Regen |
-| Trapdoor Pit | Munch | temporary | Lurks: bites the first enemy ground unit to end a move within 3" |
+| Junk Barricade | Militia | temporary | Big base that blocks enemy paths, e.g. a ramp; Scrap Cover gives friends within 2" cover (Motor Pool, or the Haymaker Bomber's Bale Out) |
+| Brood Spire | Skitterswarm | permanent | A Burrow Exit that stays: spore puffs, Regen |
+| Acid Geyser | Skitterswarm | permanent | Short-range acid jet with Corrode; Regen |
+| Tunnel Mouth | Skitterswarm | temporary | Your reserves can deploy within 3" of it (Undertunnels) |
+| Egg Clutch | Skitterswarm | temporary | Lurks: nips the first enemy ground unit to end a move within 3" (Egg Chamber) |
 | Shield Pylon | Concord | permanent | Shielded beam emplacement with Radiance |
-| Spud Mortar | Militia | permanent | Lobbed potatoes; Radio Spotter (drifts less when friends can see the spot) |
+| Pipe Mortar | Militia | permanent | Lobbed mining charges; Radio Spotter (drifts less when friends can see the spot) |
 | Sunray Tower | Concord | permanent | Long-range beam; Overcharge (burn its shields for +1 damage) |
 | Glimmer Dome | Concord | temporary | Enemy shots at friendly units within 4" of it hit one worse |
 
 ## Off-board supports, Fizz and CP
 
-- **Fizz ✦** is a second list currency, used to buy **supports**: off-board backing such as a radio, a depot or a light-choir. The Fizz budget is 6 in Skirmish and 10 in Assault.
+- **Fizz ✦** is a second list currency, used to buy **supports**: off-board backing such as a command post, a motor pool or a light-choir. The Fizz budget is 6 in Skirmish and 10 in Assault.
 - Each support adds **command points (CP)** to your pool at the start of each round. The pool starts with one round's worth and is capped at 8.
 - **Support abilities** cost CP and are **free actions** on your turn, in their listed phase or any phase. Playing one doesn't use an activation or pass the turn.
 - Many abilities **exhaust** their card until the next round.
-- **Reactions** (Dust Devil, Hold Fast, Last Bite) are **armed** on your turn and fire automatically the next time their trigger happens. If they don't fire, they expire at the end of the round.
+- **Reactions** (Dust Devil, Hold Fast, Acid Blood) are **armed** on your turn and fire automatically the next time their trigger happens. If they don't fire, they expire at the end of the round.
 - **Airdrops** deploy a unit from your reserves straight onto the table, paying its resources and supply as normal. The unit counts as having moved and acted this phase, and enemy Overwatch and Lurk react to it like any other arrival. An airdrop can never land within 6" of the enemy's home objective, inside impassable terrain or off the table. It can land on a platform.
-  - **Dirt Airstrip** (Militia, 3 ✦, +1 CP): *Hay Bale Drop* (3 CP, movement phase, exhausts) lands the unit within 12" of one of your models and at least 6" from enemies. It's in the Militia's Assault starter supports.
+  - **Forward Airstrip** (Militia, 3 ✦, +1 CP): *Supply Drop* (3 CP, movement phase, exhausts) lands the unit within 12" of one of your models and at least 6" from enemies. It's in the Militia's Assault starter supports.
   - **Rust Bucket Drop-Ship** (Militia, 4 ✦, +1 CP): *Bumpy Landing* (1 CP, movement phase, exhausts, from round 2) lands the unit **anywhere on the table**, at least 8" from enemy models. While you aim it, red rings show where it can't land, and clicking a spot it can't use says why. It's in the Militia's Skirmish starter supports.
   - **Grand Portal** (Concord, 3 ✦, +1 CP): *Step Through* (2 CP, movement phase, exhausts, from round 2) lands the unit within 4" of one of your units and at least 3" from enemies, with +1 shield per model (even above its maximum) until the end of the round. It's in the Concord's Skirmish and Assault starter supports.
-  - The Munch don't airdrop: they tunnel. *Dig Through* (Tunnel Network) opens a Gopher Hole for the round, and the Sett Lab is a permanent one.
+  - **Undertunnels** (Skitterswarm, 3 ✦, +1 CP): *Surface Breach* (2 CP, movement phase, exhausts, from round 2) bursts the unit up out of the ground within 10" of one of your models and at least 5" from enemies: closer to the fight than the drop-ship, no overcharge like the portal. Or, the same card, *Open a Tunnel* (3 CP) opens a Tunnel Mouth for the round that any number of reserves can come up beside; the Brood Spire is a permanent one. It's in the swarm's Skirmish and Assault starter supports.
 - **Teleports:** *Gate Step* (Light Gate, Concord, 3 CP, movement phase, exhausts) moves one of your unengaged units on the table up to 8". Click the unit, then where it goes.
 - Effects are data-driven, so custom factions can combine them: gain resources, heal or revive, recharge shields, blast a point, summon a structure, give melee or ranged buffs, give precision and tracking, regrow lost models, dig a unit in, teleport a unit, slow an enemy, airdrop a reserve unit (near your models or anywhere, optionally from a later round), rattle an enemy's nerve, spot an enemy (hit one better), blind an enemy (its shooting hits one worse), expose an enemy (no cover, hunker or dig-in bonus), silence an enemy, hide a unit in smoke, grant Overwatch, give extra move, ring a shield recharge round a group, add overshields, and the ward, brace and retaliate reactions.
 
@@ -482,7 +494,7 @@ Every built-in map has a tactical shape, not just scattered cover. Sight-blockin
 
 ## Campaign
 
-**⚔ Campaign** on the main menu plays the Dustline War as one of the three built-in factions: three acts of linked Skirmish and Assault battles on a map of the valley, then a finale at Fizzwater Ford. Every battle uses the normal rules, missions and maps above, against the AI. What the campaign adds:
+**⚔ Campaign** on the main menu plays the Dustline War as one of the three built-in factions (the Militia, the Skitterswarm or the Concord; a save from the Munch's side can't continue and offers to start over): three acts of linked Skirmish and Assault battles on a map of the valley, then a finale at Fizzwater Ford. Every battle uses the normal rules, missions and maps above, against the AI. What the campaign adds:
 
 - **Places.** Winning a battle takes its place; losing hands it to the enemy; a draw leaves it as it was. Battles you skip fall to the enemy when the act ends.
 - **Perks.** Each battlefield you hold gives a small edge in later battles: +1 CP, +1 starting resource, +2 roster budget, a free unit or a free support card. They are capped per battle at +2 CP, +2 resources, +3 budget, one free unit and one free support.
