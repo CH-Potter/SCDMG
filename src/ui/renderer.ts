@@ -33,6 +33,7 @@ import { DropShipFx, drawNoGo, type NoGoRing } from "./fx/dropship";
 export { INK, PLAYER_COLORS } from "./boardArt";
 import { drawAttackMark, drawExhausted, type AttackMarkView } from "./attackMark";
 import { TAP_SLOP_PX } from "./touch";
+import { createRigMini, type RigMini } from "./minis";
 export type { BannerTone } from "./fx";
 
 const MARGIN = 1.2;
@@ -136,6 +137,8 @@ interface ModelView {
   tag: Sprite;
   mark: Sprite;
   glass: Sprite | null;
+  /** New-engine miniature (Ink Rig / Overhead setting), or null for the Classic sprite. */
+  rig: RigMini | null;
   tex: FigureTex;
   spec: FigureSpec;
   kind: FigureKind;
@@ -242,6 +245,8 @@ export class BoardRenderer {
   private overlayLayer = new Graphics();
   private engageUnder = new Graphics();
   private hoverLayer = new Graphics();
+  /** Flat base layer of new-engine miniatures: under every standing figure. */
+  private footLayer = new Container();
   private modelLayer = new Container();
   private engageOver = new Graphics();
   private topOverlay = new Graphics();
@@ -320,6 +325,7 @@ export class BoardRenderer {
       this.engageUnder,
       this.hoverLayer,
       this.flagLayer,
+      this.footLayer,
       this.modelLayer,
       this.engageOver,
       this.topOverlay,
@@ -603,7 +609,10 @@ export class BoardRenderer {
     this.lastState = null;
     this.boardKey = "";
     this.units = new Map();
-    for (const v of this.models.values()) v.root.destroy({ children: true });
+    for (const v of this.models.values()) {
+      v.rig?.destroy();
+      v.root.destroy({ children: true });
+    }
     this.models.clear();
     for (const o of this.objectives.values()) {
       o.base.destroy();
@@ -905,6 +914,11 @@ export class BoardRenderer {
     v.faceTarget = face;
     v.idle = false;
     if (recoil) v.recoil = { t: -delay, dur: 220, dx: -face, dy: 0 };
+    if (v.rig) {
+      v.rig.aimAt(toward.x - m.pos.x, toward.y - m.pos.y);
+      const o = v.rig.muzzleOffset(face);
+      return { x: m.pos.x + o.x, y: m.pos.y - (v.flying ? 0 : liftOf(u, m)) + o.y };
+    }
     const mz = v.tex.meta.muzzle;
     return { x: m.pos.x + face * mz.x, y: m.pos.y - liftOf(u, m) + mz.y };
   }
@@ -1098,6 +1112,15 @@ export class BoardRenderer {
     if (stand) mini.addChild(stand);
     mini.addChild(cast, fig, fore, tag, hud, mark);
     if (glass) mini.addChild(glass);
+    // New-engine miniature (Miniatures setting): its footprint joins the flat base layer and its
+    // figure replaces the sprite; the HUD, rings and effects around it stay as they are.
+    const rig = createRigMini(prof.id, PLAYER_COLORS[u.owner], prof.baseRadius);
+    if (rig) {
+      for (const c of [base, cast, figSprite, flash, stand]) if (c) c.visible = false;
+      fig.addChild(rig.figure);
+      this.footLayer.addChild(rig.footprint);
+      rig.setStatus({ flying });
+    }
     root.addChild(mini);
     root.position.set(m.pos.x, m.pos.y);
     this.modelLayer.addChild(root);
@@ -1120,6 +1143,7 @@ export class BoardRenderer {
       tag,
       mark,
       glass,
+      rig,
       tex,
       spec,
       kind: spec.kind,
@@ -1190,7 +1214,7 @@ export class BoardRenderer {
             by = dy;
           }
         }
-        void by;
+        if (best !== Infinity) v.rig?.aimAt(bx, by);
         const face: 1 | -1 = best === Infinity ? (u.owner === 0 ? 1 : -1) : Math.abs(bx) < 0.3 ? v.faceTarget : bx >= 0 ? 1 : -1;
         if (face !== v.faceTarget) {
           v.faceTarget = face;
@@ -1245,10 +1269,12 @@ export class BoardRenderer {
     const ry = r * BASE_RY;
     const team = PLAYER_COLORS[u.owner];
     const figLift = v.flying ? v.liftTarget : 0;
-    const top = -(v.tex.meta.top + figLift);
+    const top = -((v.rig ? v.rig.top : v.tex.meta.top) + figLift);
+    // new-engine miniatures show selection, wounds and shaken on their own footprint
+    v.rig?.setStatus({ selected: o.sel, hp: m.hp, hpMax: prof.hp, shield: m.shield, shieldMax: prof.shield, shaken: v.shaken, spent: v.spent, hunkered: v.hunkered });
     // under the base: selection
     const g = v.under.clear();
-    if (o.sel) {
+    if (o.sel && !v.rig) {
       g.ellipse(0, 0.05, r + 0.42, ry + 0.4).fill({ color: ACCENT, alpha: 0.35 });
       dashCircle(g, 0, 0.05, r + 0.42, 12, 0.62, this.time / 1000, ry + 0.4);
       g.stroke({ width: 0.16, color: INK });
@@ -1287,7 +1313,7 @@ export class BoardRenderer {
     }
     // HUD: shield, braced, leader, pips
     const h = v.hud.clear();
-    if (m.shield > 0) {
+    if (m.shield > 0 && !v.rig) {
       h.ellipse(0, 0, r + 0.24, ry + 0.22).stroke({ width: 0.14, color: INK, alpha: 0.5 });
       h.ellipse(0, 0, r + 0.24, ry + 0.22).stroke({ width: 0.07, color: SHIELD, alpha: 0.95 });
       h.arc(0, 0, r + 0.24, -Math.PI * 0.85, -Math.PI * 0.6).stroke({ width: 0.12, color: 0xffffff, alpha: 0.85 });
@@ -1299,7 +1325,7 @@ export class BoardRenderer {
     }
     if (o.leader) h.star(0, top - 0.32, 5, 0.34, 0.16).fill(ACCENT).stroke({ width: 0.07, color: INK });
     const total = prof.hp + prof.shield;
-    if (total > 1) {
+    if (total > 1 && !v.rig) {
       const barY = ry + 0.24;
       const bw = Math.max(r * 1.8, total * 0.26);
       const pw = bw / total;
@@ -1310,7 +1336,7 @@ export class BoardRenderer {
         h.rect(-bw / 2 + i * pw + 0.03, barY, pw - 0.06, 0.18).fill(filled ? (isShield ? SHIELD : 0x7fdc5a) : 0x4a3a32);
       }
     }
-    v.mark.visible = v.shaken;
+    v.mark.visible = v.shaken && !v.rig;
     v.mark.position.set(o.leader ? 0.45 : 0, top - 0.32);
   }
 
@@ -1365,6 +1391,7 @@ export class BoardRenderer {
       }
       under.stroke({ width: 0.1, color: CLASH, alpha: 0.95 });
     }
+    for (const u of live) for (const m of u.models) this.models.get(`${u.uid}:${m.id}`)?.rig?.setStatus({ engaged: marked.has(m) });
   }
 
   private drawObjectives(s: GameState, animate: boolean): void {
@@ -1627,6 +1654,51 @@ export class BoardRenderer {
     v.castSprite.texture = v.tex.white[f]!;
   }
 
+  /**
+   * A new-engine miniature plays its own clips (step, recoil, flinch, death...) from the same pulses
+   * that drive the Classic sprite; only the lunge/drop offsets are shared.
+   */
+  private driveRig(v: ModelView, dt: number, ox: number, oy: number): void {
+    const rig = v.rig!;
+    const pop = v.anim?.kind === "pop";
+    rig.pulse("recoil", v.recoil, v.recoil?.t ?? 0);
+    rig.pulse("flinch", v.flinch, v.flinch?.t ?? 0);
+    if (v.anim?.kind === "ko") rig.pulse("death", v.anim, v.anim.t);
+    v.muzzle.visible = false;
+    v.mini.position.set(0, (v.flying ? 0 : -v.lift) + (pop ? oy : 0));
+    v.mini.rotation = 0;
+    v.fig.position.set(ox, pop ? 0 : oy);
+    v.fig.scale.set(1, 1);
+    v.fig.rotation = 0;
+    rig.update(dt, {
+      ppi: this.cam.ppi,
+      walking: !!v.path,
+      lift: v.lift,
+      face: v.turns ? v.face : undefined,
+      reduced: this.reduced,
+      x: v.root.x,
+      y: v.root.y + (pop ? oy : 0),
+      visible: v.root.visible,
+      alpha: v.root.alpha,
+    });
+  }
+
+  /** Rebuild every miniature (after the Miniatures setting changes). */
+  refreshMinis(): void {
+    const s = this.lastState;
+    for (const v of this.models.values()) {
+      v.rig?.destroy();
+      v.root.destroy({ children: true });
+    }
+    this.models.clear();
+    if (!s) return;
+    const banners = this.autoPhaseBanners;
+    this.autoPhaseBanners = false;
+    this.onState(null, s, null);
+    this.autoPhaseBanners = banners;
+    this.refreshArt(s);
+  }
+
   private tick(dt: number): void {
     this.time += dt;
     const now = this.time;
@@ -1647,7 +1719,10 @@ export class BoardRenderer {
     }
     const pulse = 0.55 + 0.45 * Math.sin(now / 260);
     for (const v of this.models.values()) {
-      if (!v.root.visible) continue;
+      if (!v.root.visible) {
+        if (v.rig) v.rig.footprint.visible = false;
+        continue;
+      }
       if (v.ready && !v.anim) v.readyRing.alpha = reduced ? 0.9 : pulse;
       if (v.idle) continue;
       let hop = 0;
@@ -1667,6 +1742,7 @@ export class BoardRenderer {
         const p = v.path.at(e * v.path.length);
         const ahead = v.path.at(Math.min(v.path.length, e * v.path.length + 0.3));
         if (v.turns && Math.abs(ahead.x - p.x) > 0.02) v.face = ahead.x > p.x ? 1 : -1;
+        v.rig?.heading(ahead.x - p.x, ahead.y - p.y);
         v.root.position.set(p.x, p.y);
         if (!v.structure && !reduced) {
           if (v.flying) {
@@ -1837,6 +1913,10 @@ export class BoardRenderer {
           ox = 0;
           oy = 0;
         }
+      }
+      if (v.rig) {
+        this.driveRig(v, dt, ox, oy);
+        continue;
       }
       this.setFrame(v, frame);
       // apply: the miniature hops/tilts as a whole; the figure breathes, recoils, lunges, banks
