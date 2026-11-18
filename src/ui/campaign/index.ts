@@ -71,7 +71,7 @@ import { downloadJson, pickJsonFile } from "../files";
 import { openListBuilder } from "../listbuilder";
 import type { MenuChoice } from "../menu";
 import { playStory, type ScenePanel } from "./scenes";
-import { clearCampaign, hasUnreadableSave, loadCampaign, saveCampaign } from "./store";
+import { CAMPAIGN_KEY, clearCampaign, hasUnreadableSave, legacySaveSide, loadCampaign, saveCampaign } from "./store";
 import { PIN_LABEL, PLACE_POS, valleyMapSvg } from "./valley";
 import { loadHouseRules } from "../houseRulesStore";
 
@@ -223,7 +223,9 @@ function endingPanels(s: CampaignState): ScenePanel[] {
 
 export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
   let state: CampaignState | null = loadCampaign();
-  const unreadable = !state && hasUnreadableSave();
+  // A campaign fought on a side that has left the game (the Munch): say so, and offer to start over.
+  let legacy = !state ? legacySaveSide() : null;
+  let unreadable = !state && !legacy && hasUnreadableSave();
   let selected: string | null = null;
   let placeInfo: string | null = null;
   let message = "";
@@ -315,6 +317,12 @@ export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
           <span id="c-audio"></span>
         </div>
       </header>
+      ${
+        legacy
+          ? `<div class="problem cmp-legacy" role="alert"><p>⚠ Your saved campaign was fought on the Munch's side. The Munch have left the Dustline (they live on as a Faction Forge template), so this campaign can't continue. Start over to pick a side.</p>
+             <p class="row"><button id="c-legacy-clear">Start over</button> <button class="secondary" id="c-legacy-export">Export the old save first…</button></p></div>`
+          : ""
+      }
       ${unreadable ? `<p class="problem">⚠ There is a campaign save from a different version of the game that this one can't read. Starting a new campaign replaces it.</p>` : ""}
       ${message ? `<p class="cmp-message" role="status">${esc(message)}</p>` : ""}
       <h2 class="step"><span>1</span> Choose your side</h2>
@@ -709,6 +717,22 @@ export function openCampaign(host: HTMLElement, opts: CampaignOptions): void {
     on("#c-exit", () => opts.onExit());
     on("#c-import", () => void importSave());
     on("[data-start]", (el) => void startNew(el.dataset.start as LoreFactionId));
+    on("#c-legacy-clear", () => {
+      clearCampaign();
+      legacy = null;
+      unreadable = false;
+      message = "The old Munch campaign is cleared. Pick a side to start again.";
+      render();
+    });
+    on("#c-legacy-export", () => {
+      try {
+        const raw = localStorage.getItem(CAMPAIGN_KEY);
+        if (raw) downloadJson(`scdmg-campaign-${legacy ?? "old"}`, JSON.parse(raw));
+      } catch {
+        message = "Couldn't read the old save to export it.";
+        render();
+      }
+    });
     on("#c-export", () => state && downloadJson(`scdmg-campaign-${state.faction}`, state));
     on("#c-abandon", () => {
       if (

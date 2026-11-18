@@ -115,7 +115,7 @@ const ROMAN: Record<CampaignAct, string> = { 1: "I", 2: "II", 3: "III" };
 
 export const campaignOf = (s: Pick<CampaignState, "faction">): FactionCampaign =>
   CAMPAIGNS[s.faction];
-/** A faction's name; `mid` for the middle of a sentence ("the Munch"). */
+/** A faction's name; `mid` for the middle of a sentence ("the Skitterswarm"). */
 export const factionName = (f: LoreFactionId, mid = false): string =>
   mid ? LORE_FACTIONS[f].name.replace(/^The /, "the ") : LORE_FACTIONS[f].name;
 /** A place's name; `mid` for the middle of a sentence ("the Old Refinery"). */
@@ -609,6 +609,23 @@ export function serializeCampaign(s: CampaignState): string {
 
 const isFaction = (x: unknown): x is LoreFactionId =>
   typeof x === "string" && (LORE_FACTION_IDS as readonly string[]).includes(x);
+/**
+ * Factions that have left the Dustline, and who took their place there. The Munch were a built-in
+ * faction until the Skitterswarm replaced them: a place the Munch held in an old save is the swarm's
+ * now. (A campaign played on the Munch's own side can't continue: see `LEGACY_SIDES`.)
+ */
+const RETIRED_FACTIONS: Record<string, LoreFactionId> = { munch: "swarm" };
+/** Old campaign sides this version recognises but can't continue (the screen offers to start over). */
+export const LEGACY_SIDES: readonly string[] = ["munch"];
+/** A place holder (or rival) from a save, with retired factions mapped to whoever replaced them. */
+const holderOf = (x: unknown): LoreFactionId | null | undefined =>
+  x === null
+    ? null
+    : isFaction(x)
+      ? x
+      : typeof x === "string" && Object.hasOwn(RETIRED_FACTIONS, x)
+        ? RETIRED_FACTIONS[x]
+        : undefined;
 const isStage = (x: unknown): x is CampaignStage => x === 1 || x === 2 || x === 3 || x === 4;
 const TONES: ChronicleTone[] = ["story", "win", "loss", "draw", "lost", "meanwhile"];
 const num = (x: unknown): number => (typeof x === "number" && Number.isFinite(x) ? x : 0);
@@ -665,9 +682,10 @@ export function parseCampaign(raw: unknown): CampaignState | null {
   if (isStage(o.act)) s.act = o.act;
   if (o.holders && typeof o.holders === "object") {
     const h = o.holders as Record<string, unknown>;
-    for (const p of PLACES)
-      if (p.id in h && (h[p.id] === null || isFaction(h[p.id])))
-        s.holders[p.id] = h[p.id] as LoreFactionId | null;
+    for (const p of PLACES) {
+      const who = p.id in h ? holderOf(h[p.id]) : undefined;
+      if (who !== undefined) s.holders[p.id] = who;
+    }
   }
   const known = new Set([...campaignOf(s).battles.map((b) => b.id), FINALE.id]);
   if (Array.isArray(o.results)) {
@@ -704,7 +722,8 @@ export function parseCampaign(raw: unknown): CampaignState | null {
         s.chronicle.push({ act: c.act, tone: c.tone as ChronicleTone, text: c.text.slice(0, 500) });
     }
   }
-  s.rival = isFaction(o.rival) && o.rival !== faction ? o.rival : null;
+  const rival = holderOf(o.rival);
+  s.rival = rival && rival !== faction ? rival : null;
   if (s.act === 4 && !s.rival) s.rival = computeRival(s);
   if (s.act !== 4) s.rival = null;
   s.ending = s.act === 4 && (o.ending === "win" || o.ending === "loss") ? o.ending : null;

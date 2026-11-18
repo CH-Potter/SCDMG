@@ -99,14 +99,14 @@ export const FINALE = {
 /** Who you face at the ford when the rivals hold the same number of places. */
 export const DEFAULT_RIVAL: Record<LoreFactionId, LoreFactionId> = {
   militia: "concord",
-  munch: "militia",
+  swarm: "militia",
   concord: "militia",
 };
 
 /** What each side would do with the Wellspring (for `{fate}`). */
 export const WELLSPRING_FATE: Record<LoreFactionId, string> = {
-  militia: "left in the creek and poured in the tractors",
-  munch: "pumped into Dr. Graft's vats",
+  militia: "left in the creek and poured in the Muster's engines",
+  swarm: "filled with Mother Mandible's eggs",
   concord: "polished into a fountain for His Radiance",
 };
 
@@ -158,16 +158,16 @@ export const PLACE_PERKS: Record<string, PlacePerk> = {
     flavour: "Crystal caravans pay a toll to whoever holds the road.",
   },
   "long-ridge-highway": {
-    name: "Supply wagons",
+    name: "Supply convoys",
     kind: "budget",
     amount: 2,
-    flavour: "The only paved road in keeps the wagons rolling.",
+    flavour: "The only paved road in keeps the convoys rolling.",
   },
   "scrapyard-sprawl": {
     name: "Spare parts",
     kind: "budget",
     amount: 2,
-    flavour: "Forty years of broken tractors, and most of the bits still fit something.",
+    flavour: "Forty years of broken tractors and mine carts, and most of the bits still fit something.",
   },
   "grubstake-redoubt": {
     name: "The fresh seam",
@@ -178,25 +178,25 @@ export const PLACE_PERKS: Record<string, PlacePerk> = {
   "mesa-ridge": {
     name: "Eyes on the ridge",
     kind: "unit",
-    byFaction: { militia: "mil-squinter", munch: "munch-spitter", concord: "con-lancer" },
+    byFaction: { militia: "mil-squinter", swarm: "swarm-spitters", concord: "con-lancer" },
     flavour: "Somebody up on the ridge comes down to help.",
   },
   "velvet-comet": {
     name: "Salvage from the wreck",
     kind: "unit",
-    byFaction: { militia: "mil-rustler", munch: "munch-buzz", concord: "con-skiff" },
+    byFaction: { militia: "mil-rustler", swarm: "swarm-stingers", concord: "con-skiff" },
     flavour: "The wreck of the Velvet Comet still has a few good parts in it.",
   },
   "prismwick-lawn": {
     name: "The old bean field",
     kind: "support",
-    byFaction: { militia: "mil-airstrip", munch: "munch-burrows", concord: "con-choir" },
+    byFaction: { militia: "mil-airstrip", swarm: "swarm-chamber", concord: "con-choir" },
     flavour: "Whoever holds the lawn holds the field behind it.",
   },
   "brinejaw-flats": {
     name: "A landing field",
     kind: "support",
-    byFaction: { militia: "mil-dropship", munch: "munch-tunnels", concord: "con-gate" },
+    byFaction: { militia: "mil-dropship", swarm: "swarm-tunnels", concord: "con-gate" },
     flavour: "Flat, empty salt: room to land anything.",
   },
 };
@@ -222,13 +222,13 @@ const MILITIA: FactionCampaign = {
   faction: "militia",
   title: "Not One Inch",
   blurb:
-    "Aunt Dot and the farmers of the Dustline hold their valley against critters from below and snobs from above.",
+    "Marshal Haybright and the Dustline Muster hold their valley against the swarm from below and the snobs from above.",
   prologue: [
     {
       caption: "This season, the Dustline is under attack from two directions.",
       placeId: "grange-hall",
       who: "aunt-dot",
-      text: "This is Grange Hall Radio. Everybody with a rifle, to the Crossing. Everybody without one, bring sandwiches.",
+      text: "This is Grange Hall Command. Every section, to the Crossing. Rifles loaded, plates riveted, and nobody falls back without my say-so.",
     },
     {
       caption: "Lady Prismwick has turned the Haybright bean field into a croquet lawn.",
@@ -237,10 +237,10 @@ const MILITIA: FactionCampaign = {
       text: "Two out of ten. The beans were derivative.",
     },
     {
-      caption: "Gopher holes are opening in the bean rows that are left.",
+      caption: "The bean rows that are left have started to tremble, and the clicking is back.",
       placeId: "dustbowl-crossing",
-      who: "dr-graft",
-      text: "Fresh corn, fresh farmers. Dinner is served!",
+      who: "broodmother",
+      text: "*click-click* The ground is warm. The ground is ours.",
     },
     {
       caption:
@@ -254,7 +254,7 @@ const MILITIA: FactionCampaign = {
     1: [
       {
         caption:
-          "Beetles in the corn and a lawn where the beans were. Aunt Dot's ledger has two columns: things to defend, and things to take back.",
+          "Bugs in the corn and a lawn where the beans were. The Marshal's ledger has two columns: positions to defend, and positions to take back.",
         placeId: "grange-hall",
         who: "aunt-dot",
         text: "Pick your fights. We can't be everywhere, and whatever we leave, they'll take.",
@@ -265,7 +265,7 @@ const MILITIA: FactionCampaign = {
         caption: "The war has spread to every road in the valley.",
         placeId: "long-ridge-highway",
         who: "mil-riders",
-        text: "Radio says trouble on the highway, the hills and the wreck. All at once. Naturally.",
+        text: "Dispatch from Command: trouble on the highway, the hills and the wreck. All at once. Naturally.",
       },
     ],
     3: [
@@ -274,7 +274,7 @@ const MILITIA: FactionCampaign = {
           "The pipes at the Old Refinery are humming. Something under the ford is waking up.",
         placeId: "mesa-ridge",
         who: "squinter",
-        text: "Ford's glowing. Been glowing since Tuesday. Nobody asked me.",
+        text: "Ford's glowing. Been glowing since Tuesday. Logged it. Nobody asked me.",
       },
     ],
   },
@@ -286,20 +286,20 @@ const MILITIA: FactionCampaign = {
       placeId: "dustbowl-crossing",
       mapId: "dustbowl",
       missionId: "hold",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("up-through-the-corn"),
       brief: [
         {
           who: "aunt-dot",
-          text: "Beetles at the Crossing, same as '09. Hold the silo deck till the rest of the valley gets there.",
+          text: "Bugs at the Crossing, same as '09. First Section holds the silo deck till the rest of the Muster gets there.",
         },
-        { who: "dr-graft", text: "Fresh corn, fresh farmers. Dinner is served!" },
+        { who: "swarm-skitterlings", text: "Chk-chk-chk-chk-chk." },
       ],
-      win: { who: "aunt-dot", text: "That's the Crossing held. Somebody hose down the silo." },
+      win: { who: "aunt-dot", text: "Crossing held. Somebody hose down the silo, and count the shell casings." },
       loss: {
         who: "aunt-dot",
-        text: "Fall back to the Grange. The beetles can have the corn. For now.",
+        text: "Fall back to the Grange in good order. The bugs can have the corn. For now.",
       },
     },
     {
@@ -324,9 +324,9 @@ const MILITIA: FactionCampaign = {
       ],
       win: {
         who: "aunt-dot",
-        text: "Beans back in the ground by Tuesday. Somebody fetch me a gazebo for the chickens.",
+        text: "Beans back in the ground by Tuesday. The gazebos make decent sentry posts.",
       },
-      loss: { who: "lady-prismwick", text: "A brave effort. Three out of ten, for enthusiasm." },
+      loss: { who: "lady-prismwick", text: "A brave effort. Three out of ten, for the marching." },
     },
     {
       id: "signal-lost",
@@ -335,23 +335,23 @@ const MILITIA: FactionCampaign = {
       placeId: "rattlevane-junction",
       mapId: "rattlevane",
       missionId: "hill",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
-      hook: "The Munch are chewing through the radio relays at Rattlevane Junction. Lose the windpump yard and the Grange Hall Radio goes quiet.",
+      hook: "The swarm is chewing through the radio cables at Rattlevane Junction. Lose the windpump yard and Grange Hall Command goes quiet.",
       brief: [
         {
           who: "aunt-dot",
-          text: "...hear me? Beetles are chewing the... *krrsh* ...hold the Junction...",
+          text: "...hear me? Bugs are chewing the... *krrsh* ...hold the Junction...",
         },
-        { who: "dr-graft", text: "Chew through the relays and nobody can hear Aunt Dot. Bliss." },
+        { who: "broodmother", text: "*click* Quiet up there. Quiet is good. Quiet is food." },
       ],
       win: {
         who: "aunt-dot",
-        text: "Loud and clear. This is Grange Hall Radio, and we are back on the air.",
+        text: "Loud and clear. This is Grange Hall Command, and we are back on the air.",
       },
       loss: {
         who: "mil-riders",
-        text: "Junction's lost. We'll carry the messages by bike, and it'll be slow.",
+        text: "Junction's lost. We'll carry the orders by bike, and it'll be slow.",
       },
     },
     {
@@ -361,18 +361,18 @@ const MILITIA: FactionCampaign = {
       placeId: "long-ridge-highway",
       mapId: "highway",
       missionId: "heist",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("highway-robbery"),
       brief: [
         {
           who: "mil-grannies",
-          text: "Somebody stole the Harvest Fair pie. Rhubarb. My recipe. Somebody is about to have a very bad day.",
+          text: "Something came up under my convoy and walked off with a crate of Fizz cells. Signed for. In triplicate. Somebody is about to have a very bad day.",
         },
-        { who: "dr-graft", text: "Rhubarb and Fizz. Big Mama approves." },
+        { who: "broodmother", text: "*click-click* Warm. Glowing. For the eggs." },
       ],
-      win: { who: "mil-grannies", text: "Not a crumb missing. Well. One crumb." },
-      loss: { who: "dr-graft", text: "Delicious. Tell the judges I'll be entering it." },
+      win: { who: "mil-grannies", text: "Crate recovered, seal intact. Well. One dent." },
+      loss: { who: "broodmother", text: "*chitter* The eggs are warm tonight." },
     },
     {
       id: "finders-keepers",
@@ -387,11 +387,11 @@ const MILITIA: FactionCampaign = {
       brief: [
         {
           who: "lucky-lew",
-          text: "There's three engines, a hot tub and a crystal chandelier in that wreck. I've got plans for all of them.",
+          text: "Three engines, a hull's worth of armour plate and a crystal chandelier in that wreck. I've got plans for all of them.",
         },
         { who: "con-guard", text: "Unhand the chandelier, peasant." },
       ],
-      win: { who: "lucky-lew", text: "The Rust Bucket's got a chandelier now. Classy." },
+      win: { who: "lucky-lew", text: "The Rust Bucket's got new plating and a chandelier. Classy." },
       loss: { who: "con-guard", text: "Our yacht. Our wreckage. Our rules." },
     },
     {
@@ -407,7 +407,7 @@ const MILITIA: FactionCampaign = {
       brief: [
         {
           who: "mil-riders",
-          text: "Crystal caravan, stuck in the hills, guarded by people in very clean boots. Let's go.",
+          text: "Crystal caravan, stuck in the hills, guarded by people in very clean boots. Outriders, mount up.",
         },
         { who: "con-lancer", text: "Nine out of ten for the ambush. One point off for the dust." },
       ],
@@ -424,7 +424,7 @@ const MILITIA: FactionCampaign = {
       placeId: "grubstake-redoubt",
       mapId: "grubstake",
       missionId: "siege",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("claim-jumpers"),
       brief: [
@@ -432,10 +432,10 @@ const MILITIA: FactionCampaign = {
           who: "aunt-dot",
           text: "Fresh seam of Fizz at Grubstake. Dig in, and don't open the door to anything with more than four legs.",
         },
-        { who: "dr-graft", text: "Knock knock. Never mind. We'll dig." },
+        { who: "old-grinder", text: "GRRRRRNNNNNND." },
       ],
-      win: { who: "mil-grunts", text: "Still ours. Tell the doctor to make an appointment." },
-      loss: { who: "dr-graft", text: "A lovely seam. My vats thank you." },
+      win: { who: "mil-grunts", text: "Still ours. Tell the bugs to fill in a requisition form." },
+      loss: { who: "broodmother", text: "*click-click* Warm seam. Good nest." },
     },
     {
       id: "spare-parts",
@@ -444,18 +444,18 @@ const MILITIA: FactionCampaign = {
       placeId: "scrapyard-sprawl",
       mapId: "sprawl",
       missionId: "scrapheap",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("spare-parts"),
       brief: [
         {
           who: "aunt-dot",
-          text: "If the Munch get the Sprawl, Bertha never gets her new knee. Hold it.",
+          text: "If the swarm gets the Sprawl, nobody gets new plating, and Bertha never gets her new knee. Hold it.",
         },
-        { who: "dr-graft", text: "Scrap metal and chewy farmers. Lunch and a hobby." },
+        { who: "swarm-spitters", text: "Hhhhk. Ptoo." },
       ],
       win: { who: "aunt-dot", text: "Sprawl's held. Bertha's getting that knee." },
-      loss: { who: "aunt-dot", text: "They've got the scrapyard. We'll patch with baling wire." },
+      loss: { who: "aunt-dot", text: "They've got the scrapyard. We'll patch the armour with what we carry." },
     },
     {
       id: "landing-party",
@@ -488,26 +488,26 @@ const MILITIA: FactionCampaign = {
     hook: "Every road in the valley leads to Fizzwater Ford, and {rival} got there first. Whoever holds the bridges holds the Wellspring.",
     brief: {
       who: "aunt-dot",
-      text: "This is Grange Hall Radio. Everybody. To the ford. Bring everything, and I mean the goat.",
+      text: "This is Grange Hall Command. The whole Muster, to the ford. Every section, every machine, and yes, the goat.",
     },
     win: {
       who: "aunt-dot",
       text: "The ford is ours. Somebody tell the Wellspring it can stop worrying.",
     },
-    loss: { who: "aunt-dot", text: "Fall back. Everybody home. Radio stays on." },
+    loss: { who: "aunt-dot", text: "Fall back in good order. Everybody home. Radio stays on." },
   },
   endings: {
     win: [
       {
-        caption: "The Dustline Militia hold Fizzwater Ford, and the Wellspring under it.",
+        caption: "The Dustline Muster holds Fizzwater Ford, and the Wellspring under it.",
         placeId: "wellspring",
         title: "THE WELLSPRING HOLDS",
         who: "aunt-dot",
-        text: "The Fizz stays where it belongs: in the creek, in the tractors, and in the pie.",
+        text: "The Fizz stays where it belongs: in the creek, in the war machines, and in the pie.",
       },
       {
         caption:
-          "The harvest comes in. The Harvest Fair goes ahead on Saturday, and the judging table survives.",
+          "The harvest comes in. The Muster stands down for the Harvest Fair on Saturday, and the judging table survives.",
         placeId: "grange-hall",
         who: "mil-grannies",
         text: "Rhubarb, second place. Rigged.",
@@ -523,43 +523,43 @@ const MILITIA: FactionCampaign = {
       },
       {
         caption:
-          "But the farmers did not leave. The Grange Hall Radio is still broadcasting, and the war is not over. It is just rescheduled.",
+          "But the Muster did not break. Grange Hall Command is still broadcasting, the squads are still drilling, and the war is not over. It is just rescheduled.",
         placeId: "grange-hall",
         who: "mil-grunts",
-        text: "Same time next harvest?",
+        text: "Same time next harvest, Marshal?",
       },
     ],
   },
 };
 
-const MUNCH: FactionCampaign = {
-  faction: "munch",
-  title: "One Mind, Many Mouths",
+const SWARM: FactionCampaign = {
+  faction: "swarm",
+  title: "Everything Hatches",
   blurb:
-    "Dr. Graft and Big Mama tunnel up through the fields to tap the Wellspring and wire the whole valley into the overmind.",
+    "Mother Mandible and her brood boil up out of the ground to reach the Wellspring and lay the Great Clutch in its warmth.",
   prologue: [
     {
-      caption: "Under Badger Knob, behind a steel door, the Sett Lab hums.",
-      placeId: "sett-lab",
-      who: "dr-graft",
-      text: "They laughed at me at the Harvest Fair. Who's laughing now? Not the judging table.",
+      caption: "Under Badger Knob, in the warm dark of the Brood Hollow, a thousand eggs glow.",
+      placeId: "brood-hollow",
+      who: "broodmother",
+      text: "*click-click* The ground is warm. The ground is ours.",
     },
     {
-      caption: "Every critter in the valley could be wired into the overmind, with enough Fizz.",
-      placeId: "sett-lab",
-      who: "big-mama",
-      text: "GRRRUMPH.",
+      caption: "The Hollow is full to the ceiling. The brood needs more room, and more warmth.",
+      placeId: "brood-hollow",
+      who: "old-grinder",
+      text: "GRRRRRNNNNNND.",
     },
     {
-      caption: "But the farmers are mustering, and the Concord have parked a monocle in the sky.",
+      caption: "But up above, the soft ones are drilling in their armour, and the shiny ones have hung a lamp in the sky.",
       placeId: "grange-hall",
       who: "aunt-dot",
-      text: "Everybody with a shovel, to the Crossing!",
+      text: "Every section, to the Crossing!",
     },
     {
-      caption: "Tap the Wellspring. Brew the mutagen. Win the Harvest Fair, by eating it.",
+      caption: "Reach the Wellspring. Lay the Great Clutch. Let the whole valley hatch.",
       placeId: "dustbowl-crossing",
-      who: "munch-nibblers",
+      who: "swarm-skitterlings",
       text: "Chk-chk-chk.",
     },
   ],
@@ -567,26 +567,26 @@ const MUNCH: FactionCampaign = {
     1: [
       {
         caption:
-          "The tunnels are dug, the critters are wired, and Big Mama is hungry. Up through the corn we go.",
-        placeId: "sett-lab",
-        who: "dr-graft",
-        text: "Choose where we surface, my darlings. Whatever we don't bite, someone else will.",
+          "The tunnels are dug, the brood is awake, and the corn above is very thin. Up we go.",
+        placeId: "brood-hollow",
+        who: "broodmother",
+        text: "*click... click* Choose where we surface, little ones. Where we do not go, the soft ones dig in.",
       },
     ],
     2: [
       {
-        caption: "Every hole in the valley is a door now.",
+        caption: "Every field in the valley trembles now.",
         placeId: "old-refinery",
-        who: "dr-graft",
-        text: "The refinery, the highway, the railway, the claim. So many doors, so little time.",
+        who: "broodmother",
+        text: "*chitter-chitter* The warm pipes. The road. The glowing rocks. So many nests.",
       },
     ],
     3: [
       {
-        caption: "The Wellspring is stirring under the ford. The overmind can taste it.",
-        placeId: "sett-lab",
-        who: "big-mama",
-        text: "GRRRUMPH!",
+        caption: "The Wellspring is stirring under the ford. Every egg in the Hollow can feel it.",
+        placeId: "brood-hollow",
+        who: "old-grinder",
+        text: "GRRRRRNNNNNND!",
       },
     ],
   },
@@ -600,16 +600,16 @@ const MUNCH: FactionCampaign = {
       missionId: "hold",
       enemy: "militia",
       side: 0,
-      hook: "The first beetles of the season come up through the corn at Dustbowl Crossing. Take the silo deck before the rest of the valley gets there.",
+      hook: "The first Skitterlings of the season come up through the corn at Dustbowl Crossing. Take the silo deck before the rest of the Muster gets there.",
       brief: [
-        { who: "dr-graft", text: "Up, my darlings! The silo deck is a lovely spot for a picnic." },
-        { who: "aunt-dot", text: "Beetles at the Crossing, same as '09. Everybody with a shovel!" },
+        { who: "broodmother", text: "*click-click* Up, little ones. The tall thing in the middle is warm in the sun." },
+        { who: "aunt-dot", text: "Bugs at the Crossing, same as '09. First Section, hold that deck!" },
       ],
       win: {
-        who: "dr-graft",
-        text: "The Crossing is ours. Tell the corn it's under new management.",
+        who: "broodmother",
+        text: "*chitter* The corn is ours. The corn was always ours.",
       },
-      loss: { who: "dr-graft", text: "Back down the holes! Regroup! Mama, stop eating the fence." },
+      loss: { who: "broodmother", text: "*click... click* Back down. Lay more. Come up again." },
     },
     {
       id: "signal-lost",
@@ -622,16 +622,16 @@ const MUNCH: FactionCampaign = {
       side: 0,
       hook: hookOf("signal-lost"),
       brief: [
-        { who: "dr-graft", text: "Chew through the relays and nobody can hear Aunt Dot. Bliss." },
+        { who: "broodmother", text: "*click* The soft ones talk through the long wires. Chew the wires." },
         {
           who: "aunt-dot",
-          text: "This is Grange Hall Radio... *krrsh* ...who is chewing on the...",
+          text: "This is Grange Hall Command... *krrsh* ...who is chewing on the...",
         },
       ],
-      win: { who: "dr-graft", text: "Silence. Glorious, farmer-free silence." },
+      win: { who: "broodmother", text: "*click-click* Quiet up there. Quiet is good." },
       loss: {
         who: "aunt-dot",
-        text: "This is Grange Hall Radio, and we are still on the air. Mind the wasps.",
+        text: "This is Grange Hall Command, and we are still on the air. Check your boots for bugs.",
       },
     },
     {
@@ -643,13 +643,13 @@ const MUNCH: FactionCampaign = {
       missionId: "flag",
       enemy: "concord",
       side: 0,
-      hook: "Lady Prismwick is holding a garden party on the old bean field. The Munch were not invited, and the cucumber sandwiches are unguarded.",
+      hook: "Lady Prismwick is holding a garden party on the old bean field. The lawn is soft, the soil underneath is warm, and the cucumber sandwiches are unguarded.",
       brief: [
-        { who: "dr-graft", text: "Cucumber sandwiches, crusts off. Bring me the platter." },
-        { who: "lady-prismwick", text: "Critters. On the lawn. During the croquet." },
+        { who: "broodmother", text: "*chitter* Soft grass. Warm soil. Good for eggs. Take the shiny thing they guard." },
+        { who: "lady-prismwick", text: "Insects. On the lawn. During the croquet." },
       ],
-      win: { who: "dr-graft", text: "Delicious. Two out of ten. The crusts were missing." },
-      loss: { who: "lady-prismwick", text: "Shoo. And take your molehills with you." },
+      win: { who: "swarm-skitterlings", text: "Chk-chk-crunch." },
+      loss: { who: "lady-prismwick", text: "Shoo. And take your holes with you." },
     },
     {
       id: "last-drops",
@@ -663,12 +663,12 @@ const MUNCH: FactionCampaign = {
       hook: hookOf("last-drops"),
       brief: [
         {
-          who: "dr-graft",
-          text: "There's Fizz in those tanks. Enough mutagen for a thousand new mouths.",
+          who: "broodmother",
+          text: "*click-click* Warm Fizz in the round tanks. Carry it home to the eggs.",
         },
         { who: "con-warden", text: "This facility has been scheduled for tasteful demolition." },
       ],
-      win: { who: "dr-graft", text: "Tanks drained, vats full. The overmind hums louder." },
+      win: { who: "broodmother", text: "*chitter-chitter* Tanks empty. Eggs warm. More will hatch." },
       loss: { who: "con-warden", text: "The refinery's Fizz will light a lovely chandelier." },
     },
     {
@@ -680,16 +680,16 @@ const MUNCH: FactionCampaign = {
       missionId: "heist",
       enemy: "militia",
       side: 0,
-      hook: "The Harvest Fair's prize pie is riding up Long Ridge Highway on a wagon. Dr. Graft has decided to enter it, by eating it.",
+      hook: "A Muster convoy is rumbling up Long Ridge Highway with a crate of Fizz cells: warm, glowing Fizz cells. Mother Mandible would like them for the egg chambers.",
       brief: [
         {
-          who: "dr-graft",
-          text: "Rhubarb and Fizz. Steal their pie, and keep your own snack out of their hands.",
+          who: "broodmother",
+          text: "*click* Warm boxes on the hard road. Take theirs. Keep ours.",
         },
-        { who: "mil-grannies", text: "Hands off that pie, you overgrown vermin." },
+        { who: "mil-grannies", text: "Hands off that crate, you overgrown cockroaches. It's signed for." },
       ],
-      win: { who: "big-mama", text: "CHOMP." },
-      loss: { who: "mil-grannies", text: "Back on the wagon it goes. And you, back in your hole." },
+      win: { who: "broodmother", text: "*click-click* Warm. Glowing. For the eggs." },
+      loss: { who: "mil-grannies", text: "Back on the truck it goes. And you, back in your hole." },
     },
     {
       id: "claim-jumpers",
@@ -702,11 +702,11 @@ const MUNCH: FactionCampaign = {
       side: 1,
       hook: hookOf("claim-jumpers"),
       brief: [
-        { who: "dr-graft", text: "A fresh seam of Fizz, and a door in the way. We don't knock." },
+        { who: "old-grinder", text: "GRRRRRNNNNNND." },
         { who: "mil-grunts", text: "Nobody jumps this claim. Dig in!" },
       ],
-      win: { who: "dr-graft", text: "Our claim now. The prospectors may keep their hats." },
-      loss: { who: "mil-grunts", text: "Still ours. Tell the doctor to make an appointment." },
+      win: { who: "broodmother", text: "*click-click* Warm seam. Good nest." },
+      loss: { who: "mil-grunts", text: "Still ours. Tell the bugs to fill in a requisition form." },
     },
     {
       id: "off-the-rails",
@@ -720,12 +720,12 @@ const MUNCH: FactionCampaign = {
       hook: hookOf("off-the-rails"),
       brief: [
         {
-          who: "dr-graft",
-          text: "Tunnel under the ore cars. Keep the ground moving and let the Concord fall over.",
+          who: "old-grinder",
+          text: "GRRRNND. GRRRRRNNNND.",
         },
         { who: "con-guard", text: "The ground is moving. Again. This is intolerable." },
       ],
-      win: { who: "dr-graft", text: "Glowing ore, and a Concord in a ditch. A fine day." },
+      win: { who: "broodmother", text: "*chitter* Glowing rocks, and a shiny one in a ditch. Good day." },
       loss: { who: "con-guard", text: "The ore is ours. Kindly stop moving the scenery." },
     },
     {
@@ -739,15 +739,15 @@ const MUNCH: FactionCampaign = {
       side: 0,
       hook: hookOf("spare-parts"),
       brief: [
-        { who: "dr-graft", text: "No spare parts, no walking combine. Chew the Sprawl to pieces." },
+        { who: "broodmother", text: "*click* The soft ones wear shells they make in the rust pile. No pile, no shells." },
         {
           who: "aunt-dot",
-          text: "If they get the Sprawl, Bertha never gets her new knee. Hold it!",
+          text: "If they get the Sprawl, nobody gets new plating. Hold it!",
         },
       ],
       win: {
-        who: "dr-graft",
-        text: "The scrapyard is ours. Mama, that is a tractor, not a chew toy.",
+        who: "broodmother",
+        text: "*chitter-chitter* The rust pile is ours. Their shells will crack.",
       },
       loss: { who: "aunt-dot", text: "Sprawl's held. Bertha's getting that knee." },
     },
@@ -762,40 +762,40 @@ const MUNCH: FactionCampaign = {
       side: 0,
       hook: hookOf("the-narrows"),
       brief: [
-        { who: "dr-graft", text: "Concord in the Narrows? Wonderful. They're crunchy." },
+        { who: "broodmother", text: "*click-click* Shiny ones in the canyon. They crunch." },
         { who: "grand-strider", text: "Something is chewing on my scouts. Make it stop." },
       ],
-      win: { who: "dr-graft", text: "The Narrows are ours, and the canyon echoes with munching." },
+      win: { who: "swarm-skitterlings", text: "Chk-chk-chk-crunch-chk." },
       loss: { who: "grand-strider", text: "Pests. Even here. Tidy them away." },
     },
   ],
   finale: {
-    hook: "Under Fizzwater Ford lies enough Fizz to wire the whole valley, and {rival} are standing on it. Take the bridges and the Wellspring is the overmind's.",
+    hook: "Under Fizzwater Ford lies the Wellspring, the warmest place in the valley, and {rival} are standing on it. Take the bridges and the Great Clutch can be laid.",
     brief: {
-      who: "dr-graft",
-      text: "Dig, my darlings. Dig! Under that ford is dinner for a thousand years.",
+      who: "broodmother",
+      text: "*CLICK-CLICK-CLICK* Down there is the warm place. All of you. Now.",
     },
-    win: { who: "dr-graft", text: "The Wellspring is mine! Mama, fetch the big jars." },
+    win: { who: "broodmother", text: "*chitter...* Warm. So warm. Lay the Great Clutch." },
     loss: {
-      who: "dr-graft",
-      text: "Retreat to the Sett Lab! I shall return, with bigger beetles.",
+      who: "broodmother",
+      text: "*click... click* Back to the Hollow. Lay more. The ground remembers.",
     },
   },
   endings: {
     win: [
       {
-        caption: "The Munch hold Fizzwater Ford. The Wellspring flows into Dr. Graft's vats.",
+        caption: "The Skitterswarm holds Fizzwater Ford. In the warmth of the Wellspring, Mother Mandible lays the Great Clutch.",
         placeId: "wellspring",
-        title: "THE OVERMIND FEEDS",
-        who: "dr-graft",
-        text: "One mind. Many mouths. And now, a great deal of Fizz.",
+        title: "EVERYTHING HATCHES",
+        who: "broodmother",
+        text: "*click-click* The ground is warm. The ground is ours. The ground is hungry.",
       },
       {
         caption:
-          "Every critter in the valley hums with the overmind. This year, the Harvest Fair is the main course.",
-        placeId: "sett-lab",
-        who: "big-mama",
-        text: "GRRRUMPH.",
+          "Come spring, every field in the valley hatches. The Harvest Fair goes ahead, in a manner of speaking.",
+        placeId: "brood-hollow",
+        who: "old-grinder",
+        text: "GRRRRRNNNNNND.",
       },
     ],
     loss: [
@@ -803,15 +803,15 @@ const MUNCH: FactionCampaign = {
         caption: "The Wellspring is lost, to be {fate}.",
         placeId: "wellspring",
         title: "THE FORD IS LOST",
-        who: "dr-graft",
-        text: "A setback. A temporary, deeply irritating setback.",
+        who: "broodmother",
+        text: "*click... click* Cold. The ford is cold.",
       },
       {
         caption:
-          "The tunnels go quiet, for now. Dr. Graft is drawing up a bigger plan, on the back of an old pest-control invoice.",
-        placeId: "sett-lab",
-        who: "big-mama",
-        text: "...grumph.",
+          "The tunnels go quiet, for now. Deep in the Brood Hollow, Mother Mandible curls around her eggs and waits. The ground remembers.",
+        placeId: "brood-hollow",
+        who: "swarm-tenders",
+        text: "...chk.",
       },
     ],
   },
@@ -836,10 +836,10 @@ const CONCORD: FactionCampaign = {
       text: "Two out of ten. The beans were derivative.",
     },
     {
-      caption: "The locals have not taken it well. Neither have the critters.",
+      caption: "The locals have not taken it well. Neither has whatever lives under the lawn.",
       placeId: "grange-hall",
       who: "aunt-dot",
-      text: "Everybody with a rifle, to the lawn!",
+      text: "Every section, to the lawn!",
     },
     {
       caption:
@@ -908,21 +908,21 @@ const CONCORD: FactionCampaign = {
       placeId: "prismwick-lawn",
       mapId: "prismwick",
       missionId: "flag",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
-      hook: "Lady Prismwick's garden party is under attack from below. The Munch are after the cucumber sandwiches, and the Concord would like theirs back.",
+      hook: "Lady Prismwick's garden party is under attack from below. The swarm is coming up through the lawn after the cucumber sandwiches, and the Concord would like theirs back.",
       brief: [
         {
           who: "lady-prismwick",
-          text: "There is a beetle in the sandwiches. Remove it. Remove all of them.",
+          text: "There is an insect in the sandwiches. Remove it. Remove all of them.",
         },
-        { who: "dr-graft", text: "Cucumber sandwiches, crusts off. Bring me the platter!" },
+        { who: "broodmother", text: "*chitter* Soft grass. Warm soil. Good for eggs." },
       ],
       win: {
         who: "lady-prismwick",
         text: "Croquet resumes. Fill in the holes, please. Tastefully.",
       },
-      loss: { who: "dr-graft", text: "Delicious. Two out of ten. The crusts were missing." },
+      loss: { who: "swarm-skitterlings", text: "Chk-chk-crunch." },
     },
     {
       id: "a-better-view",
@@ -933,7 +933,7 @@ const CONCORD: FactionCampaign = {
       missionId: "hill",
       enemy: "militia",
       side: 0,
-      hook: "His Radiance would like to see the whole valley from the twin mesas. The Ridgeline Squinter has been sitting on the view for years, and will not move.",
+      hook: "His Radiance would like to see the whole valley from the twin mesas. Corporal Squinter has been sitting on the view for years, and will not move.",
       brief: [
         { who: "grand-strider", text: "That ridge has the finest view in the valley. Clear it." },
         { who: "squinter", text: "Saw you coming last Tuesday." },
@@ -951,18 +951,18 @@ const CONCORD: FactionCampaign = {
       placeId: "old-refinery",
       mapId: "refinery",
       missionId: "scavenge",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("last-drops"),
       brief: [
         { who: "con-warden", text: "The tanks hold Fizz enough to light a palace. Drain them." },
-        { who: "dr-graft", text: "Hands off my mutagen, you glittering nuisance!" },
+        { who: "broodmother", text: "*CLICK* Warm Fizz. Ours. For the eggs." },
       ],
       win: {
         who: "con-warden",
         text: "The light flows to the Star Lens. The pipes may now be demolished.",
       },
-      loss: { who: "dr-graft", text: "Tanks drained, vats full. The overmind hums louder." },
+      loss: { who: "broodmother", text: "*chitter-chitter* Tanks empty. Eggs warm. More will hatch." },
     },
     {
       id: "finders-keepers",
@@ -973,7 +973,7 @@ const CONCORD: FactionCampaign = {
       missionId: "salvage",
       enemy: "militia",
       side: 1,
-      hook: "Farmers have been stripping the Velvet Comet for parts all season, and sitting in its hot tub. Its owners have come back for it, and they are livid.",
+      hook: "Farmers in tin suits have been stripping the Velvet Comet for armour plate all season, and sitting in its hot tub. Its owners have come back for it, and they are livid.",
       brief: [
         {
           who: "grand-strider",
@@ -1017,7 +1017,7 @@ const CONCORD: FactionCampaign = {
       placeId: "gutterbend",
       mapId: "gutterbend",
       missionId: "shifting",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("off-the-rails"),
       brief: [
@@ -1025,10 +1025,10 @@ const CONCORD: FactionCampaign = {
           who: "grand-strider",
           text: "The ore glows. The ground moves. One of these is acceptable.",
         },
-        { who: "dr-graft", text: "Keep digging, my darlings. Let them fall over." },
+        { who: "old-grinder", text: "GRRRNND. GRRRRRNNNND." },
       ],
       win: { who: "con-guard", text: "The ore is ours. Kindly stop moving the scenery." },
-      loss: { who: "dr-graft", text: "Glowing ore, and a Concord in a ditch. A fine day." },
+      loss: { who: "broodmother", text: "*chitter* Glowing rocks, and a shiny one in a ditch. Good day." },
     },
     {
       id: "landing-party",
@@ -1039,13 +1039,13 @@ const CONCORD: FactionCampaign = {
       missionId: "frontline",
       enemy: "militia",
       side: 0,
-      hook: "His Radiance's main fleet sets down on Brinejaw Flats, and the farmers have dragged every barricade they own across the salt to say hello.",
+      hook: "His Radiance's main fleet sets down on Brinejaw Flats, and the farmers in their riveted suits have dragged every barricade they own across the salt to say hello.",
       brief: [
         {
           who: "grand-strider",
           text: "The fleet lands today. See that the welcome is suitably grand.",
         },
-        { who: "aunt-dot", text: "Everybody with a barricade, to the salt flats!" },
+        { who: "aunt-dot", text: "Every section with a barricade, to the salt flats!" },
       ],
       win: {
         who: "grand-strider",
@@ -1063,15 +1063,15 @@ const CONCORD: FactionCampaign = {
       placeId: "mesa-ridge",
       mapId: "mesa",
       missionId: "brawl",
-      enemy: "munch",
+      enemy: "swarm",
       side: 0,
       hook: hookOf("the-narrows"),
       brief: [
         { who: "grand-strider", text: "Something is chewing on my scouts. Make it stop." },
-        { who: "dr-graft", text: "Concord in the Narrows? Wonderful. They're crunchy." },
+        { who: "broodmother", text: "*click-click* Shiny ones in the canyon. They crunch." },
       ],
       win: { who: "grand-strider", text: "Pests, tidied. Plant a hedge where they were." },
-      loss: { who: "dr-graft", text: "The Narrows are ours, and the canyon echoes with munching." },
+      loss: { who: "swarm-skitterlings", text: "Chk-chk-chk-crunch-chk." },
     },
   ],
   finale: {
@@ -1125,6 +1125,6 @@ const CONCORD: FactionCampaign = {
 
 export const CAMPAIGNS: Record<LoreFactionId, FactionCampaign> = {
   militia: MILITIA,
-  munch: MUNCH,
+  swarm: SWARM,
   concord: CONCORD,
 };

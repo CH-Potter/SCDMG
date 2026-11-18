@@ -23,7 +23,7 @@ export const PLACE_POS: Record<string, { x: number; y: number }> = {
   wellspring: { x: 51, y: 70 },
   "scrapyard-sprawl": { x: 17, y: 58 },
   gutterbend: { x: 76, y: 63 },
-  "sett-lab": { x: 31, y: 76 },
+  "brood-hollow": { x: 31, y: 76 },
   "grubstake-redoubt": { x: 9, y: 85 },
   "brinejaw-flats": { x: 52, y: 89 },
   "gemhaul-road": { x: 72, y: 83 },
@@ -51,12 +51,12 @@ const ROADS: [string, string][] = [
   ["scrapyard-sprawl", "grubstake-redoubt"],
 ];
 
-/** The Munch's tunnels, from the Sett Lab. */
+/** The Skitterswarm's Undertunnels, from the Brood Hollow. */
 const TUNNELS: [string, string][] = [
-  ["sett-lab", "dustbowl-crossing"],
-  ["sett-lab", "scrapyard-sprawl"],
-  ["sett-lab", "wellspring"],
-  ["sett-lab", "grubstake-redoubt"],
+  ["brood-hollow", "dustbowl-crossing"],
+  ["brood-hollow", "scrapyard-sprawl"],
+  ["brood-hollow", "wellspring"],
+  ["brood-hollow", "grubstake-redoubt"],
 ];
 
 const INK = "#1c1512";
@@ -95,7 +95,7 @@ export function valleyMapSvg(): string {
         `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#cfd98a" stroke="${INK}" stroke-width="3" transform="rotate(-8 ${x! + w! / 2} ${y! + h! / 2})"/><path d="M${x! + 6} ${y! + h! / 2} h${w! - 12}" stroke="#9aa95a" stroke-width="3" stroke-dasharray="8 6" transform="rotate(-8 ${x! + w! / 2} ${y! + h! / 2})"/>`,
     )
     .join("");
-  const knob = P("sett-lab");
+  const knob = P("brood-hollow");
   const lens = P("star-lens");
   const well = P("wellspring");
   const flats = P("brinejaw-flats");
