@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -13 39 26" data-part="swarm.shellback.head" data-recoil="0">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Shellback head: a low wedge with two crusher mandibles and acid in the jaws (neck at 0,0)</title>
+<path d="M-15,-6 Q-26,-11 -33,-4 Q-34,0 -30,1 Q-26,-4 -16,-1 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-15,7 Q-26,11 -33,5 Q-34,1.6 -30,1 Q-26,5 -16,3 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M-16,3 Q-26,5 -30,1.4 Q-32,4 -33,5 Q-26,10 -15,7 Z" fill="#4a2e19"/>
+<path class="glow" d="M-31,2 Q-33,6 -31.4,9 Q-29.4,6 -30,2 Z" fill="#fff2c0" stroke="#f2b84b" stroke-width="1"/>
+<path d="M2,-5 Q0,-10 -9,-10 Q-18,-9 -19,-2 Q-19,6 -11,8 Q-2,9 2,4 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M2,1 Q-1,7.6 -11,7.4 Q-16,6.6 -18,3 Q-10,5 -4,3.4 Q0,2 2,-1 Z" fill="#6c5a37"/>
+<path d="M-12,-7.4 Q-7,-9 -2,-7.4" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-32" cy="2" r="1"/></g>
+</svg>

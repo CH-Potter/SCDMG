@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -50 54 32" data-part="swarm.skitter.side.body">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Skitterling body: a tail-up segmented abdomen behind a round thorax</title>
+<path d="M8,-30 Q10,-44 24,-47 Q37,-49 38,-40 Q38,-29 26,-25 Q14,-22 8,-30 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M36,-36 Q33,-27 25,-25.6 Q15,-23.4 9.6,-28 Q20,-27 27,-30 Q33,-33 36,-36 Z" fill="#6c5a37"/>
+<path d="M10,-27.4 Q20,-23 31,-28" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round"/>
+<path d="M17,-45.6 Q21,-36 17,-24.6 M26,-47.6 Q30,-38 27,-26.4 M33,-46 Q36,-39 34,-31" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M-7,-31 Q-6,-39 2,-40 Q11,-40 12,-31 Q11,-23 2,-22.4 Q-6,-23 -7,-31 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M11.4,-30 Q10,-23.6 2,-23 Q-3,-23 -5.4,-25.4 Q3,-25 7,-27 Q10,-28.4 11.4,-30 Z" fill="#6c5a37"/>
+<path d="M-4.6,-25 Q2,-21.6 9,-24.6" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M14,-43 Q18,-46 23,-46" fill="none" stroke="#e3d8b6" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M-3.4,-35 Q-1,-38 2,-38.2" fill="none" stroke="#e3d8b6" stroke-width="1.4" stroke-linecap="round"/>
+<g class="detail"><path d="M24,-38 l1.4,-1.6 M30,-36 l1.2,-1.4" stroke="#b9bfc4" stroke-width="1" stroke-linecap="round"/></g>
+<g id="anchors"><circle id="pivot" cx="2" cy="-31" r="1"/></g>
+</svg>

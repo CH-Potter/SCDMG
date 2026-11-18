@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -26 32 52" data-part="swarm.bug.segment">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Body segment: one chitin ring of a long bug, ivory belly scute on its -y side (pivot at its centre; the body runs along x)</title>
+<path d="M-12,-20 Q2,-24 12,-18 Q15,0 12,18 Q2,24 -12,20 Q-15,0 -12,-20 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-18 Q15,0 12,18 Q4,22 -6,21 Q6,8 8,-4 Q9,-12 12,-18 Z" fill="#6c5a37"/>
+<path d="M-11,-19 Q0,-22 11,-17 L10,-11 Q0,-15 -10,-12 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-8,6 Q-9,-2 -6,-6" fill="none" stroke="#e3d8b6" stroke-width="2" stroke-linecap="round"/>
+<g class="detail"><circle cx="2" cy="4" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

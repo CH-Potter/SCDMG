@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 -182 148 134" data-part="swarm.mother.side.sac" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Broodmother egg sac: the swollen lime underside of her abdomen, packed with glowing eggs</title>
+<path d="M22,-98 Q28,-152 80,-172 Q142,-180 156,-120 Q158,-70 106,-55 Q48,-50 22,-98 Z" fill="#fff2c0" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M154,-104 Q150,-64 106,-57 Q60,-53 34,-76 Q70,-64 104,-68 Q140,-76 154,-104 Z" fill="#f2b84b"/>
+<g fill="#f2b84b" stroke="#141414" stroke-width="1.4">
+<circle cx="52" cy="-84" r="8.6"/><circle cx="74" cy="-72" r="9.4"/><circle cx="98" cy="-70" r="9"/><circle cx="121" cy="-76" r="8.4"/><circle cx="140" cy="-92" r="7.4"/>
+<circle cx="64" cy="-98" r="7"/><circle cx="88" cy="-90" r="7.6"/><circle cx="112" cy="-92" r="7.2"/><circle cx="132" cy="-108" r="6.4"/>
+</g>
+<g class="glow" fill="#fff2c0"><circle cx="49" cy="-87" r="3"/><circle cx="71" cy="-75" r="3.4"/><circle cx="95" cy="-73" r="3.2"/><circle cx="118" cy="-79" r="3"/><circle cx="138" cy="-95" r="2.6"/><circle cx="62" cy="-100" r="2.4"/><circle cx="86" cy="-92" r="2.6"/><circle cx="110" cy="-94" r="2.4"/></g>
+<g class="detail"><path d="M40,-70 Q46,-62 56,-60 M150,-96 Q148,-84 142,-78" fill="none" stroke="#5d5b45" stroke-width="1" stroke-linecap="round"/></g>
+<g id="anchors"><circle id="pivot" cx="30" cy="-100" r="1"/></g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -11 28 44" data-part="swarm.skitter.top.body">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Skitterling body from above: thorax and a pointed, segmented abdomen</title>
+<path d="M0,4 Q12,6 12,17 Q11,28 0,31 Q-11,28 -12,17 Q-12,6 0,4 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M10,10 Q13,19 9,25 Q5,30 0,31 Q8,23 10,10 Z" fill="#6c5a37"/>
+<path d="M-10.6,12 Q0,9 10.6,12 M-11.4,19 Q0,16 11.4,19 M-9,25.6 Q0,23 9,25.6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M-7,8 Q-9,12 -9,16" fill="none" stroke="#e3d8b6" stroke-width="1.8" stroke-linecap="round"/>
+<ellipse cx="0" cy="0" rx="8.6" ry="7.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M7,-4 Q10,3 3,7 Q-2,8 -5,6 Q5,4 7,-4 Z" fill="#6c5a37"/>
+<path d="M-4.6,-4 Q-3,-6 0,-6.2" fill="none" stroke="#e3d8b6" stroke-width="1.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

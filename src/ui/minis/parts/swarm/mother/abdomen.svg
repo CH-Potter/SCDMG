@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 -184 150 92" data-part="swarm.mother.side.abdomen" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Broodmother abdomen plates: three overlapping violet scutes over the egg sac, hooked at the rear</title>
+<path d="M118,-170 Q150,-158 158,-122 Q162,-108 156,-98 Q150,-112 140,-110 Q148,-138 118,-170 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M158,-122 Q162,-108 156,-98 Q151,-108 143,-111 Q152,-116 158,-122 Z" fill="#6c5a37"/>
+<path d="M74,-176 Q112,-182 130,-160 Q146,-140 142,-110 Q128,-118 116,-106 Q122,-140 74,-176 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M142,-110 Q128,-118 116,-106 Q119,-118 120,-128 Q132,-122 142,-110 Z" fill="#6c5a37"/>
+<path d="M20,-100 Q24,-150 70,-170 Q98,-180 112,-160 Q122,-140 118,-104 Q104,-114 90,-102 Q74,-112 60,-100 Q46,-108 34,-96 Q26,-100 20,-100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M118,-104 Q104,-114 90,-102 Q74,-112 60,-100 Q46,-108 34,-96 Q60,-112 90,-114 Q108,-120 116,-138 Q120,-122 118,-104 Z" fill="#6c5a37"/>
+<path d="M40,-140 Q54,-162 80,-170" fill="none" stroke="#e3d8b6" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M98,-172 Q112,-172 122,-162" fill="none" stroke="#e3d8b6" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M56,-118 Q70,-134 96,-132" fill="none" stroke="#4a5158" stroke-width="2" stroke-linecap="round"/>
+<path d="M146,-120 Q152,-136 148,-150 L156,-134 Z M134,-156 Q140,-170 134,-182 L144,-166 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="50" cy="-124" r="1.4" fill="#b9bfc4"/><circle cx="84" cy="-150" r="1.4" fill="#b9bfc4"/><circle cx="128" cy="-136" r="1.2" fill="#b9bfc4"/><path d="M66,-150 l6,-3 M100,-126 l6,0" stroke="#b9bfc4" stroke-width="1" stroke-linecap="round"/></g>
+<g id="anchors"><circle id="pivot" cx="30" cy="-100" r="1"/></g>
+</svg>

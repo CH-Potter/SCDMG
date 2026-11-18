@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -11 24 22" data-part="swarm.bug.knob">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Head knob: a plain round chitin head that eyes and jaws sit on (any bug, any view)</title>
+<path d="M0,-9 Q9,-9 10,0 Q9,8.6 0,9 Q-9,8.6 -10,0 Q-9,-9 0,-9 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M9,-2 Q9,8 0,8.4 Q-5,8.2 -8,5 Q2,6 6,2 Q8,0 9,-2 Z" fill="#6c5a37"/>
+<path d="M-6,-5 Q-3,-7.6 1,-7.6" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -60 78 84" data-part="swarm.mother.side.head" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Broodmother head: a crown of four back-swept hooks over a heavy skull with egg-tooth jaws (neck at 0,0)</title>
+<path d="M-30,-8 Q-40,-30 -30,-50 Q-26,-56 -20,-54 Q-30,-40 -22,-14 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-18,-12 Q-22,-38 -6,-54 Q0,-58 4,-54 Q-10,-40 -8,-12 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-6,-10 Q-2,-34 16,-44 Q22,-46 24,-42 Q8,-32 4,-8 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M4,-6 Q12,-24 26,-26 Q30,-26 30,-22 Q16,-18 10,-2 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="shade" fill="#4a2e19"><path d="M-22,-14 Q-30,-38 -20,-54 Q-24,-38 -20,-16 Z"/><path d="M-8,-12 Q-10,-40 4,-54 Q-4,-38 -5,-12 Z"/><path d="M4,-8 Q8,-32 24,-42 Q12,-28 7,-8 Z"/></g>
+<path d="M-36,8 Q-46,12 -44,20 Q-38,18 -32,12 Z M-26,12 Q-34,18 -30,23 Q-24,20 -21,14 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M4,-2 Q2,-16 -16,-18 Q-36,-18 -40,-2 Q-42,12 -28,15 Q-8,18 4,8 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M4,4 Q-4,15 -24,15 Q-34,14 -38,8 Q-20,10 -8,6 Q0,3 4,-2 Z" fill="#6c5a37"/>
+<path d="M-30,-12 Q-22,-17 -10,-16" fill="none" stroke="#e3d8b6" stroke-width="2.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-44" cy="14" r="1"/></g>
+</svg>

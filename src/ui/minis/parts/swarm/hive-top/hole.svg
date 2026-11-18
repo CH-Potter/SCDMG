@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-72 -72 144 144" data-part="swarm.hive.top.hole" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tunnel Mouth from above: a ragged ring of thrown-up crust round a black hole</title>
+<path d="M0,-66 L16,-60 L34,-58 L44,-44 L60,-34 L60,-16 L68,0 L60,16 L62,34 L46,44 L34,60 L16,60 L0,68 L-16,60 L-34,60 L-46,44 L-62,34 L-60,16 L-68,0 L-60,-16 L-60,-34 L-44,-44 L-34,-58 L-16,-60 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M60,-16 L68,0 L60,16 L62,34 L46,44 L34,60 L16,60 L0,68 L-16,60 L-34,60 Q20,48 40,22 Q54,4 60,-16 Z" fill="#44432f"/>
+<circle cx="0" cy="0" r="42" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<circle cx="3" cy="4" r="30" fill="#141414"/>
+<path d="M-50,-30 L-40,-38 L-34,-28 Z M40,-40 L50,-36 L46,-26 Z M44,30 L54,36 L44,44 Z M-46,36 L-38,30 L-34,42 Z M-6,-58 L4,-60 L4,-50 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-50,-40 Q-34,-56 -10,-60" fill="none" stroke="#c8bd98" stroke-width="2.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

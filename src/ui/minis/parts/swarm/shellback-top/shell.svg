@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -48 96 106" data-part="swarm.shellback.top.shell">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Shellback shell from above: a broad glossy tub with a rolled ivory lip and two dents</title>
+<ellipse cx="0" cy="6" rx="44" ry="50" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M36,-20 A44,50 0 0 1 -18,52 Q30,40 36,-20 Z" fill="#4a2e19"/>
+<ellipse cx="0" cy="4" rx="37" ry="43" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M30,-20 Q44,10 22,38 Q4,52 -18,42 Q20,34 28,6 Q32,-8 30,-20 Z" fill="#6c5a37"/>
+<path d="M-26,-14 Q-20,-30 -4,-36" fill="none" stroke="#e3d8b6" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M-22,-4 Q-20,-10 -15,-14" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M6,10 Q12,6 18,10 Q12,14 6,10 Z M-8,24 Q-3,21 2,24 Q-3,27 -8,24 Z" fill="#6c5a37" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-12" cy="8" r="1" fill="#b9bfc4"/><circle cx="14" cy="-14" r="1" fill="#b9bfc4"/><path d="M-20,30 l3,1 M20,26 l2,2" stroke="#b9bfc4" stroke-width="1" stroke-linecap="round"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

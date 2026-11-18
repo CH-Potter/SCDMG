@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-42 -32 52 60" data-part="swarm.borer.side.head" data-recoil="0">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Deep Borer head: a hooded chitin drum ending in a ring mouth of ivory grinding teeth (neck at 0,0)</title>
+<path d="M6,-14 Q2,-28 -14,-28 Q-30,-26 -34,-12 L-34,20 Q-20,26 -4,22 Q8,16 6,-14 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,-6 Q8,16 -4,22 Q-18,26 -30,22 Q-10,16 0,4 Q4,-2 6,-6 Z" fill="#6c5a37"/>
+<path d="M-6,-27 Q-2,-6 -4,22 M6,-14 Q-16,-12 -34,-12" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<ellipse cx="-34" cy="4" rx="7" ry="18" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="-35" cy="4" rx="4" ry="12" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M-36,-8 L-33,-4 L-38,-3 M-37,16 L-33,12 L-38,11 M-39,4 L-34,4 M-38,-1 L-33,1 M-38,9 L-33,7" fill="none" stroke="#e3d8b6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse class="glow" cx="-35" cy="4" rx="1.6" ry="4.4" fill="#fff2c0"/>
+<path d="M-26,-22 Q-16,-27 -6,-25" fill="none" stroke="#e3d8b6" stroke-width="2.4" stroke-linecap="round"/>
+<g class="detail"><circle cx="-18" cy="-4" r="1.2" fill="#b9bfc4"/><circle cx="-14" cy="10" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-38" cy="4" r="1"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -19 18 42" data-part="swarm.stinger.top.wasp" data-recoil="0">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Stinger wasp from above: head, thorax and a banded abdomen tapering to its sting (facing -y)</title>
+<path d="M0,1 Q6,3 6,10 Q5,18 0,21 Q-5,18 -6,10 Q-6,3 0,1 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-5.6,7 Q0,5 5.6,7 M-5.4,12.6 Q0,11 5.4,12.6" fill="none" stroke="#6e4528" stroke-width="2.2" stroke-linecap="round"/>
+<path class="shade" d="M5,6 Q6,16 0,21 Q3,13 2,4 Z" fill="#6c5a37"/>
+<path class="glow" d="M-1.4,20.4 L0,23 L1.4,20.4 Z" fill="#fff2c0"/>
+<ellipse cx="0" cy="-4" rx="5.4" ry="5.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M4.6,-6 Q6,0 0,1.6 Q3,-2 4.6,-6 Z" fill="#6c5a37"/>
+<circle cx="0" cy="-13" r="4.2" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="-2" cy="-14.4" r="1.8" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle cx="2" cy="-14.4" r="1.8" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="22" r="1"/></g>
+</svg>

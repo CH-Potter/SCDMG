@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-68 -130 146 86" data-part="swarm.bombard.side.body" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bile Bombard body: a beetle the size of a hay cart, a high split carapace over an ivory belly rim</title>
+<path d="M-62,-62 Q-64,-96 -36,-114 Q0,-130 36,-122 Q72,-110 74,-74 Q74,-58 66,-52 Q0,-46 -56,-52 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,-74 Q74,-58 66,-52 Q10,-48 -40,-52 Q20,-58 52,-70 Q66,-80 68,-100 Q74,-90 74,-74 Z" fill="#6c5a37"/>
+<path d="M-60,-58 Q0,-48 70,-56 L72,-50 Q0,-40 -58,-50 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-30,-116 Q4,-92 6,-52" fill="none" stroke="#141414" stroke-width="2"/>
+<path d="M-52,-70 Q-20,-64 4,-60 M10,-60 Q40,-62 64,-68" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M-50,-90 Q-40,-108 -16,-116" fill="none" stroke="#e3d8b6" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M18,-114 Q34,-118 48,-112" fill="none" stroke="#e3d8b6" stroke-width="2" stroke-linecap="round"/>
+<path d="M-12,-96 Q-4,-100 2,-94 Q-4,-91 -12,-96 Z M32,-90 Q40,-94 46,-88 Q40,-85 32,-90 Z" fill="#6c5a37" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-34" cy="-82" r="1.4" fill="#b9bfc4"/><circle cx="22" cy="-80" r="1.4" fill="#b9bfc4"/><circle cx="52" cy="-96" r="1.2" fill="#b9bfc4"/><path d="M-20,-74 l6,-2 M40,-76 l6,0" stroke="#b9bfc4" stroke-width="1" stroke-linecap="round"/></g>
+<g id="anchors"><circle id="pivot" cx="4" cy="-84" r="1"/></g>
+</svg>

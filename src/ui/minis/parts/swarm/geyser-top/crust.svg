@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-76 -76 152 152" data-part="swarm.geyser.top.crust" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Acid Geyser from above: a cracked chalky disc round a crater, chitin showing through the cracks</title>
+<path d="M0,-70 Q48,-68 66,-30 Q76,10 56,46 Q30,72 0,70 Q-40,70 -62,40 Q-76,0 -60,-38 Q-40,-68 0,-70 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,-30 Q76,10 56,46 Q30,72 0,70 Q-24,70 -42,58 Q20,60 44,30 Q62,4 66,-30 Z" fill="#4a2e19"/>
+<path d="M-46,-30 L-34,-42 L-20,-36 L-28,-22 Z M30,26 L46,18 L54,32 L40,42 Z M-40,26 L-26,20 L-20,34 L-34,40 Z M24,-48 L38,-50 L42,-36 L28,-34 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-26,-14 L-40,-20 L-56,-12 M20,-18 L30,-30 L28,-46 M18,20 L28,34 L24,52 M-18,22 L-22,40 L-12,56 M28,0 L48,4 L62,-6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="0" cy="0" r="30" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M-48,-44 Q-30,-62 -6,-66" fill="none" stroke="#e3d8b6" stroke-width="3" stroke-linecap="round"/>
+<g class="detail"><circle cx="-50" cy="6" r="1.6" fill="#c8bd98"/><circle cx="48" cy="-14" r="1.4" fill="#c8bd98"/><circle cx="4" cy="52" r="1.4" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

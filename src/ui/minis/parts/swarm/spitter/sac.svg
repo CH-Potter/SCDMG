@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-25 -22 50 42" data-part="swarm.spitter.sac">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Swollen acid sac: a glowing lime bladder strapped to the back by chitin bands (pivot at its root)</title>
+<path d="M-20,8 Q-23,-8 -10,-17 Q2,-23 14,-16 Q24,-9 22,4 Q20,15 4,16 Q-14,17 -20,8 Z" fill="#fff2c0" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M21,-3 Q22,12 6,15 Q-8,16 -16,11 Q0,12 10,7 Q18,3 21,-3 Z" fill="#f2b84b"/>
+<g class="glow"><circle cx="-6" cy="2" r="3.4" fill="#f2b84b"/><circle cx="6" cy="-4" r="2.4" fill="#f2b84b"/><circle cx="10" cy="6" r="1.8" fill="#f2b84b"/></g>
+<path d="M-15,-6 Q-4,-2 0,8 M4,-15 Q8,-6 15,-2" fill="none" stroke="#5d5b45" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M-12,-14 Q-15,-8 -16,-2" fill="none" stroke="#e3d8b6" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M-4,-20 Q0,-10 -2,0 Q-4,10 -1,16.6 L5,16.4 Q2,10 4,0 Q6,-10 2,-21 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M2,-21 Q6,-10 4,0 Q2,10 5,16.4 L3,16.4 Q0,8 2,-2 Q4,-12 0.4,-20.6 Z" fill="#6c5a37"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="12" r="1"/></g>
+</svg>
