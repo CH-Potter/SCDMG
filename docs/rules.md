@@ -63,7 +63,7 @@ With the **Unit class limits** house rule (on in the standard game), a list must
 | The Skitterswarm | Skitterlings 10, Stinger Swarm 5, Acid Spitters 4, Shellback Brood 4, Brood Tenders 2 | The Broodmother and the Deep Borer (monsters), Trapjaw Lurker, Bile Bombard, Brood Spire, Acid Geyser, egg clutches and tunnel mouths |
 | Lumen Concord | Phase Guard 3, Blink Dancers 3, Jetwing Scouts 2 | Ray Lancer (sniper), Beam Warden (support leader), Grand Strider (monster), Shimmer Saucer (vehicle), pylon, obelisk, ward |
 
-- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Skitterlings are worth 3 supply (a brood loses 1 for every 3 or 4 bugs), the Phase Guard 3 (every lost duellist costs 1), and the other squads 2.
+- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Skitterlings are worth 3 supply (a brood loses 1 for every 3 or 4 bugs), and the other squads 2 (the Phase Guard too, since the v0.12 balance pass).
 - To move a unit, pick a **leader** model and move it up to the unit's Move along a legal path.
 - The rest of the squad follows and **spreads out like a real squad**, not a block. Each follower travels at most Move + 2".
   - **Snap to cover:** within about 3" of the leader's spot, followers take free spots in cover: inside scrub, craters or rubble, or tucked behind a barricade on the side away from the enemy. "The enemy" means the nearest few enemy units, or their deployment zone if none are on the table yet.
@@ -156,7 +156,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Skitt
 ## Abilities
 
 **Forward-deploy limits:**
-- **Tunnel** can't be used in round 1.
+- **Tunnel** can't be used in round 1, and nor can *Open a Tunnel* (the Tunnel Mouth), like every other arrival card.
 - Neither a Tunnel nor a **Tunnel Mouth** (or a forge faction's Gopher Hole) can land within 6" of the enemy's home objective.
 
 **Unit abilities and timing:**
@@ -308,6 +308,27 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Skitt
 - **The Militia are a drafted, drilled army now** (the Dustline Muster), in riveted work-suit armour. Rivet Grunts are five troopers at armour 4 (was seven at 5; the *Second Section* upgrade brings them to seven), and lose *light*; the Patch Medics and the Old Guard Veterans (were the Front Porch Grannies) wear armour 4 too. Renamed: Ridgeline Marksman (was Squinter), Tumbleweed Outriders, Haymaker Bomber, Pipe Mortar; cards Grange Hall Command, Motor Pool, Smoke Detail, Forward Airstrip; Supply Drop, Sandbag Detail. The Skirmish starter fields three five-strong squads (one with Picket Drill, one with Jump Jets, one with its Second Section) and a Patch Medic team.
 - Quick AI-vs-AI check (1 seed, standard house rules; no balance pass yet). Skirmish: Concord–Militia 38.2%, Concord–Skitterswarm 53.3%, Militia–Skitterswarm 57.2%. Assault: 47.6%, 40.5% and 26.2%. The swarm wins on objectives and regrowth but deals the least damage of the three (about 10 a Skirmish game); the Militia are short in Assault. The full rebalance comes next.
 
+**The v0.12 balance pass** (the standard house rules, Unit class limits on):
+- **Open a Tunnel waits for round 2**, like every other arrival card. In round 1 of an Assault game the swarm had the 3 CP to open a Tunnel Mouth up to 12" ahead, bring reserves up beside it and field-deploy the Brood Spire next to them, a third of the way up the long board. It scored about 69% in Assault (94% on Long Ridge Highway); this change alone took it to about even. Summon cards can now have a first round (`fromRound`), as airdrops already could.
+- **Tunnel costs 1 CP (was 2), and the AI plays it as the free action it is:** the unit pops up, then still moves and charges. The AI used to weigh Tunnel as the unit's whole activation, at a flat 4 points, and supports spent the swarm's CP first, so it came up about once in 30 Skirmish games and once in 11 Assault games. Now it's about once in 8 Skirmish games and once an Assault game, and the Burrowers upgrade gets used. The Trapjaw Lurker costs ⚙3 (was 2) to match (`pricing.ts`: 3.5); the Skirmish starter drops its Acid Drool to stay at ⚙30.
+- **The AI values Afterglow at the wounds it may soak, less its second CP.** It was valued at 1.6 times those wounds with no CP cost, so it took most of the Concord's CP (about 4 plays a Skirmish game, 2 CP each) and Step Through came up about once in two games. Now it's about 1 Afterglow and 2 Step Throughs a game. The Concord got a lot stronger (about 63% against the Militia in Skirmish), so:
+  - *Concord, Skirmish:* the Court of Disdain instead of the Mirror Spire (with the Choir of Light, ~58%).
+  - **Phase Guard: supply 2 (was 3)**, as `pricing.ts` computes it: three duellists held an objective like a ten-bug brood.
+- **Skitterlings' Snippers have AP1**, so the bites tell against the Militia's armour 4 (`pricing.ts`: still ⚙3).
+- *Militia, Assault:* the Ammo Wagon joins the Assault cards (they left 2 Fizz unused), and a fourth Rivet Grunt squad replaces the Tumbleweed Outriders, who came on in under half the games against the swarm and did under 1 damage when they did.
+- *Skitterswarm, Assault:* the third Skitterling brood loses More Eggs and the second Stinger Swarm gets a Bigger Cloud (about 7 points off the swarm against the Militia). The Brood Spire stays: it's the swarm's way forward in round 1 now, and with the Acid Geyser in its place the swarm fell about 15 points against the Concord.
+- **Costs kept by hand** (`pricing.ts` in brackets). Tried at the computed cost and kept: Ray Lancer ⚙3 (4; at ⚙4 the Concord fell about 10 points in Assault with the same list), Shimmer Saucer ⚙5 (6; at ⚙6 it and a Phase Guard don't fit the first round's 10 resources in Skirmish, and the Concord fell about 15 points) and Grand Strider ⚙7 (8; at ⚙8 the Assault list loses a Lancer or a Phase Guard, and the Concord fell to 35–40%). Kept from v0.11 without a new test: Blink Dancers ⚙5 (6; at ⚙6, dropping Afterimage to fit, Skirmish didn't move), Patch Medic ⚙2 (3), Sky Rustler ⚙4 (5), Tumbleweed Outriders ⚙3 (4) and Old Guard Veterans ⚙5 (4). The upgrades no starter uses take their computed cost: Extra Guard and Encore 1 (were 2), Twin Lancers 2 (was 3). Every upgrade and card is now at its computed price.
+- **The Militia's cards, re-checked against the swarm:** the Ammo Wagon and the drop-ship are still the balanced Skirmish pair. Grange Hall Command and the drop-ship, or the Smoke Detail and the Forward Airstrip, took the Militia to about 70–78% against both armies in AI play.
+- Checked by AI-vs-AI simulation at 5 seeds, on two seed sets (380 Skirmish and 210 Assault games per pairing in each). Score of the first-named army:
+
+| Pairing | Skirmish, seeds 11–415 | Skirmish, seeds 50–454 | Assault, seeds 11–415 | Assault, seeds 50–454 |
+| --- | --- | --- | --- | --- |
+| Concord–Militia | 51.6% (was 47.0%) | 50.9% (was 50.8%) | 51.7% (was 55.2%) | 49.3% (was 63.8%) |
+| Concord–Skitterswarm | 54.6% (was 51.1%) | 52.8% (was 52.4%) | 45.7% (was 34.0%) | 49.0% (was 32.6%) |
+| Militia–Skitterswarm | 48.3% (was 48.0%) | 45.1% (was 46.1%) | 51.0% (was 27.9%) | 50.0% (was 23.1%) |
+
+  At 5 seeds a pairing is good to about ±2.5 points in Skirmish and ±3.5 in Assault. The swarm still deals the least damage by far (about 11 a Skirmish game against 26–33) and wins on objectives: its charging broods take about twice as much damage from shots into the melee, between the charge and the combat phase, as they do in the fights themselves.
+
 ### Flyers
 
 - **No melee engagement.** A flyer is never engaged with anything, so it can always move and shoot freely, and nothing is ever stuck fighting it. Flyers and ground units can still shoot each other (if their weapons can hit the other).
@@ -416,7 +437,7 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
   - **Forward Airstrip** (Militia, 3 ✦, +1 CP): *Supply Drop* (3 CP, movement phase, exhausts) lands the unit within 12" of one of your models and at least 6" from enemies. It's in the Militia's Assault starter supports.
   - **Rust Bucket Drop-Ship** (Militia, 4 ✦, +1 CP): *Bumpy Landing* (1 CP, movement phase, exhausts, from round 2) lands the unit **anywhere on the table**, at least 8" from enemy models. While you aim it, red rings show where it can't land, and clicking a spot it can't use says why. It's in the Militia's Skirmish starter supports.
   - **Grand Portal** (Concord, 3 ✦, +1 CP): *Step Through* (2 CP, movement phase, exhausts, from round 2) lands the unit within 4" of one of your units and at least 3" from enemies, with +1 shield per model (even above its maximum) until the end of the round. It's in the Concord's Skirmish and Assault starter supports.
-  - **Undertunnels** (Skitterswarm, 3 ✦, +1 CP): *Surface Breach* (2 CP, movement phase, exhausts, from round 2) bursts the unit up out of the ground within 10" of one of your models and at least 5" from enemies: closer to the fight than the drop-ship, no overcharge like the portal. Or, the same card, *Open a Tunnel* (3 CP) opens a Tunnel Mouth for the round that any number of reserves can come up beside; the Brood Spire is a permanent one. It's in the swarm's Skirmish and Assault starter supports.
+  - **Undertunnels** (Skitterswarm, 3 ✦, +1 CP): *Surface Breach* (2 CP, movement phase, exhausts, from round 2) bursts the unit up out of the ground within 10" of one of your models and at least 5" from enemies: closer to the fight than the drop-ship, no overcharge like the portal. Or, the same card, *Open a Tunnel* (3 CP, from round 2) opens a Tunnel Mouth for the round that any number of reserves can come up beside; the Brood Spire is a permanent one. It's in the swarm's Skirmish and Assault starter supports.
 - **Teleports:** *Gate Step* (Light Gate, Concord, 3 CP, movement phase, exhausts) moves one of your unengaged units on the table up to 8". Click the unit, then where it goes.
 - Effects are data-driven, so custom factions can combine them: gain resources, heal or revive, recharge shields, blast a point, summon a structure, give melee or ranged buffs, give precision and tracking, regrow lost models, dig a unit in, teleport a unit, slow an enemy, airdrop a reserve unit (near your models or anywhere, optionally from a later round), rattle an enemy's nerve, spot an enemy (hit one better), blind an enemy (its shooting hits one worse), expose an enemy (no cover, hunker or dig-in bonus), silence an enemy, hide a unit in smoke, grant Overwatch, give extra move, ring a shield recharge round a group, add overshields, and the ward, brace and retaliate reactions.
 

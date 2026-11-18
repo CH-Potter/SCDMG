@@ -195,11 +195,12 @@ export const EFFECT_PRICES: Partial<
     Math.sqrt(e.range / 18) *
     (e.needsSight ? 1 : 1.2) *
     0.9,
-  summon: (e: { range: number }, summoned?: UnitProfile) =>
+  summon: (e: { range: number; fromRound?: number }, summoned?: UnitProfile) =>
     (summoned
       ? 0.6 * rawUnitValue(summoned).total * (summoned.structure?.lifetime === "round" ? 0.6 : 1)
       : 1) +
-    0.02 * e.range,
+    0.02 * e.range -
+    0.15 * Math.max(0, (e.fromRound ?? 1) - 1),
   meleeBuff: (e: { dice: number }) => 1.2 * e.dice,
   rangedBuff: (e: { dice: number }) => 1.0 * e.dice,
   slow: (e: { range: number }) => 0.4 + 0.01 * e.range,

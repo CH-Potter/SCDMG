@@ -80,7 +80,7 @@ describe("off-board supports", () => {
   });
 
   it("a Glimmer Dome makes enemy shots at nearby friends hit one worse", () => {
-    let s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["concord", "militia"], seed: 4 });
+    let s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["concord", "militia"], seed: 4, supports: [["con-spire", "con-portal"], defaultSupportsFor("militia", "skirmish")] });
     s.initiative = 0;
     s.activePlayer = 0;
     const guard = place(s, uidOf(s, 0, "con-guard"), { x: 10, y: 26 });

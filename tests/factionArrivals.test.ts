@@ -135,6 +135,17 @@ describe("Surface Breach (the Skitterswarm's Undertunnels)", () => {
     for (const m of aliveModels(up)) expect(m.shield).toBe(0); // no overcharge: that's the portal's
   });
 
+  it("Open a Tunnel waits for round 2 too, like every other arrival card", () => {
+    for (const round of [1, 2]) {
+      const s = breachGame(round);
+      place(s, s.units.find((u) => u.profileId === "swarm-skitterlings")!.uid, { x: 10, y: 22 });
+      place(s, s.units.find((u) => u.profileId === "mil-grunts")!.uid, { x: 30, y: 4 });
+      const r = applyCommand(s, { type: "support", player: 0, support: "swarm-tunnels", ability: "open-tunnel", point: { x: 14, y: 18 } });
+      expect(r.ok).toBe(round === 2);
+      if (!r.ok) expect(r.error).toBe("Not before round 2");
+    }
+  });
+
   it("the AI breaches a reserve up toward an objective it wants", () => {
     const s = breachGame();
     place(s, s.units.find((u) => u.profileId === "swarm-skitterlings")!.uid, { x: 10, y: 22 });

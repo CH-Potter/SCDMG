@@ -492,6 +492,7 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
       case "summon": {
         real(where, "summon range", e.range, LIMITS.range);
         real(where, "distance from enemies", e.minEnemyDistance, [0, 24]);
+        if (e.fromRound !== undefined) int(where, "first round", e.fromRound, [1, 10]);
         const target = profiles.find((p) => p.id === e.profileId);
         if (!isStr(e.profileId) || !e.profileId) errs.push(`${where}: pick a structure to summon`);
         else if (!target) errs.push(`${where}: summons "${e.profileId}", which isn't a unit in this faction`);

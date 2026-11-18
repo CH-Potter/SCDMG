@@ -905,9 +905,11 @@ function abilityCandidates(s: GameState, u: Unit): Candidate[] {
           }
         }
       }
-      // Once- or twice-per-game tricks: only worth it for a real gain.
-      const cost = id === "tunnel" ? 4 : 1.5;
-      for (const p of pts) out.push({ cmd: { type: "ability", uid: u.uid, ability: id, point: p }, bonus: -cost, follow: u.uid });
+      // Once- or twice-per-game tricks: only worth it for a real gain. Tunnel is a free action: the unit
+      // still moves (and charges) after popping up, so it stacks with its best real action.
+      const tunnel = id === "tunnel";
+      const cost = tunnel ? 1 + (def.cp ?? 0) * CP_VALUE : 1.5;
+      for (const p of pts) out.push({ cmd: { type: "ability", uid: u.uid, ability: id, point: p }, bonus: -cost, follow: u.uid, ...(tunnel ? { stack: true } : {}) });
     } else if (id === "recall") {
       const c = centroid(u);
       const front = enemies.length ? centroid(enemies.reduce((a, b) => (unitGap(u, a) < unitGap(u, b) ? a : b))) : c;
@@ -1664,7 +1666,9 @@ export function aiSupportCommand(s: GameState): Command | null {
       } else if (e.kind === "overshield") {
         for (const u of mine) {
           const soak = Math.min(threatened(u) * 0.6, aliveModels(u).length * e.amount);
-          consider({ ...base, target: u.uid }, soak * valuePerWound(u) * 1.6);
+          // The wounds it may soak this round, less the CP it costs over a 1-CP play (Afterglow is 2 CP,
+          // and valued at 1.6x it soaked up nearly all the Concord's CP: ~4 plays a Skirmish game).
+          consider({ ...base, target: u.uid }, soak * valuePerWound(u) - (a.cp - 1) * CP_VALUE);
         }
       } else if (e.kind === "silence") {
         // Switch off the reaction or trick that stands in the way of what we're about to do.

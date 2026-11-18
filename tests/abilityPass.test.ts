@@ -688,10 +688,14 @@ describe("Flash Step (Light Gate)", () => {
 
 describe("Afterglow (Grand Portal)", () => {
   it("+1 shield per model above the maximum for the round; the AI shields the unit under fire", () => {
-    const s = at(game([L("con-guard"), L("mil-grunts", "mil-grunts")], { factions: ["concord", "militia"], supports: [["con-portal"], []] }), "assault");
+    // Enough guns on it that the shield it soaks is worth Afterglow's 2 CP (it's valued at the wounds
+    // it may soak, less the CP over a 1-CP play).
+    const s = at(game([L("con-guard"), L("mil-grunts", "mil-grunts", "mil-bertha", "mil-bertha")], { factions: ["concord", "militia"], supports: [["con-portal"], []] }), "assault");
     place(s, "p0-0", { x: 0.8, y: 26 });
     place(s, "p1-0", { x: 0.8, y: 12 });
     place(s, "p1-1", { x: 4.5, y: 4 });
+    place(s, "p1-2", { x: 8, y: 10 });
+    place(s, "p1-3", { x: 12, y: 8 });
     const cmd = aiSupportCommand(s);
     expect(isSupport("afterglow")(cmd)).toBe(true);
     const s2 = ok(applyCommand(s, cmd!));
@@ -699,5 +703,13 @@ describe("Afterglow (Grand Portal)", () => {
     expect(aliveModels(guard).every((m) => m.shield === profileOf(guard).shield + 1)).toBe(true);
     cleanupRound(s2, []);
     expect(aliveModels(guard).every((m) => m.shield === profileOf(guard).shield)).toBe(true);
+  });
+
+  it("isn't worth 2 CP against a couple of rifle squads (it used to soak up most of the Concord's CP)", () => {
+    const s = at(game([L("con-guard"), L("mil-grunts", "mil-grunts")], { factions: ["concord", "militia"], supports: [["con-portal"], []] }), "assault");
+    place(s, "p0-0", { x: 0.8, y: 26 });
+    place(s, "p1-0", { x: 0.8, y: 12 });
+    place(s, "p1-1", { x: 4.5, y: 4 });
+    expect(isSupport("afterglow")(aiSupportCommand(s))).toBe(false);
   });
 });

@@ -54,7 +54,7 @@ Bugs that slept for ages deep under the Dustline, round the Wellspring, until th
 - Supports: meleeBuff, haste (Skitter Rush), regrow (Quickening), rattle, blind, slow (Caustic Snare), retaliate (Acid Blood), summons (Egg Clutch, Tunnel Mouth), and its own airdrop (Surface Breach).
 - Stats: melee hit 4+ (monsters 3+); armour 6 (Shellbacks and monsters 4–5); nerve 6–7; cost 2–6, lowest per model.
 
-**Arrival:** **Undertunnels** in both starter sets: *Surface Breach* bursts a reserve up within 10" of the swarm (at least 5" from enemies, from round 2), or *Open a Tunnel* opens a Tunnel Mouth for the round. **The Brood Spire** is the permanent burrow, bought in the list.
+**Arrival:** **Undertunnels** in both starter sets: *Surface Breach* bursts a reserve up within 10" of the swarm (at least 5" from enemies, from round 2), or *Open a Tunnel* opens a Tunnel Mouth for the round (also from round 2). **The Brood Spire** is the permanent burrow, bought in the list.
 
 **Overlap:** the Acid Spitters, Bile Bombard and Acid Geyser shoot, but short-ranged and mostly to soften a target with acid before the swarm arrives.
 
@@ -77,7 +77,7 @@ Smug aliens who have come down in saucers to claim the valley. Domed heads in fi
 - Supports: recharge, resonate, overshield, aimBuff, expose, silence, teleport (Gate Step, Flash Step), brace, blast (Sunbeam), the Glimmer Dome summon, and the Grand Portal airdrop.
 - Stats: hit 3+; shields 1–3 per model; armour 4–5 (Grand Strider 3); nerve 8–9; cost 3–7, highest per model; precision 1–2 and tracking 1 on most guns.
 
-**Arrival:** the **Grand Portal** beams a reserve unit in within 4" of one of your units (at least 3" from enemies) from round 2, arriving with +1 shield per model for the round. It is in both the Skirmish and Assault starter supports: a few elites need it to reach the long board's many objectives. The Assault starter also brings the Light Gate (not the Star Lens) for the same reason, and the Court of Disdain, whose Withering Review switches off the Militia's Overwatch and Return Fire.
+**Arrival:** the **Grand Portal** beams a reserve unit in within 4" of one of your units (at least 3" from enemies) from round 2, arriving with +1 shield per model for the round. It is in both the Skirmish and Assault starter supports: a few elites need it to reach the long board's many objectives. So is the Court of Disdain, whose Point Out Flaws lands the Lancers' misses and whose Withering Review switches off the Militia's Overwatch and Return Fire. The Assault starter also brings the Light Gate (not the Star Lens), to get a few elites to the long board's objectives.
 
 **Overlap:** the Phase Guard and Blink Dancers fight well in melee; the Sunbeam is a strike from orbit, not a gunline.
 

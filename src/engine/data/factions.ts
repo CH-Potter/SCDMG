@@ -59,10 +59,13 @@ const militia: Faction = {
   // so Assault keeps the old starter set. Skirmish takes the Ammo Wagon rather than the Motor Pool (then
   // the Tractor Depot): after the Rivet Rifle lost its anti-armour bonus the Militia fell behind the
   // Munch there. v0.11 sims (standard house rules) kept it: with the radio instead the Militia scored
-  // ~64%, with the Weather Vane (now the Smoke Detail) ~45%. To re-check against the Skitterswarm.
+  // ~64%, with the Weather Vane (now the Smoke Detail) ~45%. v0.12 balance pass, against the swarm: still
+  // the wagon. Grange Hall Command and the drop-ship, or the Smoke Detail and the Forward Airstrip, took
+  // the Militia to ~70-78% against both armies. Assault adds the wagon to the old set: it left 2 Fizz
+  // unused, and the Concord led the Militia ~54-46 there without it.
   defaultSupports: ["mil-wagon", "mil-dropship"],
   assaultSupports: ["mil-vane"],
-  assaultStarter: ["mil-radio", "mil-depot", "mil-airstrip"],
+  assaultStarter: ["mil-radio", "mil-depot", "mil-airstrip", "mil-wagon"],
   supports: [
     {
       id: "mil-radio",
@@ -218,14 +221,16 @@ const militia: Faction = {
     },
   ],
   // The second Big Bertha is the swarm's answer: with a Grunt squad in her place the Militia scored ~33%
-  // against the Munch in Assault.
+  // against the Munch in Assault. v0.12 balance pass: a fourth Grunt squad rather than the Tumbleweed
+  // Outriders, who came on in under half the games against the swarm and did under 1 damage when they
+  // did (no change in the win rates).
   assaultExtras: [
     { profileId: "mil-rustler", upgrades: [] },
     { profileId: "mil-bertha", upgrades: [] },
     { profileId: "mil-bomber", upgrades: [] },
     { profileId: "mil-grannies", upgrades: [] },
     { profileId: "mil-mortar", upgrades: [] },
-    { profileId: "mil-riders", upgrades: [] },
+    { profileId: "mil-grunts", upgrades: [] },
   ],
   // v0.11 (before the rework): a mortar (Radio Spotter) instead of the Patch Medic and the Watchtower
   // Drill; the third Grunt squad stays (with a marksman in its place the Militia fell to ~43%).
@@ -600,8 +605,11 @@ const swarm: Faction = {
           cp: 3,
           exhaust: true,
           timing: "movement",
-          effect: { kind: "summon", profileId: "swarm-mouth", range: 12, minEnemyDistance: 6 },
-          text: 'Open a Tunnel Mouth within 12" of one of your models (at least 6" from enemies). Until the end of the round your reserves can deploy next to it.',
+          // From round 2, like every other arrival card (v0.12 balance pass). In round 1 of Assault the
+          // swarm had the 3 CP to open one a third of the way up the long board and pour out of it:
+          // ~69% in Assault, 94% on Long Ridge Highway.
+          effect: { kind: "summon", profileId: "swarm-mouth", range: 12, minEnemyDistance: 6, fromRound: 2 },
+          text: 'From round 2: open a Tunnel Mouth within 12" of one of your models (at least 6" from enemies). Until the end of the round your reserves can deploy next to it.',
         },
       ],
     },
@@ -662,22 +670,28 @@ const swarm: Faction = {
       ],
     },
   ],
+  // v0.12 balance pass: the third brood without More Eggs and the second Stinger Swarm with a Bigger
+  // Cloud (the swarm was ~4 points ahead in Assault; this took about 7 off it against the Militia). The
+  // Brood Spire stays: it's the swarm's way forward in round 1 now that the Tunnel Mouth waits for
+  // round 2, and with the Acid Geyser in its place the swarm fell ~15 points against the Concord.
   assaultExtras: [
-    { profileId: "swarm-skitterlings", upgrades: ["eggs"] },
+    { profileId: "swarm-skitterlings", upgrades: [] },
     { profileId: "swarm-shellbacks", upgrades: [] },
     { profileId: "swarm-borer", upgrades: [] },
     { profileId: "swarm-bombard", upgrades: [] },
     { profileId: "swarm-tenders", upgrades: [] },
-    { profileId: "swarm-stingers", upgrades: [] },
+    { profileId: "swarm-stingers", upgrades: ["more"] },
     { profileId: "swarm-spire", upgrades: [] },
   ],
+  // v0.12 balance pass: the Lurker without Acid Drool, now that it costs ⚙3. The Bile Bombard in its
+  // place played about the same; the Acid Geyser cost the swarm ~6 points against the Militia.
   defaultList: [
     { profileId: "swarm-skitterlings", upgrades: ["eggs"] },
     { profileId: "swarm-skitterlings", upgrades: ["burrowers"] },
     { profileId: "swarm-spitters", upgrades: ["glands"] },
     { profileId: "swarm-shellbacks", upgrades: [] },
     { profileId: "swarm-mother", upgrades: ["sacs"] },
-    { profileId: "swarm-lurker", upgrades: ["drool"] },
+    { profileId: "swarm-lurker", upgrades: [] },
     { profileId: "swarm-stingers", upgrades: [] },
   ],
   profiles: [
@@ -697,8 +711,9 @@ const swarm: Faction = {
       evade: { target: 5, against: ["pointBlank", "blast"] },
       nerve: 6,
       // No impact dice (the Munch's trick): they win by numbers, by coming back, and by chewing on
-      // whatever the acid has already softened.
-      weapons: [melee("Snippers", 1, 4, { traits: ["rending"] })],
+      // whatever the acid has already softened. AP1 since the v0.12 balance pass (pricing.ts: still ⚙3),
+      // so the bites tell against the Militia's armour 4.
+      weapons: [melee("Snippers", 1, 4, { ap: 1, traits: ["rending"] })],
       abilities: ["regrow", "rampage"],
       upgrades: [
         { id: "eggs", name: "More Eggs", cost: 1, addModels: 3, text: "+3 models." },
@@ -749,7 +764,9 @@ const swarm: Faction = {
       id: "swarm-lurker",
       name: "Trapjaw Lurker",
       faction: "swarm",
-      cost: 2,
+      // ⚙3 (was 2): Tunnel at 1 CP made it worth more (pricing.ts: 3.5). Still weak in AI play: it
+      // charges alone and is shot down (under 0.5 damage a game).
+      cost: 3,
       supply: 1,
       models: 1,
       move: 7,
@@ -952,10 +969,12 @@ const concord: Faction = {
   look: "crystal",
   // Each faction starts with its way in: drop-ship, burrow hole, portal. Unlike the drop-ship, the
   // portal also suits the long Assault board: a few elites can't hold its many objectives on foot
-  // (sims: Concord ~39% without it, ~56% with it). Skirmish keeps the Mirror Spire: the Star Lens adds no
-  // CP, so the Concord could afford neither Sunbeam nor Afterglow (v0.11 sims: ~34%), and the Choir of
-  // Light did no better than the spire against the swarm.
-  defaultSupports: ["con-spire", "con-portal"],
+  // (sims: Concord ~39% without it, ~56% with it). The Star Lens adds no CP, so the Concord could afford
+  // neither Sunbeam nor Afterglow (v0.11 sims: ~34%). v0.12 balance pass: the Court of Disdain rather than
+  // the Mirror Spire. Once the AI stopped pouring its CP into Afterglow, the Concord scored ~63% against
+  // the Militia with the spire; with the Court (and Phase Guard at supply 2) about 51%. The Choir of Light
+  // took less off (~58%).
+  defaultSupports: ["con-court", "con-portal"],
   assaultSupports: ["con-lens"],
   // Assault: the Light Gate rather than the Star Lens. With the bigger squads the Sunbeam ran away against
   // the swarm (sims: Concord ~58% vs Munch), while Gate Step helps a few elites reach the long board's objectives.
@@ -1122,7 +1141,8 @@ const concord: Faction = {
   // A third Phase Guard rather than the Sunray Tower: on the long board the Concord out-shot everyone
   // but lost on objective VP, and a structure can't hold an objective. v0.11: a second Grand Strider
   // (the best objective holder) rather than a fourth Lancer and Extra Guard (Concord ~39% -> ~45% against
-  // the Militia).
+  // the Militia). v0.12 balance pass: the Grand Strider stays ⚙7 (pricing.ts says 8). At ⚙8 this list
+  // must lose a Lancer or a Phase Guard, and the Concord fell to ~35-40% in Assault.
   assaultExtras: [
     { profileId: "con-facet", upgrades: [] },
     { profileId: "con-facet", upgrades: [] },
@@ -1146,7 +1166,9 @@ const concord: Faction = {
       name: "Phase Guard",
       faction: "concord",
       cost: 5,
-      supply: 3,
+      // Supply 2 like the other squads (was 3), as pricing.ts computes it: three duellists held an
+      // objective like a ten-bug brood.
+      supply: 2,
       models: 3,
       move: 6,
       hp: 1,
@@ -1157,13 +1179,15 @@ const concord: Faction = {
       nerve: 8,
       weapons: [melee("Glow Blade", 2, 3, { ap: 1, traits: ["rending"] }), ranged("Light Flick", 12, 1, 3, { traits: ["pistol", "blast"] })],
       abilities: ["blink", "riposte"],
-      upgrades: [{ id: "third", name: "Extra Guard", cost: 2, addModels: 1, text: "+1 model." }],
+      upgrades: [{ id: "third", name: "Extra Guard", cost: 1, addModels: 1, text: "+1 model." }],
       blurb: "Duellists who refuse to sweat.",
     },
     {
       id: "con-lancer",
       name: "Ray Lancer",
       faction: "concord",
+      // Hand-set below pricing.ts's 4 (v0.12 balance pass): at ⚙4 the Skirmish starter (two Lancers)
+      // was fine, but in Assault the Concord fell ~10 points with the same list, ~17 with one Lancer fewer.
       cost: 3,
       supply: 1,
       models: 1,
@@ -1180,13 +1204,15 @@ const concord: Faction = {
         melee("Disdainful Poke", 1, 5),
       ],
       abilities: ["overcharge", "phase-out"],
-      upgrades: [{ id: "twin", name: "Twin Lancers", cost: 3, addModels: 1, text: "+1 model." }],
+      upgrades: [{ id: "twin", name: "Twin Lancers", cost: 2, addModels: 1, text: "+1 model." }],
       blurb: "Shoots you from very far away, then sighs. Has never missed, and will mention it.",
     },
     {
       id: "con-skiff",
       name: "Shimmer Saucer",
       faction: "concord",
+      // Hand-set below pricing.ts's 6 (v0.12 balance pass): at ⚙6 it and a Phase Guard don't fit the
+      // first round's 10 resources in Skirmish, and the Concord fell ~15 points.
       cost: 5,
       supply: 3,
       models: 1,
@@ -1304,7 +1330,7 @@ const concord: Faction = {
       ],
       abilities: ["twirl-away", "pirouette"],
       upgrades: [
-        { id: "encore", name: "Encore", cost: 2, addModels: 1, text: "+1 model." },
+        { id: "encore", name: "Encore", cost: 1, addModels: 1, text: "+1 model." },
         { id: "afterimage", name: "Afterimage", cost: 1, addAbilities: ["blink"], text: "Gains Blink." },
       ],
       blurb: "Pirouette onto the roof, stab you, curtsey. Applause is expected.",

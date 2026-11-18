@@ -96,7 +96,7 @@ export function canPlaySupport(s: GameState, player: PlayerId, supportId: string
   if (card.exhausted) return "That support is exhausted until next round";
   if (pl.cp < ability.cp) return `Needs ${ability.cp} CP (you have ${pl.cp})`;
   if (ability.timing !== "any" && ability.timing !== s.phase) return `Only in the ${ability.timing} phase`;
-  const fromRound = ability.effect.kind === "airdrop" ? ability.effect.fromRound : undefined;
+  const fromRound = ability.effect.kind === "airdrop" || ability.effect.kind === "summon" ? ability.effect.fromRound : undefined;
   if (fromRound && s.round < fromRound) return `Not before round ${fromRound}`;
   if (ability.effect.kind === "rattle" && !rulesOf(s).morale) return "Morale is switched off in this game";
   const trigger = REACTION_TRIGGER[ability.effect.kind];
