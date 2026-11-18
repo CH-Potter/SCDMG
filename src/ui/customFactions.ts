@@ -327,7 +327,7 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
       case "blast":
         return { kind, radius: num(o.radius), hit: num(o.hit), damage: num(o.damage), ap: num(o.ap), range: num(o.range), needsSight: bool(o.needsSight) };
       case "summon":
-        return { kind, profileId: str(o.profileId), range: num(o.range), minEnemyDistance: num(o.minEnemyDistance) };
+        return { kind, profileId: str(o.profileId), range: num(o.range), minEnemyDistance: num(o.minEnemyDistance), ...(optNum(o.fromRound) !== undefined ? { fromRound: optNum(o.fromRound) } : {}) };
       case "meleeBuff":
       case "rangedBuff":
         return { kind, dice: num(o.dice) };

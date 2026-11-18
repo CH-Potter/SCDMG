@@ -227,7 +227,8 @@ export type SupportEffect =
   | { kind: "heal"; amount: number; revive?: boolean }
   | { kind: "recharge" }
   | { kind: "blast"; radius: number; hit: number; damage: number; ap: number; range: number; needsSight: boolean }
-  | { kind: "summon"; profileId: string; range: number; minEnemyDistance: number }
+  /** Place a summon-only structure near your models until the end of the round. `fromRound`: can't be used before this round. */
+  | { kind: "summon"; profileId: string; range: number; minEnemyDistance: number; fromRound?: number }
   | { kind: "meleeBuff"; dice: number }
   | { kind: "rangedBuff"; dice: number }
   | { kind: "slow"; range: number }
