@@ -9,11 +9,11 @@ import { css, luma, mix, rgba, shade } from "./palette";
 import { contact, ellipse, fill, flat, glowAt, ink, mat, rrect, teethRow, type Toon, tube } from "./toon";
 
 /** Labels for the forge's pickers. */
-export const BODY_NAMES: Record<MiniBody, string> = { trooper: "Trooper", critter: "Critter", brute: "Brute", walker: "Walker", flyer: "Hover pod", structure: "Tower" };
-export const HEAD_NAMES: Record<MiniHead, string> = { face: "Face", visor: "Robot visor", beast: "Beast snout", gem: "Crystal" };
-export const HEADGEAR_NAMES: Record<MiniHeadgear, string> = { none: "None", helmet: "Helmet", hat: "Wide hat", goggles: "Goggles", horns: "Horns", crown: "Crystal crown", antennae: "Antennae" };
-export const WEAPON_NAMES: Record<MiniWeapon, string> = { none: "Nothing", rifle: "Rifle", cannon: "Cannon", blade: "Blade", claws: "Claws", staff: "Staff" };
-export const BACK_NAMES: Record<MiniBack, string> = { none: "None", pack: "Backpack", jets: "Jet pack", tank: "Goo tank", banner: "Banner" };
+export const BODY_NAMES: Record<MiniBody, string> = { trooper: "Trooper", critter: "Critter", brute: "Brute", walker: "Walker", flyer: "Hover pod", structure: "Tower", rider: "Rider" };
+export const HEAD_NAMES: Record<MiniHead, string> = { face: "Face", visor: "Robot visor", beast: "Beast snout", gem: "Crystal", skull: "Skull", bug: "Bug", beard: "Bearded" };
+export const HEADGEAR_NAMES: Record<MiniHeadgear, string> = { none: "None", helmet: "Helmet", hat: "Wide hat", goggles: "Goggles", horns: "Horns", crown: "Crystal crown", antennae: "Antennae", hood: "Hood", plume: "Plumed helm" };
+export const WEAPON_NAMES: Record<MiniWeapon, string> = { none: "Nothing", rifle: "Rifle", cannon: "Cannon", blade: "Blade", claws: "Claws", staff: "Staff", bow: "Bow", shield: "Sword & shield", axe: "Axe" };
+export const BACK_NAMES: Record<MiniBack, string> = { none: "None", pack: "Backpack", jets: "Jet pack", tank: "Goo tank", banner: "Banner", wings: "Wings" };
 
 /** Design size per body: reference base radius (inches), bounds and height (centi-inches). */
 export const BODY_DESIGN: Record<MiniBody, { ref: number; b: [number, number, number, number]; top: number }> = {
@@ -23,6 +23,7 @@ export const BODY_DESIGN: Record<MiniBody, { ref: number; b: [number, number, nu
   walker: { ref: 1.1, b: [-152, -306, 202, 18], top: 240 },
   flyer: { ref: 0.8, b: [-126, -146, 142, 20], top: 110 },
   structure: { ref: 0.85, b: [-112, -252, 152, 28], top: 200 },
+  rider: { ref: 1.0, b: [-150, -290, 170, 16], top: 215 },
 };
 
 const N = {
@@ -164,6 +165,45 @@ function headShape(k: Kit): void {
       fill(t, "M 4 -3.5 L 15.5 -4.5 L 15 -1 L 5 -0.5 Z", mat(0xffffff), { s: 0, line: L * 0.4 });
       return;
     }
+    case "skull": {
+      // A grinning cartoon skull: big cranium, one deep socket with a pinprick glow, a hinged jaw.
+      const bone = mix(N.bone, P, 0.1);
+      fill(t, "M -17 0 C -19 -14 -9 -21 2 -21 C 14 -21 21 -13 20 -1 C 20 5 17 8 14 9 L 13 13 C 6 15 -3 14 -8 12 C -14 10 -17 6 -17 0 Z", mat(bone, 0.3), { s: 5, spec: [-6, -14, 4, 2, -0.5] });
+      ink(t, "M -5 -20 L -2 -14 L -6 -10 L -3 -6", L * 0.6, "rgba(70,50,35,0.6)");
+      fill(t, "M 1 10 C 6 12 13 12 18 9 L 17 17 C 12 20 5 20 1 17 Z", mat(shade(bone, -0.08), 0.2), { s: 2, line: L * 0.8 });
+      fill(t, "M 2 10 L 18 9 L 18 12 L 2 13 Z", mat(N.bone), { s: 0, line: L * 0.6 });
+      for (const x of [6, 10, 14]) ink(t, `M ${x} 9.5 L ${x} 12.5`, L * 0.5);
+      fill(t, ellipse(9, -3, 5.2, 5.8), mat(N.night), { s: 0, line: L * 0.8 });
+      glowAt(t, 10, -3, 9, shade(S, 0.5), 0.75);
+      flat(t, ellipse(10.5, -3, 1.9, 1.9), shade(S, 0.55));
+      fill(t, "M 17 2 L 20 7 L 15 7 Z", mat(N.night), { s: 0, line: L * 0.6 });
+      return;
+    }
+    case "bug": {
+      // Chitin head with a big compound eye and two mandibles that open and close.
+      const m = k.f ? 2.5 : 0;
+      fill(t, `M 13 4 C 21 ${1 - m} 29 ${4 - m} 31 ${10 - m} C 25 ${8 - m} 19 8 14 10 Z`, mat(shade(S, -0.1), 0.4), { s: 1.5, line: L * 0.8 });
+      fill(t, `M 12 9 C 19 ${13 + m} 25 ${18 + m} 25 ${24 + m} C 20 ${19 + m} 15 17 11 15 Z`, mat(shade(S, -0.25), 0.4), { s: 1.5, line: L * 0.8 });
+      fill(t, "M -16 2 C -18 -12 -8 -20 3 -20 C 15 -20 22 -11 21 1 C 20 11 12 17 2 17 C -8 17 -15 11 -16 2 Z", mat(P, 0.6), { s: 6, spec: [-5, -13, 4, 2, -0.5] });
+      ink(t, "M -6 -19 Q -11 -1 -6 16", L * 0.7, "rgba(30,20,20,0.45)");
+      glowAt(t, 10, -5, 14, shade(S, 0.4), 0.45);
+      fill(t, ellipse(10, -5, 7.5, 8), mat(shade(S, 0.15), 0.9, 0.2), { s: 2.5, spec: [7, -9, 2.4, 1.6] });
+      for (const [x, y] of [[8, -8], [12, -6], [9, -3], [13, -1], [6, -4], [11, -10]] as const) flat(t, ellipse(x, y, 1.1, 1.1), rgba(0xffffff, 0.35));
+      ink(t, "M 15 10 L 20 10", L * 0.8);
+      return;
+    }
+    case "beard": {
+      // The face, with a magnificent beard and moustache in the trim colour.
+      const hair = S;
+      fill(t, ellipse(-13, 1, 4.5, 5.5), mat(shade(N.skin, -0.08)), { s: 2, line: L * 0.8 });
+      fill(t, "M -18 0 C -19 -14 -9 -21 2 -21 C 13 -21 20 -13 20 -2 C 20 8 13 16 1 16 C -10 16 -18 11 -18 0 Z", mat(N.skin), { s: 6, spec: [-6, -13, 3.4, 2, -0.5] });
+      eyeball(t, 9, -5, 3.8, 4.4);
+      fill(t, "M -13 -2 C -13 12 -6 26 4 37 C 7 31 11 35 15 30 C 20 23 25 13 23 3 C 19 7 14 6 11 4 C 6 8 -2 7 -6 1 C -9 0 -11 -1 -13 -2 Z", mat(hair, 0.15), { s: 4 });
+      ink(t, "M 2 14 Q 4 24 4 32 M 12 14 Q 13 22 12 29", L * 0.6, "rgba(40,25,15,0.45)");
+      fill(t, "M 6 5 C 11 1 18 1 25 5 C 21 9 16 9 13 7 C 10 9 7 8 6 5 Z", mat(shade(hair, -0.12), 0.15), { s: 1.5, line: L * 0.8 });
+      fill(t, ellipse(19.5, 0, 4, 3.6), mat(shade(N.skin, -0.04)), { s: 1.5, line: L * 0.8 });
+      return;
+    }
   }
 }
 
@@ -221,6 +261,26 @@ function headgear(k: Kit): void {
       }
       return;
     }
+    case "hood": {
+      // A deep cowl over the back of the head, with a drooping point; the face peeks out the front.
+      const cloth = shade(P, -0.12);
+      fill(t, "M -16 -22 C -24 -30 -34 -30 -42 -22 C -34 -21 -27 -16 -22 -10 Z", mat(shade(cloth, -0.1), 0.1), { s: 2.5 });
+      fill(t, "M -24 16 C -28 -6 -18 -30 4 -30 C 18 -30 26 -21 25 -8 C 18 -14 8 -14 2 -10 C -4 -2 -6 8 -3 19 C -11 21 -20 20 -24 16 Z", mat(cloth, 0.15), { s: 6, spec: [-8, -24, 5, 2.4, -0.4] });
+      fill(t, "M 2 -10 C 8 -14 18 -14 25 -8 L 25 -5 C 18 -10 8 -10 3 -7 Z", mat(S, 0.3), { s: 1, line: L * 0.7 });
+      ink(t, "M -12 -24 Q -16 -4 -14 16", L * 0.6, "rgba(30,20,20,0.35)");
+      return;
+    }
+    case "plume": {
+      // A closed great helm with an eye slit, and a big swishing plume in the trim colour.
+      const sw = f ? 3 : 0;
+      fill(t, `M 0 -24 C -6 -40 -22 ${-47 - sw} -40 ${-41 - sw} C -31 -38 -25 -34 -23 -28 C -29 -30 -36 ${-28 + sw} -40 ${-21 + sw} C -27 -24 -14 -20 -6 -16 Z`, mat(S, 0.2), { s: 3 });
+      fill(t, "M -18 18 L -19 -10 C -19 -22 -8 -27 3 -27 C 14 -27 22 -21 22 -8 L 21 18 C 10 22 -8 22 -18 18 Z", mat(N.steel, 0.8), { s: 6, spec: [-8, -20, 4, 3, -0.4] });
+      fill(t, "M -19 -10 C -6 -14 10 -14 22 -10 L 22 -6 C 10 -10 -6 -10 -19 -6 Z", mat(P, 0.4), { s: 1.5, line: L * 0.8 });
+      fill(t, rrect(4, -3, 19, 4, 1.5), mat(N.night), { s: 0, line: L * 0.7 });
+      ink(t, "M 12 -26 L 12 -14 M 12 1 L 12 20", L * 0.6, "rgba(40,40,50,0.45)");
+      for (const y of [7, 12]) for (const x of [15, 19]) flat(t, ellipse(x, y, 1, 1), N.night);
+      return;
+    }
   }
 }
 
@@ -275,6 +335,32 @@ function weaponShape(k: Kit, w: MiniWeapon): Pt {
       glowAt(t, 0, -77, 24, shade(S, 0.55), 0.85);
       fill(t, ellipse(0, -77, 8, 8), mat(gemOf(S), 1), { s: 3, spec: [-2.5, -80, 2.4, 1.6] });
       return [0, -77];
+    case "bow":
+      // Held upright, bulging toward the target, string drawn back with an arrow nocked.
+      ink(t, "M -6 -38 L -12 0 L -6 38", 1.3, "rgba(250,245,230,0.95)");
+      fill(t, tube([[-6, -38], [0, -20], [3, 0], [0, 20], [-6, 38]], [1.6, 2.6, 3.2, 2.6, 1.6]), mat(N.wood, 0.25), { s: 1.5 });
+      fill(t, rrect(-1, -5, 7, 10, 2), mat(N.leatherDark), { s: 1, line: L * 0.7 });
+      fill(t, rrect(-14, -1, 42, 2.2, 1), mat(shade(N.wood, 0.1)), { s: 0, line: L * 0.6 });
+      fill(t, "M -14 -1 L -19 -6 L -9 -1 Z M -14 1.2 L -19 6 L -9 1.2 Z", mat(S, 0.2), { s: 0, line: L * 0.6 });
+      fill(t, "M 27 -4 L 36 0 L 27 4 Z", mat(N.steel, 0.7), { s: 1, line: L * 0.7 });
+      return [36, 0];
+    case "shield":
+      // A short sword raised behind a kite shield in the faction colour, with a trim-coloured boss.
+      fill(t, rrect(-3, -4, 6, 10, 2), mat(N.leatherDark), { s: 1 });
+      fill(t, rrect(-8, -8, 16, 4, 1.5), mat(N.brass, 0.7), { s: 1, line: L * 0.8 });
+      fill(t, "M -3 -8 L -3 -40 L 0 -46 L 3 -40 L 3 -8 Z", mat(0xd8dfe4, 0.9, 0.25), { s: 1.5, spec: [-1, -36, 0.8, 8, 0] });
+      fill(t, "M -4 -16 C 8 -20 22 -20 30 -16 C 31 4 24 20 13 30 C 2 20 -5 4 -4 -16 Z", mat(P, 0.4), { s: 6, spec: [4, -12, 5, 2, -0.2] });
+      fill(t, "M -4 -16 C 8 -20 22 -20 30 -16 L 29.5 -12 C 22 -16 8 -16 -3.6 -12 Z", mat(S, 0.4), { s: 1, line: L * 0.7 });
+      fill(t, ellipse(13, 0, 5, 5), mat(S, 0.6), { s: 1.5, line: L * 0.8, spec: [11.5, -1.8, 1.4, 1] });
+      return [0, -46];
+    case "axe":
+      // A long haft with a big crescent head.
+      fill(t, tube([[-10, 0], [16, 0], [48, 0]], [2.8, 2.8, 2.6]), mat(N.wood), { s: 1.5 });
+      fill(t, rrect(-13, -3, 6, 6, 1.5), mat(N.leatherDark), { s: 1, line: L * 0.7 });
+      fill(t, "M 36 -3 C 40 -10 42 -18 40 -24 C 50 -20 58 -10 58 2 C 58 12 52 20 42 24 C 44 16 42 9 36 4 Z", mat(0xc9d1d6, 0.8, 0.25), { s: 3, spec: [46, -12, 2, 5, 0.3] });
+      ink(t, "M 41 -21 C 52 -14 56 -4 56 2 C 56 10 52 17 44 21", 1.4, rgba(shade(S, 0.35), 0.9));
+      fill(t, rrect(33, -5, 7, 10, 2), mat(N.brass, 0.7), { s: 1, line: L * 0.7 });
+      return [58, 0];
     case "none":
       return [6, 0];
   }
@@ -329,6 +415,16 @@ function backShape(k: Kit): void {
       fill(t, `M -32 ${-66 + w * 0.3} L -25 ${-59 + w * 0.3} L -18 -66 L -18 -60 L -25 ${-53 + w * 0.3} L -32 ${-60 + w * 0.3} Z`, mat(P, 0.2), { s: 1, line: L * 0.6 });
       return;
     }
+    case "wings": {
+      // A pair of see-through wings that flap between frames (bug, bat, angel: the trim colour decides).
+      const up = f ? -10 : 0;
+      const film = mix(S, 0xffffff, 0.45);
+      fill(t, `M 0 -6 C -14 ${-38 + up} -40 ${-58 + up} -60 ${-50 + up} C -50 ${-36 + up} -36 -18 -4 4 Z`, mat(shade(film, -0.12), 0.6, 0.15), { s: 3, alpha: 0.8 });
+      fill(t, `M 2 -2 C -6 ${-30 + up} -26 ${-64 + up} -48 ${-68 + up} C -43 ${-46 + up} -30 -18 2 8 Z`, mat(film, 0.7, 0.15), { s: 3, alpha: 0.85, spec: [-24, -40 + up, 5, 2, -0.8] });
+      ink(t, `M 0 2 C -14 ${-20 + up} -28 ${-44 + up} -44 ${-62 + up} M -6 -6 C -18 ${-24 + up} -30 ${-36 + up} -50 ${-46 + up}`, L * 0.6, rgba(shade(S, -0.4), 0.6));
+      fill(t, ellipse(0, 0, 4, 4), mat(shade(S, -0.2), 0.3), { s: 1, line: L * 0.7 });
+      return;
+    }
   }
 }
 
@@ -379,17 +475,21 @@ const trooper: BodyPainter = (k) => {
   fill(t, rrect(-2, -50, 8, 7, 1.5), mat(S, 0.6), { s: 1.5, line: t.line * 0.8 });
   head(k, 4, -107, 17);
   // weapon, then the front arm over it
-  const hand: Pt = twoHanded ? [9, -58] : w === "blade" ? [16, -63] : w === "staff" ? [26, -70] : w === "claws" ? [18, -66] : [15, -66];
+  const hand: Pt = twoHanded ? [9, -58] : w === "blade" || w === "axe" ? [16, -63] : w === "staff" || w === "bow" ? [26, -70] : w === "claws" ? [18, -66] : w === "shield" ? [20, -62] : [15, -66];
   let muzzle: Pt;
   if (twoHanded) muzzle = weapon(k, 6, -60, w === "cannon" ? 0.95 : 1, -0.08);
   else if (w === "blade") muzzle = weapon(k, 16, -63, 1, -0.95);
+  else if (w === "axe") muzzle = weapon(k, 16, -63, 0.9, -0.9);
   else if (w === "staff") muzzle = weapon(k, 26, -70, 1, 0.1);
+  else if (w === "bow") muzzle = weapon(k, 26, -70, 1, 0);
   else muzzle = [hand[0] + 8, hand[1]];
   fill(t, tube([[10, -83], [18, -72], hand], [8.5, 7.5, 6]), suit, { s: 6 });
   fill(t, ellipse(11, -85, 10, 6.5), mat(S, 0.5), { s: 3, spec: [8, -88, 2.6, 1.2] });
   fill(t, ellipse(hand[0], hand[1], 6.6, 6.2), mat(N.leather), { s: 3 });
   if (twoHanded) fill(t, ellipse(32, -65, 6.2, 5.8), mat(N.leather), { s: 3 });
   if (w === "claws") muzzle = weapon(k, hand[0] + 3, hand[1], 1, -0.15);
+  // the shield goes in front of the arm that holds it
+  if (w === "shield") muzzle = weapon(k, hand[0], hand[1], 0.95, 0);
   ctx.restore();
   return muzzle;
 };
@@ -411,12 +511,13 @@ const critter: BodyPainter = (k) => {
   fill(t, "M -22 -12 C -8 -5 12 -5 24 -11 C 16 -17 -8 -18 -22 -12 Z", mat(mix(P, N.cream, 0.6)), { s: 2, line: t.line * 0.8 });
   for (const [x, y, rx, ry] of [[-16, -40, 4, 3], [-4, -48, 3, 2.4], [-22, -28, 2.6, 2]] as const) fill(t, ellipse(x, y, rx, ry), mat(S, 0.2), { s: 1, line: t.line * 0.6 });
   let muzzle: Pt = [44, -38];
-  if (w === "rifle" || w === "cannon") {
+  if (w === "rifle" || w === "cannon" || w === "bow") {
     fill(t, "M -14 -54 C -6 -58 6 -58 12 -54 L 12 -48 C 6 -51 -6 -51 -14 -48 Z", mat(N.leather), { s: 2, line: t.line * 0.8 });
     muzzle = weapon(k, -4, -60, 0.62, -0.05);
   }
   head(k, 24, -40, 15);
-  if (w === "blade") muzzle = weapon(k, 32, -33, 0.55, -0.25);
+  if (w === "blade" || w === "axe") muzzle = weapon(k, 32, -33, 0.55, -0.25);
+  if (w === "shield") muzzle = weapon(k, 6, -26, 0.6, 0);
   fill(t, tube([[-6, -10], [-8 - (step ? 5 : 0), -4], [-6 - (step ? 6 : 0), 0]], [7, 6, 4.5]), H, { s: 3 });
   fill(t, tube([[18, -10], [22 + (step ? 5 : 0), -4], [26 + (step ? 6 : 0), 0]], [7, 6, 4.5]), H, { s: 3 });
   if (w === "claws") {
@@ -455,12 +556,15 @@ const brute: BodyPainter = (k) => {
   let muzzle: Pt = [hand[0] + 16, hand[1]];
   if (w === "rifle" || w === "cannon") muzzle = weapon(k, 78, -62, s, -0.1);
   else if (w === "blade") muzzle = weapon(k, 86, -60, s, -1.0);
+  else if (w === "axe") muzzle = weapon(k, 86, -60, s * 0.95, -0.8);
   else if (w === "staff") muzzle = weapon(k, 92, -68, s, 0.12);
+  else if (w === "bow") muzzle = weapon(k, 92, -68, s, 0);
   fill(t, tube([[56, -150], [94, -112], hand], [22, 20, 16]), skin, { s: 8 });
   fill(t, ellipse(58, -152, 27, 17), mat(S, 0.5), { s: 6, spec: [48, -160, 6, 2.4] });
   bolts(t, [[44, -150], [60, -158], [74, -150]], 2.6);
   fill(t, ellipse(hand[0], hand[1], 18, 16), fist, { s: 6 });
   if (w === "claws") muzzle = weapon(k, hand[0] + 6, hand[1], s, -0.2);
+  if (w === "shield") muzzle = weapon(k, hand[0], hand[1], s, 0);
   return muzzle;
 };
 
@@ -495,8 +599,10 @@ const walker: BodyPainter = (k) => {
   fill(t, rrect(54, -147, 8, 18, 2), mat(S, 0.4), { s: 1, line: t.line * 0.7 });
   let muzzle: Pt = [80, -138];
   if (w === "rifle" || w === "cannon") muzzle = weapon(k, 70, -138, 1.7, 0);
-  else if (w === "blade") muzzle = weapon(k, 74, -132, 1.8, -0.55);
+  else if (w === "blade" || w === "axe") muzzle = weapon(k, 74, -132, 1.8, -0.55);
   else if (w === "claws") muzzle = weapon(k, 78, -134, 1.8, 0.25);
+  else if (w === "bow") muzzle = weapon(k, 82, -138, 1.7, 0);
+  else if (w === "shield") muzzle = weapon(k, 72, -126, 1.6, 0);
   return muzzle;
 };
 
@@ -525,8 +631,10 @@ const flyer: BodyPainter = (k) => {
   });
   let muzzle: Pt = [72, -44];
   if (w === "rifle" || w === "cannon") muzzle = weapon(k, 40, -34, 1, 0.05);
-  else if (w === "blade") muzzle = weapon(k, 62, -46, 1, 0);
+  else if (w === "blade" || w === "axe") muzzle = weapon(k, 62, -46, 1, 0);
   else if (w === "claws") muzzle = weapon(k, 48, -34, 1, 0.6);
+  else if (w === "bow") muzzle = weapon(k, 30, -80, 0.8, 0);
+  else if (w === "shield") muzzle = weapon(k, 50, -50, 0.9, 0);
   return muzzle;
 };
 
@@ -548,7 +656,9 @@ const structure: BodyPainter = (k) => {
   if (w === "rifle" || w === "cannon") {
     fill(t, rrect(24, -118, 22, 26, 6), mat(N.gun, 0.5), { s: 3 });
     muzzle = weapon(k, 36, -104, 1.5, 0);
-  } else if (w === "blade") muzzle = weapon(k, 34, -84, 1.6, -1.15);
+  } else if (w === "blade" || w === "axe") muzzle = weapon(k, 34, -84, 1.6, -1.15);
+  else if (w === "bow") muzzle = weapon(k, 32, -150, 1.4, 0);
+  else if (w === "shield") muzzle = weapon(k, 30, -78, 1.5, 0);
   else if (w === "claws") {
     weapon(k, -54, -30, 1.4, -2.6);
     muzzle = weapon(k, 54, -30, 1.4, -0.5);
@@ -556,7 +666,63 @@ const structure: BodyPainter = (k) => {
   return muzzle;
 };
 
-const BODIES: Record<MiniBody, BodyPainter> = { trooper, critter, brute, walker, flyer, structure };
+/** A rider on a sturdy cartoon steed: the steed's blanket and the rider's tunic take the main colour. */
+const rider: BodyPainter = (k) => {
+  const { t, P, S, f } = k;
+  const step = f === 1;
+  const w = k.r.weapon;
+  const coat = mix(shade(P, -0.55), 0x8a5a36, 0.75);
+  const C = mat(coat, 0.2);
+  const CB = mat(shade(coat, -0.2));
+  const mane = mat(shade(coat, -0.5), 0.1);
+  const hoof = mat(N.night, 0.3);
+  contact(t, 4, -2, 104, 16, 0.55);
+  const leg = (x: number, lift: number, m: ReturnType<typeof mat>) => {
+    fill(t, tube([[x, -78], [x + 5, -40 - lift], [x + 2, -10 - lift]], [12, 8, 7]), m, { s: 4 });
+    fill(t, ellipse(x + 3, -6 - lift, 9, 6), hoof, { s: 2 });
+  };
+  // far legs and the tail
+  leg(-60, step ? 9 : 0, CB);
+  leg(44, step ? 0 : 9, CB);
+  fill(t, tube([[-76, -100], [-98, -84 + (step ? 4 : 0)], [-104, -52 + (step ? 6 : 0)]], [8, 10, 4]), mane, { s: 3 });
+  back(k, -26, -158, 1.15);
+  if (w === "staff") weapon(k, -18, -150, 0.9, -0.15);
+  // barrel, neck and head
+  fill(t, "M -80 -96 C -82 -122 -52 -128 0 -126 C 40 -126 72 -120 78 -104 C 82 -80 62 -66 20 -64 L -40 -64 C -66 -66 -80 -76 -80 -96 Z", C, { s: 14, spec: [-40, -116, 14, 3, -0.1] });
+  fill(t, "M 46 -112 C 54 -134 66 -154 80 -164 C 94 -168 106 -162 118 -144 C 124 -134 122 -126 114 -124 C 104 -124 96 -132 90 -130 C 82 -120 78 -102 72 -90 Z", C, { s: 10, spec: [84, -158, 5, 2, -0.6] });
+  fill(t, "M 84 -162 L 80 -180 L 93 -166 Z", C, { s: 2 });
+  fill(t, "M 48 -112 C 55 -136 68 -156 82 -166 C 78 -152 72 -138 70 -124 C 64 -118 56 -112 48 -112 Z", mane, { s: 2 });
+  flat(t, ellipse(100, -150, 2.8, 2.8), N.ink);
+  flat(t, ellipse(116, -132, 1.8, 1.4), N.ink);
+  ink(t, "M 104 -126 Q 110 -122 116 -125", t.line * 0.8);
+  // blanket in the main colour, trimmed
+  fill(t, "M -52 -128 C -20 -132 20 -132 42 -126 L 46 -86 C 20 -80 -20 -80 -56 -86 Z", mat(P, 0.2), { s: 6 });
+  fill(t, "M -56 -90 C -20 -84 20 -84 46 -90 L 46 -82 C 20 -76 -20 -76 -56 -82 Z", mat(S, 0.4), { s: 1.5, line: t.line * 0.8 });
+  // near legs
+  leg(-42, step ? 0 : 9, C);
+  leg(60, step ? 9 : 0, C);
+  // the rider: leg down the flank, body, head, then the weapon arm
+  fill(t, tube([[-6, -126], [12, -104], [8, -80]], [9, 8, 7]), mat(shade(P, -0.3)), { s: 4 });
+  fill(t, ellipse(12, -76, 10, 6), mat(N.leatherDark, 0.2), { s: 2 });
+  fill(t, "M -20 -172 C -24 -156 -22 -140 -18 -126 C -8 -122 10 -122 16 -126 C 20 -140 18 -156 14 -172 C 4 -177 -10 -177 -20 -172 Z", mat(P), { s: 8, spec: [-10, -166, 3, 5, -0.2] });
+  fill(t, "M -16 -171 L -10 -173 L 14 -130 L 8 -126 Z", mat(S, 0.3), { s: 2, line: t.line * 0.8 });
+  head(k, 0, -190, 17);
+  const twoHanded = w === "rifle" || w === "cannon";
+  const hand: Pt = twoHanded ? [12, -142] : w === "staff" || w === "bow" ? [30, -152] : [24, -146];
+  let muzzle: Pt = [hand[0] + 8, hand[1]];
+  if (twoHanded) muzzle = weapon(k, 10, -144, w === "cannon" ? 0.9 : 1, -0.08);
+  else if (w === "blade") muzzle = weapon(k, hand[0], hand[1], 1.1, -0.6);
+  else if (w === "axe") muzzle = weapon(k, hand[0], hand[1], 0.95, -1.1);
+  else if (w === "bow") muzzle = weapon(k, hand[0], hand[1], 1, 0);
+  fill(t, tube([[8, -166], [20, -156], hand], [8.5, 7.5, 6]), mat(P), { s: 6 });
+  fill(t, ellipse(9, -168, 10, 6.5), mat(S, 0.5), { s: 3 });
+  fill(t, ellipse(hand[0], hand[1], 6.6, 6.2), mat(N.leather), { s: 3 });
+  if (w === "claws") muzzle = weapon(k, hand[0] + 3, hand[1], 1, -0.15);
+  if (w === "shield") muzzle = weapon(k, hand[0], hand[1], 1, 0);
+  return muzzle;
+};
+
+const BODIES: Record<MiniBody, BodyPainter> = { trooper, critter, brute, walker, flyer, structure, rider };
 
 /** Paint a recipe figure (feet at the origin, centi-inches, facing right). Returns the muzzle. */
 export function paintRecipe(t: Toon, recipe: MiniatureRecipe, factionColor: number, frame: number): Pt {
@@ -569,11 +735,11 @@ export function randomRecipe(rnd: () => number = Math.random, base?: Partial<Min
   const pick = <T>(xs: readonly T[]): T => xs[Math.floor(rnd() * xs.length)]!;
   const trims = [0xffc23a, 0xe9e2d0, 0x7fe7ff, 0xf0565b, 0x56b34a, 0xb98aff, 0xff8a3d, 0x2c2f58];
   return {
-    body: base?.body ?? pick(["trooper", "trooper", "critter", "brute", "walker", "flyer"] as const),
-    head: pick(["face", "visor", "beast", "gem"] as const),
-    headgear: pick(["none", "helmet", "hat", "goggles", "horns", "crown", "antennae"] as const),
-    weapon: pick(["rifle", "cannon", "blade", "claws", "staff", "none"] as const),
-    back: pick(["none", "pack", "jets", "tank", "banner"] as const),
+    body: base?.body ?? pick(["trooper", "trooper", "critter", "brute", "walker", "flyer", "rider"] as const),
+    head: pick(["face", "visor", "beast", "gem", "skull", "bug", "beard"] as const),
+    headgear: pick(["none", "helmet", "hat", "goggles", "horns", "crown", "antennae", "hood", "plume"] as const),
+    weapon: pick(["rifle", "cannon", "blade", "claws", "staff", "bow", "shield", "axe", "none"] as const),
+    back: pick(["none", "pack", "jets", "tank", "banner", "wings"] as const),
     secondary: pick(trims),
     scale: 1,
     ...(base?.primary !== undefined ? { primary: base.primary } : {}),

@@ -146,6 +146,17 @@
   background: #fff0c4;
   border-style: dashed;
 }
+.ff-tropes h3 {
+  margin: 14px 0 0;
+}
+.ff-tropes h3 small {
+  font-weight: normal;
+  margin-left: 6px;
+}
+.ff-libcard p.ff-trope-units {
+  flex: none;
+  font-size: 0.8rem;
+}
 .ff-draft {
   display: flex;
   align-items: center;

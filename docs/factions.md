@@ -139,3 +139,27 @@ Every unit has at least two abilities (structures at least one). Most cards and 
 | Concord | Shield Pylon | Radiance |
 | Concord | Sunray Tower | Overcharge |
 | Concord | Glimmer Dome | Glimmer Field |
+
+## Faction forge templates
+
+Besides the three built-in factions, the faction forge offers **trope templates**: complete starting factions for the classic tabletop army types, so a player can pick, say, an insect swarm or a knightly kingdom and tweak it rather than build from a blank page. They live in `src/forge/templates/` as data. They are not built-in factions and never appear in the game until a player starts one (the forge gives it a fresh id, like a copy) and saves it.
+
+Each template has 6 to 10 units spread over the unit classes, each with two or more existing abilities and a miniature built from parts, 3 support cards with two abilities and army slots each, faction slots, and Skirmish and Assault starter lists that fit the mode limits and class slots. Costs, supply, upgrade costs and Fizz are computed by `engine/pricing.ts`, like any custom faction. Names and flavour are SCDMG's own: they play the genre trope, not any particular game's army. `tests/forge.templates.test.ts` checks every template and plays two AI-vs-AI games with them.
+
+| Group | Template | Trope |
+| --- | --- | --- |
+| Grimdark sci-fi | Bulwark Brotherhood | Armoured super-soldiers: few, huge, very hard to kill |
+| Grimdark sci-fi | 88th Mudfoot Regiment | Regular troopers: a disciplined gunline, a walking tank, mortars and artillery |
+| Grimdark sci-fi | The Skitterswarm | Insectoid hive swarm: regrowing bugs, burrowing monsters, egg clutches |
+| Grimdark sci-fi | Scrapjaw Mob | Brutish green warband: loud, scrap-built, numbers and melee |
+| Grimdark sci-fi | Veilwalker Kin | Ancient psychic space-elves: fast, fragile, shields and teleporting |
+| Grimdark sci-fi | Tin Can Legion | Droid legion: fearless robots that regrow, regenerate and repair |
+| Grimdark sci-fi | Cult of the Grinning Star | Doom cult: fanatics, mutants and summoned rifts |
+| Fantasy | Silverbough Host | Elven host: swift, evasive archers |
+| Fantasy | Gristletusk Horde | Orc horde: big numbers, wolf riders, a troll and a bolt thrower |
+| Fantasy | The Ever-Restless | Undead legion: shambling, fearless and raised again |
+| Fantasy | Deepdelve Hold | Dwarf hold: stubborn, armoured, with artillery |
+| Fantasy | Brightmantle Kingdom | Knightly kingdom: a cavalry charge backed by men-at-arms and longbows |
+| Fantasy | Circle of the Mossy Stone | Druid circle: treefolk, wolves, bees and regrowth |
+
+The templates brought a few new miniature parts that any custom unit can use: a **rider** body (on a cartoon steed), **skull**, **bug** and **bearded** heads, **hood** and **plumed helm** headgear, a **bow**, **sword and shield** or **axe** to hold, and **wings** on the back. The dev gallery shows the templates' miniatures at `gallery.html?faction=templates`.

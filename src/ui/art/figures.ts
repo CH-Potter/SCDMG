@@ -85,7 +85,7 @@ export function figureSpec(p: UnitProfile, look: Look, color: number): FigureSpe
 }
 
 /** The animation archetype each builder body behaves like. */
-const RECIPE_KIND: Record<MiniatureRecipe["body"], FigureKind> = { trooper: "trooper", critter: "critter", brute: "brute", walker: "walker", flyer: "skiff", structure: "turret" };
+const RECIPE_KIND: Record<MiniatureRecipe["body"], FigureKind> = { trooper: "trooper", critter: "critter", brute: "brute", walker: "walker", flyer: "skiff", structure: "turret", rider: "critter" };
 
 /** The built-in archetype for a profile, ignoring custom art. */
 export function archetypeSpec(p: UnitProfile, look: Look, color: number): FigureSpec {
