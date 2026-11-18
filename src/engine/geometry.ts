@@ -22,11 +22,15 @@ export function towards(from: Vec, to: Vec, maxLen: number): Vec {
 }
 
 export function pointSegmentDistance(p: Vec, a: Vec, b: Vec): number {
-  const ab = sub(b, a);
-  const l2 = ab.x * ab.x + ab.y * ab.y;
+  // The same arithmetic as dist(p, a + ab * t), without allocating (this runs millions of times).
+  const abx = b.x - a.x;
+  const aby = b.y - a.y;
+  const l2 = abx * abx + aby * aby;
   if (l2 < EPS) return dist(p, a);
-  const t = Math.max(0, Math.min(1, ((p.x - a.x) * ab.x + (p.y - a.y) * ab.y) / l2));
-  return dist(p, { x: a.x + ab.x * t, y: a.y + ab.y * t });
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * abx + (p.y - a.y) * aby) / l2));
+  const dx = p.x - (a.x + abx * t);
+  const dy = p.y - (a.y + aby * t);
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 const cross = (o: Vec, a: Vec, b: Vec): number => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
@@ -107,9 +111,8 @@ export function polyBounds(poly: Vec[]): Bounds {
   return b;
 }
 
-/** Cheap reject: is the segment's bounding box further than `pad` from the polygon's? */
-function farFromBounds(a: Vec, b: Vec, poly: Vec[], pad: number): boolean {
-  const bb = polyBounds(poly);
+/** Cheap reject: is the segment's bounding box further than `pad` from the polygon's (bounds `bb`)? */
+function farFromBounds(a: Vec, b: Vec, bb: Bounds, pad: number): boolean {
   return (
     Math.max(a.x, b.x) < bb.x0 - pad ||
     Math.min(a.x, b.x) > bb.x1 + pad ||
@@ -118,8 +121,9 @@ function farFromBounds(a: Vec, b: Vec, poly: Vec[], pad: number): boolean {
   );
 }
 
-export function segmentIntersectsPolygon(a: Vec, b: Vec, poly: Vec[]): boolean {
-  if (farFromBounds(a, b, poly, EPS)) return false;
+/** `bb`: the polygon's bounds, when the caller already has them (see polyBounds). */
+export function segmentIntersectsPolygon(a: Vec, b: Vec, poly: Vec[], bb: Bounds = polyBounds(poly)): boolean {
+  if (farFromBounds(a, b, bb, EPS)) return false;
   if (pointInPolygon(a, poly) || pointInPolygon(b, poly)) return true;
   for (let i = 0, n = poly.length; i < n; i++) {
     if (segmentsIntersect(a, b, poly[i]!, poly[(i + 1) % n]!)) return true;
@@ -128,8 +132,8 @@ export function segmentIntersectsPolygon(a: Vec, b: Vec, poly: Vec[]): boolean {
 }
 
 /** Shortest distance from a segment to a polygon (0 if they touch or overlap). */
-export function segmentPolygonDistance(a: Vec, b: Vec, poly: Vec[]): number {
-  if (segmentIntersectsPolygon(a, b, poly)) return 0;
+export function segmentPolygonDistance(a: Vec, b: Vec, poly: Vec[], bb: Bounds = polyBounds(poly)): number {
+  if (segmentIntersectsPolygon(a, b, poly, bb)) return 0;
   let best = Infinity;
   for (let i = 0, n = poly.length; i < n; i++) {
     const d = segmentSegmentDistance(a, b, poly[i]!, poly[(i + 1) % n]!);
@@ -139,9 +143,9 @@ export function segmentPolygonDistance(a: Vec, b: Vec, poly: Vec[]): number {
 }
 
 /** Does the segment pass within `r` of the polygon? Same as segmentPolygonDistance(...) < r, but faster. */
-export function segmentNearPolygon(a: Vec, b: Vec, poly: Vec[], r: number): boolean {
-  if (farFromBounds(a, b, poly, r)) return false;
-  return segmentPolygonDistance(a, b, poly) < r;
+export function segmentNearPolygon(a: Vec, b: Vec, poly: Vec[], r: number, bb: Bounds = polyBounds(poly)): boolean {
+  if (farFromBounds(a, b, bb, r)) return false;
+  return segmentPolygonDistance(a, b, poly, bb) < r;
 }
 
 export function circleOverlapsPolygon(c: Vec, r: number, poly: Vec[]): boolean {

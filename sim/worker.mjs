@@ -1,16 +1,10 @@
-// Worker thread for the balance sim. Loads sim/play.ts through Vite's module runner (so TypeScript
-// works without a separate build), then plays the jobs the parent sends until told to stop.
+// Worker thread for the balance sim. Imports the bundled sim/play.ts (see sim/bundle.mjs; the parent
+// builds it once and passes its URL as workerData), then plays the jobs the parent sends until told
+// to stop.
 
-import { parentPort } from "node:worker_threads";
-import { fileURLToPath } from "node:url";
-import { runnerImport } from "vite";
+import { parentPort, workerData } from "node:worker_threads";
 
-const playPath = fileURLToPath(new URL("./play.ts", import.meta.url));
-// SIM_DATA_DIR: play with alternative copies of factions.ts / abilities.ts (e.g. a "before" snapshot
-// for a before/after comparison). Their imports must point at the real engine files.
-const dataDir = process.env.SIM_DATA_DIR?.replace(/\\/g, "/");
-const alias = dataDir ? [{ find: /^(\.{1,2}\/)+([\w-]+\/)*(factions|abilities)$/, replacement: `${dataDir}/$3.ts` }] : [];
-const { module } = await runnerImport(playPath, { logLevel: "silent", configFile: false, resolve: { alias } });
+const { playGame } = await import(workerData.bundle);
 
 parentPort.on("message", (job) => {
   if (job === null) {
@@ -18,7 +12,7 @@ parentPort.on("message", (job) => {
   }
   let result;
   try {
-    result = module.playGame(job);
+    result = playGame(job);
   } catch (e) {
     result = { job, error: String(e && e.stack ? e.stack : e) };
   }

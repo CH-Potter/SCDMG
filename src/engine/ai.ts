@@ -20,7 +20,7 @@ import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, 
 import { evadeTarget, expectedDamage, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
 import { SHELL_BURST } from "./constants";
-import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, twoDiceAtLeast } from "./game";
+import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, tableKey, twoDiceAtLeast } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf, reacts } from "./profile";
@@ -41,7 +41,7 @@ import {
   ENGAGE_RANGE,
   reserves,
 } from "./rules";
-import { platformAt, planRoute } from "./terrain";
+import { allPlaced, platformAt, planRoute, type Placed, type Route } from "./terrain";
 import type { AbilityId, Command, GameState, Objective, PlayerId, SupportEffect, Unit, Vec } from "./types";
 
 const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
@@ -263,17 +263,36 @@ export function evaluate(s: GameState, me: PlayerId): number {
   const them = other(me);
   let score = (s.players[me].vp - s.players[them].vp) * VP;
   if (s.over) return s.winner === me ? 1000 + score : s.winner === them ? -1000 + score : score;
+  // Pure lookups asked many times per call (per unit and objective): work each out once.
+  const control = new Map<Objective, PlayerId | null>();
+  const controlOfHere = (o: Objective): PlayerId | null => {
+    let c = control.get(o);
+    if (c === undefined) {
+      c = controlOf(s, o);
+      control.set(o, c);
+    }
+    return c;
+  };
+  const worthMemo: [Map<Objective, number>, Map<Objective, number>] = [new Map(), new Map()];
+  const worth = (o: Objective, p: PlayerId): number => {
+    let w = worthMemo[p].get(o);
+    if (w === undefined) {
+      w = objectiveWorth(s, o, p);
+      worthMemo[p].set(o, w);
+    }
+    return w;
+  };
 
   // Objectives: worth the VP they'll score.
   for (const o of s.objectives) {
-    const c = controlOf(s, o);
-    if (c === me) score += objectiveWorth(s, o, me);
-    else if (c === them) score -= objectiveWorth(s, o, them);
+    const c = controlOfHere(o);
+    if (c === me) score += worth(o, me);
+    else if (c === them) score -= worth(o, them);
     else {
       // Contested: a little credit for having a foot in the door.
       const [a, b] = objectivePresence(s, o);
       const mine = me === 0 ? a : b;
-      if (mine > 0) score += objectiveWorth(s, o, me) * 0.25;
+      if (mine > 0) score += worth(o, me) * 0.25;
     }
   }
 
@@ -312,10 +331,12 @@ export function evaluate(s: GameState, me: PlayerId): number {
 
   // Shaping for our own units: toward objectives, into range, into charge reach; away from threats.
   const enemies = onBoard(s, them);
+  const enemyReach = enemies.map(reach);
+  const enemyFire = enemies.map(firepower);
   // Objectives worth VP to us, plus our own ones the enemy is scoring from.
-  const wanted = s.objectives.filter((o) => objectiveWorth(s, o, me) > 0 || (o.team === me && controlOf(s, o) === them && objectiveWorth(s, o, them) > 0));
+  const wanted = s.objectives.filter((o) => worth(o, me) > 0 || (o.team === me && controlOfHere(o) === them && worth(o, them) > 0));
   // Richer objectives pull from further away: each VP of worth above 1 counts as OBJECTIVE_PULL" closer.
-  const pull = new Map(wanted.map((o) => [o, Math.max(0, objectiveWorth(s, o, me) / (VP * 0.6) - 1) * OBJECTIVE_PULL]));
+  const pull = new Map(wanted.map((o) => [o, Math.max(0, worth(o, me) / (VP * 0.6) - 1) * OBJECTIVE_PULL]));
   for (const u of onBoard(s, me)) {
     const c = centroid(u);
     const prof = profileOf(u);
@@ -326,7 +347,7 @@ export function evaluate(s: GameState, me: PlayerId): number {
         if (!canReach(s, u, o)) continue;
         const d = Math.max(0, dist(o.pos, c) - o.radius);
         // Objectives we already hold only pull the units standing on them.
-        if (controlOf(s, o) === me && d > 1) continue;
+        if (controlOfHere(o) === me && d > 1) continue;
         best = Math.min(best, d - (pull.get(o) ?? 0));
       }
       if (best < Infinity) score -= best * (isMeleeUnit(u) ? 0.12 : 0.22);
@@ -350,7 +371,9 @@ export function evaluate(s: GameState, me: PlayerId): number {
       }
     }
     let threat = 0;
-    for (const e of enemies) if (unitGap(e, u) <= reach(e)) threat += firepower(e);
+    enemies.forEach((e, i) => {
+      if (unitGap(e, u) <= enemyReach[i]!) threat += enemyFire[i]!;
+    });
     const cover = u.status.hunkered ? 0.75 : 1;
     score -= Math.min(threat * cover, wounds(u)) * (valuePerWound(u) / MATERIAL) * 0.15;
   }
@@ -477,6 +500,16 @@ interface Candidate {
   expected?: boolean;
 }
 
+/**
+ * `tableKey(s)` for the state the AI is thinking about, worked out once per state (the AI never
+ * edits a state it's given, and nobody may edit one after applyCommand returned it).
+ */
+let lastTable: { s: GameState; key: string } | null = null;
+function tableOf(s: GameState): string {
+  if (lastTable?.s !== s) lastTable = { s, key: tableKey(s) };
+  return lastTable.key;
+}
+
 function simulate(s: GameState, cmd: Command): GameState | null {
   const scrambled = { ...s, rng: (s.rng ^ 0x9e3779b9) >>> 0 };
   const r = applyCommand(scrambled, cmd);
@@ -599,12 +632,17 @@ function goals(s: GameState, u: Unit): Vec[] {
   return out;
 }
 
-/** The point `budget` inches along the planned route from `from` toward `goal` (or null if no route). */
-function alongRoute(s: GameState, u: Unit, from: { pos: Vec; elevation: 0 | 1 | 2 }, goal: Vec, budget: number): Vec | null {
+/** The planned route from `from` toward `goal` (null if there's none), for `alongRoute`. */
+function routeToward(s: GameState, u: Unit, from: { pos: Vec; elevation: 0 | 1 | 2 }, goal: Vec, enemies?: Placed[]): Route | null {
   // Bound the search: a detour much longer than the straight line isn't worth planning toward,
   // and an unbounded A* over every waypoint was most of the AI's thinking time on Assault boards.
-  const route = planRoute(s, u, from.pos, from.elevation, goal, undefined, dist(from.pos, goal) * 1.5 + 4);
-  if (typeof route === "string") return null;
+  const route = planRoute(s, u, from.pos, from.elevation, goal, enemies, dist(from.pos, goal) * 1.5 + 4);
+  return typeof route === "string" ? null : route;
+}
+
+/** The point `budget` inches along `route` toward `goal` (or null if there's no route). */
+function alongRoute(route: Route | null, goal: Vec, budget: number): Vec | null {
+  if (!route) return null;
   if (route.length <= budget) return goal;
   const legSum = route.legs.reduce((a, l) => a + dist(l.from, l.to), 0);
   const climb = Math.max(0, route.length - legSum);
@@ -634,11 +672,14 @@ function moveCandidates(s: GameState, u: Unit, type: "move" | "advance" | "disen
     targets.push(p);
   };
   const nearestTo = (p: Vec) => models.reduce((a, b) => (dist(a.pos, p) < dist(b.pos, p) ? a : b));
+  // The enemy bases routes go around: the same for every goal (planRoute would gather them each time).
+  const enemies = allPlaced(s).filter((p) => p.owner !== u.owner);
   for (const g of goals(s, u).sort(frameOrder(s, u.owner))) {
     const leader = nearestTo(g);
     if (dist(leader.pos, g) <= mv) add(g);
-    add(alongRoute(s, u, leader, g, mv));
-    add(alongRoute(s, u, leader, g, mv * 0.55));
+    const route = routeToward(s, u, leader, g, enemies);
+    add(alongRoute(route, g, mv));
+    add(alongRoute(route, g, mv * 0.55));
   }
   const c = centroid(u);
   for (let i = 0; i < 8; i++) {
@@ -678,7 +719,7 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
     const base = evaluate(s, u.owner);
     return chargeCandidatesIn(sure, u).map((c): Candidate | null => {
       const e = s.units.find((x) => c.cmd.type === "charge" && x.uid === c.cmd.target)!;
-      const raw = rules.rolledCharges ? chargeNeed(s, u, e) : 0;
+      const raw = rules.rolledCharges ? chargeNeed(s, u, e, tableOf(s)) : 0;
       // Pirouette: the target steps up to 3" away before the roll (the "sure" look-ahead can't show it).
       const dodge = rules.rolledCharges && reacts(e, "pirouette") && !e.reactionsUsed.includes("pirouette") && !isEngaged(s, e) ? (ABILITIES.pirouette.range ?? 3) : 0;
       const need = raw === null ? null : raw + dodge;
@@ -1281,6 +1322,7 @@ const SUPPORT_THRESHOLD = 1.8;
 
 /** The most useful support play right now, if any is clearly worth its CP. Supports are free actions. */
 export function aiSupportCommand(s: GameState): Command | null {
+  lastTable = null; // only trusted within one decision
   const me = s.activePlayer;
   const pl = s.players[me];
   const mine = onBoard(s, me);
@@ -1528,7 +1570,7 @@ export function aiSupportCommand(s: GameState): Command | null {
               if (isFlying(t) || !meleeWeapons(u).some((w) => meleeCanHit(u, t, w.targets))) continue;
               const strike = attackValue(s, t, chargeDamage(u, t, 0));
               if (s.phase === "assault" && rulesOf(s).rolledCharges) {
-                const need = chargeNeed(s, u, t);
+                const need = chargeNeed(s, u, t, tableOf(s));
                 const gap = unitGap(u, t);
                 if (need === null && gap > ROLLED_CHARGE_MAX + chargeBonus(s, u) + e.move) continue;
                 const before = need === null ? 0 : twoDiceAtLeast(need);
@@ -1772,6 +1814,7 @@ function abilityOfCard(id: string) {
 
 /** The AI's next command for the active player. Always returns something legal (falls back to pass). */
 export function aiCommand(s: GameState): Command {
+  lastTable = null; // only trusted within one decision
   const me = s.activePlayer;
   // Order choice: moving second lets us react to the opponent, which tests show is the stronger seat.
   if (s.orderChoice) return { type: "chooseOrder", player: s.orderChoice.player, goFirst: false };

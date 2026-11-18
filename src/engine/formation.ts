@@ -376,15 +376,45 @@ function findSpot(c: SpotContext, f: Model, want: Vec): Vec | null {
    */
   const tryBest = (cands: Cand[]): Vec | null => {
     let travelling = false;
+    // Lowest score first, the earliest of equals first: a binary heap of candidate indexes.
+    const before = (a: number, b: number): boolean => cands[a]!.sc < cands[b]!.sc || (cands[a]!.sc === cands[b]!.sc && a < b);
+    let heap: number[] = [];
+    const down = (i: number): void => {
+      for (;;) {
+        const l = 2 * i + 1;
+        const r = l + 1;
+        let m = i;
+        if (l < heap.length && before(heap[l]!, heap[m]!)) m = l;
+        if (r < heap.length && before(heap[r]!, heap[m]!)) m = r;
+        if (m === i) return;
+        [heap[i], heap[m]] = [heap[m]!, heap[i]!];
+        i = m;
+      }
+    };
+    /** Untried candidates (tried ones are scored Infinity, as are any that can never come first). */
+    const build = (): void => {
+      heap = [];
+      cands.forEach((x, i) => {
+        if (x.sc < Infinity) heap.push(i);
+      });
+      for (let i = (heap.length >> 1) - 1; i >= 0; i--) down(i);
+    };
+    build();
     for (let left = cands.length; left > 0; left--) {
       if (routeTries >= MAX_ROUTE_TRIES && !opts.teleport) return null;
       if (unreachable && !travelling) {
         travelling = true;
         for (const x of cands) x.sc += TRAVEL * dist(x.p, f.pos);
+        build();
       }
-      let best: Cand | undefined;
-      for (const x of cands) if (x.sc < (best?.sc ?? Infinity)) best = x;
-      if (!best) return null;
+      if (!heap.length) return null;
+      const top = heap[0]!;
+      const last = heap.pop()!;
+      if (heap.length) {
+        heap[0] = last;
+        down(0);
+      }
+      const best = cands[top]!;
       best.sc = Infinity;
       if (tryAt(best.p, best.chained)) return best.p;
     }
