@@ -141,8 +141,8 @@ describe("factionProblems", () => {
     g.profiles[0]!.cost = 20;
     expect(has(factionProblems(g), "over the limit of 30")).toBe(true);
     const h = builtIn("militia");
-    h.supports.find((x) => x.id === h.defaultSupports[0])!.fizz = 9; // with a 3-Fizz second card: 12
-    expect(has(factionProblems(h), "Skirmish starter supports: cost ✦12 Fizz")).toBe(true);
+    h.supports.find((x) => x.id === h.defaultSupports[0])!.fizz = 9; // with a 4-Fizz second card: 13
+    expect(has(factionProblems(h), "Skirmish starter supports: cost ✦13 Fizz")).toBe(true);
     const k = builtIn("militia");
     k.defaultList = [];
     expect(has(factionProblems(k), "add at least one unit")).toBe(true);

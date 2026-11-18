@@ -67,28 +67,28 @@ describe("calibration against the built-in factions", () => {
     );
   }
 
-  // The weights were fitted at 0.28 (units) and 0.14 (supply). Since then the ability pass gave
-  // units new abilities and the medic became a team of three, without re-pricing the built-ins
-  // (that's the next balance pass's job), so the hand-set costs have drifted: every unit is still
-  // within 1. Tighten these again once the built-in costs are re-set.
+  // The weights were fitted at 0.28 (units) and 0.14 (supply), before the ability pass. The v0.11
+  // balance pass took the computed Fizz for every card and the computed cost for upgrades no starter
+  // list uses, but kept hand-set unit costs where the sims back them (see the comments in
+  // data/factions.ts and docs/rules.md): MAE 0.38 units, 0.21 supply, 0.19 upgrades, 0 supports.
   it("lands unit costs close to the hand-set ones", () => {
-    expect(mean(unitErr.map(Math.abs))).toBeLessThanOrEqual(0.45);
+    expect(mean(unitErr.map(Math.abs))).toBeLessThanOrEqual(0.4);
     expect(Math.max(...unitErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 
   it("derives supply close to the hand-set one", () => {
-    expect(mean(supplyErr.map(Math.abs))).toBeLessThanOrEqual(0.3);
+    expect(mean(supplyErr.map(Math.abs))).toBeLessThanOrEqual(0.22);
     expect(Math.max(...supplyErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 
   it("prices upgrades close to the hand-set costs", () => {
-    expect(mean(upgradeErr.map(Math.abs))).toBeLessThanOrEqual(0.35);
+    expect(mean(upgradeErr.map(Math.abs))).toBeLessThanOrEqual(0.2);
     // Only Tunnel Claws (hand-priced at 4 to keep a cross-board monster honest) is off by more than 1.
     expect(upgradeErr.filter((e) => Math.abs(e) > 1)).toHaveLength(1);
   });
 
-  it("prices support cards close to the hand-set Fizz", () => {
-    expect(mean(fizzErr.map(Math.abs))).toBeLessThanOrEqual(0.2);
+  it("prices support cards at the hand-set Fizz", () => {
+    expect(mean(fizzErr.map(Math.abs))).toBeLessThanOrEqual(0.05);
     expect(Math.max(...fizzErr.map(Math.abs))).toBeLessThanOrEqual(1);
   });
 
