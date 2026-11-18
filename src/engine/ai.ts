@@ -34,6 +34,7 @@ import {
   engagedWith,
   isEngaged,
   meleeCanHit,
+  allObjectivePresence,
   objectivePresence,
   onBoard,
   presenceController,
@@ -258,21 +259,42 @@ function onObjective(s: GameState, u: Unit): boolean {
 
 // ---------- evaluation ----------
 
+/**
+ * [unitGap(a, b), unitGap(b, a)] in one pass: the same sums in the same order as unitGap's (the
+ * centre distance is the same either way round), so the same numbers.
+ */
+function gapsBetween(a: Unit, b: Unit): [number, number] {
+  const ra = profileOf(a).baseRadius;
+  const rb = profileOf(b).baseRadius;
+  let ab = Infinity;
+  let ba = Infinity;
+  for (const am of a.models) {
+    if (!am.alive) continue;
+    for (const bm of b.models) {
+      if (!bm.alive) continue;
+      const d = dist(am.pos, bm.pos);
+      ab = Math.min(ab, d - ra - rb);
+      ba = Math.min(ba, d - rb - ra);
+    }
+  }
+  return [ab, ba];
+}
+
 /** Static evaluation from `me`'s point of view. */
 export function evaluate(s: GameState, me: PlayerId): number {
   const them = other(me);
   let score = (s.players[me].vp - s.players[them].vp) * VP;
   if (s.over) return s.winner === me ? 1000 + score : s.winner === them ? -1000 + score : score;
   // Pure lookups asked many times per call (per unit and objective): work each out once.
+  // controlOf for every objective (presenceController, else a sticky objective's owner).
+  const presence = allObjectivePresence(s);
+  const sticky = isSticky(s);
   const control = new Map<Objective, PlayerId | null>();
-  const controlOfHere = (o: Objective): PlayerId | null => {
-    let c = control.get(o);
-    if (c === undefined) {
-      c = controlOf(s, o);
-      control.set(o, c);
-    }
-    return c;
-  };
+  s.objectives.forEach((o, i) => {
+    const [a, b] = presence[i]!;
+    control.set(o, a > b ? 0 : b > a ? 1 : sticky ? o.controller : null);
+  });
+  const controlOfHere = (o: Objective): PlayerId | null => control.get(o)!;
   const worthMemo: [Map<Objective, number>, Map<Objective, number>] = [new Map(), new Map()];
   const worth = (o: Objective, p: PlayerId): number => {
     let w = worthMemo[p].get(o);
@@ -284,13 +306,13 @@ export function evaluate(s: GameState, me: PlayerId): number {
   };
 
   // Objectives: worth the VP they'll score.
-  for (const o of s.objectives) {
+  for (const [i, o] of s.objectives.entries()) {
     const c = controlOfHere(o);
     if (c === me) score += worth(o, me);
     else if (c === them) score -= worth(o, them);
     else {
       // Contested: a little credit for having a foot in the door.
-      const [a, b] = objectivePresence(s, o);
+      const [a, b] = presence[i]!;
       const mine = me === 0 ? a : b;
       if (mine > 0) score += worth(o, me) * 0.25;
     }
@@ -352,27 +374,29 @@ export function evaluate(s: GameState, me: PlayerId): number {
       }
       if (best < Infinity) score -= best * (isMeleeUnit(u) ? 0.12 : 0.22);
     }
+    // unitGap(u, e) and unitGap(e, u) for every enemy, in one pass over the model pairs.
+    const gaps = enemies.map((e) => gapsBetween(u, e));
     if (enemies.length) {
       const ranged = rangedWeapons(u);
       if (ranged.length) {
         const range = Math.max(...ranged.map((w) => w.range));
-        const targetable = enemies.filter((e) => ranged.some((w) => (isFlying(e) ? w.targets !== "ground" : w.targets !== "air")));
+        const targetable = enemies.flatMap((e, i) => (ranged.some((w) => (isFlying(e) ? w.targets !== "ground" : w.targets !== "air")) ? [i] : []));
         if (targetable.length) {
-          const gap = Math.min(...targetable.map((e) => unitGap(u, e)));
+          const gap = Math.min(...targetable.map((i) => gaps[i]![0]));
           score -= Math.max(0, gap - range + 1) * 0.12;
         }
       }
       if (isMeleeUnit(u) || flying) {
-        const reachable = enemies.filter((e) => divesAt(u, e) || meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)));
+        const reachable = enemies.flatMap((e, i) => (divesAt(u, e) || meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets)) ? [i] : []));
         if (reachable.length) {
-          const gap = Math.min(...reachable.map((e) => unitGap(u, e)));
+          const gap = Math.min(...reachable.map((i) => gaps[i]![0]));
           score -= Math.max(0, gap - prof.move) * 0.18;
         }
       }
     }
     let threat = 0;
-    enemies.forEach((e, i) => {
-      if (unitGap(e, u) <= enemyReach[i]!) threat += enemyFire[i]!;
+    enemies.forEach((_, i) => {
+      if (gaps[i]![1] <= enemyReach[i]!) threat += enemyFire[i]!;
     });
     const cover = u.status.hunkered ? 0.75 : 1;
     score -= Math.min(threat * cover, wounds(u)) * (valuePerWound(u) / MATERIAL) * 0.15;
@@ -498,6 +522,8 @@ interface Candidate {
   stack?: boolean;
   /** Valued by expectation in `bonus` only (no simulated dice or status changes in the evaluation). */
   expected?: boolean;
+  /** The state `simulate` gave for `cmd` while the candidate was built (so it needn't be simulated again on that same state). */
+  after?: GameState;
 }
 
 /**
@@ -508,6 +534,13 @@ let lastTable: { s: GameState; key: string } | null = null;
 function tableOf(s: GameState): string {
   if (lastTable?.s !== s) lastTable = { s, key: tableKey(s) };
   return lastTable.key;
+}
+
+/** `evaluate(s, me)` for the state the AI is deciding on, worked out once (same trust as `tableOf`). */
+let lastEval: { s: GameState; me: PlayerId; v: number } | null = null;
+function baseEval(s: GameState, me: PlayerId): number {
+  if (lastEval?.s !== s || lastEval.me !== me) lastEval = { s, me, v: evaluate(s, me) };
+  return lastEval.v;
 }
 
 function simulate(s: GameState, cmd: Command): GameState | null {
@@ -716,7 +749,7 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
   // then weigh it by the odds of the roll and the overwatch it will face.
   if (rules.rolledCharges || rules.overwatch) {
     const sure: GameState = { ...s, rules: { ...rules, overwatch: false }, aiAssumeChargesLand: true };
-    const base = evaluate(s, u.owner);
+    const base = baseEval(s, u.owner);
     return chargeCandidatesIn(sure, u).map((c): Candidate | null => {
       const e = s.units.find((x) => c.cmd.type === "charge" && x.uid === c.cmd.target)!;
       const raw = rules.rolledCharges ? chargeNeed(s, u, e, tableOf(s)) : 0;
@@ -725,7 +758,7 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
       const need = raw === null ? null : raw + dodge;
       if (need === null || need > ROLLED_CHARGE_MAX) return null;
       const odds = rules.rolledCharges ? twoDiceAtLeast(need) : 1;
-      const after = simulate(sure, c.cmd);
+      const after = c.after ?? simulate(sure, c.cmd);
       const position = after ? evaluate(after, u.owner) - base : 0;
       const ow = rules.overwatch ? overwatchPlan(s, e, u) : null;
       const shot = ow ? expectedDamage(s, e, u, ow.plan, false) * valuePerWound(u) : 0;
@@ -750,7 +783,7 @@ function chargeCandidatesIn(s: GameState, u: Unit): Candidate[] {
     const me = after.units.find((x) => x.uid === u.uid)!;
     const them = after.units.find((x) => x.uid === e.uid)!;
     if (me.destroyed || them.destroyed) {
-      out.push({ cmd, bonus: 0 });
+      out.push({ cmd, bonus: 0, after });
       continue;
     }
     if (dive) {
@@ -758,7 +791,7 @@ function chargeCandidatesIn(s: GameState, u: Unit): Candidate[] {
       const exp = imp ? expectedDamage(after, me, them, imp, true) : 0;
       // Eye Peck: a dive on a gun that hasn't fired yet this round puts it off its aim.
       const peck = exp > 0 && reacts(u, "eye-peck") && !e.status.blinded && !e.status.acted && rangedWeapons(e).length ? Math.min(2.5, firepower(e) * 0.8) * Math.min(1, exp) : 0;
-      out.push({ cmd, bonus: imp ? attackValue(after, them, exp) + peck : 0 });
+      out.push({ cmd, bonus: imp ? attackValue(after, them, exp) + peck : 0, after });
       continue;
     }
     let best = 0;
@@ -778,7 +811,7 @@ function chargeCandidatesIn(s: GameState, u: Unit): Candidate[] {
     const survive = 1 - Math.min(1, best / Math.max(1, wounds(them)));
     // Tying up a shooter in melee also stops it shooting next round.
     const tieUp = rangedWeapons(them).length ? firepower(them) * valuePerWound(u) * 0.2 : 0;
-    out.push({ cmd, bonus: attackValue(after, them, best) - back * survive * valuePerWound(me) * 0.8 + tieUp });
+    out.push({ cmd, bonus: attackValue(after, them, best) - back * survive * valuePerWound(me) * 0.8 + tieUp, after });
   }
   return out;
 }
@@ -1322,7 +1355,7 @@ const SUPPORT_THRESHOLD = 1.8;
 
 /** The most useful support play right now, if any is clearly worth its CP. Supports are free actions. */
 export function aiSupportCommand(s: GameState): Command | null {
-  lastTable = null; // only trusted within one decision
+  lastTable = lastEval = null; // only trusted within one decision
   const me = s.activePlayer;
   const pl = s.players[me];
   const mine = onBoard(s, me);
@@ -1412,7 +1445,7 @@ export function aiSupportCommand(s: GameState): Command | null {
       } else if (e.kind === "teleport") {
         // Gate Step in the movement phase, Flash Step in the assault phase (then shoot or charge).
         if (s.phase === "combat") continue;
-        const evalBase = evaluate(s, me);
+        const evalBase = baseEval(s, me);
         for (const u of mine) {
           if (profileOf(u).structure || isEngaged(s, u) || u.status.acted) continue;
           const leader = aliveModels(u)[0]!;
@@ -1814,14 +1847,14 @@ function abilityOfCard(id: string) {
 
 /** The AI's next command for the active player. Always returns something legal (falls back to pass). */
 export function aiCommand(s: GameState): Command {
-  lastTable = null; // only trusted within one decision
+  lastTable = lastEval = null; // only trusted within one decision
   const me = s.activePlayer;
   // Order choice: moving second lets us react to the opponent, which tests show is the stronger seat.
   if (s.orderChoice) return { type: "chooseOrder", player: s.orderChoice.player, goFirst: false };
   const support = aiSupportCommand(s);
   if (support) return support;
   const candidates = candidatesFor(s, me);
-  const base = evaluate(s, me);
+  const base = baseEval(s, me);
   const baseFollow = new Map<string, number>();
   const followBefore = (uid: string): number => {
     let v = baseFollow.get(uid);

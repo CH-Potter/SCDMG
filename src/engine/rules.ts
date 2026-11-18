@@ -155,6 +155,23 @@ export function objectivePresence(s: GameState, o: Objective): [number, number] 
   return v;
 }
 
+/** `objectivePresence` for every objective at once (one pass over the units; the same sums). */
+export function allObjectivePresence(s: GameState): [number, number][] {
+  const out = s.objectives.map((): [number, number] => [0, 0]);
+  for (const u of s.units) {
+    if (!u.onBoard || u.destroyed || isFlying(u) || profileOf(u).structure || u.status.shaken) continue;
+    const r = radiusOf(u);
+    let weight: number | undefined;
+    s.objectives.forEach((o, i) => {
+      if (aliveModels(u).some((m) => m.elevation === o.elevation && dist(m.pos, o.pos) <= o.radius + r + EPS)) {
+        weight ??= controlWeight(u);
+        out[i]![u.owner] += weight;
+      }
+    });
+  }
+  return out;
+}
+
 /** Who holds an objective right now (more supply on it), or null if empty/tied. */
 export function presenceController(s: GameState, o: Objective): PlayerId | null {
   const [a, b] = objectivePresence(s, o);

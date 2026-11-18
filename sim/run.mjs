@@ -61,16 +61,20 @@ const text = `${r.stdout ?? ""}${r.stderr ?? ""}`;
 writeFileSync(log, text);
 const wall = ((Date.now() - t0) / 1000).toFixed(0);
 const lines = text.split(/\r?\n/);
+/** The first line matching `re` and up to `after` lines after it, stopping at a blank line. */
 const pick = (re, after = 0) => {
   const i = lines.findIndex((l) => re.test(l));
-  return i < 0 ? [] : lines.slice(i, i + 1 + after);
+  if (i < 0) return [];
+  const out = [lines[i]];
+  for (let k = i + 1; k <= i + after && k < lines.length && lines[k].trim(); k++) out.push(lines[k]);
+  return out;
 };
 if (!existsSync(out)) {
   console.log(lines.filter((l) => /error|fail|timed out/i.test(l)).slice(0, 20).join("\n"));
   console.log(`sim failed after ${wall}s: no results (full log: ${log})`);
   process.exit(1);
 }
-if (!flag("quiet")) console.log([...pick(/^faction\s+games/, 3), "", ...pick(/^pairing \(A vs B\)/, 3)].join("\n"));
+if (!flag("quiet")) console.log([...pick(/^faction\s+games/, 30), "", ...pick(/^pairing \(A vs B\)/, 30)].join("\n"));
 console.log([...pick(/^reference check/, 40), ...pick(/^wall time/)].join("\n"));
 if (golden && update) {
   writeFileSync(goldenFile, goldenText(toGolden(JSON.parse(readFileSync(out, "utf8")))));

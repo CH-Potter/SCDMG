@@ -181,7 +181,6 @@ function firstObstruction(s: GameState, from: Vec, target: Unit, tm: Model, shoo
 }
 
 export interface Placed {
-  key: string; // `${uid}:${modelId}`
   uid: string;
   owner: PlayerId;
   pos: Vec;
@@ -198,7 +197,7 @@ export function allPlaced(s: GameState): Placed[] {
     if (!u.onBoard) continue;
     const r = profileOf(u).baseRadius;
     for (const m of u.models) {
-      if (m.alive) out.push({ key: modelKey(u, m), uid: u.uid, owner: u.owner, pos: m.pos, elevation: m.elevation, radius: r });
+      if (m.alive) out.push({ uid: u.uid, owner: u.owner, pos: m.pos, elevation: m.elevation, radius: r });
     }
   }
   return out;
@@ -260,7 +259,14 @@ function terrainLegError(s: GameState, from: Vec, to: Vec, elevation: Elevation,
 
 /** Does an enemy base (on the leg's level) stand in the way of this leg? */
 function enemyLegClear(from: Vec, to: Vec, r: number, levelEnemies: Placed[]): boolean {
+  const x0 = Math.min(from.x, to.x);
+  const x1 = Math.max(from.x, to.x);
+  const y0 = Math.min(from.y, to.y);
+  const y1 = Math.max(from.y, to.y);
   for (const e of levelEnemies) {
+    const reach = r + e.radius;
+    // Further than `reach` from the leg's bounding box: further than that from the leg, so clear.
+    if (e.pos.x < x0 - reach || e.pos.x > x1 + reach || e.pos.y < y0 - reach || e.pos.y > y1 + reach) continue;
     if (pointSegmentDistance(e.pos, from, to) < r + e.radius - EPS) return false;
   }
   return true;

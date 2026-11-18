@@ -7,7 +7,21 @@ const cache = new Map<string, UnitProfile>();
 /** Fast path: a unit's upgrade list is never edited in place, so its identity is a good cache key. */
 const byList = new WeakMap<string[], { profileId: string; profile: UnitProfile }>();
 
+/** The last answer, checked first: callers tend to ask about the same unit many times in a row. */
+let lastUpgrades: string[] | null = null;
+let lastId = "";
+let lastProfile: UnitProfile | null = null;
+
 export function profileFor(profileId: string, upgrades: string[]): UnitProfile {
+  if (upgrades === lastUpgrades && profileId === lastId) return lastProfile!;
+  const p = lookupProfile(profileId, upgrades);
+  lastUpgrades = upgrades;
+  lastId = profileId;
+  lastProfile = p;
+  return p;
+}
+
+function lookupProfile(profileId: string, upgrades: string[]): UnitProfile {
   const quick = byList.get(upgrades);
   if (quick && quick.profileId === profileId) return quick.profile;
   const key = upgrades.length === 0 ? profileId : `${profileId}|${[...upgrades].sort().join(",")}`;
@@ -50,4 +64,5 @@ export const reacts = (u: Unit, a: AbilityId): boolean => !u.status.silenced && 
 /** Forget cached effective profiles (call after custom factions are re-registered). */
 export function clearProfileCache(): void {
   cache.clear();
+  lastUpgrades = null;
 }

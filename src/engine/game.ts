@@ -702,7 +702,7 @@ export function planCloseRanks(s: GameState, unit: Unit, target: Unit): { id: nu
   for (const m of mine.filter((x) => !inContact(x)).sort((a, b) => nearest(a) - nearest(b))) {
     const obstacles: Placed[] = [
       ...others,
-      ...mine.filter((x) => x.id !== m.id).map((x) => ({ key: `${unit.uid}:${x.id}`, uid: unit.uid, owner: unit.owner, pos: posOf.get(x.id)!, elevation: x.elevation, radius: ra })),
+      ...mine.filter((x) => x.id !== m.id).map((x) => ({ uid: unit.uid, owner: unit.owner, pos: posOf.get(x.id)!, elevation: x.elevation, radius: ra })),
     ];
     const rings: { centre: Vec; r: number; rank: number }[] = tms.filter((tm) => tm.elevation === m.elevation).map((tm) => ({ centre: tm.pos, r: ra + rt + 0.05, rank: 0 }));
     if (support) for (const f of mine) if (f.id !== m.id && f.elevation === m.elevation && inContact(f)) rings.push({ centre: posOf.get(f.id)!, r: 2 * ra + 0.05, rank: 1 });
@@ -1280,7 +1280,7 @@ function slideUnit(s: GameState, t: Unit, dir: Vec, max: number, through: boolea
         ok = false;
         break;
       }
-      placed.push({ key: `${t.uid}:${m.id}`, uid: t.uid, owner: t.owner, pos: to, elevation: m.elevation, radius: r });
+      placed.push({ uid: t.uid, owner: t.owner, pos: to, elevation: m.elevation, radius: r });
       moves.push({ m, to });
     }
     if (!ok) continue;

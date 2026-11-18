@@ -43,6 +43,17 @@ VITEST_SIM=1 SIM_MODE=assault SIM_SEEDS=3 npx vitest run sim/ai-sim.test.ts --si
 
 `SIM_MODE` is `skirmish` or `assault`; `SIM_FACTIONS`, `SIM_MAPS` and `SIM_OPEN=1` narrow it further. Run one sim at a time. In a pull request that changes balance, include the win rates before and after.
 
+`sim/run.mjs` wraps the same sim with flags, keeps each run's results and report in `sim/out/`, and prints the pairing tables at the end (`sim/summary.mjs` prints them, and per-unit and ability-use tables, from any results file):
+
+```bash
+npm run sim:quick                                   # Skirmish, 1 seed: the first look at a change
+npm run sim:quick -- --factions concord,munch       # one pairing
+node sim/run.mjs --mode assault --seeds 3 --vs sim/out/<before>.json   # full run, with the change per pairing
+node sim/summary.mjs sim/out/<run>.json --pair concord-munch           # VP sources, missions, maps, seeds, units
+```
+
+Engine or AI changes that shouldn't change what the AI decides (refactors, speed-ups) can be checked with `npm run sim:golden`: it plays a fixed cross-section of both modes and fails if any game plays differently from `sim/golden.json` (same commands, same final state). For a bigger check, run the full sim before and after with `--tag before` / `--ref sim/out/before.json`. If a change is meant to alter the AI, rewrite the golden file with `npm run sim:golden -- --update`.
+
 ## Pull requests
 
 1. Fork the repo and create a branch from `main`.

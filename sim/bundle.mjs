@@ -30,7 +30,7 @@ export async function bundlePlay(dataDir = process.env.SIM_DATA_DIR) {
       minify: false,
       sourcemap: false,
       reportCompressedSize: false,
-      rollupOptions: { output: { format: "es", entryFileNames: "play.mjs" } },
+      rolldownOptions: { output: { format: "es", entryFileNames: "play.mjs" } },
     },
   });
   return pathToFileURL(join(outDir, "play.mjs")).href;
