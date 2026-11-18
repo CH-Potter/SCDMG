@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { playAiTurn } from "../src/engine/ai";
-import { breachFor, expectedBreach, expectedDamage, nerveTest, planMelee, planShooting, resolveAttack, scatterShell, strayTarget } from "../src/engine/combat";
+import { breachFor, evadeVsShot, expectedBreach, expectedDamage, nerveTest, planMelee, planShooting, resolveAttack, scatterShell, strayTarget } from "../src/engine/combat";
 import { applyCommand, createGame, planCloseRanks, type GameSetup } from "../src/engine/game";
 import { CLASSIC_RULES, cleanRules, HOUSE_RULES, rulesOf, rulesSummary, STANDARD_RULES, type HouseRules } from "../src/engine/houseRules";
 import { planUnitMove } from "../src/engine/formation";
@@ -244,6 +244,55 @@ describe("house rules: charges", () => {
     const ow = r.events.find((e) => e.type === "attack" && e.report.kind === "overwatch");
     expect(ow?.type === "attack" && ow.report.uid).toBe(guard.uid);
     expect(ow?.type === "attack" && ow.report.hitOn).toBe(6);
+  });
+});
+
+describe("house rules: evade in the scrum", () => {
+  /** Skitterlings (evade 5+ vs point-blank and blasts only) in a melee with Grunts, and a Marksman shooting in from outside. */
+  function scrum(rules: Partial<HouseRules>) {
+    const s = createGame({
+      factions: ["militia", "swarm"],
+      seed: 4,
+      rules,
+      lists: [
+        [
+          { profileId: "mil-grunts", upgrades: [] },
+          { profileId: "mil-squinter", upgrades: [] },
+        ],
+        [{ profileId: "swarm-skitterlings", upgrades: [] }],
+      ],
+    });
+    s.terrain = [];
+    s.orderChoice = null;
+    const grunts = s.units.find((u) => u.profileId === "mil-grunts")!;
+    const marksman = s.units.find((u) => u.profileId === "mil-squinter")!;
+    const bugs = s.units.find((u) => u.profileId === "swarm-skitterlings")!;
+    place(s, grunts, { x: 15, y: 15 });
+    const reach = profileOf(grunts).baseRadius + profileOf(bugs).baseRadius + 0.3;
+    place(s, bugs, { x: 15, y: 15 + reach + 2 * profileOf(grunts).baseRadius + 0.1 });
+    place(s, marksman, { x: 15, y: 6 });
+    s.phase = "assault";
+    s.activePlayer = 0;
+    return { s, grunts, marksman, bugs };
+  }
+
+  it("lets an engaged unit roll its own evade against a shot from outside the melee", () => {
+    const on = scrum({});
+    expect(STANDARD_RULES.engagedEvade).toBe(true);
+    const gun = (b: ReturnType<typeof scrum>) => profileOf(b.marksman).weapons.find((w) => !w.melee)!;
+    const planOn = planShooting(on.s, on.marksman, on.bugs, gun(on));
+    if (typeof planOn === "string") throw new Error(planOn);
+    expect(planOn.evadeOn).toBe(profileOf(on.bugs).evade!.target); // its card only lists point-blank and blasts
+    const off = scrum({ engagedEvade: false });
+    const planOff = planShooting(off.s, off.marksman, off.bugs, gun(off));
+    if (typeof planOff === "string") throw new Error(planOff);
+    expect(planOff.evadeOn).toBeNull();
+  });
+
+  it("gives nothing to an engaged unit with no evade on its card", () => {
+    const { s, grunts } = scrum({});
+    expect(profileOf(grunts).evade).toBeUndefined();
+    expect(evadeVsShot(s, grunts, ["ranged"])).toBeNull(); // engaged, but no evade to roll
   });
 });
 

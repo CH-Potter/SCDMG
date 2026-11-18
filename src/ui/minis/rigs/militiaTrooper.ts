@@ -24,8 +24,8 @@ import scatterTop from "../parts/militia/trooper-top/scatter.svg?raw";
 import gauntletTop from "../parts/militia/trooper-top/gauntlet.svg?raw";
 import type { PartUse, RigDef } from "../types";
 
-/** Design units per board inch: a 0.5" base radius is 34 u, and the trooper stands about 2.4". */
-const UPI = 68;
+/** Design units per board inch: the trooper (about 163 u) stands about 1.55" on its base, close to the Classic figure (was 68 u/in, 2.4"). */
+const UPI = 105;
 const MILITIA_GROUND = "#4f4a41";
 
 /** Weapons the line trooper's frame can carry: where each sits in the hands (frame rest coords). */

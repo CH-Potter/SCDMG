@@ -413,7 +413,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const report = pushAttack(events, (ev) => resolveAttack(s, unit, target, w.name, plan, "shoot", ev));
       const misses = reportMisses(report);
       if (friend && misses > 0 && friend.onBoard && aliveModels(friend).length) {
-        pushAttack(events, (ev) => resolveAttack(s, unit, friend, `${w.name} (stray)`, strayPlan(friend, plan, misses), "shoot", ev));
+        pushAttack(events, (ev) => resolveAttack(s, unit, friend, `${w.name} (stray)`, strayPlan(s, friend, plan, misses), "shoot", ev));
       }
       // Return Fire: a target the shot hurt (but didn't finish) shoots back.
       if (report.damage > 0 && !target.destroyed) returnFire(s, target, unit, events);

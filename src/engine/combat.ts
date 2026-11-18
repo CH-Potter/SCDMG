@@ -140,6 +140,21 @@ export function evadeTarget(t: Unit, conditions: EvadeCondition[]): number | nul
   return Math.max(2, Math.min(6, ev.target - (t.status.evadeBonus ?? 0)));
 }
 
+/** A unit's own evade number (with buffs), in any situation, or null if its card has no evade. */
+export function ownEvade(t: Unit): number | null {
+  const ev = profileOf(t).evade;
+  return ev ? Math.max(2, Math.min(6, ev.target - (t.status.evadeBonus ?? 0))) : null;
+}
+
+/**
+ * The evade a shot's target rolls. With the "Evade in the scrum" house rule, a unit in a melee rolls
+ * its own evade against any shot (blasts and barrages still go by its card's situations).
+ */
+export function evadeVsShot(s: GameState, t: Unit, conditions: EvadeCondition[], kind: AttackKind = "shoot"): number | null {
+  if (rulesOf(s).engagedEvade && kind !== "barrage" && isEngaged(s, t)) return ownEvade(t);
+  return evadeTarget(t, conditions);
+}
+
 /** The situations a shot counts as for evade, or null when it allows none (point-blank pistol shots). */
 export function shotConditions(s: GameState, a: Unit, t: Unit, w: Weapon, kind: AttackKind): EvadeCondition[] | null {
   const pointBlank = kind !== "barrage" && isEngaged(s, a) && unitsEngage(a, t);
@@ -233,7 +248,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     rending: hasTrait(w, "rending"),
     precision: precisionOf(a, w),
     tracking: trackingOf(a, w),
-    evadeOn: conditions && rules.evade ? evadeTarget(t, conditions) : null,
+    evadeOn: conditions && rules.evade ? evadeVsShot(s, t, conditions, kind) : null,
     ...(indirect ? { indirect: true } : {}),
     ...(breach && !indirect ? { breach } : {}),
   };
@@ -704,14 +719,14 @@ export function strayTarget(s: GameState, a: Unit, t: Unit, w: Weapon): Unit | n
 }
 
 /** Every missed die rolls again at the friend in the melee, as the same shot. */
-export function strayPlan(friend: Unit, plan: AttackPlan, misses: number): AttackPlan {
+export function strayPlan(s: GameState, friend: Unit, plan: AttackPlan, misses: number): AttackPlan {
   return {
     attackers: [{ model: plan.attackers[0]!.model, dice: misses }],
     targets: aliveModels(friend),
     hitOn: plan.hitOn,
     damage: plan.damage,
     ap: plan.ap,
-    evadeOn: evadeTarget(friend, ["ranged"]),
+    evadeOn: rulesOf(s).evade ? evadeVsShot(s, friend, ["ranged"]) : null,
   };
 }
 
@@ -724,7 +739,7 @@ export function expectedStray(s: GameState, a: Unit, t: Unit, w: Weapon, plan: A
   if (!friend) return null;
   const dice = plan.attackers.reduce((n, x) => n + x.dice, 0);
   const misses = dice * (1 - pAtLeast(plan.hitOn));
-  const fp = strayPlan(friend, plan, Math.max(1, Math.round(misses)));
+  const fp = strayPlan(s, friend, plan, Math.max(1, Math.round(misses)));
   const perDie = expectedDamage(s, a, friend, fp, false) / Math.max(1, Math.round(misses));
   return { friend, damage: perDie * misses };
 }

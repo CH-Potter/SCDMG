@@ -135,6 +135,7 @@ Every attack, ranged or melee, runs the same sequence:
 - **Shooting into a melee:** an unengaged unit may shoot an enemy unit that is in a melee. With **precision 1+** (from the weapon or a buff) it picks the target out cleanly. Without precision, resolve the shot as normal, then **every missed die rolls again, as the same shot, at your own unit in that melee** (the one nearest the shooter), with its evade and saves. Lobbed shells (indirect fire) don't stray this way: their burst hits whoever is under it.
 - **Shooting out of a melee:** an engaged unit can only shoot at a unit it is directly engaged with. It may do so in the assault phase with any ranged weapon.
 - **Point-blank shots** let the target use its point-blank (or ranged) evade. **Pistols** are built for this: point-blank pistol shots can't be evaded.
+- **Evade in the scrum** (a core house rule, on in the standard game): any shot at a unit that is in a melee, point-blank or from outside the melee, lets it roll **its own evade** against each hit, whatever situations its card lists; then it saves against the hits left. A unit with no evade on its card gets no roll. The exceptions stay: point-blank pistol shots can't be evaded, and blasts and barrages still go by the situations on the card. Your own unit hit by stray shots in a melee gets the same roll.
 
 ## Keywords (rock–paper–scissors, but soft)
 
@@ -385,6 +386,7 @@ Pick these in the main menu (step 5, *House rules*). They're saved in your brows
 | Rolled charges | A charge reaches up to the unit's move and always arrives. |
 | Close ranks | Models fight from where they stand. |
 | Supporting rank | Only models in base contact with the enemy fight. |
+| Evade in the scrum | A unit in a melee only evades shots in the situations its card lists. |
 | Evade rolls | Every hit goes straight to a save. |
 | Stray shots into melee | You can shoot into a melee freely: misses never hit your own side. |
 | Impact on charge | Ground units roll no impact dice when a charge lands. A flyer's dive still strikes, since it's the flyer's whole attack. |
