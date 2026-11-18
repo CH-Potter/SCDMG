@@ -307,6 +307,11 @@ h3,
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  /* One piece: in a narrow card the badge drops to the next line whole rather than splitting its border. */
+  display: inline-block;
+  white-space: nowrap;
+  line-height: 1.4;
+  vertical-align: 0.1em;
 }
 
 .actions {

@@ -75,10 +75,10 @@ function defaults(): Prefs {
 
 const missionsFor = (mode: ModeId) => Object.values(MISSIONS).filter((m) => m.mode === mode);
 
-/** "⚙10 (+5/round) · ◆6 → 14" for one side's economy. */
+/** "⚙10 (+5/round) · ◆6 → 14" for one side's economy (HTML: each figure stays on one line in a narrow card). */
 const economyText = (m: MissionDef, p: 0 | 1) => {
   const e = economyOf(m, p);
-  return `⚙${e.startResources} (+${e.income}/round) · ◆${e.startSupply} → ${e.maxSupply}`;
+  return `<span class="nowrap">⚙${e.startResources} (+${e.income}/round)</span> · <span class="nowrap">◆${e.startSupply} → ${e.maxSupply}</span>`;
 };
 
 export function openMenu(host: HTMLElement, opts: MenuOptions): void {

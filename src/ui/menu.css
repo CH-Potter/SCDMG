@@ -458,3 +458,8 @@ button.mini.support-btn {
 .modal.menu .house-rule small {
   opacity: 0.8;
 }
+
+/* Keep a figure such as "◆8 → 14" together when a card's text wraps. */
+.modal.menu .nowrap {
+  white-space: nowrap;
+}
