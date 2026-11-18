@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 150 13 22" data-part="militia.trooper.side.shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shin plate</title>
+<path d="M66,152 L75,152 L74,170 L67,170 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70.5" cy="152" r="1"/></g>
+</svg>

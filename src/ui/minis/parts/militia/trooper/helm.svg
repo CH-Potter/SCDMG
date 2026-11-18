@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 23 43 39" data-part="militia.trooper.side.helm">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Domed mining helm: slit visor, headlamp, rebreather hose, team stripe</title>
+<path d="M66,55 Q76,60 81,66" fill="none" stroke="#25282c" stroke-width="6" stroke-linecap="round"/>
+<path d="M66,55 Q76,60 81,66" fill="none" stroke="#353b41" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="1.6 1.4"/>
+<path d="M49,43 L69,41 L70,54 Q60,59 50,56 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="55.6" cy="54.4" r="3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<path class="detail" d="M54,54.4 h3.2" stroke="#b9bfc4" stroke-width="0.9"/>
+<path class="glow" d="M51,46.6 L66,45.2 L66,48.4 L51,49.8 Z" fill="#f2b84b"/>
+<path class="glow" d="M53,48.1 L63.5,47.1" stroke="#fff2c0" stroke-width="1"/>
+<path d="M46,45 Q45,28 59,26.5 Q73,27.5 73,43 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,27.6 Q73,30 73,43 L67.6,43.6 Q69.4,34 66,27.6 Z" fill="#6c5a37"/>
+<path class="tag" d="M57,26.9 Q60,26.4 63,26.8 Q66,35 66.4,43.8 L61.4,44.3 Q61,35 57,26.9 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45,46 L73,42.5 L73.6,45.6 L45.4,49 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="52" cy="43.4" r="1" fill="#c8bd98"/><circle cx="70" cy="41.2" r="1" fill="#c8bd98"/><path d="M70,33 l2.2,2 l-2.2,1.2 Z" fill="#b9bfc4"/></g>
+<circle cx="50" cy="36" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="49.4" cy="36" r="2.7" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/><circle id="lamp" cx="47" cy="36" r="1"/></g>
+</svg>

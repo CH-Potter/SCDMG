@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="61 27 36 83" data-part="militia.trooper.side.pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Compressor pack</title>
+<rect x="79" y="30" width="6.5" height="34" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="87.5" y="38" width="6.5" height="27" rx="2" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M78.6,31.5 h7.4 M87,39.5 h7.4" stroke="#25282c" stroke-width="3"/>
+<path d="M64,58 L88,62 L90,104 L70,107 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,60.6 L88,62 L90,104 L82,105.2 Z" fill="#353b41"/>
+<path d="M70,73 L87,75 M70,88 L88,90" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="73" cy="66" r="1.1" fill="#c8bd98"/><circle cx="73" cy="98" r="1.1" fill="#c8bd98"/><path d="M84,94 l2.4,-0.6 l-0.6,2.2 Z" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/><circle id="exhaust1" cx="82.2" cy="29" r="1"/><circle id="exhaust2" cx="90.7" cy="37" r="1"/></g>
+</svg>

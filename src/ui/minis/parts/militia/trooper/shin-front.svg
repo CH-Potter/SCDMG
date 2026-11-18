@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 150 14 22" data-part="militia.trooper.side.shin-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near shin plate</title>
+<path d="M44,152 L54,152 L52,170 L45,170 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M50.5,152.8 L53.2,152.8 L51.3,169.2 L49,169.2 Z" fill="#6c5a37"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>
