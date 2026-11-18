@@ -15,8 +15,10 @@ describe("unit classes", () => {
     expect(cls("mil-bertha")).toBe("elite");
     expect(cls("mil-rustler")).toBe("flyer");
     expect(cls("mil-turret")).toBe("static");
-    expect(cls("munch-mama")).toBe("elite");
-    expect(cls("munch-lobber")).toBe("elite");
+    expect(cls("swarm-mother")).toBe("elite");
+    expect(cls("swarm-borer")).toBe("elite");
+    expect(cls("swarm-bombard")).toBe("support"); // a single beast, not a monster
+    expect(cls("swarm-tenders")).toBe("support"); // a team of 2 with Hatchlings
     expect(cls("con-facet")).toBe("elite");
     expect(cls("con-lancer")).toBe("support");
     expect(cls("con-dancers")).toBe("base");
@@ -37,7 +39,7 @@ describe("unit classes", () => {
   it("counts slots from the mode, the faction and the support cards", () => {
     const counts = listSlots("militia", "skirmish", [{ profileId: "mil-turret", upgrades: [] }], ["mil-depot"]);
     const st = counts.find((c) => c.cls === "static")!;
-    expect(st).toMatchObject({ used: 1, max: MODE_SLOTS.skirmish.max.static + 1 + 1 }); // mode + Militia + Tractor Depot
+    expect(st).toMatchObject({ used: 1, max: MODE_SLOTS.skirmish.max.static + 1 + 1 }); // mode + Militia + Motor Pool
     expect(listSlotProblems("militia", "skirmish", [{ profileId: "mil-turret", upgrades: [] }], [])).toContain("Needs at least 2 Base units: has 0");
     const elites = Array.from({ length: 2 }, () => ({ profileId: "mil-bertha", upgrades: [] }));
     expect(listSlotProblems("militia", "skirmish", elites, []).some((e) => e.startsWith("Too many Elite"))).toBe(true);

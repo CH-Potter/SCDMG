@@ -39,7 +39,7 @@ describe("weapon traits, nerve and fearless", () => {
   });
 
   it("keeps traits and nerve through copy and import, and coerces them", () => {
-    for (const id of ["militia", "munch", "concord"]) {
+    for (const id of ["militia", "swarm", "concord"]) {
       const src = FACTIONS[id]!;
       const f = copyFaction(src, "Keep");
       src.profiles.forEach((p, i) => {
@@ -48,7 +48,7 @@ describe("weapon traits, nerve and fearless", () => {
       });
       expect(importFaction(JSON.parse(JSON.stringify(exportable(f))), []).faction).toEqual(f);
     }
-    const raw = JSON.parse(JSON.stringify(exportable(copyFaction(FACTIONS.munch!, "Coerce")))) as {
+    const raw = JSON.parse(JSON.stringify(exportable(copyFaction(FACTIONS.swarm!, "Coerce")))) as {
       faction: { profiles: { nerve?: unknown; keywords: string[]; weapons: { traits?: unknown }[] }[] };
     };
     const p0 = raw.faction.profiles[0]!;

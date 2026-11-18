@@ -9,6 +9,10 @@ import { aliveModels, supplyFor, unitById } from "../src/engine/rules";
 import { scoreRound } from "../src/engine/scoring";
 import type { GameEvent, GameState, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function place(s: GameState, uid: string, at: Vec): Unit {
   const u = unitById(s, uid)!;

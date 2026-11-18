@@ -26,11 +26,12 @@ import type {
   WeaponTrait,
 } from "../../engine/types";
 
-export type TemplateGroup = "grimdark" | "fantasy";
+export type TemplateGroup = "grimdark" | "fantasy" | "dustline";
 
 export const TEMPLATE_GROUPS: Record<TemplateGroup, { name: string; blurb: string }> = {
   grimdark: { name: "Grimdark sci-fi", blurb: "Very serious armies of the very far future, played for laughs." },
   fantasy: { name: "Fantasy", blurb: "Swords, bows, spells and siege engines, given a cartoon polish." },
+  dustline: { name: "Dustline veterans", blurb: "Armies that once fought for the Dustline. They've left the main game, but every unit, card and grudge is here." },
 };
 
 /** A starting faction for a classic tabletop trope. The faction is a template: start one to edit it. */
@@ -98,7 +99,8 @@ export interface UnitSpec {
   impact?: ImpactDef;
   structure?: StructureDef;
   blurb: string;
-  art: ArtSpec;
+  /** The miniature. Leave it out to draw the unit with the faction look's own painters (the Munch's critters, say). */
+  art?: ArtSpec;
 }
 
 /** An upgrade (its cost is computed). */
@@ -156,7 +158,6 @@ export function template(s: TemplateSpec): FactionTemplate {
   const fid = `${TEMPLATE_PREFIX}${s.key}`;
   const pid = (local: string) => `${fid}:${local}`;
   const profiles: UnitProfile[] = s.units.map((u) => {
-    const [body, head, headgear, weapon, back, secondary, scale, primary] = u.art;
     const p: UnitProfile = {
       id: pid(u.id),
       name: u.name,
@@ -174,8 +175,11 @@ export function template(s: TemplateSpec): FactionTemplate {
       abilities: [...u.abilities],
       upgrades: (u.upgrades ?? []).map((x) => structuredClone(x)),
       blurb: u.blurb,
-      art: { kind: "parts", recipe: { body, head, headgear, weapon, back, secondary, scale: scale ?? 1, ...(primary !== undefined ? { primary } : {}) } },
     };
+    if (u.art) {
+      const [body, head, headgear, weapon, back, secondary, scale, primary] = u.art;
+      p.art = { kind: "parts", recipe: { body, head, headgear, weapon, back, secondary, scale: scale ?? 1, ...(primary !== undefined ? { primary } : {}) } };
+    }
     if (u.nerve !== undefined) p.nerve = u.nerve;
     if (u.evade) p.evade = structuredClone(u.evade);
     if (u.impact) p.impact = { ...u.impact };

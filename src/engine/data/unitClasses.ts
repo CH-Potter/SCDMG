@@ -48,7 +48,7 @@ export const MODE_SLOTS: Record<ModeId, { max: Record<UnitClass, number>; minBas
 /** Built-in factions' extra slots (custom factions set `Faction.slots` in the forge). */
 const FACTION_SLOTS: Record<string, Slots> = {
   militia: { static: 1 }, // they dig in
-  munch: { base: 1 }, // there are always more of them
+  swarm: { base: 1 }, // there are always more of them
   concord: { elite: 1 }, // few, but fabulous
 };
 
@@ -60,11 +60,11 @@ const SUPPORT_SLOTS: Record<string, Slots> = {
   "mil-airstrip": { flyer: 1 },
   "mil-dropship": { base: 1 },
   "mil-wagon": { support: 1 },
-  "munch-nest": { flyer: 1 },
-  "munch-tunnels": { elite: 1 },
-  "munch-stash": { support: 1 },
-  "munch-stink": { base: 1 },
-  "munch-burrows": { static: 1 },
+  "swarm-hum": { flyer: 1 },
+  "swarm-chamber": { base: 1 },
+  "swarm-tunnels": { elite: 1 },
+  "swarm-pheromones": { support: 1 },
+  "swarm-glands": { static: 1 },
   "con-spire": { static: 1 },
   "con-choir": { base: 1 },
   "con-lens": { flyer: 1 },

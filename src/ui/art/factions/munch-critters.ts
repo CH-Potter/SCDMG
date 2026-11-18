@@ -1,7 +1,7 @@
 // The Munch small fry: grafted, mind-controlled farmland critters. Nibbler beetles, Boing Hopper
 // foxes, Web-Gunner Spiders spiders, the Brood Scorpion scorpion broodmother, and a grafted raccoon for custom
 // "teeth" troopers. Designs are drawn at their own base radius (ref), so one design unit is one
-// centi-inch on the table. Every critter wears the overmind implant (see munch-kit.ts).
+// centi-inch on the table. Every critter wears the signal implant (see munch-kit.ts).
 
 import { mix, shade } from "../palette";
 import { contact, ellipse, fill, flat, glowAt, ink, mat, tube } from "../toon";

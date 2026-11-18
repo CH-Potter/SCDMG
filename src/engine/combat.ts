@@ -306,7 +306,7 @@ export const SCRAP_COVER_RANGE = 2;
 
 /** The save roll a model needs (null = no save). */
 export function saveNeeded(s: GameState, a: Unit, t: Unit, tm: Model, ap: number, melee: boolean, from?: Model): number | null {
-  let save = profileOf(t).armor + ap + (t.status.reckless ? 1 : 0);
+  let save = profileOf(t).armor + ap + (t.status.reckless ? 1 : 0) + (t.status.corroded ? 1 : 0);
   if (!melee) {
     // Spotlit (exposed) units get nothing from cover, hunkering or digging in. A friendly Scrap Cover
     // structure gives cover like terrain does.
@@ -495,9 +495,17 @@ export function resolveAttack(
     if (t.destroyed) break;
   }
   if (report.damage > 0 && !melee && reacts(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
+  if (report.damage > 0) corrode(a, t, events);
   if (report.damage > 0) moraleCheck(s, t, events);
   report.unitDestroyed = t.destroyed;
   return report;
+}
+
+/** Corrode: an attack from a unit with acid that dealt damage leaves the target's saves one worse this round (no stacking). */
+export function corrode(a: Unit, t: Unit, events: GameEvent[]): void {
+  if (t.destroyed || t.status.corroded || a.owner === t.owner || !hasAbility(a, "corrode")) return;
+  t.status.corroded = true;
+  events.push({ type: "ability", uid: a.uid, ability: "corrode", text: `${profileOf(a).name}'s acid eats into ${profileOf(t).name}: its saves are one worse this round.` });
 }
 
 /** Apply damage to one model (shields first). Returns damage dealt. Handles deaths and reactions. */
@@ -654,6 +662,7 @@ export function burstAt(s: GameState, a: Unit, weapon: string, p: Vec, e: { hit:
     if (rolled.damage > 0) moraleCheck(s, t, events);
     // Sticky Goo slows whoever the burst hurt, friend or foe.
     if (rolled.damage > 0 && reacts(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
+    if (rolled.damage > 0) corrode(a, t, events);
     events.splice(at, 0, {
       type: "attack",
       report: { uid: a.uid, target: t.uid, weapon, kind: "barrage", attackers: 1, hitOn: e.hit, ...rolled, unitDestroyed: t.destroyed },

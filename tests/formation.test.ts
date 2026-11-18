@@ -20,6 +20,10 @@ import { deployZones } from "../src/engine/supports";
 import { platformAt } from "../src/engine/terrain";
 import type { Elevation, GameState, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 // Dustbowl Crossing (the default map): barn x 4-9 y 11-16, east wall x 4.7-5.5 y 15.5-20.5,
 // fence x 14-21 y 25.2-26, silo deck x 12.5-22.5 y 14.5-20.5 with a ramp from (17.5, 22.1) up to (17.5, 19.7).

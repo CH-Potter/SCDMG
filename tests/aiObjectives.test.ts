@@ -8,6 +8,10 @@ import { profileOf } from "../src/engine/profile";
 import { currentSupply, supplyFor, unitById } from "../src/engine/rules";
 import type { GameState, ListEntry, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 const L = (...ids: string[]): ListEntry[] => ids.map((profileId) => ({ profileId, upgrades: [] }));
 

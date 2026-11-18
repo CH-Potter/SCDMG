@@ -4,6 +4,10 @@ import { aiCommand } from "../src/engine/ai";
 import { applyCommand, createGame } from "../src/engine/game";
 import type { GameState } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 describe("attack events come before what they cause", () => {
   it("a morale test is logged after the attack on that unit, not before it", () => {

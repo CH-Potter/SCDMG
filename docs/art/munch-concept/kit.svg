@@ -5,7 +5,7 @@
 <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f6"/><stop offset="0.45" stop-color="#c9d2d8"/><stop offset="1" stop-color="#8d989f"/></linearGradient>
 <g id="staple"><path d="M -7 3 L -7 -3 L 7 -3 L 7 3" fill="none" stroke="#1c1512" stroke-width="4" stroke-linejoin="round"/><path d="M -7 3 L -7 -3 L 7 -3 L 7 3" fill="none" stroke="#dfe6ea" stroke-width="1.8" stroke-linejoin="round"/></g>
 </defs>
-<!-- 1. the overmind implant -->
+<!-- 1. the signal implant -->
 <g transform="translate(120 170)">
 <path d="M -70 30 C -70 -40 70 -40 70 30 Z" fill="#8f8d88"/>
 <circle cx="0" cy="-60" r="80" fill="url(#glow)"/>

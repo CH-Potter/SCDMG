@@ -157,6 +157,9 @@ export const ABILITY_PRICES: Partial<Record<AbilityId, AbilityPrice>> = {
   pirouette: 0.5,
   "phase-out": 0.5,
   "twirl-away": 0.4,
+  // the Skitterswarm: first estimates
+  corrode: (c) => 0.2 + 0.25 * (c.ranged + c.melee), // every hit that lands softens the target for the rest
+  "brood-bond": 1.5, // a refill for every hurt squad around her, every round
 };
 
 /** Price of an ability the table doesn't know, by kind (unknown ids count as passive). */

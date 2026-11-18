@@ -6,11 +6,12 @@ import type { Faction } from "../../engine/types";
 import { copyFaction } from "../../ui/customFactions";
 import { FANTASY } from "./fantasy";
 import { GRIMDARK } from "./grimdark";
+import { MUNCH } from "./munch";
 import type { FactionTemplate } from "./kit";
 
 export { TEMPLATE_GROUPS, TEMPLATE_PREFIX, type FactionTemplate, type TemplateGroup } from "./kit";
 
-export const TEMPLATES: readonly FactionTemplate[] = [...GRIMDARK, ...FANTASY];
+export const TEMPLATES: readonly FactionTemplate[] = [...GRIMDARK, ...FANTASY, MUNCH];
 
 export const templateByKey = (key: string): FactionTemplate | undefined => TEMPLATES.find((t) => t.key === key);
 

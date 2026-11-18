@@ -302,7 +302,7 @@ export function comb(t: Toon, x0: number, y0: number, cols: number, rows: number
 
 // ---------- the lab graft kit (final direction: grafted, mind-controlled farmland critters) ----------
 // Natural animal coats, plus the scientist's clean lab tech: chrome plates held on with surgical
-// staples, glass vials of glowing mutagen, and on every critter the overmind implant: a chrome
+// staples, glass vials of glowing mutagen, and on every critter the signal implant: a chrome
 // skull cap with a glowing faction-green lens. That implant and the green glow are the faction's
 // shared thread.
 
@@ -360,7 +360,7 @@ export function stitches(t: Toon, d: string, w = 1.2): void {
   t.ctx.restore();
 }
 
-/** The overmind implant: a chrome skull cap at (x, y) of radius r, with a glowing hive-green lens. */
+/** The signal implant: a chrome skull cap at (x, y) of radius r, with a glowing hive-green lens. */
 export function implant(t: Toon, x: number, y: number, r: number, A: number, rot = 0): void {
   const { ctx } = t;
   ctx.save();
@@ -403,7 +403,7 @@ export function graftPlate(t: Toon, d: string, seam: [number, number, number, nu
   staples(t, seam[0], seam[1], seam[2], seam[3], n, s);
 }
 
-/** A natural eye with the overmind's green glint. */
+/** A natural eye with the signal's green glint. */
 export function critterEye(t: Toon, x: number, y: number, r: number, A: number): void {
   glowAt(t, x, y, r * 2.4, A, 0.35);
   fill(t, ellipse(x, y, r, r * 1.05), mat(0x1c1512, 0.5), { s: 0, line: 0 });

@@ -7,7 +7,7 @@ import type { GameState } from "../src/engine/types";
 
 const maps = ["dustbowl", "mesa", "refinery"];
 const missions = ["hold", "grab", "brawl", "flag"];
-const factions = ["militia", "munch", "concord"];
+const factions = ["militia", "swarm", "concord"];
 
 it.skipIf(!process.env.SIM_SIDEBIAS)("side bias", () => {
   const rows: { map: string; mission: string; f: string; seed: number; winner: string; init1: number; vp: [number, number]; firstMover: number[] }[] = [];

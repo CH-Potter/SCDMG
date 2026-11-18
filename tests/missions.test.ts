@@ -9,6 +9,10 @@ import { profileOf } from "../src/engine/profile";
 import { onBoard, supplyUsed, unitById } from "../src/engine/rules";
 import { crownObjectives, economyState, forwardObjective, scoreRound, updateFlags } from "../src/engine/scoring";
 import type { FactionId, GameEvent, GameState, Objective, PlayerId, Unit, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 /** Put a reserve unit on the board in a tight cluster around `at` (test helper, bypasses rules). */
 function place(s: GameState, owner: PlayerId, at: Vec, nth = 0, elevation: 0 | 1 = 0): Unit {

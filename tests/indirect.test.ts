@@ -8,6 +8,10 @@ import { aliveModels, unitById } from "../src/engine/rules";
 import { freshStatus } from "../src/engine/supports";
 import type { GameEvent, GameState, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function place(_s: GameState, u: Unit, at: Vec): Unit {
   const r = profileOf(u).baseRadius;
@@ -19,7 +23,7 @@ function place(_s: GameState, u: Unit, at: Vec): Unit {
   return u;
 }
 
-/** A game with a Spud Mortar for player 0, a building between it and a pack of beetles, and nothing else on the table. */
+/** A game with a Pipe Mortar for player 0, a building between it and a pack of beetles, and nothing else on the table. */
 function setup(seed: number, wall = true): { s: GameState; mortar: Unit; pack: Unit } {
   const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["militia", "munch"], seed, missionId: "brawl" });
   s.terrain = wall ? [{ id: "b", kind: "building", level: 0, poly: rect(12, 0, 3, 35) }] : [];

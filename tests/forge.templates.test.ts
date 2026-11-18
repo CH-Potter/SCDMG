@@ -21,9 +21,16 @@ const builtIns = (): Faction[] => BUILT_IN_FACTION_IDS.map((id) => FACTIONS[id]!
 const profileIn = (f: Faction) => (id: string) => f.profiles.find((p) => p.id === id);
 
 describe("trope templates", () => {
-  it("cover both groups with unique keys and names", () => {
+  it("cover every group with unique keys and names", () => {
     expect(TEMPLATES.filter((t) => t.group === "grimdark").length).toBeGreaterThanOrEqual(6);
     expect(TEMPLATES.filter((t) => t.group === "fantasy").length).toBeGreaterThanOrEqual(5);
+    // The Munch left the built-in factions for the forge, whole: units, cards and abilities.
+    const munch = templateByKey("munch")!;
+    expect(munch.group).toBe("dustline");
+    expect(munch.faction.profiles.map((p) => p.name)).toEqual(expect.arrayContaining(["Chrome-Jaw Beetles", "Dr. Graft and Big Mama", "The Sett Lab", "Bomb Wasps"]));
+    expect(munch.faction.supports.flatMap((s) => s.abilities.map((a) => a.name))).toEqual(expect.arrayContaining(["Feeding Frenzy", "Implant Jolt", "Dig Through", "Cough Up"]));
+    // No borrowed names: the old haste ability is the Implant Jolt now, and Dr. Graft runs a signal, not a "mind".
+    expect(JSON.stringify(munch.faction).toLowerCase()).not.toContain("overmind");
     expect(new Set(TEMPLATES.map((t) => t.key)).size).toBe(TEMPLATES.length);
     expect(new Set(TEMPLATES.map((t) => t.faction.name)).size).toBe(TEMPLATES.length);
     expect(new Set(TEMPLATES.map((t) => t.faction.id)).size).toBe(TEMPLATES.length);
@@ -69,7 +76,8 @@ describe("trope templates", () => {
         expect(classes.size).toBeGreaterThanOrEqual(4);
         for (const p of buyable) {
           expect(p.abilities.length, p.name).toBeGreaterThanOrEqual(2);
-          if (!p.structure) expect(p.weapons.length, p.name).toBeGreaterThan(0);
+          // Every fighting unit can hurt something: a weapon, or a flyer's dive (the Munch's Bomb Wasps and crows).
+          if (!p.structure) expect(p.weapons.length + (p.impact ? 1 : 0), p.name).toBeGreaterThan(0);
         }
       });
 
@@ -106,8 +114,14 @@ describe("trope templates", () => {
         });
       }
 
-      it("gives every unit a miniature built from parts that validates", () => {
+      it("gives every unit a miniature built from parts that validates (the Munch keep their own critters)", () => {
         for (const p of f.profiles) {
+          // The Munch were a built-in faction: their look's own painters draw them, so they carry no parts.
+          if (t.key === "munch") {
+            expect(p.art, p.name).toBeUndefined();
+            expect(f.look).toBe("teeth");
+            continue;
+          }
           expect(p.art?.kind, p.name).toBe("parts");
           expect(artProblems(p.art, p.name)).toEqual([]);
           const notes: string[] = [];
@@ -177,9 +191,9 @@ describe("starting a template", () => {
   });
 
   it("can be renamed on the way in", () => {
-    const f = startFromTemplate(templateByKey("hive")!, "My Bugs");
-    expect(f.name).toBe("My Bugs");
-    expect(f.id.startsWith("custom-my-bugs-")).toBe(true);
+    const f = startFromTemplate(templateByKey("munch")!, "My Critters");
+    expect(f.name).toBe("My Critters");
+    expect(f.id.startsWith("custom-my-critters-")).toBe(true);
   });
 });
 
@@ -205,7 +219,9 @@ describe("templates in play", () => {
     expect(s.units.some((u) => u.owner === 1)).toBe(true);
   };
 
-  it("a grimdark and a fantasy template finish a Skirmish game without an illegal move", () => playOut(["hive", "knights"], "dustbowl", 3), 240_000);
+  it("a grimdark and a fantasy template finish a Skirmish game without an illegal move", () => playOut(["mob", "knights"], "dustbowl", 3), 240_000);
+
+  it("the Munch, as a template, still play a whole Skirmish game", () => playOut(["munch", "regiment"], "dustbowl", 5), 240_000);
 
   it("two more finish an Assault game without an illegal move", () => playOut(["bulwark", "undead"], "highway", 8), 240_000);
 });

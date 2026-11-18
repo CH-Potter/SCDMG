@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { MAPS } from "../src/engine/data/maps";
 import { economyOf, missionFitsMap, MISSIONS, rulesFor, swapMapSides, swapMissionSides } from "../src/engine/data/missions";
 import { createGame } from "../src/engine/game";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 describe("playing side B of a role mission", () => {
   const siege = MISSIONS.siege!;

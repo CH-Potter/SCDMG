@@ -23,7 +23,7 @@ import type { SupportDef, UnitProfile, Weapon } from "../src/engine/types";
 // Computed pricing (engine/pricing.ts) is calibrated against the built-in factions' hand-set costs,
 // which are balance-tuned with AI-vs-AI sims. Run with PRICING_REPORT=1 to print the comparison.
 
-const BUILT_INS = ["militia", "munch", "concord"].map((id) => FACTIONS[id]!);
+const BUILT_INS = ["militia", "swarm", "concord"].map((id) => FACTIONS[id]!);
 const buyable = BUILT_INS.flatMap((f) => f.profiles.filter((p) => !p.structure?.summonOnly));
 const upgrades = buyable.flatMap((p) => p.upgrades.map((u) => ({ p, u })));
 const supports = BUILT_INS.flatMap((f) =>
@@ -83,8 +83,9 @@ describe("calibration against the built-in factions", () => {
 
   it("prices upgrades close to the hand-set costs", () => {
     expect(mean(upgradeErr.map(Math.abs))).toBeLessThanOrEqual(0.2);
-    // Only Tunnel Claws (hand-priced at 4 to keep a cross-board monster honest) is off by more than 1.
-    expect(upgradeErr.filter((e) => Math.abs(e) > 1)).toHaveLength(1);
+    // None is off by more than 1. (Tunnel Claws, hand-priced at 4, was the one outlier; it left the
+    // built-ins with the Munch, and the Munch template prices it like any other upgrade.)
+    expect(upgradeErr.filter((e) => Math.abs(e) > 1)).toEqual([]);
   });
 
   it("prices support cards at the hand-set Fizz", () => {
@@ -234,8 +235,8 @@ describe("support pricing", () => {
   });
 
   it("prices a summon from the structure it makes", () => {
-    const f = FACTIONS.munch!;
-    const tunnels = f.supports.find((s) => s.id === "munch-tunnels")!;
+    const f = FACTIONS.swarm!;
+    const tunnels = f.supports.find((s) => s.id === "swarm-chamber")!;
     const lookup = (id: string) => f.profiles.find((p) => p.id === id);
     const tougher = (id: string) => {
       const p = lookup(id);

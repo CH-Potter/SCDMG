@@ -7,6 +7,10 @@ import { createGame } from "../src/engine/game";
 import { pointInPolygon, pointSegmentDistance, polygonCentroid } from "../src/engine/geometry";
 import { checkPlacement, planRoute } from "../src/engine/terrain";
 import type { Terrain, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 /** The largest base in the built-in factions is 1.4"; leave a little room on top of that. */
 const CLEARANCE = 1.45;

@@ -15,6 +15,10 @@ import { cleanupRound } from "../src/engine/scoring";
 import { supportTarget } from "../src/engine/supports";
 import type { GameState, ListEntry, Phase, PlayerId, Unit, Vec } from "../src/engine/types";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 const ok = (r: ReturnType<typeof applyCommand>): GameState => {
   if (!r.ok) throw new Error(r.error);

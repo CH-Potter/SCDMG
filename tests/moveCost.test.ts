@@ -4,6 +4,10 @@ import { createGame } from "../src/engine/game";
 import { rect } from "../src/engine/geometry";
 import { profileOf } from "../src/engine/profile";
 import { CLASSIC_DUSTBOWL } from "./helpers/classicMap";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 describe("moving out of area cover", () => {
   it('says when "Too far" is because cover costs double, not the straight distance', () => {

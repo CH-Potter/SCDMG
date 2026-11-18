@@ -10,6 +10,10 @@ import { canStillRecruit, recruitableProfiles, rosterOrder } from "../src/engine
 import { profileOf } from "../src/engine/profile";
 import { deployable, onBoard, reserves, unitById } from "../src/engine/rules";
 import type { GameEvent, GameState, PlayerId, Unit, Vec } from "../src/engine/types";
+import { registerMunch } from "./helpers/munch";
+
+// The Munch are a Forge template now: register a test copy under their old ids.
+registerMunch();
 
 function game(setup: Partial<GameSetup> = {}): GameState {
   const s = createGame({ factions: ["militia", "munch"], seed: 7, armyRule: "open", ...setup });
@@ -258,7 +262,7 @@ describe("AI in open roster games", () => {
   ] as const) {
     it(`plays a whole ${a} vs ${b} game with a mixed army`, () => {
       // Seed 4: with the ability pass, seed 3's Concord game overcharges the Sunray Tower into the
-      // Militia's Hay Bombers, and the Militia keeps re-buying the one unit the Concord can barely hit
+      // Militia's Haymaker Bombers, and the Militia keeps re-buying the one unit the Concord can barely hit
       // (4 of 6 recruits). Seeds 1-6 otherwise all field mixed armies.
       let s = createGame({ factions: [a, b], seed: 4, armyRule: "open", orderChoice: true, missionId: "hold", mapId: "dustbowl" });
       const deployed: Record<string, number>[] = [{}, {}];
