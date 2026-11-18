@@ -15,6 +15,23 @@ Free and open source under the [GNU GPL v3 or later](LICENSE).
 
 ## What's in it
 
+### New in v0.10: house rules, so you play it your way
+
+![The House rules panel in the main menu, with Morale, Breach dice, Overwatch and Random activation order switched on: core rules to switch off on the left, optional tabletop staples to switch on on the right](docs/images/house-rules.webp)
+
+Every tabletop group plays a little differently. In the main menu, **step 5, House rules**, you tick the mechanics you want, and the AI plays by the same rules. Your choice is saved in your browser and applies to every battle, campaign included.
+
+- **Switch core mechanics off:** rolled charges, close ranks, supporting rank, evade rolls, stray shots into melee, impact on the charge, difficult terrain, units blocking line of fire, and shell scatter.
+- **Switch tabletop staples on:**
+  - **Morale and Shaken:** battered units test their nerve.
+  - **Breach dice:** anti-armour and anti-air weapons roll a d3 or d6 with the attack, and that many hits skip the save.
+  - **Overwatch:** a unit being charged fires first, hitting on 6s.
+  - **Command re-roll:** spend 1 CP after an attack to re-roll the misses.
+  - **Chargers strike first:** every charging unit fights before anyone else.
+  - **Turn order:** whole-army turns (I go, you go), or a random activation order drawn like order dice from a bag.
+
+One click puts everything back to the standard rules. Every rule is explained in [docs/rules.md](docs/rules.md#house-rules).
+
 ### Three factions, three ways to fight
 
 ![The three factions: Dustline Militia, The Munch and Lumen Concord](docs/images/factions.webp)
@@ -111,7 +128,7 @@ Details, the security settings, and how to swap in a real icon are in [docs/pack
 
 ## Rules in a nutshell
 
-Each round has four phases: **Movement** (deploy, move, disengage, hunker), **Assault** (shoot, charge, advance), **Combat** (engaged units fight; chargers first) and **Scoring**. Players alternate activations within each phase. Armies start in reserve and deploy over time, limited by resources and a growing supply cap. Squads move by leader plus coherency; range, line of sight and cover are per model. Raised platforms are reached by ramps and ladders. Keywords such as light, armoured, heavy, flying and jump give soft rock–paper–scissors.
+Each round has four phases: **Movement** (deploy, move, disengage, hunker), **Assault** (shoot, charge, advance), **Combat** (engaged units fight) and **Scoring**. Players alternate activations within each phase. Charges are declared within 12" and roll 2d6 for the distance. In combat each side fights with its chargers first, and models close ranks (a free 3" step) and fight from a supporting rank behind a squad-mate. House rules change any of this to taste. Armies start in reserve and deploy over time, limited by resources and a growing supply cap. Squads move by leader plus coherency; range, line of sight and cover are per model. Raised platforms are reached by ramps and ladders. Keywords such as light, armoured, heavy, flying and jump give soft rock–paper–scissors.
 
 The full rules are in [docs/rules.md](docs/rules.md), and in the game under **❓ How to play**.
 
