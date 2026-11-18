@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -9 136 21" data-part="concord.courtier.side.needle-rifle" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Needle ray rifle: a hair-thin gold needle, a crystal focus prism, a slim pearl body and gold stock</title>
+<path d="M0,-1 L58,-1.6 L58,1.6 L0,1 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M56,0 L62,-6 L72,-6 L76,0 L72,6 L62,6 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M62,0 L72,0 L76,0 L72,6 L62,6 L56,0 Z" fill="#f2b84b"/>
+<path d="M75,-3.6 L110,-4.6 L112,3.4 L76,3.6 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M76,0.6 L111.4,0.4 L112,3.4 L76,3.6 Z" fill="#6c5a37"/>
+<path d="M84,3.4 L90,3.4 L88,9 L84,9 Z" fill="#5d5b45" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M104,3 L110,3 L109,10 L104,10 Z" fill="#5d5b45" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M110,-5.6 L130,-7 L131,4 L112,3.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M112,0.6 L131,0.4 L131,4 L112,3.4 Z" fill="#4a2e19"/>
+<g class="detail"><circle cx="80" cy="-1.6" r="1" fill="#c8bd98"/><circle cx="106" cy="-2.4" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="86" cy="5" r="1"/><circle id="g2" cx="106.6" cy="5.6" r="1"/><circle id="muzzle" cx="-1.6" cy="0" r="1"/></g>
+</svg>

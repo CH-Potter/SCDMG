@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 128 132 70" data-part="concord.monument.side.glimmer-dome">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Glimmer Dome: a hex-cell shield dome of crystal light, lavender seams</title>
+<path d="M38,194 A62,64 0 0 1 162,194 Z" fill="#fff2c0" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M118,133 A62,64 0 0 1 162,194 L128,194 Q140,160 118,133 Z" fill="#f2b84b" opacity="0.55"/>
+<path d="M69.9,190.1 L61.9,194 L53.9,190.1 L53.9,182.3 L61.9,178.3 L69.9,182.3 Z M88.9,190.1 L80.9,194 L72.9,190.1 L72.9,182.3 L80.9,178.3 L88.9,182.3 Z M108,190.1 L100,194 L92,190.1 L92,182.3 L100,178.3 L108,182.3 Z M127.1,190.1 L119.1,194 L111.1,190.1 L111.1,182.3 L119.1,178.3 L127.1,182.3 Z M146.1,190.1 L138.1,194 L130.1,190.1 L130.1,182.3 L138.1,178.3 L146.1,182.3 Z M79.4,176.1 L71.4,180 L63.4,176.1 L63.4,168.2 L71.4,164.3 L79.4,168.2 Z M98.5,176.1 L90.5,180 L82.5,176.1 L82.5,168.2 L90.5,164.3 L98.5,168.2 Z M117.5,176.1 L109.5,180 L101.5,176.1 L101.5,168.2 L109.5,164.3 L117.5,168.2 Z M136.6,176.1 L128.6,180 L120.6,176.1 L120.6,168.2 L128.6,164.3 L136.6,168.2 Z M88.9,162.1 L80.9,166 L72.9,162.1 L72.9,154.2 L80.9,150.3 L88.9,154.2 Z M108,162.1 L100,166 L92,162.1 L92,154.2 L100,150.3 L108,154.2 Z M127.1,162.1 L119.1,166 L111.1,162.1 L111.1,154.2 L119.1,150.3 L127.1,154.2 Z M98.5,148 L90.5,152 L82.5,148 L82.5,140.2 L90.5,136.3 L98.5,140.2 Z M117.5,148 L109.5,152 L101.5,148 L101.5,140.2 L109.5,136.3 L117.5,140.2 Z" fill="none" stroke="#f2b84b" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M52,160 Q62,142 82,135" fill="none" stroke="#e3d8b6" stroke-width="3"/>
+<path d="M36,190 L164,190 L165,197 L35,197 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M120,190 L164,190 L165,197 L120,197 Z" fill="#4a2e19"/>
+<path class="tag" d="M96,193.6 L100,189 L104,193.6 L100,198 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="50" cy="193.6" r="1" fill="#c8bd98"/><circle cx="75" cy="193.6" r="1" fill="#c8bd98"/><circle cx="125" cy="193.6" r="1" fill="#c8bd98"/><circle cx="150" cy="193.6" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="100" cy="196" r="1"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 9 30 52" data-part="concord.courtier.side.helm-crest">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Smooth pearl mask, lavender visor slit, a tall gold crest fin standing straight up</title>
+<path d="M57,35 L60.4,12 L64.6,13 L67.6,34 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M62.6,12.6 L64.6,13 L67.6,34 L63.4,34.6 Z" fill="#4a2e19"/>
+<path d="M65,40 L73,44 L72,55 L65,58 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50,38 L57,32 L68,32 L72,40 L71,51 L64,58 L55,58 L50,52 L48,45 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M65,32 L68,32 L72,40 L71,51 L64,58 L62,58 L66,48 Z" fill="#6c5a37"/>
+<path class="glow" d="M48.4,44 L60.6,42 L61,45.6 L49.4,47.8 Z" fill="#f2b84b"/>
+<path class="glow" d="M50,45.4 L59,44" stroke="#fff2c0" stroke-width="1"/>
+<path d="M50,52 L57,50 L64,58" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="detail" d="M52.6,36 L57,33" stroke="#e3d8b6" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="57" r="1"/></g>
+</svg>

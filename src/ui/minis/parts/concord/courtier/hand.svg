@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 12 12" data-part="concord.courtier.hand">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pearl glove with a gold cuff</title>
+<path d="M-3.6,-3.4 L3.4,-3.6 L4,3 L-3.2,3.8 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M2,-3.6 L3.4,-3.6 L4,3 L2.4,3.2 Z" fill="#6e4528"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

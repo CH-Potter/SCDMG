@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="68 30 64 42" data-part="concord.saucer.side.dome">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Faceted crystal dome with a smug pilot inside: a crested mask, chin up</title>
+<path d="M72,68 L76,50 L88,37 L100,34 L112,37 L124,50 L128,68 Z" fill="#fff2c0" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M94,48 L98,43 L106,43 L109,49 L108,58 L102,62 L96,61 L92,56 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M99,43 L101,36 L104,43 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M92,52 L100,51 L100,53.4 L92.6,54.6 Z" fill="#f2b84b"/>
+<path d="M90,62 L112,62 L114,68 L88,68 Z" fill="#5d5b45"/>
+<path class="glow" d="M100,34 L112,37 L124,50 L128,68 L116,68 L110,48 Z" fill="#f2b84b" opacity="0.55"/>
+<path d="M76,50 L88,50 L100,34 M88,50 L86,68 M88,37 L88,50 M112,37 L110,48 L124,50 M110,48 L116,68" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M79,52 L86,41" stroke="#e3d8b6" stroke-width="2"/>
+<path d="M72,68 L128,68" stroke="#6e4528" stroke-width="3.4"/>
+<g id="anchors"><circle id="pivot" cx="100" cy="68" r="1"/></g>
+</svg>

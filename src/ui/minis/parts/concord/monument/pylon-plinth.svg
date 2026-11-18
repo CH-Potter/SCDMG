@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 176 80 26" data-part="concord.monument.side.pylon-plinth">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pylon plinth: two pearl steps with gold edges, the team gem set in the front</title>
+<path d="M64,200 L136,200 L133,190 L67,190 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M112,190 L133,190 L136,200 L112,200 Z" fill="#6c5a37"/>
+<path d="M76,190 L124,190 L121,180 L79,180 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M108,180 L121,180 L124,190 L108,190 Z" fill="#6c5a37"/>
+<path d="M67,190 L133,190 M79,180 L121,180" stroke="#6e4528" stroke-width="2.4"/>
+<path class="tag" d="M95,185.4 L100,181 L105,185.4 L100,189.4 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="74" cy="195" r="1" fill="#c8bd98"/><circle cx="100" cy="195" r="1" fill="#c8bd98"/><circle cx="126" cy="195" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="100" cy="196" r="1"/></g>
+</svg>

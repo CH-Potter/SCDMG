@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="142 40 50 38" data-part="concord.saucer.side.fin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Swept tail fin: gold blade with the team stripe, the saucer's one tag</title>
+<path d="M146,74 L174,46 L188,44 L180,76 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M180,47 L188,44 L180,76 L174,75.6 Z" fill="#4a2e19"/>
+<path class="tag" d="M158,64 L178,49 L184,48.4 L180,62 L166,74 L155,74 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M178,49 L184,48.4 L180,62 L174,67 Z" fill="#b000b0"/>
+<g id="anchors"><circle id="pivot" cx="170" cy="72" r="1"/></g>
+</svg>

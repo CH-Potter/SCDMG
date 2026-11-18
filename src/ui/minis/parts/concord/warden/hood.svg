@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 18 36 44" data-part="concord.warden.side.hood">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warden's peaked hood: navy, gold-edged, framing the pearl mask and its lavender visor</title>
+<path d="M48,46 L54,28 L66,20 L76,32 L78,54 L68,61 L56,59 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,20 L76,32 L78,54 L68,61 L70,40 Z" fill="#44432f"/>
+<path d="M49,44 L55,34 L66,34 L67,52 L62,58 L54,57 L49,51 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M62,34 L66,34 L67,52 L62,58 L60,58 Z" fill="#6c5a37"/>
+<path class="glow" d="M48.6,44.4 L60,42.8 L60.4,45.8 L49.4,47.6 Z" fill="#f2b84b"/>
+<path d="M48,46 L54,28 L66,20 L76,32" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M63,22 L66,15 L69,22.4 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="57" r="1"/></g>
+</svg>

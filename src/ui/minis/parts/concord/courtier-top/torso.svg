@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -10 40 19" data-part="concord.courtier.top.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Narrow shoulders from above: pearl chest plate and pointed pauldrons</title>
+<ellipse cx="0" cy="1" rx="9" ry="6.6" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<path d="M-8,-1.6 L0,-7.4 L8,-1.6 L6,3 L-6,3 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M0,-7.4 L8,-1.6 L6,3 L0,3 Z" fill="#6c5a37"/>
+<path d="M-6,-4 L-12.6,-5.4 L-18,0 L-12.6,5.4 L-6,4 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M6,-4 L12.6,-5.4 L18,0 L12.6,5.4 L6,4 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-18,0 L-6,0 M18,0 L6,0" stroke="#6e4528" stroke-width="1.8"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="shoulderL" cx="-12" cy="-1" r="1"/><circle id="shoulderR" cx="12" cy="-1" r="1"/></g>
+</svg>

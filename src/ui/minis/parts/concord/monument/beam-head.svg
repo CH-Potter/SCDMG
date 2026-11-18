@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -9 31 18" data-part="concord.monument.beam-head" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Beam head: a gold cowl round a crystal lens (lens to the left, turning on its own axis)</title>
+<path d="M-8,-6 L8,-6 L11,0 L8,6 L-8,6 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M-8,1 L10.4,1 L8,6 L-8,6 Z" fill="#4a2e19"/>
+<path d="M-14,0 L-8,-5 L-8,5 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-14,0 L-8,0 L-8,5 Z" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-15" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="84 26 32 158" data-part="concord.monument.side.pylon-shaft" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pylon shaft: a slim faceted pearl obelisk with a crystal inlay running up its face, gold bands</title>
+<path d="M88,182 L90,64 L100,30 L110,64 L112,182 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M100,30 L110,64 L112,182 L104,182 L104,64 Z" fill="#6c5a37"/>
+<path d="M90,64 L100,30 L104,64 L104,182" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M95,170 L96,72 L100,50 L101.6,72 L101.6,170 Z" fill="#f2b84b"/>
+<path class="glow" d="M97.6,160 L98,80" stroke="#fff2c0" stroke-width="1.4"/>
+<path d="M88.4,150 L111.6,150 M89.2,98 L110.8,98 M90,64 L110,64" stroke="#6e4528" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="100" cy="182" r="1"/></g>
+</svg>

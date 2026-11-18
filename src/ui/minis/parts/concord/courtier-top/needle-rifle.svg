@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -6 86 12" data-part="concord.courtier.top.needle-rifle" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Needle ray rifle from above</title>
+<path d="M0,-0.8 L38,-1.2 L38,1.2 L0,0.8 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M37,0 L41,-4 L46,-4 L49,0 L46,4 L41,4 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M37,0 L49,0 L46,4 L41,4 Z" fill="#f2b84b"/>
+<path d="M48,-2.8 L68,-3 L68,3 L48,2.8 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M68,-3.6 L80,-4 L80,4 L68,3.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="54" cy="0" r="1"/><circle id="g2" cx="67" cy="0" r="1"/><circle id="muzzle" cx="-1.6" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 36 34 35" data-part="concord.courtier.side.collar-high">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Standing navy collar with gold-edged points, team gem at the throat</title>
+<path d="M64,64 L66,40 L76,48 L74,66 Z" fill="#44432f" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M66,40 L76,48 L74.6,52" fill="none" stroke="#6e4528" stroke-width="2"/>
+<path d="M50,66 L48,46 L57,53 L59,66 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M48,46 L57,53 L57.6,57" fill="none" stroke="#6e4528" stroke-width="2"/>
+<path d="M49,67 Q62,58 75,65 L74,69 Q62,63 50,70 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M50.6,62 L53.6,58 L56.6,62 L53.6,66.4 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="62" cy="62" r="1"/></g>
+</svg>

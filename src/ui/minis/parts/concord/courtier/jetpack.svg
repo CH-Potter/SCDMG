@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 58 26 54" data-part="concord.courtier.side.jetpack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Slim jet pack: navy casing, gold ribs, lavender thruster glow</title>
+<path d="M67,62 L80,60 L86,96 L72,100 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M77,60.5 L80,60 L86,96 L80,97.8 Z" fill="#353b41"/>
+<path d="M69,74 L81.6,72 M70.6,86 L83.4,84" stroke="#6e4528" stroke-width="2.4"/>
+<path d="M72,100 L86,96 L84,104 L75,106 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M75.6,104.6 L83.6,102.6 L82,109 L77.6,110 Z" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="66" r="1"/><circle id="exhaust1" cx="79" cy="108" r="1"/></g>
+</svg>

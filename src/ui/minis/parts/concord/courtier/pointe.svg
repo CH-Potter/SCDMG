@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -10 12 21" data-part="concord.courtier.side.pointe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pointed dancer's shoe: a pearl lozenge with a gold tip</title>
+<path d="M-3.6,-8 L3.6,-8 L3,3 L0,9 L-3,3 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M0,-8 L3.6,-8 L3,3 L0,9 Z" fill="#6c5a37"/>
+<path d="M-3,3 L0,9 L3,3" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

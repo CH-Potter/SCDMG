@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -5 10 10" data-part="concord.courtier.top.hand">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pearl glove from above</title>
+<path d="M0,-3.4 L3,0 L0,3.4 L-3,0 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

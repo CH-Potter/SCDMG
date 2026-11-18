@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -5 24 17" data-part="concord.courtier.top.collar-high">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Standing collar from above: a navy horseshoe edged in gold, team gem behind the neck</title>
+<path d="M-9,-2 Q-10,8 0,9.6 Q10,8 9,-2 L5.6,-1 Q6,5.4 0,6 Q-6,5.4 -5.6,-1 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-9,-2 Q-10,8 0,9.6 Q10,8 9,-2" fill="none" stroke="#6e4528" stroke-width="1.6"/>
+<path class="tag" d="M0,5.4 L2.4,7.8 L0,10.2 L-2.4,7.8 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="1" r="1"/></g>
+</svg>

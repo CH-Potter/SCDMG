@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -6 38 12" data-part="concord.courtier.top.stiletto" data-recoil="4">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crystal stiletto from above (tip at the left)</title>
+<path d="M0,0 L6,-2 L25,-2.2 L25,2.2 L6,2 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M0,0 L25,0.3 L25,2.2 L6,2 Z" fill="#f2b84b"/>
+<path d="M25,-5 L28,-5 L28,5 L25,5 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M28,-1.4 L33,-1.4 L33,1.4 L28,1.4 Z" fill="#5d5b45" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="30" cy="0" r="1"/><circle id="g1" cx="30" cy="0" r="1"/><circle id="muzzle" cx="0.5" cy="0" r="1"/></g>
+</svg>
