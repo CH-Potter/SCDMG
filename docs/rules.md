@@ -17,7 +17,7 @@ Every unit has a **class**, worked out from its stats, so units made in the Fact
 | Class | Which units |
 | --- | --- |
 | 🛡 Base | Squads of several models: the backbone of the army. |
-| 🔧 Support | Single models that aren't heavy or monsters: medics, snipers, gunners, specialists. |
+| 🔧 Support | Single models, and teams of up to 3 with a support ability (Patch Up, Hatchlings, Mending Aura, Steadying Presence, Radiance, Recall, Bubble Shield, Spotter, Brood Call): medics, snipers, gunners, specialists. |
 | ⭐ Elite | Monsters, and heavy units with 6 or more wounds in total. |
 | 🪽 Flyer | Anything with the flying keyword. |
 | 🏰 Static | Structures. |

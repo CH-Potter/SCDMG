@@ -120,7 +120,7 @@ describe("Rust Bucket Drop-Ship", () => {
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toMatch(/home objective/);
     // Just outside the exclusion is fine.
-    expect(drop(s, "p0-1", { x: home.pos.x + 2, y: home.pos.y + home.radius + 7 }).ok).toBe(true);
+    expect(drop(s, "p0-1", { x: home.pos.x + 2, y: home.pos.y + home.radius + 9 }).ok).toBe(true); // room for the whole medic team
   });
 
   it("needs the unit's resources and supply", () => {
@@ -237,7 +237,7 @@ describe("AI and the drop-ship", () => {
 
   it("uses it in a full AI game without an illegal move", () => {
     let uses = 0;
-    for (const seed of [21, 33]) {
+    for (const seed of [21, 33, 45, 57]) {
       let s = createGame({ map: CLASSIC_DUSTBOWL,
         factions: ["militia", "munch"],
         seed,

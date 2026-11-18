@@ -10,7 +10,8 @@ describe("unit classes", () => {
   it("are worked out from a unit's stats", () => {
     const cls = (id: string) => unitClassOf(builtIns.flatMap((f) => f.profiles).find((p) => p.id === id)!);
     expect(cls("mil-grunts")).toBe("base");
-    expect(cls("mil-medic")).toBe("support");
+    expect(cls("mil-medic")).toBe("support"); // a team of 3 with Patch Up
+    expect(cls("con-guard")).toBe("base"); // 3 models, no support ability
     expect(cls("mil-bertha")).toBe("elite");
     expect(cls("mil-rustler")).toBe("flyer");
     expect(cls("mil-turret")).toBe("static");

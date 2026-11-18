@@ -12,7 +12,7 @@ export const UNIT_CLASSES: readonly UnitClass[] = ["base", "support", "elite", "
 
 export const CLASS_INFO: Record<UnitClass, { name: string; icon: string; text: string }> = {
   base: { name: "Base", icon: "🛡", text: "Squads of several models: the backbone of the army." },
-  support: { name: "Support", icon: "🔧", text: "Single models that aren't heavy or monsters: medics, snipers, gunners, specialists." },
+  support: { name: "Support", icon: "🔧", text: "Single models, and teams of up to 3 with a support ability (healing, steadying, regrowing, recalling...): medics, snipers, gunners, specialists." },
   elite: { name: "Elite", icon: "⭐", text: "Monsters, and heavy units with 6 or more wounds." },
   flyer: { name: "Flyer", icon: "🪽", text: "Anything with the flying keyword." },
   static: { name: "Static", icon: "🏰", text: "Structures: turrets, pylons, pods and other emplacements." },
@@ -20,12 +20,22 @@ export const CLASS_INFO: Record<UnitClass, { name: string; icon: string; text: s
 
 export type Slots = Partial<Record<UnitClass, number>>;
 
-/** A unit's class, from its stats: structure, then flying, then monster or big heavy, then single model, else a squad. */
-export function unitClassOf(p: Pick<UnitProfile, "structure" | "keywords" | "models" | "hp">): UnitClass {
+/** Abilities that make a small team a Support unit: they look after other units rather than fight. */
+export const SUPPORT_ABILITIES: readonly string[] = ["patch-up", "hatch", "mending-aura", "steadying", "radiance", "recall", "bubble-shield", "spotter", "brood-call"];
+
+/** Most models a team with a support ability can have and still count as Support. */
+export const SUPPORT_TEAM_MAX = 3;
+
+/**
+ * A unit's class, from its stats: structure, then flying, then monster or big heavy, then a single
+ * model or a small team with a support ability, else a squad.
+ */
+export function unitClassOf(p: Pick<UnitProfile, "structure" | "keywords" | "models" | "hp"> & { abilities?: readonly string[] }): UnitClass {
   if (p.structure) return "static";
   if (p.keywords.includes("flying")) return "flyer";
   if (p.keywords.includes("monster") || (p.keywords.includes("heavy") && p.hp * p.models >= 6)) return "elite";
   if (p.models <= 1) return "support";
+  if (p.models <= SUPPORT_TEAM_MAX && (p.abilities ?? []).some((a) => SUPPORT_ABILITIES.includes(a))) return "support";
   return "base";
 }
 
@@ -87,7 +97,7 @@ export function slotCounts(
   faction: Pick<Faction, "id" | "slots">,
   entries: readonly ListEntry[],
   supports: readonly Pick<SupportDef, "id" | "slots">[],
-  profileOf: (id: string) => Pick<UnitProfile, "structure" | "keywords" | "models" | "hp"> | undefined,
+  profileOf: (id: string) => (Pick<UnitProfile, "structure" | "keywords" | "models" | "hp"> & { abilities?: readonly string[] }) | undefined,
 ): SlotCount[] {
   const base = MODE_SLOTS[mode];
   const extra: Slots[] = [factionSlots(faction), ...supports.map(supportSlots)];

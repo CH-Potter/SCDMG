@@ -208,7 +208,7 @@ describe("auras", () => {
   });
 
   it("Mending Spores heal unhurt friends nearby at the end of the round", () => {
-    const s = game([L("munch-pod", "mil-medic"), L("mil-grunts")]);
+    const s = game([L("munch-pod", "mil-squinter"), L("mil-grunts")]); // a single 3-wound model to heal
     place(s, "p0-0", { x: 10, y: 26 });
     const medic = place(s, "p0-1", { x: 13, y: 26 });
     place(s, "p1-0", { x: 28, y: 5 });
