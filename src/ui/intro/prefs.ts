@@ -5,7 +5,7 @@
 export const INTRO_SEEN_KEY = "scdmg.intro.v1";
 
 /** "game" for the game intro, or a built-in faction id. */
-export type IntroId = "game" | "militia" | "munch" | "concord";
+export type IntroId = "game" | "militia" | "swarm" | "concord";
 
 type StorageLike = Pick<Storage, "getItem" | "setItem">;
 

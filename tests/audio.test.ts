@@ -248,21 +248,22 @@ describe("audio: event mapping", () => {
     keywords: ["infantry", "light"],
     weapons: [
       { name: "Rivet Rifle", melee: false, damage: 1, dice: 1 },
-      { name: "Shovel Swing", melee: true, damage: 1, dice: 1 },
+      { name: "Trench Spade", melee: true, damage: 1, dice: 1 },
       { name: "Thumper Cannon", melee: false, damage: 2, dice: 3, traits: ["blast", "heavy"] },
       { name: "Staple Pistol", melee: false, damage: 1, dice: 2, traits: ["pistol"] },
       { name: "Chain Popper", melee: false, damage: 1, dice: 3 },
     ],
   };
-  const munch: UnitInfo = {
+  const swarm: UnitInfo = {
     owner: 1,
-    faction: "munch",
+    faction: "swarm",
     look: "teeth",
     keywords: ["infantry", "beast"],
     weapons: [
-      { name: "Goo Glob", melee: false, damage: 1, dice: 1 },
-      { name: "Chompers", melee: true, damage: 1, dice: 1 },
+      { name: "Acid Spit", melee: false, damage: 1, dice: 1 },
+      { name: "Snippers", melee: true, damage: 1, dice: 1 },
       { name: "Stinger", melee: true, damage: 1, dice: 2 },
+      { name: "Bile Shell", melee: false, damage: 1, dice: 2, traits: ["indirect"] },
     ],
   };
   const concord: UnitInfo = {
@@ -293,19 +294,20 @@ describe("audio: event mapping", () => {
     expect(attackSfx(report({ weapon: "Thumper Cannon" }), militia)).toBe("cannon");
     expect(attackSfx(report({ weapon: "Staple Pistol" }), militia)).toBe("pistol");
     expect(attackSfx(report({ weapon: "Chain Popper" }), militia)).toBe("burst");
-    expect(attackSfx(report({ weapon: "Shovel Swing", kind: "fight" }), militia)).toBe("thwack");
-    expect(attackSfx(report({ weapon: "Goo Glob" }), munch)).toBe("goo");
-    expect(attackSfx(report({ weapon: "Chompers", kind: "fight" }), munch)).toBe("chomp");
-    expect(attackSfx(report({ weapon: "Stinger", kind: "fight" }), munch)).toBe("sting");
+    expect(attackSfx(report({ weapon: "Trench Spade", kind: "fight" }), militia)).toBe("thwack");
+    expect(attackSfx(report({ weapon: "Acid Spit" }), swarm)).toBe("goo");
+    expect(attackSfx(report({ weapon: "Bile Shell" }), swarm)).toBe("goo");
+    expect(attackSfx(report({ weapon: "Snippers", kind: "fight" }), swarm)).toBe("chomp");
+    expect(attackSfx(report({ weapon: "Stinger", kind: "fight" }), swarm)).toBe("sting");
     expect(attackSfx(report({ weapon: "Flicker Cannon" }), concord)).toBe("beam");
     expect(attackSfx(report({ weapon: "Barrage", kind: "barrage" }), militia)).toBe("cannon");
-    expect(attackSfx(report({ weapon: "Impact", kind: "impact" }), munch)).toBe("slam");
+    expect(attackSfx(report({ weapon: "Impact", kind: "impact" }), swarm)).toBe("slam");
     // Unknown attacker: falls back on the weapon name.
     expect(attackSfx(report({ weapon: "Sunlance" }))).toBe("beam");
   });
 
   it("maps a batch of events to staggered cues", () => {
-    const units: Record<string, UnitInfo> = { a: militia, b: munch, c: concord };
+    const units: Record<string, UnitInfo> = { a: militia, b: swarm, c: concord };
     const resolve = (uid: string) => units[uid];
     const events: GameEvent[] = [
       { type: "moved", uid: "a", kind: "move" },
@@ -336,7 +338,7 @@ describe("audio: event mapping", () => {
   });
 
   it("covers the other event types", () => {
-    const resolve = (uid: string) => ({ a: militia, b: munch, s: { ...militia, keywords: ["structure"] } })[uid];
+    const resolve = (uid: string) => ({ a: militia, b: swarm, s: { ...militia, keywords: ["structure"] } })[uid];
     const one = (e: GameEvent) => cuesForEvents([e], resolve, { reduced: false }).map((c) => c.sfx);
     expect(one({ type: "deployed", uid: "a" })).toEqual(["thunk"]);
     expect(one({ type: "deployed", uid: "s" })).toEqual(["thunk-heavy"]);

@@ -1,6 +1,6 @@
 // Dev-only miniature gallery (http://localhost:5173/gallery.html): every built-in unit, large and at
 // board size, in both player colours, facing both ways, with its idle and step frames. Used to review
-// the faction art. Query: ?faction=militia|munch|concord|all|templates|<template key>, &ground=<hex>,
+// the faction art. Query: ?faction=militia|swarm|concord|all|templates|<template key>, &ground=<hex>,
 // &px=<large size>. "templates" shows the faction forge's trope templates (built from miniature parts).
 
 import { FACTIONS } from "./engine/data/factions";

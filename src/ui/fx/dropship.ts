@@ -1,5 +1,5 @@
 // Arrival visuals for support airdrops, in each faction's own style: the Militia's patched-up
-// drop-ship swoops in from its own table edge and clatters off again; Munch critters burst up out of
+// drop-ship swoops in from its own table edge and clatters off again; Skitterswarm bugs burst up out of
 // the dirt; the Concord step out of a ring of light. Also the no-go rings shown while aiming. Board
 // units are inches; everything respects `reduced` (prefers-reduced-motion).
 
@@ -109,7 +109,7 @@ export class DropShipFx {
       // Each faction arrives its own way; custom factions borrow the drop-ship.
       const faction = profileOf(u).faction;
       const ms2 =
-        faction === "munch" ? this.burst(at, spread) : faction === "concord" ? this.portal(at, spread, u.owner) : this.land(at, spread, u.owner, board);
+        faction === "swarm" ? this.burst(at, spread) : faction === "concord" ? this.portal(at, spread, u.owner) : this.land(at, spread, u.owner, board);
       out.set(u.uid, ms2);
     }
     return out;
@@ -170,7 +170,7 @@ export class DropShipFx {
     return dur * touch;
   }
 
-  /** Munch arrival: the ground bulges, cracks open and flings dirt clods out. Returns the pop-out time in ms. */
+  /** Skitterswarm arrival: the ground bulges, cracks open and flings dirt clods out. Returns the pop-out time in ms. */
   burst(at: Vec, spread: number): number {
     if (this.reduced) {
       this.dust(at, spread, 0);

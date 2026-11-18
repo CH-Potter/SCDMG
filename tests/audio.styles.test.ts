@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { DORIAN, MINOR_PENTATONIC, chordPcs, chordTones, formBars, inKey, styleForLook, type Inst, type Style } from "../src/audio/composer";
+import { chordPcs, chordTones, formBars, inKey, styleForLook, type Inst, type Style } from "../src/audio/composer";
 import { CRYSTAL_DEGREES, arpIndex, composeCrystal } from "../src/audio/crystal";
-import { MUNCH_DEGREES, composeMunch, generateGroove, generateRiff } from "../src/audio/munch";
+import { PHRYGIAN, SWARM_DEGREES, SWARM_POOL, SWARM_RIFF_INTERVALS, composeSwarm, generateGroove, generateRiff } from "../src/audio/swarm";
 import { Rng } from "../src/audio/rng";
 import { arrangeStyleBar, composeStyleSong, composeStyleStinger, guestTexture } from "../src/audio/score";
 import { Sequencer } from "../src/audio/sequencer";
 
 const SEEDS = Array.from({ length: 30 }, (_, i) => i * 104729 + 7);
-const STYLES: Style[] = ["western", "crystal", "munch"];
+const STYLES: Style[] = ["western", "crystal", "swarm"];
 
 describe("audio styles: faction mapping", () => {
   it("maps token looks to styles (custom factions included)", () => {
     expect(styleForLook("cap")).toBe("western");
     expect(styleForLook("plain")).toBe("western");
     expect(styleForLook("crystal")).toBe("crystal");
-    expect(styleForLook("teeth")).toBe("munch");
+    expect(styleForLook("teeth")).toBe("swarm");
     expect(styleForLook(undefined)).toBe("western");
   });
 });
@@ -77,25 +77,29 @@ describe("audio styles: crystal (Lumen Concord)", () => {
   });
 });
 
-describe("audio styles: munch (The Munch)", () => {
-  it("vamps on Dorian 7th chords with a minor-pentatonic kalimba hook", () => {
+describe("audio styles: swarm (The Skitterswarm)", () => {
+  it("vamps on Phrygian 7th chords with a dark five-note kalimba hook", () => {
     for (const seed of SEEDS) {
-      const song = composeMunch("battle", seed);
+      const song = composeSwarm("battle", seed);
       for (const sec of [song.sections.A, song.sections.B]) {
-        for (const c of sec.chords) expect(MUNCH_DEGREES).toContain(c.degree);
-        for (const n of sec.melody) expect(inKey(song.key, n.midi, MINOR_PENTATONIC)).toBe(true);
+        for (const c of sec.chords) expect(SWARM_DEGREES).toContain(c.degree);
+        for (const n of sec.melody) expect(inKey(song.key, n.midi, SWARM_POOL)).toBe(true);
       }
-      expect(song.mode).toBe(DORIAN);
+      expect(song.mode).toBe(PHRYGIAN);
+      // The flat second is the colour: the bII chord or the b2 in the riff comes up somewhere.
+      const all = [song.sections.A, song.sections.B];
+      expect(all.some((sec) => sec.chords.some((c) => c.degree === 1) || sec.riff.some((n) => n.midi === 1))).toBe(true);
     }
   });
 
-  it("riffs start on the root, stay inside the bar and grooves keep their backbone", () => {
+  it("riffs pulse from the root, stay inside the bar and grooves keep their backbone", () => {
     for (const seed of SEEDS) {
       const riff = generateRiff(new Rng(seed));
       expect(riff[0]).toMatchObject({ t: 0, midi: 0 });
+      expect(riff.length).toBeGreaterThanOrEqual(4);
       for (const n of riff) {
         expect(n.t + n.dur).toBeLessThanOrEqual(4);
-        expect([0, 3, 5, 7, 10, 12]).toContain(n.midi);
+        expect(SWARM_RIFF_INTERVALS).toContain(n.midi);
       }
       const g = generateGroove(new Rng(seed));
       expect(g.some((n) => n.t === 0 && n.midi === 45)).toBe(true);
@@ -103,14 +107,15 @@ describe("audio styles: munch (The Munch)", () => {
     }
   });
 
-  it("heats up with more shaker and percussion", () => {
-    const song = composeMunch("battle", 8);
+  it("drones on the root and heats up with more clicks", () => {
+    const song = composeSwarm("battle", 8);
     const perc = (I: number) => {
       let n = 0;
       for (let i = 0; i < 16; i++) n += arrangeStyleBar(song, i, { intensity: I, flourishes: false }).notes.filter((x) => x.inst === "shaker" || x.inst === "hand").length;
       return n;
     };
     expect(perc(0.9)).toBeGreaterThan(perc(0.1) * 1.5);
+    for (let i = 0; i < 8; i++) expect(arrangeStyleBar(song, i, { intensity: 0.5, flourishes: false }).notes.filter((x) => x.inst === "sub")).toHaveLength(1);
   });
 });
 
@@ -141,8 +146,8 @@ describe("audio styles: all styles", () => {
   });
 
   it("each style sounds like itself: signature instruments only", () => {
-    const sig: Record<Style, Inst[]> = { western: ["guitar", "harmonica", "clip"], crystal: ["bell", "pad", "arp", "kick"], munch: ["rubber", "kalimba", "hand"] };
-    const foreign: Record<Style, Inst[]> = { western: ["pad", "rubber", "bell"], crystal: ["guitar", "rubber", "kalimba"], munch: ["guitar", "pad", "bell"] };
+    const sig: Record<Style, Inst[]> = { western: ["guitar", "harmonica", "clip"], crystal: ["bell", "pad", "arp", "kick"], swarm: ["rubber", "kalimba", "hand", "sub"] };
+    const foreign: Record<Style, Inst[]> = { western: ["pad", "rubber", "bell"], crystal: ["guitar", "rubber", "kalimba"], swarm: ["guitar", "pad", "bell"] };
     for (const style of STYLES) {
       const song = composeStyleSong(style, "battle", 3);
       const insts = new Set(Array.from({ length: 32 }, (_, i) => arrangeStyleBar(song, i, { intensity: 0.7, flourishes: true }).notes.map((n) => n.inst)).flat());
@@ -162,7 +167,7 @@ describe("audio styles: all styles", () => {
     const chord = song.sections[song.form[0]!].chords[3]!;
     for (const n of extra) expect(chordPcs(song.key, chord).includes(n.midi % 12)).toBe(true);
     // Same style as the song: no guest.
-    expect(guestTexture(song, 3, "munch", true).length).toBeGreaterThan(0);
+    expect(guestTexture(song, 3, "swarm", true).length).toBeGreaterThan(0);
     expect(arrangeStyleBar(song, 3, { intensity: 0.5, flourishes: false, guest: "western" }).notes.length).toBe(plain.notes.length);
   });
 

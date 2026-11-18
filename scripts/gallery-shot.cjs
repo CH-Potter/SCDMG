@@ -1,7 +1,7 @@
 // Dev tool: screenshot the miniature gallery to a PNG, headless, so art can be reviewed without a browser.
 // Needs the dev server running (npm run dev).
 //   npx electron scripts/gallery-shot.cjs <faction|all> <out.png> [width] [query]
-// e.g. npx electron scripts/gallery-shot.cjs munch shots/munch.png 1400 "ground=5d7a45&px=220"
+// e.g. npx electron scripts/gallery-shot.cjs swarm shots/swarm.png 1400 "ground=5d7a45&px=220"
 
 const { app, BrowserWindow } = require("electron");
 const fs = require("node:fs");

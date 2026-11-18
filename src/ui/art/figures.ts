@@ -13,6 +13,7 @@ import { hash, makeCanvas } from "./ink";
 import { BODY_DESIGN, paintRecipe } from "./miniBuilder";
 import { luma, mix, rgba, shade } from "./palette";
 import { FACTION_ART, factionFigure } from "./factions";
+import { swarmRecipe } from "./factions/swarm";
 import { contact, ellipse, fill, flat, glowAt, ink, mat, type Mat, outlined, rrect, teethRow, type Toon, tube } from "./toon";
 
 export type Look = Faction["look"];
@@ -74,7 +75,9 @@ export interface FigureMeta {
 /** Classify a profile into a figure archetype (or its custom art, if it has any). */
 export function figureSpec(p: UnitProfile, look: Look, color: number): FigureSpec {
   const auto = archetypeSpec(p, look, color);
-  const art = p.art;
+  // The Skitterswarm's bugs are built miniatures for now (see factions/swarm.ts).
+  const recipe = p.art ? undefined : swarmRecipe(p.id);
+  const art = p.art ?? (recipe ? { kind: "parts" as const, recipe } : undefined);
   if (art?.kind === "parts") {
     const flying = p.keywords.includes("flying");
     const kind: FigureKind = flying ? "skiff" : RECIPE_KIND[art.recipe.body];

@@ -68,7 +68,7 @@ describe("attack marker", () => {
   });
 
   it("builds a marker from the state on screen, falling back to the next state for arriving units", () => {
-    const s = createGame({ factions: ["militia", "munch"], mapId: "dustbowl", seed: 1, orderChoice: false });
+    const s = createGame({ factions: ["militia", "swarm"], mapId: "dustbowl", seed: 1, orderChoice: false });
     const a = s.units.find((u) => u.owner === 0)!;
     const t = s.units.find((u) => u.owner === 1)!;
     // Neither is on the table in `s`: no marker.

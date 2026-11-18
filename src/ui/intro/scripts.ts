@@ -7,7 +7,7 @@
 import { LORE_FACTIONS, WORLD, leaderOf, type LoreFactionId } from "../../engine/data/lore";
 import { wordmarkSvg } from "../art/emblems";
 import { esc } from "../describe";
-import { barnDoor, barnFront, creekCutaway, hallMast, hole, LAB_VATS, lab, lawn, lightGate, mound, orbit, pumpkin, rays, scoreCard, starLens, valley } from "./backdrops";
+import { barnDoor, barnFront, creekCutaway, hallMast, HOLLOW_EGGS, hole, hollow, lawn, lightGate, mound, orbit, pumpkin, rays, scoreCard, starLens, valley } from "./backdrops";
 import type { IntroDef, Kit, SceneDef } from "./stage";
 
 // ---------------------------------------------------------------- shared bits
@@ -36,7 +36,7 @@ function glow(k: Kit, x: number, y: number, size: number, color: string, at = 0)
   return g;
 }
 
-/** Rings spreading out from a point (radio waves, the overmind, a targeting ping). */
+/** Rings spreading out from a point (radio waves, a tremor, a targeting ping). */
 function rings(k: Kit, x: number, y: number, size: number, color: string, n = 3, at = 0, arc = false): void {
   for (let i = 0; i < n; i++) {
     const r = k.add(
@@ -177,17 +177,17 @@ const gameScenes = (): SceneDef[] => {
         for (const [x, y, at] of holes) {
           const h = art(k, hole(), x, y, 20, 8, 30);
           k.pop(h, at - 200, 250);
-          const b = k.mini("munch-nibblers", { x, y: y - 1, k: 13, z: 31, flip: x > 50 });
+          const b = k.mini("swarm-skitterlings", { x, y: y - 1, k: 13, z: 31, flip: x > 50 });
           k.anim(b, [{ transform: "translateY(30%) scale(0.2)", opacity: 0 }, { transform: "translateY(-35%) scale(1.05)", opacity: 1, offset: 0.55 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { at, dur: 520 });
           k.dust(x, y, at, 8);
         }
-        const mama = k.mini("munch-mama", { x: 55, y: 89, k: 15, z: 60 });
-        k.anim(mama, [{ transform: "translateY(70%)" }, { transform: "translateY(-6%)", offset: 0.75 }, { transform: "translateY(0)" }], { at: 1250, dur: 700, ease: "ease-out" });
+        const borer = k.mini("swarm-borer", { x: 55, y: 89, k: 15, z: 60 });
+        k.anim(borer, [{ transform: "translateY(70%)" }, { transform: "translateY(-6%)", offset: 0.75 }, { transform: "translateY(0)" }], { at: 1250, dur: 700, ease: "ease-out" });
         art(k, mound(), 55, 94, 62, 16, 70);
         k.dust(55, 88, 1300, 14);
         k.shake(300, 0.7);
         k.shake(1300, 1.3, 520);
-        k.burst("KRA-KOOM!", 22, 30, { size: 22, at: 1350, color: "#c6ea52", rot: -10 });
+        k.burst("KRA-KOOM!", 22, 30, { size: 22, at: 1350, color: "#d6f56a", rot: -10 });
         k.sfx("dig", 450);
         k.sfx("chomp", 800, 0.7);
         k.sfx("slam", 1300);
@@ -253,7 +253,7 @@ const gameScenes = (): SceneDef[] => {
         k.add("ix-abs ix-table", "", "left:0;right:0;bottom:0;height:20%;z-index:5");
         const em = [
           ["militia", 15, 74, "left", 150],
-          ["munch", 50, 79, "bottom", 400],
+          ["swarm", 50, 79, "bottom", 400],
           ["concord", 85, 74, "right", 650],
         ] as const;
         for (const [fid, x, y, from, at] of em) {
@@ -282,25 +282,33 @@ const gameScenes = (): SceneDef[] => {
 export const GAME_INTRO = (): IntroDef => ({
   id: "game",
   title: WORLD.name,
-  cast: ["munch-nibblers", "munch-mama", "con-skiff", "con-lancer", "con-dancers", "mil-bertha", "mil-grunts", "mil-medic", "mil-grannies"],
+  cast: ["swarm-skitterlings", "swarm-borer", "con-skiff", "con-lancer", "con-dancers", "mil-bertha", "mil-grunts", "mil-medic", "mil-grannies"],
   scenes: gameScenes(),
 });
 
 // ---------------------------------------------------------------- Dustline Militia
+
+/** A painted unit marking on a plank, e.g. "3RD HAYBRIGHT SECTION". */
+function marking(k: Kit, text: string, x: number, y: number, rot: number, at: number): HTMLElement {
+  const m = k.add("ix-plank", esc(text), `left:${x}%;top:${y}%;transform:rotate(${rot}deg)`);
+  k.anim(m, [{ transform: `translateY(-50cqh) rotate(${rot}deg)` }, { transform: `translateY(0) rotate(${rot}deg)` }], { at, dur: 420, ease: "cubic-bezier(.2,1.3,.4,1)" });
+  return m;
+}
 
 const militiaScenes = (): SceneDef[] => {
   const c = LORE_FACTIONS.militia.intro;
   return [
     {
       dur: 3000,
-      caption: c[0]!,
+      caption: c[0] ?? "When trouble comes up the valley, the Marshal calls the Muster roll.",
       build: (k) => {
         k.backdrop(valley({ sky: "dawn", hall: true, fence: true, pump: true }));
         const m = hallMast();
         rings(k, m.x, m.y, 26, "#fff3c0", 3, 100);
-        k.bubble("Now listen here.", m.x + 1.5, m.y - 4, { at: 450, w: 34 });
-        k.bubble("Everybody to the Crossing!", m.x + 3, m.y + 22, { at: 1500, w: 30, shout: true });
-        // A courier is already on the way.
+        marking(k, "DUSTLINE MUSTER · HQ", 40, 74, -3, 150);
+        k.bubble("Muster roll! First Section!", m.x + 1.5, m.y - 4, { at: 450, w: 34 });
+        k.bubble("All sections, fall in at the Crossing!", m.x + 3, m.y + 22, { at: 1500, w: 30, shout: true });
+        // A dispatch rider is already on the way with the orders.
         const rider = k.mini("mil-riders", { x: 26, y: 93, k: 14, z: 80 });
         k.anim(rider, [{ transform: "translateX(-60cqw)" }, { transform: "translateX(0)" }], { at: 1700, dur: 700, ease: "cubic-bezier(.3,.8,.4,1)" });
         k.dust(20, 92, 2300, 9);
@@ -310,32 +318,37 @@ const militiaScenes = (): SceneDef[] => {
     },
     {
       dur: 3000,
-      caption: c[1]!,
+      caption: c[1] ?? "Every family sends its hands: squads fall in, riveted into their armour.",
       build: (k) => {
         k.backdrop(valley({ sky: "day", fence: true, road: "dirt", clouds: true, silo: true }));
-        [56, 68, 80].forEach((x, i) => {
-          const g = k.mini("mil-grannies", { x, y: 77, k: 11, bob: true });
+        marking(k, "3RD HAYBRIGHT SECTION", 6, 56, -2, 0);
+        marking(k, "OLD GUARD", 62, 50, 3, 700);
+        // The squad falls in: one step at a time, in a line, no bobbing about.
+        [8, 19, 30, 41].forEach((x, i) => {
+          const g = k.mini("mil-grunts", { x, y: 91, k: 14 });
+          k.anim(g, [{ transform: "translateX(-70cqw)" }, { transform: "translateX(0)", offset: 0.85 }, { transform: "translateY(-1.5cqh)", offset: 0.92 }, { transform: "translate(0,0)" }], {
+            at: i * 160,
+            dur: 900,
+            ease: "steps(6, end)",
+          });
+        });
+        const medic = k.mini("mil-medic", { x: 52, y: 93, k: 13 });
+        enter(k, medic, "left", 750, 650);
+        [62, 73, 84].forEach((x, i) => {
+          const g = k.mini("mil-grannies", { x, y: 78, k: 11 });
           k.pop(g, 900 + i * 150, 360);
         });
-        const riders = k.mini("mil-riders", { x: 88, y: 71, k: 10, z: 70 });
-        k.anim(riders, [{ transform: "translateX(-95cqw)" }, { transform: "translateX(0)" }], { at: 1500, dur: 900, ease: "cubic-bezier(.3,.8,.4,1)" });
-        k.dust(88, 71, 2300, 7);
-        [8, 20, 32, 44].forEach((x, i) => {
-          const g = k.mini("mil-grunts", { x, y: i % 2 ? 87 : 93, k: 14, bob: true });
-          enter(k, g, "left", i * 140, 620);
-        });
-        const medic = k.mini("mil-medic", { x: 58, y: 92, k: 14, bob: true });
-        enter(k, medic, "left", 650, 650);
+        k.burst("HUP!", 86, 26, { size: 18, at: 1700, rot: 8 });
         k.sfx("shuffle", 50, 0.8);
-        k.sfx("shuffle", 500, 0.6);
-        k.sfx("whoosh", 1500, 0.6);
+        k.sfx("thunk", 900, 0.5);
+        k.sfx("stomp", 1700, 0.6);
       },
     },
     {
       dur: 3200,
-      caption: c[2]!,
+      caption: c[2] ?? "Big Bertha strides out of the motor pool.",
       build: (k) => {
-        k.backdrop(barnFront());
+        k.backdrop(barnFront("MUSTER MOTOR POOL"));
         const bertha = k.mini("mil-bertha", { x: 50, y: 95, k: 19, z: 40 });
         k.anim(
           bertha,
@@ -365,17 +378,24 @@ const militiaScenes = (): SceneDef[] => {
     },
     {
       dur: 3000,
-      caption: c[3]!,
+      caption: c[3] ?? "The crop dusters fly over in formation.",
       build: (k) => {
         k.backdrop(valley({ sky: "day", horizon: 770, clouds: true, pump: true, barn: true, silo: true }));
-        const rustler = k.mini("mil-rustler", { x: 50, y: 52, k: 17, z: 60 });
-        flyAcross(k, rustler, false, 0, 2700);
-        const bomber = k.mini("mil-bomber", { x: 52, y: 34, k: 15, z: 50, flip: true });
-        flyAcross(k, bomber, true, 250, 2900);
+        // A V of three, the leader out front, then the bomber the other way.
+        for (const [x, y, s, at] of [
+          [58, 46, 15, 0],
+          [44, 34, 12, 120],
+          [44, 60, 12, 120],
+        ] as const) {
+          const r = k.mini("mil-rustler", { x, y, k: s, z: 60 });
+          flyAcross(k, r, false, at, 2700);
+        }
+        const bomber = k.mini("mil-bomber", { x: 52, y: 28, k: 12, z: 50, flip: true });
+        flyAcross(k, bomber, true, 300, 2900);
         const mortar = k.mini("mil-mortar", { x: 13, y: 97, k: 12, z: 80 });
         k.pop(mortar, 0, 300);
         k.burst("PTOOMF!", 22, 70, { size: 14, at: 1300, rot: -6 });
-        k.burst("BRRRAP!", 78, 66, { size: 16, at: 1000, rot: 6, color: "#ffd06a" });
+        k.burst("BRRRAP!", 80, 72, { size: 16, at: 1000, rot: 6, color: "#ffd06a" });
         k.sfx("whoosh", 100, 0.7);
         k.sfx("burst", 1000, 0.6);
         k.sfx("cannon", 1300, 0.5);
@@ -383,128 +403,152 @@ const militiaScenes = (): SceneDef[] => {
     },
     {
       dur: 3700,
-      caption: c[4]!,
+      caption: c[4] ?? "Dustline Militia: rivets, rifles and a very long memory.",
       build: (k) => titleCard(k, "militia", { a: "#f28c28", b: "#f6a548", name: ["DUSTLINE", "MILITIA"], lineup: ["mil-grunts", "mil-squinter", "mil-bertha", "mil-grannies", "mil-medic", "mil-riders"] }),
     },
   ];
 };
 
-// ---------------------------------------------------------------- The Munch
+// ---------------------------------------------------------------- The Skitterswarm
 
-const munchScenes = (): SceneDef[] => {
-  const c = LORE_FACTIONS.munch.intro;
+/** Cracks spreading across the ground (an SVG overlay over the whole panel). */
+function cracks(k: Kit, at: number): void {
+  const paths = [
+    "M800 900 L780 820 L820 760 L760 690 L800 640",
+    "M780 820 L640 800 L560 840 L430 820",
+    "M820 760 L960 740 L1050 780 L1190 760",
+    "M760 690 L650 670 L600 700",
+    "M300 900 L330 830 L280 780",
+    "M1300 900 L1270 840 L1330 790",
+  ];
+  const d = paths.map((p) => `<path d="${p}"/>`).join("");
+  const el = k.add(
+    "ix-abs",
+    `<svg viewBox="0 0 1600 900" preserveAspectRatio="none" style="width:100%;height:100%"><g fill="none" stroke="#1c1512" stroke-width="16" stroke-linejoin="round" stroke-linecap="round">${d}</g><g fill="none" stroke="#d6f56a" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" opacity="0.8">${d}</g></svg>`,
+    "inset:0;z-index:20",
+  );
+  k.anim(el, [{ clipPath: "circle(0% at 50% 100%)" }, { clipPath: "circle(80% at 50% 100%)" }], { at, dur: 1300, ease: "ease-out" });
+}
+
+const swarmScenes = (): SceneDef[] => {
+  const c = LORE_FACTIONS.swarm.intro;
   return [
     {
       dur: 3000,
-      caption: c[0]!,
+      caption: c[0] ?? "Under Badger Knob, the ground trembles.",
       build: (k) => {
-        k.backdrop(lab());
-        for (const v of LAB_VATS) fizz(k, v.x, 5, v.bottom - 4, v.top + 4, 7, Math.round(v.x));
-        glow(k, 50, 48, 70, "rgba(182,255,106,0.55)");
-        const nanny = k.mini("munch-nanny", { x: 34, y: 92, k: 13, z: 70 });
-        k.anim(nanny, [{ transform: "translateX(-40cqw)" }, { transform: "translateX(0)" }], { at: 200, dur: 1400, ease: "ease-out" });
-        const thread = k.add("ix-abs", "", "left:68%;top:0;width:0.5cqh;height:30%;background:#e8ffd0;border:0.15cqh solid #1c1512;z-index:59;transform-origin:50% 0");
-        const spider = k.mini("munch-spitter", { x: 68.2, y: 44, k: 12, z: 60 });
-        k.anim(thread, [{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }], { at: 1100, dur: 520, ease: "cubic-bezier(.3,1.3,.5,1)" });
-        k.anim(spider, [{ transform: "translateY(-50cqh)" }, { transform: "translateY(0)" }], { at: 1100, dur: 520, ease: "cubic-bezier(.3,1.3,.5,1)" });
-        k.burst("BZZT!", 27, 64, { size: 13, at: 1800, color: "#c6ea52", rot: -12 });
-        k.sfx("fizzle", 200, 0.7);
-        k.sfx("scurry", 1100, 0.7);
-        k.sfx("twang", 1800, 0.5);
+        k.backdrop(valley({ sky: "dusk", crops: "corn", horizon: 470, barn: true }));
+        k.shake(200, 0.5, 600);
+        k.shake(1100, 0.9, 700);
+        k.shake(2000, 1.3, 600);
+        cracks(k, 900);
+        // Feelers poke up out of the cracks, and duck back down.
+        for (const [x, y, at] of [
+          [48, 74, 1400],
+          [70, 86, 1700],
+        ] as const) {
+          const h = art(k, hole(), x, y, 14, 5.5, 30);
+          k.pop(h, at - 150, 200);
+          const b = k.mini("swarm-skitterlings", { x, y: y - 0.5, k: 11, z: 31, flip: x > 50 });
+          k.anim(b, [{ transform: "translateY(40%) scale(0.3)", opacity: 0 }, { transform: "translateY(-10%) scale(0.9)", opacity: 1, offset: 0.4 }, { transform: "translateY(0) scale(0.9)", opacity: 1 }], { at, dur: 600 });
+        }
+        k.burst("RRRMBLE...", 22, 30, { size: 17, at: 1100, color: "#d6f56a", rot: -6 });
+        k.sfx("dig", 200, 0.6);
+        k.sfx("thunk-heavy", 1100, 0.7);
+        k.sfx("scurry", 1500, 0.6);
       },
     },
     {
       dur: 3200,
-      caption: c[1]!,
+      caption: c[1] ?? "In the Brood Hollow, a thousand eggs glow in the warm dark.",
       build: (k) => {
-        k.backdrop(lab(true));
-        const eyes = k.add("ix-abs", `<span></span><span></span>`, "left:64%;top:58%;width:10cqh;height:3cqh;z-index:80;display:flex;justify-content:space-between");
-        eyes.querySelectorAll("span").forEach((s) => ((s as HTMLElement).style.cssText = "width:3cqh;height:2.2cqh;border-radius:50%;background:#ffd23a;box-shadow:0 0 2cqh #ffd23a,0 0 0 0.35cqh #1c1512"));
+        k.backdrop(hollow());
+        for (const [i, e] of HOLLOW_EGGS.entries()) {
+          glow(k, e.x, e.y, 30, "rgba(214,245,106,0.6)", i * 220);
+          fizz(k, e.x, 8, e.y - 4, e.y - 30, 4, i + 3);
+        }
+        const tenders = k.mini("swarm-tenders", { x: 30, y: 93, k: 12, z: 70 });
+        k.anim(tenders, [{ transform: "translateX(-40cqw)" }, { transform: "translateX(0)" }], { at: 200, dur: 1300, ease: "ease-out" });
+        // An egg cracks, and something small and furious climbs out.
+        const hatch = k.mini("swarm-skitterlings", { x: 64, y: 90, k: 12, z: 72, flip: true });
+        k.anim(hatch, [{ transform: "translateY(30%) scale(0.2)", opacity: 0 }, { transform: "translateY(-30%) scale(1.1)", opacity: 1, offset: 0.6 }, { transform: "translateY(0) scale(1)", opacity: 1 }], { at: 1600, dur: 520 });
+        k.burst("CRACK!", 74, 58, { size: 15, at: 1600, color: "#d6f56a", rot: 10 });
+        k.sfx("fizzle", 200, 0.6);
+        k.sfx("scurry", 400, 0.6);
+        k.sfx("thunk", 1600, 0.6);
+      },
+    },
+    {
+      dur: 3200,
+      caption: c[2] ?? "Mother Mandible is awake. Every one of them is hers.",
+      build: (k) => {
+        k.backdrop(hollow(true));
+        const eyes = k.add("ix-abs", `<span></span><span></span>`, "left:45%;top:50%;width:12cqh;height:3.5cqh;z-index:80;display:flex;justify-content:space-between");
+        eyes.querySelectorAll("span").forEach((sp) => ((sp as HTMLElement).style.cssText = "width:4cqh;height:3cqh;border-radius:50%;background:#d6f56a;box-shadow:0 0 2.4cqh #d6f56a,0 0 0 0.35cqh #1c1512"));
         k.anim(eyes, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, transform: "scaleY(1)", offset: 0.5 }, { opacity: 1, transform: "scaleY(0.1)", offset: 0.55 }, { opacity: 1, transform: "scaleY(1)", offset: 0.6 }, { opacity: 0 }], {
           at: 100,
           dur: 1200,
           hold: 0,
         });
-        beam(k, 52, 0, 96, 70, 1150, "rgba(214,255,150,0.75)");
-        const mama = k.mini("munch-mama", { x: 52, y: 93, k: 21, z: 60 });
-        k.anim(mama, [{ filter: "brightness(0.04)" }, { filter: "brightness(0.04)", offset: 0.6 }, { filter: "brightness(1.25)", offset: 0.8 }, { filter: "brightness(1)" }], { dur: 1700 });
-        k.bubble("Mama... it's dinner time.", 53, 22, { at: 1900, w: 34 });
+        beam(k, 50, 0, 96, 72, 1150, "rgba(214,245,106,0.6)");
+        rings(k, 50, 70, 70, "#d6f56a", 3, 1300);
+        const mother = k.mini("swarm-mother", { x: 50, y: 94, k: 15, z: 60 });
+        k.anim(mother, [{ filter: "brightness(0.04)" }, { filter: "brightness(0.04)", offset: 0.6 }, { filter: "brightness(1.25)", offset: 0.8 }, { filter: "brightness(1)" }], { dur: 1700 });
+        k.bubble("*click-click* The ground is warm.", 52, 20, { at: 1900, w: 34 });
         k.sfx("thunk", 1150, 0.8);
-        k.sfx("gulp", 2000, 0.8);
+        k.sfx("summon", 1300, 0.6);
+        k.sfx("scurry", 2000, 0.7);
       },
     },
     {
       dur: 3000,
-      caption: c[2]!,
-      build: (k) => {
-        k.add("ix-abs", "", "inset:0;background:radial-gradient(circle at 50% 50%, #4f8a30, #18300f 70%);z-index:1");
-        rings(k, 50, 50, 110, "#c6ea52", 3, 0);
-        const crew = [
-          ["munch-nibblers", 16, 40, false],
-          ["munch-buzz", 32, 22, false],
-          ["munch-flapjaw", 80, 28, true],
-          ["munch-spitter", 86, 64, true],
-          ["munch-hoppers", 18, 86, false],
-          ["munch-lobber", 70, 94, true],
-        ] as const;
-        const lines = crew.map(([, x, y]) => `<path d="M800 450 L${x * 16} ${(y - 6) * 9}"/>`).join("");
-        const net = k.add(
-          "ix-abs",
-          `<svg viewBox="0 0 1600 900" preserveAspectRatio="none" style="width:100%;height:100%"><g fill="none" stroke="#1c1512" stroke-width="14" stroke-linecap="round">${lines}</g><g class="ix-net" fill="none" stroke="#c6ea52" stroke-width="6" stroke-dasharray="18 14" stroke-linecap="round">${lines}</g></svg>`,
-          "inset:0;z-index:20",
-        );
-        k.fadeIn(net, 500, 500);
-        const em = k.emblem("munch", 50, 50, 30);
-        em.style.zIndex = "90";
-        k.pop(em, 100, 420);
-        crew.forEach(([id, x, y, flip], i) => {
-          const m = k.mini(id, { x, y, k: 11, flip, bob: true, z: 50 + i });
-          k.pop(m, 450 + i * 180, 340);
-        });
-        k.sfx("summon", 150);
-        k.sfx("sting", 900, 0.5);
-        k.sfx("chomp", 1400, 0.5);
-      },
-    },
-    {
-      dur: 3000,
-      caption: c[3]!,
+      caption: c[3] ?? "And every one of them is coming up.",
       build: (k) => {
         k.backdrop(valley({ sky: "dusk", crops: "corn", horizon: 470 }));
-        const beetles = [
-          [34, 80],
-          [52, 92],
-          [70, 82],
-          [86, 94],
-          [20, 95],
+        // Tunnel mouths open across the field and the swarm pours out of them, running for the farms.
+        const holes = [
+          [16, 82, 0],
+          [44, 92, 180],
+          [30, 72, 360],
         ] as const;
-        beetles.forEach(([x, y], i) => {
-          const b = k.mini("munch-nibblers", { x, y, k: 12, bob: true });
-          k.anim(b, [{ transform: "translateX(-100cqw)" }, { transform: "translateX(0)" }], { at: i * 120, dur: 1100, ease: "cubic-bezier(.2,.8,.3,1)" });
+        for (const [x, y, at] of holes) {
+          const h = art(k, hole(), x, y, 18, 7, 30);
+          k.pop(h, at, 220);
+          k.dust(x, y, at + 100, 6);
+        }
+        const runners = [
+          [40, 80, 0],
+          [58, 92, 1],
+          [72, 82, 2],
+          [86, 94, 0],
+          [62, 74, 2],
+          [80, 72, 1],
+        ] as const;
+        runners.forEach(([x, y, from], i) => {
+          const h = holes[from]!;
+          const b = k.mini("swarm-skitterlings", { x, y, k: 11, bob: true });
+          k.anim(b, [{ transform: `translate(${h[0] - x}cqw, ${(h[1] - y) * 0.9}cqh) scale(0.3)`, opacity: 0 }, { opacity: 1, offset: 0.15 }, { transform: "translate(0,0) scale(1)", opacity: 1 }], {
+            at: 300 + i * 130,
+            dur: 900,
+            ease: "cubic-bezier(.2,.8,.3,1)",
+          });
         });
-        [
-          [26, 86, 300],
-          [46, 82, 520],
-          [62, 90, 740],
-        ].forEach(([x, y, at]) => {
-          const f = k.mini("munch-hoppers", { x: x!, y: y!, k: 13 });
-          k.anim(f, [{ transform: "translate(-60cqw, 0)" }, { transform: "translate(-30cqw, -32cqh)", offset: 0.5 }, { transform: "translate(0, 0)" }], { at: at!, dur: 800, ease: "ease-out" });
-        });
-        const wasps = k.mini("munch-buzz", { x: 64, y: 40, k: 14, bob: true });
-        enter(k, wasps, "left", 200, 1100, 90);
-        const crow = k.mini("munch-flapjaw", { x: 34, y: 30, k: 13, bob: true });
-        enter(k, crow, "left", 450, 1100, 90);
-        k.burst("MUNCH!", 82, 32, { size: 22, at: 1500, color: "#c6ea52", rot: 8 });
-        k.shake(1500, 1);
-        k.sfx("scurry", 50);
-        k.sfx("flutter", 400, 0.6);
-        k.sfx("chomp", 1500);
+        const spitters = k.mini("swarm-spitters", { x: 24, y: 95, k: 12 });
+        k.pop(spitters, 1100, 340);
+        const stingers = k.mini("swarm-stingers", { x: 62, y: 38, k: 13, bob: true });
+        enter(k, stingers, "left", 200, 1100, 90);
+        k.burst("SKITTER-SKITTER!", 74, 22, { size: 17, at: 1500, color: "#d6f56a", rot: 8 });
+        k.shake(1500, 0.8);
+        k.sfx("dig", 0, 0.6);
+        k.sfx("scurry", 300);
+        k.sfx("flutter", 400, 0.5);
+        k.sfx("chomp", 1500, 0.8);
       },
     },
     {
       dur: 3700,
-      caption: c[4]!,
-      build: (k) => titleCard(k, "munch", { a: "#2c5a1c", b: "#3d7a28", name: ["THE", "MUNCH"], lineup: ["munch-nibblers", "munch-spitter", "munch-mama", "munch-hoppers", "munch-nanny", "munch-lobber"] }),
+      caption: c[4] ?? "The Skitterswarm: the ground is hungry.",
+      build: (k) => titleCard(k, "swarm", { a: "#2a1c24", b: "#3d2a36", name: ["SKITTER", "SWARM"], lineup: ["swarm-skitterlings", "swarm-spitters", "swarm-shellbacks", "swarm-mother", "swarm-lurker", "swarm-tenders"] }),
     },
   ];
 };
@@ -614,11 +658,11 @@ const FACTION_INTROS: Record<LoreFactionId, () => IntroDef> = {
     cast: ["mil-grunts", "mil-medic", "mil-grannies", "mil-riders", "mil-bertha", "mil-rustler", "mil-bomber", "mil-mortar", "mil-squinter"],
     scenes: militiaScenes(),
   }),
-  munch: () => ({
-    id: "munch",
-    title: LORE_FACTIONS.munch.name,
-    cast: ["munch-nanny", "munch-spitter", "munch-mama", "munch-nibblers", "munch-buzz", "munch-flapjaw", "munch-hoppers", "munch-lobber"],
-    scenes: munchScenes(),
+  swarm: () => ({
+    id: "swarm",
+    title: LORE_FACTIONS.swarm.name,
+    cast: ["swarm-skitterlings", "swarm-tenders", "swarm-mother", "swarm-spitters", "swarm-stingers", "swarm-shellbacks", "swarm-borer"],
+    scenes: swarmScenes(),
   }),
   concord: () => ({
     id: "concord",

@@ -62,7 +62,7 @@ function defaults(): Prefs {
     mode: "skirmish",
     mission: { skirmish: "hold", assault: "frontline" },
     map: { skirmish: "dustbowl", assault: "highway" },
-    faction: ["militia", "munch"],
+    faction: ["militia", "swarm"],
     list: ["", ""],
     side: {},
     army: "list",
