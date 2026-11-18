@@ -157,7 +157,7 @@ describe("deployment, supply and phases", () => {
     s.players[0].resources = 99;
     const s2 = ok(applyCommand(s, { type: "deploy", uid: uidOf(s, 0, "mil-grunts"), to: { x: 10, y: 33.5 } }));
     s2.activePlayer = 0;
-    const r = applyCommand(s2, { type: "deploy", uid: uidOf(s, 0, "mil-medic"), to: { x: 20, y: 33.5 } });
+    const r = applyCommand(s2, { type: "deploy", uid: uidOf(s, 0, "mil-squinter"), to: { x: 20, y: 33.5 } });
     expect(r.ok).toBe(false);
   });
 
@@ -200,7 +200,7 @@ describe("combat and keywords", () => {
 
   it("charges into base contact, then the combat phase resolves melee", () => {
     let s = game();
-    const nib = place(s, uidOf(s, 1, "munch-nibblers"), { x: 10, y: 24 });
+    const nib = place(s, uidOf(s, 1, "munch-nibblers", 1), { x: 10, y: 24 });
     place(s, uidOf(s, 0, "mil-grunts", 2), { x: 10, y: 29 });
     s.phase = "assault";
     s.activePlayer = 1;

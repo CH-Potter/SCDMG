@@ -557,6 +557,19 @@ describe("Undermine (Tunnel Network)", () => {
     at(s2, "assault");
     expect(err(applyCommand(s2, { type: "support", player: 0, support: "munch-tunnels", ability: "undermine", target: "p1-0" }))).toMatch(/exhausted|movement phase/);
   });
+
+  it("the AI doesn't spend the CP a swarm about to fight needs for Feeding Frenzy", () => {
+    const setup = (cp: number) => {
+      const s = at(game([L("munch-nibblers"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-nest", "munch-tunnels"], []] }), "movement");
+      s.players[0].cp = cp;
+      place(s, "p0-0", { x: 0.8, y: 26 });
+      place(s, "p1-0", { x: 0.8, y: 19 });
+      return s;
+    };
+    // With CP to spare it undermines; with only Feeding Frenzy's CP left it keeps it.
+    expect(isSupport("undermine")(aiSupportCommand(setup(2)))).toBe(true);
+    expect(isSupport("undermine")(aiSupportCommand(setup(1)))).toBe(false);
+  });
 });
 
 describe("Eye-Watering Reek (Stink Gland)", () => {

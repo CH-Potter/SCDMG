@@ -57,7 +57,9 @@ const militia: Faction = {
   look: "cap",
   // The drop-ship balances in Skirmish but runs away with the long Assault board (sims: ~84% Militia),
   // so Assault keeps the old starter set. Skirmish takes the Ammo Wagon rather than the Tractor Depot:
-  // after the Rivet Rifle lost its anti-armour bonus the Militia fell behind the Munch there.
+  // after the Rivet Rifle lost its anti-armour bonus the Militia fell behind the Munch there. v0.11 sims
+  // (standard house rules) kept it: with the Grange Hall Radio instead the Militia scored ~64%, with the
+  // Weather Vane ~45%.
   defaultSupports: ["mil-wagon", "mil-dropship"],
   assaultSupports: ["mil-vane"],
   assaultStarter: ["mil-radio", "mil-depot", "mil-airstrip"],
@@ -114,7 +116,7 @@ const militia: Faction = {
       id: "mil-vane",
       name: "Weather Vane",
       faction: "militia",
-      fizz: 2,
+      fizz: 3,
       cp: 2,
       blurb: "It always points at trouble.",
       abilities: [
@@ -170,7 +172,7 @@ const militia: Faction = {
       id: "mil-dropship",
       name: "Rust Bucket Drop-Ship",
       faction: "militia",
-      fizz: 3,
+      fizz: 4,
       cp: 1,
       blurb: "Forty years old, three engines out of four, and a landing light that is just a lantern on a hook.",
       abilities: [
@@ -215,6 +217,8 @@ const militia: Faction = {
       ],
     },
   ],
+  // The second Big Bertha is the swarm's answer: with a Grunt squad in her place the Militia scored ~33%
+  // against the Munch in Assault.
   assaultExtras: [
     { profileId: "mil-rustler", upgrades: [] },
     { profileId: "mil-bertha", upgrades: [] },
@@ -223,14 +227,18 @@ const militia: Faction = {
     { profileId: "mil-mortar", upgrades: [] },
     { profileId: "mil-riders", upgrades: [] },
   ],
+  // v0.11: a Spud Mortar (Radio Spotter) instead of the Patch Medic and the Watchtower Drill. The medic
+  // team did under 1 damage a game and patched up about once every three games, and against the Munch
+  // the list scored ~56% with them; the third Grunt squad stays (with a Squinter in its place the
+  // Militia fell to ~43%).
   defaultList: [
-    { profileId: "mil-grunts", upgrades: ["overwatch"] },
+    { profileId: "mil-grunts", upgrades: [] },
     { profileId: "mil-grunts", upgrades: ["jets"] },
     { profileId: "mil-grunts", upgrades: [] },
-    { profileId: "mil-medic", upgrades: [] },
     { profileId: "mil-bertha", upgrades: ["barrage"] },
     { profileId: "mil-squinter", upgrades: [] },
     { profileId: "mil-squinter", upgrades: [] },
+    { profileId: "mil-mortar", upgrades: [] },
   ],
   profiles: [
     {
@@ -270,7 +278,8 @@ const militia: Faction = {
       name: "Patch Medic",
       faction: "militia",
       // A team of three (was one 3-wound medic): the same wounds, more bodies, a pistol each.
-      // Still priced as before; the next balance pass sets its cost.
+      // Kept at ⚙2/◆1 (pricing.ts says ⚙3/◆2): in v0.11 sims it did under 1 damage a game and
+      // patched up about once every three games, so it isn't worth more.
       cost: 2,
       supply: 1,
       models: 3,
@@ -422,7 +431,7 @@ const militia: Faction = {
       abilities: ["demo-charge", "rocket-hop"],
       upgrades: [
         { id: "nitro", name: "Nitro Cans", cost: 1, move: 2, text: "+2 move." },
-        { id: "sidecar", name: "Sidecar", cost: 2, addModels: 1, text: "+1 model." },
+        { id: "sidecar", name: "Sidecar", cost: 1, addModels: 1, text: "+1 model." },
       ],
       blurb: "Dirt bikes held together with baling wire and pure spite. They shoot from the saddle, because the brakes are decorative.",
     },
@@ -510,17 +519,21 @@ const munch: Faction = {
   color: 0x6cc24a,
   look: "teeth",
   defaultSupports: ["munch-nest", "munch-tunnels"],
+  // CP is the swarm's big lever in Assault: every extra CP goes into Gopher Holes. With the Stink Gland
+  // as well (3 CP a round) the Munch scored ~62% in Assault, with the Deep Burrows too (4 CP) ~74%.
   assaultSupports: ["munch-stash"],
   supports: [
     {
       id: "munch-nest",
       name: "Brood Nest",
       faction: "munch",
-      fizz: 3,
+      fizz: 4,
       cp: 1,
       blurb: "Rows of humming incubators. Something in every one of them is hungry.",
+      // Feeding Frenzy costs 1 CP (was 2): at 2 the Munch's two CP a round went on Overmind Pulse and
+      // Undermine, and the Frenzy came up about once in 25 games.
       abilities: [
-        { id: "frenzy", name: "Feeding Frenzy", cp: 2, exhaust: false, timing: "any", effect: { kind: "meleeBuff", dice: 1 }, text: "A friendly unit gets +1 melee die per model this round." },
+        { id: "frenzy", name: "Feeding Frenzy", cp: 1, exhaust: false, timing: "any", effect: { kind: "meleeBuff", dice: 1 }, text: "A friendly unit gets +1 melee die per model this round." },
         {
           id: "overmind-pulse",
           name: "Overmind Pulse",
@@ -637,22 +650,27 @@ const munch: Faction = {
       ],
     },
   ],
+  // Assault: the Stink Mortar and the Brood Scorpion rather than a second Big Mama. A fourteenth unit
+  // counted for more than the second monster on the long board (sims: about +5 points).
   assaultExtras: [
     { profileId: "munch-nibblers", upgrades: ["litter"] },
     { profileId: "munch-spitter", upgrades: ["acid"] },
     { profileId: "munch-buzz", upgrades: [] },
-    { profileId: "munch-mama", upgrades: [] },
+    { profileId: "munch-lobber", upgrades: [] },
     { profileId: "munch-hoppers", upgrades: [] },
     { profileId: "munch-warren", upgrades: [] },
+    { profileId: "munch-nanny", upgrades: [] },
   ],
+  // v0.11: more beetles (Bigger Litter twice), Acid Goo, the Can-Opener Beak and a Mutagen Vat (Brood
+  // Call) rather than the Bomb Wasps, which were shot down in 60% of their games for about 1 damage.
   defaultList: [
-    { profileId: "munch-nibblers", upgrades: [] },
+    { profileId: "munch-nibblers", upgrades: ["litter"] },
     { profileId: "munch-nibblers", upgrades: ["legs"] },
-    { profileId: "munch-spitter", upgrades: [] },
-    { profileId: "munch-flapjaw", upgrades: [] },
+    { profileId: "munch-spitter", upgrades: ["acid"] },
+    { profileId: "munch-flapjaw", upgrades: ["opener"] },
     { profileId: "munch-mama", upgrades: [] },
     { profileId: "munch-nibblers", upgrades: ["legs", "litter"] },
-    { profileId: "munch-buzz", upgrades: [] },
+    { profileId: "munch-pod", upgrades: [] },
   ],
   profiles: [
     {
@@ -852,7 +870,7 @@ const munch: Faction = {
       ],
       abilities: ["sticky-goo", "regen"],
       upgrades: [
-        { id: "chunky", name: "Extra-Ripe Shells", cost: 2, weapon: { index: 0, patch: { damage: 2 } }, text: "Stink Shell deals 2 damage." },
+        { id: "chunky", name: "Extra-Ripe Shells", cost: 1, weapon: { index: 0, patch: { damage: 2 } }, text: "Stink Shell deals 2 damage." },
       ],
       blurb: "A skunk hauling a mortar that lobs shells of its finest stink. Whatever it hits stops running, which is when the others arrive.",
     },
@@ -937,12 +955,16 @@ const concord: Faction = {
   look: "crystal",
   // Each faction starts with its way in: drop-ship, burrow hole, portal. Unlike the drop-ship, the
   // portal also suits the long Assault board: a few elites can't hold its many objectives on foot
-  // (sims: Concord ~39% without it, ~56% with it).
+  // (sims: Concord ~39% without it, ~56% with it). Skirmish keeps the Mirror Spire: the Star Lens adds no
+  // CP, so the Concord could afford neither Sunbeam nor Afterglow (v0.11 sims: ~34%), and the Choir of
+  // Light did no better than the spire against the swarm.
   defaultSupports: ["con-spire", "con-portal"],
   assaultSupports: ["con-lens"],
   // Assault: the Light Gate rather than the Star Lens. With the bigger squads the Sunbeam ran away against
   // the swarm (sims: Concord ~58% vs Munch), while Gate Step helps a few elites reach the long board's objectives.
-  assaultStarter: ["con-spire", "con-portal", "con-gate"],
+  // v0.11: the Court of Disdain rather than the Mirror Spire. Point Out Flaws and Withering Review (which
+  // switches off Overwatch and Return Fire) took the Concord from ~45% to ~54% against the Militia.
+  assaultStarter: ["con-court", "con-portal", "con-gate"],
   supports: [
     {
       id: "con-spire",
@@ -1044,7 +1066,7 @@ const concord: Faction = {
       id: "con-gate",
       name: "Light Gate",
       faction: "concord",
-      fizz: 3,
+      fizz: 4,
       cp: 1,
       blurb: "A doorway of pure light for getting about the battlefield. Please wipe your feet.",
       abilities: [
@@ -1101,21 +1123,25 @@ const concord: Faction = {
     },
   ],
   // A third Phase Guard rather than the Sunray Tower: on the long board the Concord out-shot everyone
-  // but lost on objective VP, and a structure can't hold an objective.
+  // but lost on objective VP, and a structure can't hold an objective. v0.11: a second Grand Strider
+  // (the best objective holder) rather than a fourth Lancer and Extra Guard (Concord ~39% -> ~45% against
+  // the Militia).
   assaultExtras: [
-    { profileId: "con-lancer", upgrades: [] },
     { profileId: "con-facet", upgrades: [] },
-    { profileId: "con-sylph", upgrades: ["plumage"] },
-    { profileId: "con-guard", upgrades: ["third"] },
+    { profileId: "con-facet", upgrades: [] },
+    { profileId: "con-sylph", upgrades: [] },
+    { profileId: "con-guard", upgrades: [] },
   ],
+  // v0.11: a third Ray Lancer and Afterimage (Blink) on the Blink Dancers rather than the Beam Warden,
+  // who did under 1 damage a game and recalled a unit about once in a hundred games.
   defaultList: [
     { profileId: "con-guard", upgrades: [] },
     { profileId: "con-guard", upgrades: [] },
     { profileId: "con-lancer", upgrades: [] },
     { profileId: "con-lancer", upgrades: [] },
     { profileId: "con-skiff", upgrades: [] },
-    { profileId: "con-warden", upgrades: [] },
-    { profileId: "con-dancers", upgrades: [] },
+    { profileId: "con-lancer", upgrades: [] },
+    { profileId: "con-dancers", upgrades: ["afterimage"] },
   ],
   profiles: [
     {
@@ -1257,7 +1283,7 @@ const concord: Faction = {
       ],
       abilities: ["refraction", "provoke"],
       impact: { dice: 1, hit: 3, damage: 2, ap: 1 },
-      upgrades: [{ id: "lustre", name: "Lustre Core", cost: 2, addAbilities: ["radiance"], text: "Gains Radiance." }],
+      upgrades: [{ id: "lustre", name: "Lustre Core", cost: 1, addAbilities: ["radiance"], text: "Gains Radiance." }],
       blurb: "His Radiance, on three gleaming legs. Believes he is the main character. Is, unfortunately, correct.",
     },
     {

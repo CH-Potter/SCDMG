@@ -122,7 +122,7 @@ describe("house rules: switching core mechanics off", () => {
     const s = createGame({ factions: ["munch", "militia"], seed: 2, rules: { impact: false } });
     s.terrain = [];
     s.orderChoice = null;
-    const nib = place(s, s.units.find((u) => u.owner === 0 && profileOf(u).impact && !profileOf(u).keywords.includes("flying"))!, { x: 10, y: 10 });
+    const nib = place(s, s.units.find((u) => u.owner === 0 && profileOf(u).impact && !profileOf(u).keywords.includes("flying") && profileOf(u).models <= 9)!, { x: 10, y: 10 });
     const foe = place(s, s.units.find((u) => u.owner === 1 && !profileOf(u).keywords.includes("flying") && !profileOf(u).structure)!, { x: 10, y: 15 });
     s.phase = "assault";
     s.activePlayer = 0;

@@ -55,6 +55,8 @@ export interface GameResult {
   /** Wounds each side got back on the table: shields recharged, HP healed, models revived or regrown. */
   restored: [Restored, Restored];
   profiles: Record<string, ProfileStat>;
+  /** Per side: charges made, short and blocked, and damage by attack kind ("dmg shoot", "dmg impact"...). */
+  sides?: [Record<string, number>, Record<string, number>];
   /** Role missions: the role ids of side A (player 1) and side B (player 2). */
   roles?: [string, string];
   error?: string;
@@ -152,6 +154,11 @@ export function playGame(job: Job): GameResult {
     ...(startBonus ? { startBonus } : {}),
   });
   const counts: Record<string, number> = {};
+  const sides: [Record<string, number>, Record<string, number>] = [{}, {}];
+  const bump = (p: number, k: string, n = 1) => {
+    const c = sides[p as 0 | 1];
+    c[k] = (c[k] ?? 0) + n;
+  };
   const damage: [number, number] = [0, 0];
   const vpBy: [Record<string, number>, Record<string, number>] = [{}, {}];
   const profiles: Record<string, ProfileStat> = {};
@@ -173,8 +180,9 @@ export function playGame(job: Job): GameResult {
     const ms = performance.now() - t0;
     maxMs = Math.max(maxMs, ms);
     totalMs += ms;
-    const key = cmd.type === "ability" ? `ab:${cmd.ability}` : cmd.type;
+    const key = cmd.type === "ability" ? `ab:${cmd.ability}` : cmd.type === "support" ? `sp:${cmd.ability}` : cmd.type;
     counts[key] = (counts[key] ?? 0) + 1;
+    if (cmd.type === "support") counts.support = (counts.support ?? 0) + 1;
     const before = woundSnapshot(s);
     const r = applyCommand(s, cmd);
     if (!r.ok) {
@@ -182,8 +190,15 @@ export function playGame(job: Job): GameResult {
       break;
     }
     for (const e of r.events) {
+      // Every ability that went off (active or reactive), so new abilities' usage shows up in the results.
+      if (e.type === "ability") counts[`ev:${e.ability}`] = (counts[`ev:${e.ability}`] ?? 0) + 1;
+      if (e.type === "chargeRoll" || e.type === "chargeFailed") {
+        const u = r.state.units.find((x) => x.uid === e.uid);
+        if (u) bump(u.owner, e.type === "chargeRoll" ? (e.made ? "charge made" : "charge short") : "charge blocked");
+      }
       if (e.type === "attack") {
         const u = s.units.find((x) => x.uid === e.report.uid) ?? r.state.units.find((x) => x.uid === e.report.uid);
+        if (u) bump(u.owner, `dmg ${e.report.kind}`, e.report.damage);
         if (u) {
           damage[u.owner] += e.report.damage;
           stat(u.profileId).damage += e.report.damage;
@@ -247,6 +262,7 @@ export function playGame(job: Job): GameResult {
     vpBy,
     restored,
     profiles,
+    sides,
     roles: rolesOf(missionId),
     error,
   };

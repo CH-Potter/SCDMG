@@ -1299,7 +1299,7 @@ export function aiSupportCommand(s: GameState): Command | null {
   for (const card of pl.supports) {
     for (const a of abilityOfCard(card.id)) {
       if (canPlaySupport(s, me, card.id, a.id)) continue;
-      reserve = a.exhaust ? cardReserve(s, me, card.id, a.id) : 0;
+      reserve = Math.max(a.exhaust ? cardReserve(s, me, card.id, a.id) : 0, cpReserve(s, me, a.id, a.cp));
       const cpLeft = pl.cp - a.cp;
       const base = { type: "support" as const, player: me, support: card.id, ability: a.id };
       const e = a.effect;
@@ -1726,20 +1726,37 @@ function anywhereDrops(
  */
 function cardReserve(s: GameState, me: PlayerId, cardId: string, abilityId: string): number {
   let v = 0;
-  const mine = onBoard(s, me);
-  const theirs = onBoard(s, other(me));
-  for (const b of abilityOfCard(cardId)) {
-    if (b.id === abilityId) continue;
-    const e = b.effect;
-    if (e.kind === "meleeBuff" && s.phase !== "combat") {
-      for (const u of mine) {
-        if (!meleeWeapons(u).length) continue;
-        const fighting = isEngaged(s, u) || theirs.some((t) => !isFlying(t) && unitGap(u, t) <= likelyChargeRange(s, u) + 1);
-        if (fighting) v = Math.max(v, aliveModels(u).length * e.dice * 0.7 * 0.6);
-      }
-    } else if (e.kind === "rangedBuff" && s.phase === "movement") {
-      for (const u of mine) if (rangedWeapons(u).length) v = Math.max(v, aliveModels(u).length * e.dice * 0.6 * 0.5);
+  for (const b of abilityOfCard(cardId)) if (b.id !== abilityId) v = Math.max(v, laterBuffValue(s, me, b.effect));
+  return v;
+}
+
+/** A rough value of a buff that would still come up later this round (see `cardReserve`). */
+function laterBuffValue(s: GameState, me: PlayerId, e: SupportEffect): number {
+  let v = 0;
+  if (e.kind === "meleeBuff" && s.phase !== "combat") {
+    const theirs = onBoard(s, other(me));
+    for (const u of onBoard(s, me)) {
+      if (!meleeWeapons(u).length) continue;
+      const fighting = isEngaged(s, u) || theirs.some((t) => !isFlying(t) && unitGap(u, t) <= likelyChargeRange(s, u) + 1);
+      if (fighting) v = Math.max(v, aliveModels(u).length * e.dice * 0.7 * 0.6);
     }
+  } else if (e.kind === "rangedBuff" && s.phase === "movement") {
+    for (const u of onBoard(s, me)) if (rangedWeapons(u).length) v = Math.max(v, aliveModels(u).length * e.dice * 0.6 * 0.5);
+  }
+  return v;
+}
+
+/**
+ * CP is shared by every card: a cheap play that leaves too little CP for a big buff on another card
+ * later this round (Feeding Frenzy after an Undermine) gives that buff up. Its rough value, as in
+ * `cardReserve`.
+ */
+function cpReserve(s: GameState, me: PlayerId, abilityId: string, cost: number): number {
+  const pl = s.players[me];
+  let v = 0;
+  for (const card of pl.supports) {
+    if (card.exhausted) continue;
+    for (const b of abilityOfCard(card.id)) if (b.id !== abilityId && pl.cp >= b.cp && pl.cp - cost < b.cp) v = Math.max(v, laterBuffValue(s, me, b.effect));
   }
   return v;
 }
