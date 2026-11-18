@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 166 28 23" data-part="militia.trooper.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near work boot with steel toe</title>
+<path d="M40,168 L55,168 L56,187 L32,187 L33,181 L40,178 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M32,187 L33,181 L40,178.6 L42,187 Z" fill="#4a5158" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="detail" d="M43,172 H54" stroke="#4a2e19" stroke-width="1.6"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

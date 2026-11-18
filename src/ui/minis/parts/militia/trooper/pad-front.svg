@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 56 30 29" data-part="militia.trooper.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near shoulder plate</title>
+<path d="M33,75 Q32,60 47,59 Q56,60 57,69 L53,80 Q42,83 33,75 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M33,75 Q42,83 53,80 L52,76.5 Q42,79 35.5,72 Z" fill="#6c5a37"/>
+<g class="detail"><circle cx="37.5" cy="73" r="1.1" fill="#c8bd98"/><circle cx="42.5" cy="76.4" r="1.1" fill="#c8bd98"/><circle cx="48" cy="77.4" r="1.1" fill="#c8bd98"/><path d="M46,60.4 l3.4,1 l-2.2,2.2 Z" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

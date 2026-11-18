@@ -66,6 +66,7 @@ import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec, Weapon
 import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine, impactLine, evadeLine, reportHits, noHarmVerdict, unitName, abilityStatusTags } from "./describe";
 import { ComicAlerts, type AlertTone } from "./alerts";
 import { DICE_SPEED_LABEL, DiceTray, type DiceRoll, type DiceSpeed } from "./dice";
+import { MINI_STYLE_LABEL, miniStyle, nextMiniStyle, setMiniStyle } from "./minis";
 import { BoardRenderer, drawPos, type RenderView } from "./renderer";
 import { audio } from "../audio"; // [audio]
 import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserveRowsHtml, reservesHeading } from "./recruit";
@@ -386,6 +387,13 @@ export class Controller {
   private cycleDice(): void {
     const order: DiceSpeed[] = ["throw", "full", "quick", "off"];
     this.tray.setSpeed(order[(order.indexOf(this.tray.speed) + 1) % order.length]!);
+    this.refresh();
+  }
+
+  /** Miniatures: Classic, Ink Rig or Overhead (units without new-engine art stay Classic). */
+  private cycleMinis(): void {
+    setMiniStyle(nextMiniStyle(miniStyle()));
+    this.renderer.refreshMinis();
     this.refresh();
   }
 
@@ -1808,6 +1816,7 @@ export class Controller {
       <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" aria-pressed="${this.mode.kind === "measure"}" title="${this.mode.kind === "measure" ? "Stop measuring (M or Esc)" : "Measure distances and check line of sight (M)"}">📏 Measure</button>
       <button class="secondary" id="btn-undo" ${this.humanTurn() && this.history.length ? "" : "disabled"} title="Take back your last action (Ctrl+Z)">↶ Undo</button>
       <button class="secondary" id="btn-dice" title="Dice: Throw (you throw your own dice), Auto, Quick or Off">🎲 Dice: ${DICE_SPEED_LABEL[this.tray.speed]}</button>
+      <button class="secondary" id="btn-minis" title="Miniatures: Classic, Ink Rig (side-on) or Overhead (from above). Units without new-engine art stay Classic.">♟ Minis: ${MINI_STYLE_LABEL[miniStyle()]}</button>
       <span id="audio-slot"></span>
       <button class="secondary" id="btn-rules">How to play</button>
       ${
@@ -1825,6 +1834,7 @@ export class Controller {
     this.els.topbar.querySelector("#btn-fit")!.addEventListener("click", () => this.renderer.resetView());
     this.els.topbar.querySelector("#btn-rules")!.addEventListener("click", () => showRules());
     this.els.topbar.querySelector("#btn-dice")!.addEventListener("click", () => this.cycleDice());
+    this.els.topbar.querySelector("#btn-minis")!.addEventListener("click", () => this.cycleMinis());
     this.els.topbar.querySelector("#btn-new")!.addEventListener("click", () => (this.hooks.campaign ? this.leaveCampaignBattle() : this.onNewGame()));
   }
 

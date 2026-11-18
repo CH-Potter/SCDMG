@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="61 53 32 32" data-part="militia.trooper.side.pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shoulder plate with rank chevrons</title>
+<path d="M64,63 Q72,55 83,59 Q91,65 89,79 Q81,85 71,81 L65,71 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M83,59 Q91,65 89,79 Q81,85 74,82 Q84,74 83,59 Z" fill="#6c5a37"/>
+<path d="M70.5,66.5 L76,71.5 L81.5,66 M70.5,72 L76,77 L81.5,71.5" fill="none" stroke="#e3d8b6" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+<g class="detail"><circle cx="86.4" cy="74" r="1" fill="#c8bd98"/><path d="M80.4,58.6 l2.6,0.6 l-1.6,1.8 Z" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

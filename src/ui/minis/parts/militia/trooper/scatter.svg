@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -8 70 24" data-part="militia.trooper.side.scatter" data-recoil="6">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scatter-gun (muzzle at the left)</title>
+<path d="M-4,-5.5 L6,-3.5 L6,3.5 L-4,5.5 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="5" y="-3.2" width="26" height="6.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M12,-3.2 V3.2 M18,-3.2 V3.2" stroke="#141414" stroke-width="1.4"/>
+<path d="M28,-5 L46,-5 L46,5 L28,5 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="37" cy="9" r="6" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M46,-4 L62,-6 L62,6 L46,4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="32" cy="-2.4" r="1" fill="#c8bd98"/><circle cx="40" cy="-2.4" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="20.2" cy="0.2" r="1"/><circle id="g2" cx="40.3" cy="-0.2" r="1"/><circle id="muzzle" cx="-5" cy="0" r="1"/></g>
+</svg>
