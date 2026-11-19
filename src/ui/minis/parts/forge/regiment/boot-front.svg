@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="27 163 35 28" data-part="forge.regiment.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near boot: a big hobnailed ammo boot caked in mud</title>
+<path d="M39,166 L56,166 L57,185 L30,185 Q29,178 36,176 Z" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M29.6,180.4 Q35,176.6 41,179.6 Q47,176.4 52,179.4 Q55,177.6 57,179 L57,185 L30,185 Z" fill="#44432f"/>
+<path d="M28,185 L59,185 L59,189 L28,189 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M41,170 H55" stroke="#5d5b45" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

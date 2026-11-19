@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -16 28 30" data-part="forge.legion.top.stamp">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crusher foot from above: the press stamp with hazard stripes</title>
+<rect x="-12" y="-14" width="24" height="26" rx="2" fill="#353b41" stroke="#141414" stroke-width="2.4"/>
+<path d="M-10,-6 L-2,-13 M-10,4 L6,-12 M-6,11 L10,-4 M4,11 L10,6" stroke="#6e4528" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 0 32 32" data-part="forge.mob.top.helmpole">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Helmet pole from above: the top helmet and a streamer</title>
+<rect x="-10" y="4" width="20" height="12" rx="2" fill="#4a2e19" stroke="#141414" stroke-width="2.4"/>
+<path d="M4,18 L16,21 L12,24 L16,28 L4,27 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="-7" y="15" width="14" height="14" rx="2" fill="#353b41" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="22" r="3.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

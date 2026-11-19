@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="54 164 26 24" data-part="forge.kin.side.boot-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far boot</title>
+<path d="M66,166 L76,166 L77,184 L56,184 Q58,179 66,176 Z" fill="#44432f" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="170" r="1"/></g>
+</svg>

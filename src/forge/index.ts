@@ -960,6 +960,24 @@ class FactionForge {
       case "overshield":
         params = numField("Shield per model", `${ep}.amount`, e.amount, [1, 3]);
         break;
+      case "armourBuff":
+        params = numField("Save bonus", `${ep}.save`, e.save, [1, 2]);
+        break;
+      case "armourBreak":
+        params = numField("Save penalty", `${ep}.save`, e.save, [1, 2]) + numField("Range ″", `${ep}.range`, e.range, LIMITS.range, { step: 0.5 });
+        break;
+      case "evadeBuff":
+        params = numField("Evade bonus", `${ep}.amount`, e.amount, [1, 2]) + numField("Evade given (no evade)", `${ep}.grant`, e.grant, [3, 6]);
+        break;
+      case "evadeDebuff":
+        params = numField("Evade penalty", `${ep}.amount`, e.amount, [1, 2]) + numField("Range ″", `${ep}.range`, e.range, LIMITS.range, { step: 0.5 });
+        break;
+      case "damageBuff":
+        params = numField("Extra damage", `${ep}.amount`, e.amount, [1, 2]);
+        break;
+      case "weaken":
+        params = numField("Fewer dice per model", `${ep}.dice`, e.dice, [1, 2]) + numField("Range ″", `${ep}.range`, e.range, LIMITS.range, { step: 0.5 });
+        break;
       default:
         params = `<p class="hint span2">No settings.</p>`;
     }

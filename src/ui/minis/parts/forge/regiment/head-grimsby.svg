@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 12 54 50" data-part="forge.regiment.side.head-grimsby">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sergeant-Major Grimsby: a peaked officer's cap, a ruddy nose and an enormous handlebar moustache</title>
+<path d="M54,48 L65,48 L65,60 L54,60 Z" fill="#44432f" stroke="#141414" stroke-width="2"/>
+<path d="M49,54 Q45,50 46,44 L43.6,43 L46,39 Q46,28 60,27 Q73,28 73,41 Q73,52 66,56 Q58,59 49,54 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,29 Q73,32 73,41 Q73,52 66,56 L63.6,56.2 Q69,46 66,29 Z" fill="#c8bd98"/>
+<ellipse cx="66" cy="43" rx="3" ry="3.8" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<path d="M48,37.6 L55,36.8" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M49.4,40.4 L53.4,40" stroke="#141414" stroke-width="2" stroke-linecap="round"/>
+<circle cx="45.4" cy="44.6" r="3.8" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<path d="M28,41 Q29,48.4 37,48 Q43,47.6 47,49.6 Q51,46.6 57,48.4 Q65,50.6 71,45 Q74,42 72,39.6 Q70,44 64,44.4 Q57,44 51,46 Q45,43.6 38,45 Q31,45.4 30,39.4 Q27.4,39 28,41 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M44,30 Q41,22 50,19 L72,18 Q81,19 79.6,27 L77.6,32 L46,34 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,18.4 L72,18 Q81,19 79.6,27 L77.6,32 L72,32.4 Q74,24 70,18.4 Z" fill="#6c5a37"/>
+<path d="M45.4,29.6 L77.8,27.4 L77.6,32.6 L46,35 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M47.6,33 L35,36.6 Q33.6,39 37,39.4 L50,36 Z" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="51.6" cy="27.6" r="2.8" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

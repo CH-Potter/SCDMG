@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -64 12 128" data-part="forge.mob.side.rotor">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Whirlybasher rotor, side on: one long blade with hazard tips (drawn upright, laid flat by its placement)</title>
+<path d="M-2.6,-60 L2.6,-60 L3.4,60 L-3.4,60 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="-3.6" y="-62" width="7.2" height="12" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="-4" y="50" width="8" height="12" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

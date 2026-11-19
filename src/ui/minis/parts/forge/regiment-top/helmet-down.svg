@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -21 34 36" data-part="forge.regiment.top.helmet-down">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Soup-bowl helmet from above, goggles down, their lenses peeking under the brim</title>
+<circle cx="-4.4" cy="-15.6" r="3.2" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<circle cx="4.4" cy="-15.6" r="3.2" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-4.4" cy="-16.4" r="1.6" fill="#fff2c0"/>
+<circle class="glow" cx="4.4" cy="-16.4" r="1.6" fill="#fff2c0"/>
+<circle cx="0" cy="-2" r="15" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M10,-13 A15,15 0 0 1 -9,10 Q8,4 10,-13 Z" fill="#6c5a37"/>
+<circle cx="0" cy="-2" r="9" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M5,-9 A9,9 0 0 1 -4,6 Q5,2 5,-9 Z" fill="#6c5a37"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

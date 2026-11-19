@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 -8 50 112" data-part="forge.mob.side.helmpole">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warlord's back: a pole stacked with looted helmets, a hazard streamer on top</title>
+<path d="M64,60 L84,62 L86,98 L68,100 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="80" y="-4" width="4.4" height="102" rx="1.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M88,-4 L106,0 L100,6 L106,12 L88,9 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M74,6 L76,-6 L88,-6 L90,6 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M73,28 L82,8 L91,28 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="71" y="26" width="22" height="5" rx="1" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M71,48 Q71,34 82,34 Q93,34 93,48 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M74,42 H90" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="78" cy="38.6" r="1.6" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

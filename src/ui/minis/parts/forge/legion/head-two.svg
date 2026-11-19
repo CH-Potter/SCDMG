@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 6 42 56" data-part="forge.legion.side.head-two">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Clank head: a flat-lidded tin with twin lens tubes and a spring antenna</title>
+<path d="M60,24 L60,14" stroke="#141414" stroke-width="2.4"/>
+<path d="M57,22 L63,20 M57,18 L63,16" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="60" cy="11.4" r="3.2" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<path d="M47,54 L47,31 Q47,27 51,27 L68,27 Q72,27 72,31 L72,54 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,27.6 L68,27.6 Q71.4,27.6 71.4,31 L71.4,53.4 L66,53.4 Z" fill="#6c5a37"/>
+<rect x="45" y="23.5" width="29" height="6" rx="2" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect x="44.5" y="50" width="29" height="6" rx="3" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M39,33 L49,33 L49,40 L39,40 Z M39,42 L49,42 L49,49 L39,49 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<ellipse class="glow" cx="39" cy="36.5" rx="2.2" ry="3.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<ellipse class="glow" cx="39" cy="45.5" rx="2.2" ry="3.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<path d="M58,34 V46 M62,34 V46 M66,34 V46" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

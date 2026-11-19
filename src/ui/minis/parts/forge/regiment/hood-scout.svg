@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 8 58 58" data-part="forge.regiment.side.hood-scout">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sniper scout's ghillie hood: a shaggy cowl of leaf tufts shading the face</title>
+<path d="M46,41 Q43,23 60,21 Q77,22 78,40 L79,58 L69,61 Q71,46 66,40 Q57,34 49,41 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,24 Q77,28 78,40 L79,58 L73,60 Q76,40 70,24 Z" fill="#4a2e19"/>
+<path d="M46.6,38.6 Q55,33 64,37 L62,40 Q55,37.4 48,41 Z" fill="#44432f"/>
+<path d="M49.2,33 Q45.7,27.1 38.8,27 Q42.3,32.9 49.2,33 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M52.1,26.6 Q53.2,19.8 47.9,15.4 Q46.8,22.2 52.1,26.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M61,23.9 Q65.3,18.6 63,12.1 Q58.7,17.4 61,23.9 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M69.1,26.6 Q75.6,24.2 76.9,17.4 Q70.4,19.8 69.1,26.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M72.4,35.1 Q79.2,36.2 83.6,30.9 Q76.8,29.8 72.4,35.1 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M73.1,45 Q78.4,49.3 84.9,47 Q79.6,42.7 73.1,45 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M70.4,52.1 Q72.8,58.6 79.6,59.9 Q77.2,53.4 70.4,52.1 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M53.8,26.5 Q57.1,30.4 62.2,29.5 Q58.9,25.6 53.8,26.5 Z" fill="#9a8458"/>
+<path d="M66.8,31.6 Q63.4,35.5 65.2,40.4 Q68.6,36.5 66.8,31.6 Z" fill="#4a2e19"/>
+<path d="M67.8,42.1 Q67.7,47.3 72.2,49.9 Q72.3,44.7 67.8,42.1 Z" fill="#9a8458"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

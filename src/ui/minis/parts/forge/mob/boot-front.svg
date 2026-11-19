@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 160 38 30" data-part="forge.mob.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near boot: a clompy hobnail boot with a scrap toe cap</title>
+<path d="M39,163 L56,163 L58,184 L30,184 Q26,177 33,173 L38,172 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M27,184 Q26,177 33,174 L40,175 L40,184 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="26" y="183" width="34" height="4.6" rx="1" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M41,166.4 L55,166.4" stroke="#6e4528" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

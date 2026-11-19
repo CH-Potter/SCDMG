@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 14 54 44" data-part="forge.regiment.side.helmet-down">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Soup-bowl helmet, goggles down over the eyes</title>
+<path d="M65.6,38 Q68,48 60.4,55.6" fill="none" stroke="#6e4528" stroke-width="2.2"/>
+<path d="M45.6,36 Q45,22 59,20.6 Q73,21 73,35.4 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66.4,22.6 Q73,26 73,35.4 L67.4,35.6 Q69,28 66.4,22.6 Z" fill="#6c5a37"/>
+<g class="detail"><circle cx="52" cy="31" r="1" fill="#c8bd98"/><path d="M56,26 q3,-2 5,1" fill="none" stroke="#44432f" stroke-width="1"/></g>
+<path d="M33.6,39.6 Q36,35.4 46,35 L72,34 Q83,34 85,37.4 Q84,40.4 78,40.2 L46,40.8 Q38,41.8 33.6,39.6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M36,39.6 Q42,38.4 46,38.6 L78,38 Q82,38.2 84,37.8 Q83,40.2 78,40.2 L46,40.8 Q39,41.6 36,39.6 Z" fill="#6c5a37"/>
+<path d="M54,42.6 L70,41.4" stroke="#4a2e19" stroke-width="3"/>
+<circle cx="51.4" cy="42.4" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="51" cy="42.4" r="2.8" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -71,6 +71,10 @@ const SUPPORT_SLOTS: Record<string, Slots> = {
   "con-court": { support: 1 },
   "con-gate": { elite: 1 },
   "con-portal": { support: 1 },
+  // the dice cards (the CP ability pass)
+  "mil-powder": { support: 1 },
+  "swarm-moult": { base: 1 },
+  "con-forge": { elite: 1 },
 };
 
 export const factionSlots = (f: Pick<Faction, "id" | "slots">): Slots => f.slots ?? FACTION_SLOTS[f.id] ?? {};

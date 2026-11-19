@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="66 2 64 74" data-part="forge.cult.side.imp-wing">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Imp's bat wing: a scalloped membrane on long finger bones (beats from the shoulder)</title>
+<path d="M74,70 Q78,40 96,16 Q110,6 126,8 Q119,18 124,30 Q114,29 114,44 Q104,42 102,56 Q92,54 88,68 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M88,68 Q92,54 102,56 Q104,42 114,44 Q114,29 124,30 L121,34 Q116,36 116,46 Q106,46 104,59 Q95,58 88,68 Z" fill="#44432f"/>
+<path d="M75,68 Q84,36 124,9 M80,66 Q98,42 123,30 M84,66 Q98,52 113,44" fill="none" stroke="#9a8458" stroke-width="3" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="70" r="1"/></g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 44 56 82" data-part="forge.legion.side.torso-heavy">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Lumbering Heavy: a riveted boiler body with brass bands, a pressure gauge, a furnace grate and a bellows waist</title>
+<path d="M50,104 L74,104 L77,109 L73,114 L76,119 L73,124 L51,124 L48,119 L51,114 L47,109 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M50,109 H75 M50,114 H75 M50,119 H75" stroke="#141414" stroke-width="1.4"/>
+<path d="M38,60 Q38,50 50,50 L72,50 Q84,50 84,60 L84,104 Q84,112 74,112 L48,112 Q38,112 38,104 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,50.8 Q83.4,51.6 83.4,60 L83.4,104 Q83.4,111.4 74,111.4 L74,111.4 Q80,82 74,50.8 Z" fill="#6c5a37"/>
+<rect x="37" y="58" width="48" height="7" rx="3.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect class="tag" x="37" y="79" width="48" height="8" rx="3" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<rect x="37" y="100" width="48" height="7" rx="3.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="47" cy="73" r="5" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<path d="M47,73 L50,70" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<rect x="41" y="89.6" width="16" height="8" rx="1.4" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<path class="glow" d="M43,92 H55 M43,95.2 H55" fill="none" stroke="#f2b84b" stroke-width="1.6"/>
+<path d="M60,50.6 V111.4" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="63" cy="54" r="1" fill="#c8bd98"/><circle cx="63" cy="70" r="1" fill="#c8bd98"/><circle cx="63" cy="92" r="1" fill="#c8bd98"/><circle cx="63" cy="110" r="1" fill="#c8bd98"/><circle cx="70" cy="70" r="1" fill="#c8bd98"/><circle cx="70" cy="92" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

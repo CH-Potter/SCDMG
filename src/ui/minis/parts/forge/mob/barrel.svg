@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 40 46 66" data-part="forge.mob.side.barrel">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Fuel drum on the back: hazard bands, a hose over the shoulder and a pilot flame</title>
+<path d="M70,57 Q60,46 52,62" fill="none" stroke="#44432f" stroke-width="4"/>
+<rect x="66" y="56" width="24" height="46" rx="4" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M83,56.6 L86,56.6 Q89.4,56.6 89.4,60 L89.4,98 Q89.4,101.4 86,101.4 L83,101.4 Z" fill="#353b41"/>
+<rect x="66" y="68" width="24" height="6" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="66" y="86" width="24" height="6" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M71,68 L68,74 M78,68 L75,74 M85,68 L82,74 M71,86 L68,92 M78,86 L75,92 M85,86 L82,92" stroke="#141414" stroke-width="2"/>
+<rect x="72" y="50" width="8" height="7" rx="1" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path class="glow" d="M84,56 Q81,50 84,44 Q87,50 84,56 Z" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="76" cy="62" r="1"/></g>
+</svg>

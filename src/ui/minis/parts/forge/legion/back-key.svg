@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="70 62 26 36" data-part="forge.legion.side.back-key">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Clank trooper's back: the clockwork housing and the brass shaft of its wind-up key</title>
+<path d="M73,66 L82,67 L82,92 L73,94 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M82,77.6 L93,77.6 L93,82.4 L82,82.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="78" cy="88" r="1.6" fill="#b9bfc4"/>
+<g id="anchors"><circle id="pivot" cx="78" cy="78" r="1"/></g>
+</svg>

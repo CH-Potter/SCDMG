@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -13 28 22" data-part="forge.cult.top.imp-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Imp head from above: round, ears out to the sides, glowing eyes in front</title>
+<path d="M-6,-3 L-13,-8 L-7,1 Z M6,-3 L13,-8 L7,1 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="0" cy="-2" r="8" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M4,-9 Q8,-6 8,-2 Q8,5 0,6 Q7,1 4,-9 Z" fill="#6c5a37"/>
+<circle class="glow" cx="-3" cy="-8" r="1.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="3" cy="-8" r="1.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

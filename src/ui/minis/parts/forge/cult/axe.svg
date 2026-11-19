@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -30 114 50" data-part="forge.cult.side.axe" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Grin-moon greataxe: a crescent blade like a wide smile, gold socket, long haft (head left)</title>
+<rect x="4" y="-2.6" width="96" height="5.2" rx="2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M48,-2.6 v5.2 M84,-2.6 v5.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M16,-27 Q-12,-16 -7,4 Q-2,15 14,17 Q2,7 3,-5 Q5,-17 16,-27 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-7,4 Q-2,15 14,17 Q2,10 -2,2 Z" fill="#4a5158"/>
+<path d="M3,-5 Q2,7 14,17 M5.6,-10 L9,-7 M3.4,-1 L7,0 M4.6,7 L8,6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="7" y="-6" width="11" height="12" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="100" cy="0" r="3.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="44" cy="0" r="1"/><circle id="g2" cx="80" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="-4" r="1"/></g>
+</svg>

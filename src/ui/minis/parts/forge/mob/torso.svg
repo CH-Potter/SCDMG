@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 52 54 90" data-part="forge.mob.side.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrapjaw torso: a green barrel belly with a stitched scar, a strap, hazard belt, scrap apron and team loin-rag</title>
+<path d="M64,102 L82,100 L85,132 L68,138 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M48,62 Q60,56 74,60 Q83,66 82,84 L80,104 Q62,111 45,107 Q34,98 36,84 Q38,70 48,62 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,60 Q83,66 82,84 L80,104 Q76,106 72,106.4 Q79,84 74,60 Z" fill="#6c5a37"/>
+<path d="M38,94 Q46,101 56,99 M47,70 Q55,67 62,72" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M44,84 L64,78" stroke="#6c5a37" stroke-width="2.4"/>
+<g class="detail"><path d="M48,80 l2,5 M53,78.6 l2,5 M58,77.2 l2,5" stroke="#141414" stroke-width="1"/></g>
+<path d="M70,58 L50,98" stroke="#6e4528" stroke-width="4"/>
+<rect x="56" y="80" width="7" height="7" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path d="M42,108 L63,107 L62,136 L44,139 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M38,100 L82,97 L82,107 L40,110 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M47,99.4 L44,109.6 M66,98.2 L63,108.6 M74,97.6 L71,108" stroke="#141414" stroke-width="2"/>
+<rect x="52" y="99" width="9" height="10" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path class="tag" d="M45,110 L59,109 L59,130 L55.4,126 L52,134 L48.6,127.6 L45,132 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="66" cy="66" r="1.1" fill="#b9bfc4"/><circle cx="76" cy="102" r="1.1" fill="#b9bfc4"/></g>
+<path d="M50,58 L70,56 L71,64 L51,66 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

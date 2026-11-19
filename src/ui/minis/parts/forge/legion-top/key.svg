@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -5 28 10" data-part="forge.legion.top.key">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wind-up key bow from above</title>
+<path d="M-1,0 Q-4,-4.4 -9,-4 Q-13,-3.4 -12.6,0 Q-13,3.4 -9,4 Q-4,4.4 -1,0 Z M1,0 Q4,-4.4 9,-4 Q13,-3.4 12.6,0 Q13,3.4 9,4 Q4,4.4 1,0 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="2" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

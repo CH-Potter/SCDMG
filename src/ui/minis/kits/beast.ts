@@ -24,6 +24,9 @@ export interface BeastOpts {
   variant: LookVariant;
   /** Template overrides: the body, tail and head parts. */
   parts?: Partial<Record<"body" | "tail" | "head" | "gear", string | null>>;
+  /** Template overrides: the wing (one side's part, placed like the kit's; null for none) and more parts in frame coords. */
+  wing?: string | null;
+  extras?: PartUse[];
 }
 
 interface Leg {
@@ -94,8 +97,8 @@ export function beastSide(o: BeastOpts): RigDef {
     parts.push({ id: "weapon", src: w.src, bone: "gun", place: placeAt(w.src, "g1", { x: 2, y: -68 }, o.variant.aim * 0.5, 0.62), z: 7 });
     weapon = "weapon";
   }
-  if (s.back === "wings" || s.flying) {
-    const wing = kitPart("humanoid", "side", "back-wings");
+  if ((s.back === "wings" || s.flying) && o.wing !== null) {
+    const wing = o.wing ?? kitPart("humanoid", "side", "back-wings");
     parts.push(
       { id: "wing-far", src: wing, bone: "pelvis", place: placeAt(wing, "pivot", { x: 10, y: -64 }, -6, 0.62), z: 0.5, anim: { flap: 0.8, phase: 0.06 } },
       { id: "wing-near", src: wing, bone: "pelvis", place: placeAt(wing, "pivot", { x: 4, y: -62 }, 4, 0.7), z: 6.5, anim: { flap: 0.8 } },
@@ -104,6 +107,7 @@ export function beastSide(o: BeastOpts): RigDef {
     const b = kitPart("humanoid", "side", `back-${s.back}`);
     parts.push({ id: "back", src: b, bone: "pelvis", place: placeAt(b, "pivot", { x: 8, y: -62 }, -84, 0.6), z: 6.2 });
   }
+  parts.push(...(o.extras ?? []));
   let rig: RigDef = {
     id: `${o.id}.side`,
     name: o.name,
@@ -151,13 +155,14 @@ export function beastTop(o: BeastOpts): RigDef {
     parts.push({ id: "weapon", src: w.src, bone: "gun", place: placeAt(w.src, "g1", { x: 0, y: 2 }, 90, 0.8), z: 5 });
     weapon = "weapon";
   }
-  if (s.back === "wings" || s.flying) {
-    const wing = kitPart("humanoid", "top", "back-wing");
+  if ((s.back === "wings" || s.flying) && o.wing !== null) {
+    const wing = o.wing ?? kitPart("humanoid", "top", "back-wing");
     parts.push(
       { id: "wing-l", src: mirrorPart(wing), bone: "pelvis", place: { x: -12, y: -4, rot: -90, scale: 0.8 }, z: 3.5, anim: { flap: 0.7 } },
       { id: "wing-r", src: wing, bone: "pelvis", place: { x: 12, y: -4, rot: 90, scale: 0.8 }, z: 3.5, anim: { flap: 0.7 } },
     );
   }
+  parts.push(...(o.extras ?? []));
   let rig: RigDef = {
     id: `${o.id}.top`,
     name: `${o.name} (from above)`,

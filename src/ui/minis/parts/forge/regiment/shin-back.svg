@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 144 18 28" data-part="forge.regiment.side.shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shin: a puttee in shade</title>
+<path d="M65,147 L76,147 L74.6,169 L66.4,169 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M65.3,153 L76,150 M65.6,159 L75.6,156 M65.9,165 L75.2,162" fill="none" stroke="#44432f" stroke-width="1.8"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="152" r="1"/></g>
+</svg>

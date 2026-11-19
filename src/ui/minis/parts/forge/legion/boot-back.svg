@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 162 36 28" data-part="forge.legion.side.boot-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far foot: a boxy tin block in shade</title>
+<path d="M58,166 L80,166 L81,182 L55,182 L55,172 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M53,182 L83,182 L83,186 L53,186 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="170" r="1"/></g>
+</svg>

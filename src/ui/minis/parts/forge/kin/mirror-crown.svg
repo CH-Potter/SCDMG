@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 2 44 38" data-part="forge.kin.side.mirror-crown">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mirror Dancer's crown: three mirror shards fanned behind the head</title>
+<path d="M60,30 L53,10 L61,4 L68,24 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M68,28 L71,6 L80,9 L75,30 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M74,34 L87,17 L92,25 L79,37 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M57,11 L62,21 M73,11 L74,23 M87,22 L80,30" fill="none" stroke="#fff2c0" stroke-width="1.8" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="68" cy="30" r="1"/></g>
+</svg>

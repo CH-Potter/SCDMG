@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 62 12" data-part="forge.kin.top.lance" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Prism lance from above (point left)</title>
+<rect x="8" y="-1.4" width="46" height="2.8" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path class="glow" d="M-4,0 L5,-4 L11,0 L5,4 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="30" cy="0" r="1"/><circle id="g1" cx="30" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

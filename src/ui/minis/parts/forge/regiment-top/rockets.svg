@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -8 54 16" data-part="forge.regiment.top.rockets" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rocket pods from above, slung either side of the cab (muzzles left)</title>
+<rect x="0" y="-7" width="44" height="5.6" rx="2.8" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="0" y="1.4" width="44" height="5.6" rx="2.8" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path class="glow" d="M0,-6.4 L-5,-4.2 L0,-2 Z M0,2 L-5,4.2 L0,6.4 Z" fill="#f2b84b" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="16" y="-2" width="12" height="4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="22" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

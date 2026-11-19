@@ -226,11 +226,19 @@ export default defineTemplateArt({
           name: ctx.profile.name,
           spec: ctx.spec,
           variant: v,
-          parts: { head: PIECE("skull"), gear: PIECE("rider-helm"), torso: PIECE("rider-torso"), back: { side: side("standard"), top: null } },
-          padsSide: { front: side("pad-front"), back: side("pad-back") },
           steed: { side: { body: side("horse-body"), head: side("horse-head"), tail: side("horse-tail") }, top: { body: top("horse-body"), head: top("horse-head"), tail: top("horse-tail") }, scale: 1.1 },
-          weaponSide: { src: l, place: v.tag === "b" ? placeAt(l, "g1", { x: 50, y: 84 }, 22) : placeAt(l, "g1", { x: 52, y: 88 }, 4) },
-          weaponTop: { src: lt, place: placeAt(lt, "g1", { x: -12, y: -6 }, 86) },
+          rider: {
+            helm: side("skull"),
+            gear: side("rider-helm"),
+            torso: side("rider-torso"),
+            pack: side("standard"),
+            pads: { front: side("pad-front"), back: side("pad-back") },
+            weapon: { src: l, place: v.tag === "b" ? placeAt(l, "g1", { x: 50, y: 84 }, 22) : placeAt(l, "g1", { x: 52, y: 88 }, 4) },
+            top: {
+              parts: { head: { top: top("skull") }, gear: { top: top("rider-helm") }, torso: { top: top("rider-torso") }, back: { top: null } },
+              weaponTop: { src: lt, place: placeAt(lt, "g1", { x: -12, y: -6 }, 86) },
+            },
+          },
         };
         const steed = (id: string) => id.startsWith("s");
         const rider = (id: string) => !id.startsWith("s");

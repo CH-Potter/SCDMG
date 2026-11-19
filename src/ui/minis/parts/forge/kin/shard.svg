@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -14 16 28" data-part="forge.kin.side.shard">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A floating crystal shard</title>
+<path d="M0,-12 L6,-2 L0,12 L-6,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M0,-12 L6,-2 L0,12 Z" fill="#6c5a37"/>
+<path class="glow" d="M-2,-3 L0,-8 L2,-3 L0,4 Z" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

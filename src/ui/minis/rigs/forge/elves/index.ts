@@ -198,10 +198,14 @@ export default defineTemplateArt({
           name: ctx.profile.name,
           spec: ctx.spec,
           variant: v,
-          parts: { head: PIECE("head"), gear: v.tag === "b" ? PIECE("circlet") : PIECE("hood"), torso: PIECE("torso-plain") },
           steed: { side: { body: side("stag-body"), head: side("stag-head"), tail: side("stag-tail") }, top: { body: top("stag-body"), head: top("stag-head"), tail: top("stag-tail") }, scale: 1.15 },
-          weaponSide: bowSide(),
-          weaponTop: bowTop(),
+          rider: {
+            helm: side("head"),
+            gear: side(v.tag === "b" ? "circlet" : "hood"),
+            torso: side("torso-plain"),
+            weapon: bowSide(),
+            top: { parts: { head: { top: top("head") }, gear: { top: top(v.tag === "b" ? "circlet" : "hood") }, torso: { top: top("torso-plain") } }, weaponTop: bowTop() },
+          },
         };
         const steed = (id: string) => id.startsWith("s");
         return { side: limbSlot(riderSide(o), steed, "leather", "leatherShade"), top: limbSlot(riderTop(o), steed, "leather", "leatherShade") };

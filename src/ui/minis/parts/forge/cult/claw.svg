@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -14 36 28" data-part="forge.cult.side.claw" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mutant claw: a swollen hand with three long talons (talons left)</title>
+<path d="M8,-6 Q-2,-13 -9,-9 Q-2,-6.4 6,-1.6 Z M6,-1.4 Q-4,-0.4 -10,3 Q-3,4.4 6,3.4 Z M8,4 Q0,10.4 -7,11.6 Q-1,6.4 8,7.6 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="14" cy="0" rx="9" ry="8" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M18,-7.4 Q23,-4 23,0 Q23,5 17,7.8 Q20,2 18,-7.4 Z" fill="#c8bd98"/>
+<g id="anchors"><circle id="pivot" cx="18" cy="0" r="1"/><circle id="g1" cx="18" cy="0" r="1"/><circle id="muzzle" cx="-8" cy="0" r="1"/></g>
+</svg>

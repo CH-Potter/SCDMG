@@ -8,16 +8,16 @@
 //   scoring:  mission scoring and clean-up, then the next round begins
 
 import { ABILITIES } from "./data/abilities";
-import { defaultListFor, defaultSupportsFor } from "./data/factions";
+import { defaultListFor, defaultSupportsFor, SUPPORTS } from "./data/factions";
 import { MERCY_LEAD } from "./constants";
 import { grantCp, spendCp } from "./cp";
 import { consumeReaction } from "./reactions";
 import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type ArmyRule } from "./openRoster";
-import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels, summon } from "./supports";
+import { applyDiceEffect, cardToBurn, deployZones, exhaustEnemyCard, type DiceEffect, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels, summon } from "./supports";
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
 import { cleanRules, CLOSE_RANKS_MOVE, OVERWATCH_HIT, REROLL_CP, ROLLED_CHARGE_MAX, rulesOf, type HouseRules } from "./houseRules";
-import { applyDamage, barrageGun, barrageMarkerFor, barrageOn, blastOn, burstAt, corrode, evadeTarget, markerCatches, expectedDamage, hasTrait, moraleCheck, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
+import { applyDamage, barrageGun, barrageMarkerFor, barrageOn, blastOn, burstAt, corrode, evadeTarget, markerCatches, PHASE_EVADE, expectedDamage, hasTrait, moraleCheck, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
 import { dist, pointSegmentDistance, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf, reacts } from "./profile";
@@ -347,6 +347,9 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
   if ((cmd.type === "move" || cmd.type === "advance" || cmd.type === "disengage" || cmd.type === "charge") && isStructure(unit)) {
     return "Structures can't move";
   }
+  if ((cmd.type === "move" || cmd.type === "advance" || cmd.type === "charge") && unit.status.holding) {
+    return "It's holding the line: it stays put this round";
+  }
 
   switch (cmd.type) {
     case "move":
@@ -541,11 +544,15 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   // Declared: from here on dice are rolled, so the charge happens (or fails) and can't be taken back.
   // Pirouette: the target steps away before the charge is rolled.
   const dodged = pirouette(s, target, unit, events);
+  // Stand To: a unit braced for it shoots the charger first.
+  if (!s.aiAssumeChargesLand) standTo(s, target, unit, events);
   if (rules.overwatch) chargeOverwatch(s, target, unit, events);
   if (unit.destroyed) return false;
   let plan: UnitMovePlan | string = declared;
   if (rules.rolledCharges && !s.aiAssumeChargesLand) {
-    const roll: [number, number] = [rollD6(s), rollD6(s)];
+    // Mad Scramble: three dice, the best two count.
+    const dice = [rollD6(s), rollD6(s), ...(unit.status.scrambling ? [rollD6(s)] : [])].sort((a, b) => b - a);
+    const roll: [number, number] = [dice[0]!, dice[1]!];
     const need = chargeNeed(s, unit, target);
     const made = need !== null && roll[0] + roll[1] >= need;
     events.push({ type: "chargeRoll", uid: unit.uid, target: target.uid, roll, need: need ?? ROLLED_CHARGE_MAX + 1, made });
@@ -802,7 +809,7 @@ function useAbility(
   if (unit.status.silenced) return "Silenced: it can't use abilities this round";
   const cpCost = def.cp ?? 0;
   if (s.players[unit.owner].cp < cpCost) return `${def.name} needs ${cpCost} CP (you have ${s.players[unit.owner].cp})`;
-  if (isEngaged(s, unit) && id !== "patch-up") return "Can't do that while engaged";
+  if (isEngaged(s, unit) && !USABLE_ENGAGED.has(id)) return "Can't do that while engaged";
   if (unit.status.burrowed && id !== "burrow") return "It's under the ground: surface first";
   if (def.needs === "enemyUnit" && targetUid) {
     const t = unitById(s, targetUid);
@@ -1059,6 +1066,179 @@ function useAbility(
       say(`${name} turns a spotlight on ${profileOf(t).name}: no cover, hunkering or digging in will help it this round.`);
       break;
     }
+    // ---------- the CP ability pass ----------
+    case "stand-to": {
+      if (unit.status.standingTo) return "Already standing to";
+      if (!profileOf(unit).weapons.some((w) => !w.melee && !hasTrait(w, "indirect"))) return "It has no gun to stand to with";
+      unit.status.standingTo = true;
+      say(`${name} stands to: the first unit to charge it this round gets shot first.`);
+      break;
+    }
+    case "hold-the-line": {
+      if (isStructure(unit)) return "Structures already stay put";
+      unit.status.holding = true;
+      unit.status.acted = true; // planting its feet is its movement
+      say(`${name} holds the line: it counts double on objectives this round, and it isn't going anywhere.`);
+      break;
+    }
+    case "smoke-shells": {
+      if (!point) return "Pick a point";
+      const gun = barrageGun(profileOf(unit));
+      if (!gun) return "It has no gun to lob smoke with";
+      if (!aliveModels(unit).some((m) => dist(m.pos, point) <= gun.range)) return `Out of range (${gun.range}")`;
+      const hid = smokeCaught(s, unit.owner, point);
+      if (!hid.length) return `No friendly unit within ${SMOKE_SHELLS.radius}" of that point`;
+      for (const f of hid) f.status.smoked = f.status.smoked ? Math.min(f.status.smoked, SMOKE_SHELLS.range) : SMOKE_SHELLS.range;
+      say(`${name} lobs smoke: ${hid.map((f) => profileOf(f).name).join(", ")} can't be shot from more than ${SMOKE_SHELLS.range}" away this round.`);
+      break;
+    }
+    case "steel-core": {
+      if (unit.status.apBonus) return "Already loaded with steel-core rounds";
+      if (!profileOf(unit).weapons.some((w) => !w.melee)) return "It has no gun to load";
+      unit.status.apBonus = 1;
+      say(`${name} loads steel-core rounds: +1 AP on its shots this round.`);
+      break;
+    }
+    case "mad-scramble": {
+      if (!rulesOf(s).rolledCharges) return "Charges aren't rolled in this game";
+      if (!profileOf(unit).weapons.some((w) => w.melee)) return "This unit has no melee weapon";
+      if (unit.status.scrambling) return "Already scrambling";
+      unit.status.scrambling = true;
+      say(`${name} scrambles over itself: its charge rolls three dice and keeps the best two this round.`);
+      break;
+    }
+    case "eat-through": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (t.status.melting) return "Acid has already eaten right through it";
+      if (unitGap(unit, t) > (def.range ?? 12)) return `Must be within ${def.range}"`;
+      if (!canSee(s, unit, t)) return "This unit can't see that one";
+      const deeper = !!t.status.corroded;
+      if (deeper) t.status.melting = true;
+      else t.status.corroded = true;
+      say(deeper ? `${name} drenches ${profileOf(t).name} in acid: its saves are two worse this round.` : `${name} drenches ${profileOf(t).name} in acid: its saves are one worse this round.`);
+      break;
+    }
+    case "brood-frenzy": {
+      const range = def.range ?? 6;
+      const wild = onBoard(s, unit.owner).filter((f) => f.uid !== unit.uid && !isStructure(f) && profileOf(f).weapons.some((w) => w.melee) && unitGap(unit, f) <= range);
+      if (!wild.length) return `No friendly unit with a melee weapon within ${range}"`;
+      for (const f of wild) f.status.meleeBonus += 1;
+      say(`${name} shrieks! ${wild.map((f) => profileOf(f).name).join(", ")} get +1 melee die per model this round.`);
+      break;
+    }
+    case "lay-eggs": {
+      if (!point) return "Pick a point";
+      const reach = (def.range ?? 3) + profileOf(unit).baseRadius;
+      if (!aliveModels(unit).some((m) => dist(m.pos, point) <= reach + 1e-6)) return `Must be within ${def.range}" of this unit`;
+      for (const en of onBoard(s)) {
+        if (en.owner === unit.owner) continue;
+        const r = profileOf(en).baseRadius;
+        if (aliveModels(en).some((m) => dist(m.pos, point) - r < LAY_EGGS.minEnemyDistance)) return `Must be at least ${LAY_EGGS.minEnemyDistance}" from enemies`;
+      }
+      const made = summon(s, unit.owner, LAY_EGGS.profileId, point);
+      if (typeof made === "string") return made;
+      events.push({ type: "summoned", uid: made.uid });
+      say(`${name} lays a clutch of eggs.`);
+      break;
+    }
+    case "phase-shift": {
+      if (unit.status.phased) return "Already phase-shifted";
+      unit.status.phased = true;
+      say(`${name} slips half out of phase: it evades shots on a ${PHASE_EVADE}+ this round.`);
+      break;
+    }
+    case "triangulate": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      if (t.status.triangulated) return "That unit is already locked on";
+      if (unitGap(unit, t) > (def.range ?? 24)) return `Must be within ${def.range}"`;
+      if (!canSee(s, unit, t)) return "This unit can't see that one";
+      t.status.triangulated = true;
+      say(`${name} triangulates ${profileOf(t).name}: your shots at it get precision +1 and tracking +1 this round.`);
+      break;
+    }
+    case "bow-out": {
+      if (!point) return "Pick a point";
+      const leader = aliveModels(unit)[0]!;
+      if (dist(leader.pos, point) > (def.range ?? 6) + 1e-6) return `Too far (${def.range}")`;
+      dropCarriedFlag(s, unit, events, "bows out");
+      const e = moveUnit(s, unit, leader.id, point, 0, true);
+      if (e) return e;
+      if (isEngaged(s, unit)) return "Can't bow out into base contact";
+      unit.status.acted = true; // the bow is its movement
+      unit.status.disengaged = false; // it leaves cleanly
+      say(`${name} bows out with exquisite manners.`);
+      events.push({ type: "moved", uid: unit.uid, kind: "teleport" });
+      react(s, unit, events);
+      break;
+    }
+    case "lend-shields": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner !== unit.owner || t.uid === unit.uid) return "Pick another friendly unit";
+      if (unitGap(unit, t) > (def.range ?? 6)) return `Must be within ${def.range}"`;
+      const mine = aliveModels(unit);
+      let pool = mine.reduce((n, m) => n + m.shield, 0);
+      if (!pool) return "It has no shields to lend";
+      const theirs = aliveModels(t);
+      const given = pool;
+      for (const m of mine) m.shield = 0;
+      for (let i = 0; pool > 0; i++, pool--) theirs[i % theirs.length]!.shield += 1;
+      say(`${name} lends ${given} shield${given === 1 ? "" : "s"} to ${profileOf(t).name}.`);
+      break;
+    }
+    case "rivet-plates":
+    case "slime-coat":
+    case "exacting-standards": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner !== unit.owner) return "Pick a friendly unit";
+      if (t.uid !== unit.uid && unitGap(unit, t) > (def.range ?? 3)) return `Must be within ${def.range}"`;
+      const r = applyDiceEffect(t, UNIT_DICE_EFFECTS[id]!);
+      if (r.error) return r.error;
+      say(`${name}: ${def.name}! ${r.text}`);
+      break;
+    }
+    case "numbing-sting": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      const range = def.range ?? 10;
+      if (unitGap(unit, t) > range) return `Must be within ${range}"`;
+      const r = applyDiceEffect(t, UNIT_DICE_EFFECTS[id]!);
+      if (r.error) return r.error;
+      say(`${name}: ${def.name}! ${r.text}`);
+      break;
+    }
+    case "star-shell": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      const range = barrageGun(profileOf(unit))?.range ?? 0;
+      if (unitGap(unit, t) > range) return `Must be within ${range}" (its lobbed gun's range)`;
+      if (t.status.noEvade) return "It's already lit up";
+      if (!profileOf(t).evade && !(t.status.evadeGrant ?? 0) && !t.status.phased) return "That unit doesn't evade anything";
+      t.status.noEvade = true;
+      say(`${name} fires a star shell over ${profileOf(t).name}: lit up like noon, it can't evade anything this round.`);
+      break;
+    }
+    case "snipe-runner":
+    case "chew-wires":
+    case "cutting-remark": {
+      const why = disruptProblem(s, unit, id);
+      if (why) return why;
+      const victim = other(unit.owner);
+      const card = cardToBurn(s, victim)!;
+      const e = exhaustEnemyCard(s, victim, card, events);
+      if (e) return e;
+      const cardName = SUPPORTS[card]?.name ?? card;
+      if (id === "snipe-runner") unit.status.acted = true; // settling in is the marksman's movement
+      say(
+        id === "snipe-runner"
+          ? `${name} picks off a dispatch runner: ${cardName} is out of the fight this round.`
+          : id === "chew-wires"
+            ? `${name} chews through the wires: ${cardName} goes quiet this round.`
+            : `${name} delivers a cutting remark: ${cardName} walks out this round.`,
+      );
+      break;
+    }
     default:
       return "That ability can't be activated";
   }
@@ -1120,6 +1300,76 @@ export const CROP_DUST = { width: 1, hit: 4, damage: 1, ap: 0, noEvade: true };
 export const BALE_OUT = { profileId: "mil-junk", minEnemyDistance: 2 };
 /** Riposte: dice per model in base contact, hit, damage and AP. */
 export const RIPOSTE = { dice: 1, hit: 3, damage: 1, ap: 1 };
+/** Smoke Shells: friendly units with a model this close to the point are hidden, and how close a shot must come to find them. */
+export const SMOKE_SHELLS = { radius: 3, range: 12 };
+/** Lay Eggs: what's laid, and how far from enemies. */
+export const LAY_EGGS = { profileId: "swarm-eggs", minEnemyDistance: 3 };
+/** The dice buff or debuff each such unit ability puts on its target (the support effects' statuses). */
+export const UNIT_DICE_EFFECTS: Partial<Record<AbilityId, DiceEffect>> = {
+  "rivet-plates": { kind: "armourBuff", save: 1 },
+  "slime-coat": { kind: "evadeBuff", amount: 1, grant: 6 },
+  "exacting-standards": { kind: "damageBuff", amount: 1 },
+  "numbing-sting": { kind: "weaken", dice: 1, range: 0 },
+};
+/** Active abilities a unit can use while it's in a melee. */
+const USABLE_ENGAGED: ReadonlySet<AbilityId> = new Set<AbilityId>(["patch-up", "bow-out"]);
+
+/** Friendly units of `owner` with a model within Smoke Shells' reach of `p` (flyers can't hide in it). */
+export function smokeCaught(s: GameState, owner: PlayerId, p: Vec): Unit[] {
+  return onBoard(s, owner).filter((f) => !isFlying(f) && aliveModels(f).some((m) => dist(m.pos, p) - profileOf(f).baseRadius <= SMOKE_SHELLS.radius + 1e-6));
+}
+
+/** Why a card-burning ability (Snipe the Runner, Chew the Wires, Cutting Remark) can't be used now, or null. */
+export function disruptProblem(s: GameState, u: Unit, id: AbilityId): string | null {
+  if (!cardToBurn(s, other(u.owner))) return "The enemy has no ready support card to burn";
+  const range = ABILITIES[id].range ?? 12;
+  if (id === "snipe-runner" && u.status.moved) return "It has moved this round: the runner is long gone";
+  if (id === "chew-wires" && !onBoard(s, other(u.owner)).some((e) => unitGap(u, e) <= range)) return `No enemy unit within ${range}"`;
+  if (id === "cutting-remark" && !onBoard(s, other(u.owner)).some((e) => unitGap(u, e) <= range && !concealment(s, u, e) && canSee(s, u, e))) return `No enemy unit in sight within ${range}" to be rude to`;
+  return null;
+}
+
+/** Stand To: the gun (and plan) a unit standing to fires at `charger`, in a snap volley (hitting one worse), or null. */
+export function standToPlan(s: GameState, t: Unit, charger: Unit): { weapon: Weapon; plan: AttackPlan } | null {
+  if (t.destroyed || !t.onBoard || charger.destroyed || isEngaged(s, t)) return null;
+  let best: { weapon: Weapon; plan: AttackPlan; value: number } | null = null;
+  for (const w of profileOf(t).weapons) {
+    if (w.melee || hasTrait(w, "indirect")) continue;
+    const plan = planShooting(s, t, charger, w, "overwatch"); // a snap volley: one worse
+    if (typeof plan === "string") continue;
+    const value = expectedDamage(s, t, charger, plan, false);
+    if (!best || value > best.value) best = { weapon: w, plan, value };
+  }
+  return best && { weapon: best.weapon, plan: best.plan };
+}
+
+/** Is `t` standing to, and able to react, against a charge right now? */
+export const standsTo = (t: Unit): boolean => !!t.status.standingTo && !t.status.silenced && !t.reactionsUsed.includes("stand-to");
+
+/** Stand To: a charge was just declared at `t`; it fires first (once per round). */
+function standTo(s: GameState, t: Unit, charger: Unit, events: GameEvent[]): void {
+  if (!standsTo(t)) return;
+  const st = standToPlan(s, t, charger);
+  if (!st) return;
+  t.reactionsUsed.push("stand-to");
+  if (consumeReaction(s, charger.owner, "enemyShoots", events)) st.plan.hitOn = Math.min(6, st.plan.hitOn + 1);
+  events.push({ type: "ability", uid: t.uid, ability: "stand-to", text: `${profileOf(t).name} stood to: it fires on the charging ${profileOf(charger).name}!` });
+  pushAttack(events, (ev) => resolveAttack(s, t, charger, st.weapon.name, st.plan, "overwatch", ev));
+}
+
+/** Chance the charge roll reaches `need`: 2d6, or with Mad Scramble the best two of 3d6. */
+export function chargeOdds(u: Unit, need: number): number {
+  return u.status.scrambling ? bestTwoOfThreeAtLeast(need) : twoDiceAtLeast(need);
+}
+
+/** Chance that the best two of 3d6 add up to `need` or more. */
+export function bestTwoOfThreeAtLeast(need: number): number {
+  let n = 0;
+  for (let a = 1; a <= 6; a++)
+    for (let b = 1; b <= 6; b++)
+      for (let c = 1; c <= 6; c++) if (a + b + c - Math.min(a, b, c) >= need) n += 1;
+  return n / 216;
+}
 
 /** Enemy ground models a flight from `from` to `to` passes within Crop Dust's reach of, by unit. */
 export function cropDustCaught(s: GameState, flyer: Unit, from: Vec, to: Vec): { unit: Unit; models: Model[] }[] {

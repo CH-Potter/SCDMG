@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -14 48 54" data-part="forge.kin.top.torso-dancer">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mirror Dancer from above: a short robe, team sash, violet ribbons streaming behind</title>
+<path d="M-6,6 Q-14,20 -10,38 L-6,36 Q-10,20 -2,8 Z M6,6 Q14,20 12,38 L8,36 Q8,20 2,8 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-11,2 Q-12,12 -6,18 L6,18 Q12,12 11,2 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<ellipse cx="0" cy="0.6" rx="11" ry="8" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-21,-2 Q-19,-10 -11,-8 Q-8,-2 -11,6 Q-19,8 -21,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M21,-2 Q19,-10 11,-8 Q8,-2 11,6 Q19,8 21,-2 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-11,7 Q0,11 11,7 L10.4,14 Q0,18 -10.4,14 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

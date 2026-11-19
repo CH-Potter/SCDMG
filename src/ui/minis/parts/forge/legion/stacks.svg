@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="68 18 28 46" data-part="forge.legion.side.stacks">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Heavy's back: twin smokestacks with brass caps</title>
+<path d="M74,60 L74,30 L84,30 L84,60 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="72" y="25" width="14" height="6" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M84,60 L84,40 L92,40 L92,60 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="82.6" y="36" width="11" height="5" rx="1.4" fill="#4a2e19" stroke="#141414" stroke-width="2"/>
+<path d="M74,44 H84 M84,50 H92" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="80" cy="60" r="1"/><circle id="exhaust1" cx="79" cy="22" r="1"/><circle id="exhaust2" cx="88" cy="34" r="1"/></g>
+</svg>

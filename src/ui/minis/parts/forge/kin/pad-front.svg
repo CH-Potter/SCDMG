@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 54 34 38" data-part="forge.kin.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near lotus pauldron: two layered petals with a violet edge</title>
+<path d="M33,64 Q38,56 50,58 Q60,62 56,72 Q50,86 38,90 Q30,80 33,64 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M36,66 Q42,60 52,63 Q56,68 52,76 Q46,84 38,84 Q33,76 36,66 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M38,83 Q46,82 51,75" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M44,63 Q42,74 40,82" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path class="detail" d="M39,67 Q42,63 47,63" fill="none" stroke="#b9bfc4" stroke-width="1" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

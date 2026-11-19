@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 -25 26 30" data-part="forge.mob.top.hog-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>War hog head from above: the iron snout, tusks out to the sides</title>
+<path d="M-7,-2 L-12,3 L-5,4 Z M7,-2 L12,3 L5,4 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-9,0 Q-10,-10 -6,-16 L-5,-20 L5,-20 L6,-16 Q10,-10 9,0 Q8,5 0,5 Q-8,5 -9,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-6,-14 L-11,-19 L-6,-17.4 Z M6,-14 L11,-19 L6,-17.4 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="-5" y="-23" width="10" height="5" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-4" cy="-9" r="1.6" fill="#fff2c0"/>
+<circle class="glow" cx="4" cy="-9" r="1.6" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>
