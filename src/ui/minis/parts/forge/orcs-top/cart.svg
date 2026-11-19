@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100" data-part="forge.orcs.top.cart" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Skewer Chucker from above: the plank bed, wheels either side, the spiked mantlet at the front with its team daub</title>
+<rect x="-46" y="-24" width="12" height="48" rx="3" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<rect x="34" y="-24" width="12" height="48" rx="3" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<path d="M-40,-20 V20 M40,-20 V20" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="-34" y="-32" width="68" height="70" rx="4" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M10,-32 L34,-32 L34,38 L10,38 Z" fill="#6e4528"/>
+<path d="M-34,-12 H34 M-34,8 H34 M-34,26 H34" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-40,-36 Q0,-50 40,-36 L36,-28 Q0,-40 -36,-28 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-14,-43 Q0,-46 14,-43 L13,-35 Q0,-38 -13,-35 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-36,-36 L-42,-44 L-30,-38 Z M36,-36 L42,-44 L30,-38 Z M-4,-44 L0,-50 L4,-44 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M30,28 L44,34 L36,40 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

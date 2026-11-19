@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 14 42 34" data-part="forge.orcs.side.pot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pot helm: a dented iron cookpot jammed on, a rust rag knotted round it, a rivet spike on top</title>
+<path d="M43,38 Q42,23 57,21 Q71,22 72,34 L75,37 L40,41 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M65,23 Q71,26 72,34 L75,37 L68,38 Q69,28 65,23 Z" fill="#353b41"/>
+<path d="M54,22 L57,14 L60,22 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M43,33 Q57,28 72,31" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M50,26 L53,29 L50,32" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M70,30 L78,28 L74,35 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="47" cy="38" r="1" fill="#b9bfc4"/><circle cx="56" cy="37" r="1" fill="#b9bfc4"/><circle cx="65" cy="36" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="40" r="1"/></g>
+</svg>

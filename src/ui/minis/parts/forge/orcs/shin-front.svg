@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 142 22 30" data-part="forge.orcs.side.shin-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Orc shin: rust rag wrappings over green hide</title>
+<path d="M42,146 L57,146 L56,168 L43,168 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M51,146.6 L56.4,146.6 L55.6,167.4 L51,167.4 Z" fill="#4a2e19"/>
+<path d="M42.4,153 L56.6,151 M42.8,160 L56.2,158" fill="none" stroke="#2b2019" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>

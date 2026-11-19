@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -12 44 24" data-part="forge.orcs.side.hatchet">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Chucking axe, held ready to throw (gripped at the haft)</title>
+<rect x="0" y="-2" width="30" height="4" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M-6,-10 L6,-7 L6,6 L-6,10 Q-11,0 -6,-10 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M-8,2 L6,2 L6,6 L-6,10 Z" fill="#4a5158"/>
+<g id="anchors"><circle id="pivot" cx="24" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 24 48 38" data-part="forge.orcs.side.head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Orc head: a small heavy-browed skull set low, a huge underbite with upturned tusks, a bone nose ring, a short pointed ear</title>
+<path d="M54,46 L67,46 L68,60 L53,60 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M47,52 Q42,46 43,40 Q43,29 55,27 Q67,27 71,36 Q73,46 68,52 Q60,58 47,52 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64,29 Q71,32 71,36 Q73,46 68,52 L65,53 Q70,42 64,29 Z" fill="#6c5a37"/>
+<path d="M64,38 L77,31 L69,44 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M36,44 L56,45 Q59,55 51,58 Q40,59 36,52 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M36,52 Q40,59 51,58 Q56,57 57,52 Q46,54 36,52 Z" fill="#6c5a37"/>
+<path d="M38,46 L35,33 L42,45 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M47,47 L47,36 L52,46 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M41,37 L57,34 L58,39 L42,42 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="47.6" cy="41.4" r="1.7" fill="#fff2c0"/>
+<path d="M36.4,41.2 a2.2,2.2 0 1 0 4.4,0 a2.2,2.2 0 1 0 -4.4,0" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="60" cy="32" r="1" fill="#6c5a37"/><circle cx="56" cy="50" r="1" fill="#6c5a37"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

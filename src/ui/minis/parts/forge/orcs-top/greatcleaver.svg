@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -12 76 24" data-part="forge.orcs.top.greatcleaver" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Great cleaver from above: the slab blade and spiked spine ahead (left), long haft</title>
+<rect x="20" y="-2" width="46" height="4" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path d="M-6,-5 L22,-5 L22,5 L-6,5 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-4,-5 L-2,-10 L2,-5 Z M6,-5 L8,-10 L12,-5 Z M14,-5 L16,-10 L20,-5 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="40" cy="0" r="1"/><circle id="g2" cx="56" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

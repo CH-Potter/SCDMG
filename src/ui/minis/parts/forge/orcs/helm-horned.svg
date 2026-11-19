@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 -2 52 54" data-part="forge.orcs.side.helm-horned">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tuskguard helm: a scrap-iron bucket with a barred face slot, one great bone horn swept forward and a snapped stub behind</title>
+<path d="M43,44 Q42,22 58,20 Q73,21 74,36 L74,48 L66,49 L65,40 Q56,36 46,42 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,22 Q73,26 74,36 L74,48 L69,48.6 Q71,32 66,22 Z" fill="#353b41"/>
+<path d="M50,24 Q38,16 36,0 Q46,10 58,21 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M36,0 Q46,10 58,21 L54,22 Q44,14 36,0 Z" fill="#c8bd98"/>
+<path d="M66,24 Q74,14 82,16 L78,25 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M44,36 L64,33" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48,40 V48 M53,39 V48 M58,38 V48" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="70" cy="30" r="1" fill="#b9bfc4"/><circle cx="70" cy="42" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

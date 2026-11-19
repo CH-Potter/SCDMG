@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -50 112 100" data-part="forge.orcs.top.crossbow" data-recoil="4" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The great crossbow from above: the long stock, the bent iron prod across, the bolt ahead (left)</title>
+<path d="M10,-5 L84,-5 L84,5 L10,5 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M8,-46 Q20,-20 18,0 Q20,20 8,46 L2,44 Q12,20 11,0 Q12,-20 2,-44 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M4,-44 L58,-2 M4,44 L58,2" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-14,0 H60" fill="none" stroke="#2b2019" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-18,0 L-8,-5 L-6,0 L-8,5 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="80" cy="0" r="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="70" cy="0" r="1"/><circle id="muzzle" cx="-18" cy="0" r="1"/></g>
+</svg>

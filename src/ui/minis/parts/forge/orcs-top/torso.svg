@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-34 -20 60 40" data-part="forge.orcs.top.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Orc from above: broad green shoulders, the spiked pauldron on the near side, a scrap plate, the team rag tied round the waist</title>
+<ellipse cx="0" cy="1.6" rx="16" ry="11.4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M11,-6.6 A16,11.4 0 0 1 -2,12.8 Q10,8 11,-6.6 Z" fill="#6c5a37"/>
+<ellipse cx="17" cy="1" rx="7.4" ry="9" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-6,-8 L6,-9 L7,2 L-5,3 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-13,4 Q0,9 13,4 L12,12 Q0,17 -12,12 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-8,-9 L9,6" fill="none" stroke="#2b2019" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="-17" cy="0" rx="8" ry="9" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<path d="M-21,-5 L-30,-9 L-22,-1 Z M-22,3 L-31,5 L-22,6 Z M-15,-8 L-16,-16 L-11,-9 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

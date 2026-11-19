@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 10 66 54" data-part="forge.orcs.side.hood-goblin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Goblin rag hood: a ragged rust hood with a floppy point, one big ear out through a slit</title>
+<path d="M44,46 Q40,22 58,19 Q72,19 78,28 L92,22 L85,35 Q81,48 75,58 Q66,52 66,42 Q64,32 56,31.6 Q48,32 47.6,44 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,21 Q76,24 78,28 L92,22 L85,35 Q81,48 75,58 Q71,54 70,50 Q76,36 70,21 Z" fill="#4a2e19"/>
+<path d="M47.6,44 Q48,32 56,31.6 Q64,32 66,42" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M77,56 L80,62 L84,52 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M66,40 L94,33 L84,42 L68,46 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

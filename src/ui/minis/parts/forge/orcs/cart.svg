@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-68 -98 136 98" data-part="forge.orcs.side.cart" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Skewer Chucker cart: a crude plank cart on two big wheels, a spiked green-painted mantlet with the team daub, rust rags</title>
+<path d="M-46,-34 L46,-34 L52,-58 L-50,-58 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-58 L52,-58 L46,-34 L24,-34 Z" fill="#6e4528"/>
+<path d="M-30,-58 L-28,-34 M-8,-58 L-8,-34 M14,-58 L12,-34" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-64,-30 L-50,-90 L-34,-86 L-44,-28 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-50,-90 L-34,-86 L-38,-60 L-46,-62 Z" fill="#6c5a37"/>
+<path class="tag" d="M-55,-74 L-41,-71 L-46,-40 L-60,-43 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-52,-92 L-54,-98 L-48,-91 Z M-60,-62 L-66,-66 L-58,-58 Z M-62,-38 L-68,-40 L-60,-34 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="-24" cy="-24" r="22" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<circle cx="-24" cy="-24" r="15" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M-24,-46 V-2 M-46,-24 H-2 M-39,-39 L-9,-9 M-9,-39 L-39,-9" fill="none" stroke="#2b2019" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="-24" cy="-24" r="4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="30" cy="-24" r="22" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<circle cx="30" cy="-24" r="15" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M30,-46 V-2 M8,-24 H52 M15,-39 L45,-9 M45,-39 L15,-9" fill="none" stroke="#2b2019" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="30" cy="-24" r="4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M46,-58 L60,-60 L56,-48 L64,-44 L50,-40 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/><circle id="mount" cx="0" cy="-60" r="1"/></g>
+</svg>
