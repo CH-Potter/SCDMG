@@ -1,9 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -24 20 34" data-part="forge.munch.top.vent" data-recoil="3">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Spore vent from above: the round stack and its cowled nozzle (pivot at its centre, nozzle up)</title>
-<path d="M-4,-4 L-6,-20 L6,-20 L4,-4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<circle cx="0" cy="0" r="8" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
-<circle cx="0" cy="0" r="4" fill="#25282c" stroke="#141414" stroke-width="2"/>
-<circle class="glow" cx="0" cy="0" r="1.8" fill="#fff2c0"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-20" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -24 20 34" data-part="forge.munch.top.vent" data-recoil="3"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-4,-4 L-6,-20 L6,-20 L4,-4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><circle cx="0" cy="0" r="8" fill="#4a5158" stroke="#141414" stroke-width="2.4"/><circle cx="0" cy="0" r="4" fill="#25282c" stroke="#141414" stroke-width="2"/><circle class="glow" cx="0" cy="0" r="1.8" fill="#fff2c0"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-20" r="1"/></g></svg>

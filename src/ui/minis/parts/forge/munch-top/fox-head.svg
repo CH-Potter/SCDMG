@@ -1,10 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -28 24 32" data-part="forge.munch.top.fox-head" data-recoil="0">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Piston Fox head from above: ears up, the long snout, the implant lens (neck at 0,0)</title>
-<path d="M-7,-6 L-11,0 L-4,-2 Z M7,-6 L11,0 L4,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<path d="M0,2 Q-8,2 -8,-6 Q-8,-14 -3,-18 L0,-26 L3,-18 Q8,-14 8,-6 Q8,2 0,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path d="M-2,-20 L0,-26 L2,-20 Q0,-18 -2,-20 Z" fill="#5d5b45"/>
-<circle cx="0" cy="-5" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
-<circle class="glow" cx="0" cy="-6" r="2" fill="#fff2c0"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-26" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -28 24 32" data-part="forge.munch.top.fox-head" data-recoil="0"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-7,-6 L-11,0 L-4,-2 Z M7,-6 L11,0 L4,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><path d="M0,2 Q-8,2 -8,-6 Q-8,-14 -3,-18 L0,-26 L3,-18 Q8,-14 8,-6 Q8,2 0,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><path d="M-2,-20 L0,-26 L2,-20 Q0,-18 -2,-20 Z" fill="#5d5b45"/><circle cx="0" cy="-5" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/><circle class="glow" cx="0" cy="-6" r="2" fill="#fff2c0"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-26" r="1"/></g></svg>

@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -2 20 40" data-part="forge.munch.top.fox-tail">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Fox brush from above: a ragged tail behind, white tip (pivot at the root)</title>
-<path d="M-3,0 Q-9,10 -8,24 L-5,32 L0,36 L5,32 L8,24 Q9,10 3,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path d="M-7.6,26 L-5,32 L0,36 L5,32 L7.6,26 Q0,22 -7.6,26 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -2 20 40" data-part="forge.munch.top.fox-tail"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-3,0 Q-9,10 -8,24 L-5,32 L0,36 L5,32 L8,24 Q9,10 3,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><path d="M-7.6,26 L-5,32 L0,36 L5,32 L7.6,26 Q0,22 -7.6,26 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g></svg>

@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -30 34 34" data-part="forge.munch.top.beetle-head" data-recoil="0">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Chrome-Jaw Beetle head from above: chrome pincer jaws, the implant cap and lens (neck at 0,0)</title>
-<path d="M-4,-8 Q-8,-14 -12,-15 M4,-8 Q8,-14 12,-15" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round"/>
-<path d="M-5,-9 Q-15,-16 -12,-27 Q-9,-20 -2,-16 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path d="M5,-9 Q15,-16 12,-27 Q9,-20 2,-16 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<ellipse cx="0" cy="-4" rx="8.6" ry="7.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
-<path d="M-6,-2 Q-6,-9 0,-9 Q6,-9 6,-2 Q0,0 -6,-2 Z" fill="#4a5158" stroke="#141414" stroke-width="2"/>
-<circle class="glow" cx="0" cy="-5" r="2.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-26" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -30 34 34" data-part="forge.munch.top.beetle-head" data-recoil="0"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-4,-8 Q-8,-14 -12,-15 M4,-8 Q8,-14 12,-15" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round"/><g stroke="#141414" stroke-width="2.4" stroke-linejoin="round"><path d="M-5,-9 Q-15,-16 -12,-27 Q-9,-20 -2,-16 Z" fill="#b9bfc4"/><path d="M5,-9 Q15,-16 12,-27 Q9,-20 2,-16 Z" fill="#4a5158"/></g><ellipse cx="0" cy="-4" rx="8.6" ry="7.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/><path d="M-6,-2 Q-6,-9 0,-9 Q6,-9 6,-2 Q0,0 -6,-2 Z" fill="#4a5158" stroke="#141414" stroke-width="2"/><circle class="glow" cx="0" cy="-5" r="2.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-26" r="1"/></g></svg>

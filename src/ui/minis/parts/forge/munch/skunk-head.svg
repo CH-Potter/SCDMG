@@ -1,16 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -42 66 64" data-part="forge.munch.side.skunk-head" data-recoil="0">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Stink Mortar head: a black skunk wedge with a white blaze, a scarred nose, a beady green eye and the implant cap (neck at 0,0)</title>
-<path d="M-4,-24 L-2,-34 L6,-24 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<path d="M4,-20 Q-14,-30 -34,-20 Q-50,-12 -56,4 Q-56,12 -48,12 Q-30,16 -10,14 Q4,12 6,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path class="shade" d="M-48,12 Q-30,16 -10,14 Q4,12 6,2 Q-10,8 -30,8 Q-44,8 -48,12 Z" fill="#6c5a37"/>
-<path d="M-54,0 Q-40,-14 -20,-22 Q-6,-26 2,-22 L2,-16 Q-12,-18 -26,-12 Q-40,-6 -52,6 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<ellipse cx="-55" cy="5" rx="4.6" ry="4" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
-<path d="M-46,10 l4,-2 l2,4 l3,-3" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
-<circle class="glow" cx="-30" cy="-4" r="3.2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
-<path d="M-38,-8 L-24,-11" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
-<path d="M-20,-24 Q-18,-38 -6,-38 Q6,-38 6,-24 Q-6,-20 -20,-24 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<circle class="glow" cx="-6" cy="-31" r="3.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
-<path d="M-40,-2 L-34,8 M-38,0 l3,-1.6 M-36,4 l3,-1.6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -42 66 64" data-part="forge.munch.side.skunk-head" data-recoil="0"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-4,-24 L-2,-34 L6,-24 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><path d="M4,-20 Q-14,-30 -34,-20 Q-50,-12 -56,4 Q-56,12 -48,12 Q-30,16 -10,14 Q4,12 6,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><path class="shade" d="M-48,12 Q-30,16 -10,14 Q4,12 6,2 Q-10,8 -30,8 Q-44,8 -48,12 Z" fill="#6c5a37"/><path d="M-54,0 Q-40,-14 -20,-22 Q-6,-26 2,-22 L2,-16 Q-12,-18 -26,-12 Q-40,-6 -52,6 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><ellipse cx="-55" cy="5" rx="4.6" ry="4" fill="#5d5b45" stroke="#141414" stroke-width="2"/><path d="M-46,10 l4,-2 l2,4 l3,-3" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/><circle class="glow" cx="-30" cy="-4" r="3.2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/><path d="M-38,-8 L-24,-11" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/><path d="M-20,-24 Q-18,-38 -6,-38 Q6,-38 6,-24 Q-6,-20 -20,-24 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><circle class="glow" cx="-6" cy="-31" r="3.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/><path d="M-40,-2 L-34,8 M-38,0 l3,-1.6 M-36,4 l3,-1.6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g></svg>

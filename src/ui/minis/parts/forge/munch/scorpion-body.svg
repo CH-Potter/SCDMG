@@ -1,13 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -44 80 36" data-part="forge.munch.side.scorpion-body">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Brood Scorpion body: a low banded tan carapace, a mean little head with its implant cap, the team strap that holds the incubator on (frame coords)</title>
-<path d="M-34,-24 Q-34,-36 -18,-38 Q8,-42 28,-36 Q38,-32 36,-22 Q34,-14 20,-13 Q-6,-11 -26,-14 Q-34,-16 -34,-24 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path class="shade" d="M-32,-18 Q0,-20 35,-24 Q34,-14 20,-13 Q-6,-11 -26,-14 Z" fill="#6c5a37"/>
-<path d="M-10,-39 Q-12,-26 -10,-12 M2,-40 Q0,-26 2,-12 M14,-39 Q12,-26 14,-13 M26,-37 Q24,-26 26,-14" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
-<path class="tag" d="M-8,-40 L4,-41 L6,-12 L-6,-12 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
-<path d="M-36,-26 Q-36,-34 -28,-34 Q-22,-34 -22,-26 Q-24,-20 -30,-20 Q-36,-20 -36,-26 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<circle class="glow" cx="-32" cy="-27" r="1.8" fill="#fff2c0"/>
-<path d="M-34,-32 Q-32,-42 -26,-42 Q-20,-42 -21,-33 Q-28,-31 -34,-32 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<circle class="glow" cx="-27" cy="-37" r="2" fill="#fff2c0"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="-26" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -44 80 36" data-part="forge.munch.side.scorpion-body"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-34,-24 Q-34,-36 -18,-38 Q8,-42 28,-36 Q38,-32 36,-22 Q34,-14 20,-13 Q-6,-11 -26,-14 Q-34,-16 -34,-24 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><path class="shade" d="M-32,-18 Q0,-20 35,-24 Q34,-14 20,-13 Q-6,-11 -26,-14 Z" fill="#6c5a37"/><path d="M-10,-39 Q-12,-26 -10,-12 M2,-40 Q0,-26 2,-12 M14,-39 Q12,-26 14,-13 M26,-37 Q24,-26 26,-14" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/><path class="tag" d="M-8,-40 L4,-41 L6,-12 L-6,-12 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/><path d="M-36,-26 Q-36,-34 -28,-34 Q-22,-34 -22,-26 Q-24,-20 -30,-20 Q-36,-20 -36,-26 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><circle class="glow" cx="-32" cy="-27" r="1.8" fill="#fff2c0"/><path d="M-34,-32 Q-32,-42 -26,-42 Q-20,-42 -21,-33 Q-28,-31 -34,-32 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><circle class="glow" cx="-27" cy="-37" r="2" fill="#fff2c0"/><g id="anchors"><circle id="pivot" cx="0" cy="-26" r="1"/></g></svg>

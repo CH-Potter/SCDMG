@@ -1,16 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -26 44 92" data-part="forge.munch.top.scorpion-body">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Brood Scorpion from above: the banded carapace, the incubator dome full of eggs, the tail running back to its staple gun, the team strap (frame coords)</title>
-<path d="M-6,22 L-7,58 L0,64 L7,58 L6,22 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path d="M-6.6,32 L6.6,32 M-6.8,42 L6.8,42 M-7,52 L7,52" fill="none" stroke="#141414" stroke-width="1.4"/>
-<path d="M-4,58 L-4,64 L4,64 L4,58 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<path d="M0,-22 Q-16,-20 -17,-4 Q-18,16 -10,24 Q0,28 10,24 Q18,16 17,-4 Q16,-20 0,-22 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path class="shade" d="M10,-18 Q17,-10 17,-4 Q18,16 10,24 Q4,27 0,26 Q14,10 10,-18 Z" fill="#6c5a37"/>
-<path class="tag" d="M-17,10 Q0,6 17,10 L17.4,18 Q0,14 -17.4,18 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
-<circle cx="0" cy="-2" r="11" fill="#b9bfc4" stroke="#141414" stroke-width="2.4"/>
-<circle cx="0" cy="-2" r="8" fill="#6e4528"/>
-<circle cx="-3" cy="-4" r="3" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
-<circle cx="3.4" cy="0" r="3" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
-<circle class="glow" cx="3" cy="-6" r="1.6" fill="#fff2c0"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -26 44 92" data-part="forge.munch.top.scorpion-body"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-6,22 L-7,58 L0,64 L7,58 L6,22 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><path d="M-6.6,32 L6.6,32 M-6.8,42 L6.8,42 M-7,52 L7,52" fill="none" stroke="#141414" stroke-width="1.4"/><path d="M-4,58 L-4,64 L4,64 L4,58 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><path d="M0,-22 Q-16,-20 -17,-4 Q-18,16 -10,24 Q0,28 10,24 Q18,16 17,-4 Q16,-20 0,-22 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><path class="shade" d="M10,-18 Q17,-10 17,-4 Q18,16 10,24 Q4,27 0,26 Q14,10 10,-18 Z" fill="#6c5a37"/><path class="tag" d="M-17,10 Q0,6 17,10 L17.4,18 Q0,14 -17.4,18 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/><circle cx="0" cy="-2" r="11" fill="#b9bfc4" stroke="#141414" stroke-width="2.4"/><circle cx="0" cy="-2" r="8" fill="#6e4528"/><circle cx="-3" cy="-4" r="3" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/><circle cx="3.4" cy="0" r="3" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/><circle class="glow" cx="3" cy="-6" r="1.6" fill="#fff2c0"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g></svg>

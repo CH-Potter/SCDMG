@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -46 60 50" data-part="forge.munch.top.claws" data-recoil="0">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Brood Scorpion head and pincers from above: two claws reaching forward, the implant lens between (pivot at the shoulders)</title>
-<path d="M-8,0 L-20,-18 L-14,-22 L-4,-6 Z M8,0 L20,-18 L14,-22 L4,-6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path d="M-24,-16 Q-28,-30 -20,-34 Q-12,-32 -12,-22 Q-14,-16 -24,-16 Z M24,-16 Q28,-30 20,-34 Q12,-32 12,-22 Q14,-16 24,-16 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<path d="M-24,-32 L-26,-44 L-20,-36 Z M-16,-33 L-12,-44 L-14,-32 Z M24,-32 L26,-44 L20,-36 Z M16,-33 L12,-44 L14,-32 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<path d="M-8,-2 Q-8,-14 0,-14 Q8,-14 8,-2 Q0,2 -8,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
-<circle cx="0" cy="-7" r="4.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
-<circle class="glow" cx="0" cy="-8" r="2" fill="#fff2c0"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-40" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -46 60 50" data-part="forge.munch.top.claws" data-recoil="0"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><g stroke="#141414" stroke-width="2.4" stroke-linejoin="round"><path d="M-8,0 L-20,-18 L-14,-22 L-4,-6 Z M8,0 L20,-18 L14,-22 L4,-6 Z" fill="#9a8458"/><path d="M-24,-16 Q-28,-30 -20,-34 Q-12,-32 -12,-22 Q-14,-16 -24,-16 Z M24,-16 Q28,-30 20,-34 Q12,-32 12,-22 Q14,-16 24,-16 Z" fill="#9a8458"/></g><path d="M-24,-32 L-26,-44 L-20,-36 Z M-16,-33 L-12,-44 L-14,-32 Z M24,-32 L26,-44 L20,-36 Z M16,-33 L12,-44 L14,-32 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><path d="M-8,-2 Q-8,-14 0,-14 Q8,-14 8,-2 Q0,2 -8,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/><circle cx="0" cy="-7" r="4.4" fill="#4a5158" stroke="#141414" stroke-width="2"/><circle class="glow" cx="0" cy="-8" r="2" fill="#fff2c0"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-40" r="1"/></g></svg>

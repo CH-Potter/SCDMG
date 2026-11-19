@@ -1,12 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -9 32 18" data-part="forge.munch.side.vial">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Mutagen vial: a glass tube of glowing mutagen with chrome caps and a rubber strap (pivot at its centre)</title>
-<rect x="-11" y="-5.6" width="22" height="11.2" rx="5" fill="#b9bfc4" stroke="#141414" stroke-width="2.4"/>
-<path d="M-10.6,-0.6 Q0,1.6 10.6,-1 L10.6,1 Q10,5.4 6,5.6 L-6,5.6 Q-10.4,5.4 -10.6,1 Z" fill="#6e4528"/>
-<path class="glow" d="M-8,1.6 Q0,3.4 8,1.4 L8,3.6 L-8,3.6 Z" fill="#fff2c0"/>
-<path d="M-7,-3.4 L4,-3.4" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
-<rect x="-15" y="-6.4" width="5.4" height="12.8" rx="1.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
-<rect x="9.6" y="-6.4" width="5.4" height="12.8" rx="1.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
-<path d="M-2.6,-6.6 L2.4,-6.6 L2.4,6.8 L-2.6,6.8 Z" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -9 32 18" data-part="forge.munch.side.vial"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><rect x="-11" y="-5.6" width="22" height="11.2" rx="5" fill="#b9bfc4" stroke="#141414" stroke-width="2.4"/><path d="M-10.6,-0.6 Q0,1.6 10.6,-1 L10.6,1 Q10,5.4 6,5.6 L-6,5.6 Q-10.4,5.4 -10.6,1 Z" fill="#6e4528"/><path class="glow" d="M-8,1.6 Q0,3.4 8,1.4 L8,3.6 L-8,3.6 Z" fill="#fff2c0"/><path d="M-7,-3.4 L4,-3.4" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/><g stroke="#141414" stroke-width="2"><rect x="-15" y="-6.4" width="5.4" height="12.8" rx="1.6" fill="#4a5158"/><rect x="9.6" y="-6.4" width="5.4" height="12.8" rx="1.6" fill="#4a5158"/></g><path d="M-2.6,-6.6 L2.4,-6.6 L2.4,6.8 L-2.6,6.8 Z" fill="#25282c" stroke="#141414" stroke-width="1.4"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g></svg>

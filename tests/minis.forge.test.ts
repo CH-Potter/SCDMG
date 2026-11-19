@@ -286,6 +286,44 @@ describe("fantasy templates: their own art for every unit", () => {
   });
 });
 
+describe("the Munch: Dustline veterans with their own art for every unit", () => {
+  const munch = () => templateByKey("munch")!;
+  const unit = (u: string) => munch().faction.profiles.find((p) => p.id.endsWith(`:${u}`))!;
+
+  it("draws all twelve units with the template's own art, in both views, summon-only burrows too", () => {
+    expect(TEMPLATE_ART_KEYS).toContain("munch");
+    expect(munch().faction.profiles).toHaveLength(12);
+    for (const p of munch().faction.profiles)
+      for (const l of artFor(p)!.looks) {
+        expect(l.side.id, p.id).toMatch(/^forge\.munch\./);
+        expect(l.top.id, p.id).toMatch(/^forge\.munch\./);
+      }
+    for (const u of ["hole", "pit"]) {
+      expect(unit(u).structure?.summonOnly, u).toBe(true);
+      expect(artFor(unit(u))!.looks[0]!.side.frame, u).toBe("structure");
+    }
+    expect(artFor(unit("buzz"))!.looks[0]!.side.frame).toBe("hover");
+  });
+
+  it("varies the squads and keeps three looks at most", () => {
+    for (const p of munch().faction.profiles) {
+      const a = artFor(p)!;
+      expect(a.looks.length, p.id).toBeLessThanOrEqual(3);
+      if (p.models >= 2 && !p.structure) expect(a.looks.length, p.id).toBeGreaterThan(1);
+    }
+  });
+
+  it("keeps each critter's coat and paints the mutagen in the faction colour", () => {
+    const fox = artFor(unit("hoppers"))!;
+    const skunk = artFor(unit("lobber"))!;
+    expect(fox.colourway.plate).not.toBe(skunk.colourway.plate);
+    expect(fox.colourway.leather).toBe(skunk.colourway.leather);
+    const purple = artFor(unit("hoppers"), { color: 0x8a3ac8, look: munch().faction.look })!;
+    expect(purple.colourway.leather).not.toBe(fox.colourway.leather);
+    expect(purple.colourway.plate).not.toBe(fox.colourway.plate);
+  });
+});
+
 describe("snapshots: the worked example and a generic kit unit", () => {
   const cases: [string, () => { rig: RigDef; cw: ReturnType<typeof artFor> }][] = [
     ["bulwark brothers (side, sergeant)", () => ({ rig: artFor(templateByKey("bulwark")!.faction.profiles[0]!)!.looks[0]!.side, cw: artFor(templateByKey("bulwark")!.faction.profiles[0]!) })],
@@ -312,6 +350,8 @@ describe("snapshots: the worked example and a generic kit unit", () => {
         ["dwarves", "shieldbeards", "cannon"],
         ["knights", "menatarms", "knights"],
         ["druids", "wardens", "oakheart"],
+        // the Munch: the beetle pack leader and Dr. Graft on Big Mama
+        ["munch", "nibblers", "mama"],
       ] as const
     ).flatMap(([key, squad, big]): [string, () => { rig: RigDef; cw: ReturnType<typeof artFor> }][] => {
       const unit = (u: string) => templateByKey(key)!.faction.profiles.find((x) => x.id.endsWith(`:${u}`))!;

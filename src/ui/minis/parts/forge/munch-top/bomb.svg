@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" data-part="forge.munch.top.bomb" data-recoil="0">
-<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Mutagen bomb from above: four fins, the team waist band showing round the chrome cap (centre at 0,0)</title>
-<path d="M-15,0 L-6,-3 L-6,3 Z M15,0 L6,-3 L6,3 Z M0,-15 L-3,-6 L3,-6 Z M0,15 L-3,6 L3,6 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
-<circle class="tag" cx="0" cy="0" r="9.6" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
-<circle cx="0" cy="0" r="7.6" fill="#b9bfc4" stroke="#141414" stroke-width="2.4"/>
-<circle cx="0" cy="0" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
-<circle class="glow" cx="-4.6" cy="3.6" r="1.6" fill="#fff2c0"/>
-<circle cx="0" cy="0" r="1.8" fill="none" stroke="#141414" stroke-width="1.4"/>
-<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" data-part="forge.munch.top.bomb" data-recoil="0"><!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. --><path d="M-15,0 L-6,-3 L-6,3 Z M15,0 L6,-3 L6,3 Z M0,-15 L-3,-6 L3,-6 Z M0,15 L-3,6 L3,6 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/><circle class="tag" cx="0" cy="0" r="9.6" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/><circle cx="0" cy="0" r="7.6" fill="#b9bfc4" stroke="#141414" stroke-width="2.4"/><circle cx="0" cy="0" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/><circle class="glow" cx="-4.6" cy="3.6" r="1.6" fill="#fff2c0"/><circle cx="0" cy="0" r="1.8" fill="none" stroke="#141414" stroke-width="1.4"/><g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g></svg>

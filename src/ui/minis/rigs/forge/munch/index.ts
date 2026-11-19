@@ -301,7 +301,7 @@ function mama(): Look {
     pivots: { torso: { x: 0, y: 0 }, head: { x: 0, y: -104 } },
     parts: [
       { id: "body", src: top("mama-body"), bone: "torso", z: 5 },
-      { id: "graft", src: top("graft"), bone: "torso", z: 7, anim: { pulse: 0.02 } },
+      { id: "graft", src: top("graft"), bone: "torso", place: { x: 0, y: 0, rot: 0, scale: 1.25 }, z: 7, anim: { pulse: 0.02 } },
       { id: "head", src: top("mama-head"), bone: "gun", place: { x: 0, y: -100, rot: 0 }, z: 6 },
     ],
     limbs: tl.limbs,
