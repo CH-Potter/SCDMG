@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 4 58 56" data-part="forge.orcs.side.mask">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mud Shaman's mask: a tusked beast skull worn over the face, ember sockets, curled horns and rust feathers</title>
+<path d="M68,26 L72,6 L75,26 Z M72,28 L82,10 L80,30 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M38,44 Q36,30 50,26 Q64,25 67,36 L62,50 L48,55 Q38,53 38,44 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M58,27 Q64,29 67,36 L62,50 L56,52 Q63,40 58,27 Z" fill="#c8bd98"/>
+<circle cx="47" cy="38" r="3.6" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="47" cy="38" r="1.6" fill="#fff2c0"/>
+<path d="M40,48 L36,40 L44,47 Z M47,52 L46,43 L51,50 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M60,30 Q72,16 84,26 Q88,38 76,40 Q80,30 70,30 Q66,32 64,36 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M66,46 L64,56 M70,44 L70,54" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

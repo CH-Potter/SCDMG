@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 23 40 36" data-part="forge.dwarves.side.goggles">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Boomstick cap: a padded cloth cap with ear flaps and brass goggles pushed up on the brow</title>
+<path d="M46 47Q45 31 59 29.6Q73 30 74 43L73 55L66 55L65 45Q60 40 52 41Q48 42 47 48Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68 32Q74 36 74 43L73 55L69 55Q71 41 68 32Z" fill="#44432f"/>
+<path d="M46 39.6Q60 35 73.6 39" fill="none" stroke="#25282c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="57.6" cy="37.4" r="4.6" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<circle cx="49.6" cy="39.4" r="5.2" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="49.6" cy="39.4" r="2.8" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="57.6" cy="37.4" r="2.4" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="53" r="1"/></g>
+</svg>

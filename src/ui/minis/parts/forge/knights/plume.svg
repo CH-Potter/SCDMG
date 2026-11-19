@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 -14 58 62" data-part="forge.knights.side.plume">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tall plume: blue feathers streaming back from a gold holder</title>
+<path d="M58,24 Q52,6 62,-4 Q74,-12 90,-4 Q96,2 92,10 Q86,2 78,6 Q90,12 88,24 Q80,16 72,20 Q64,21 58,24 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M78,6 Q90,12 88,24 Q80,16 72,20 Q80,14 78,6 Z" fill="#6c5a37"/>
+<path d="M60,20 Q62,4 76,-4" fill="none" stroke="#6c5a37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M55,26 L63,24 L63,19 L56,20 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

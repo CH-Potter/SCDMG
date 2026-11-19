@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 40 48 78" data-part="forge.regiment.side.ghillie-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Ghillie cape over the back: a heap of leaf tufts, so the scout reads as a walking hedge</title>
+<path d="M64,58 Q84,50 94,66 L97,98 L91,97 L93,107 L85,104 L83,112 L77,104 L71,108 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M86,56 Q92,60 94,66 L97,98 L91,97 L92,102 Q92,74 86,56 Z" fill="#4a2e19"/>
+<path d="M68.9,58.4 Q73.5,52.6 71.1,45.6 Q66.5,51.4 68.9,58.4 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M77.8,57 Q84.8,54.3 86.2,47 Q79.2,49.7 77.8,57 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M86.9,64.2 Q94.2,65.4 99.1,59.8 Q91.8,58.6 86.9,64.2 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M91.5,78 Q98,81.6 104.5,78 Q98,74.4 91.5,78 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M90.9,91.8 Q95.8,97.4 103.1,96.2 Q98.2,90.6 90.9,91.8 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M86.8,102.4 Q86.9,109.8 93.2,113.6 Q93.1,106.2 86.8,102.4 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M78,103.5 Q74.4,110 78,116.5 Q81.6,110 78,103.5 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M75.7,63.5 Q78.6,68.4 84.3,68.5 Q81.4,63.6 75.7,63.5 Z" fill="#9a8458"/>
+<path d="M90.5,75.7 Q85.6,78.6 85.5,84.3 Q90.4,81.4 90.5,75.7 Z" fill="#4a2e19"/>
+<path d="M77.5,87.7 Q77.6,93.4 82.5,96.3 Q82.4,90.6 77.5,87.7 Z" fill="#9a8458"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

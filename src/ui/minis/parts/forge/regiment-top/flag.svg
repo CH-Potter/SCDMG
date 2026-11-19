@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 16 28 24" data-part="forge.regiment.top.flag">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The marker pennant from above, streaming back from its stick</title>
+<path class="tag" d="M24,20 L42,28 L24,36 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="24" cy="20" r="2.6" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="24" cy="20" r="1"/></g>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 142 22 30" data-part="forge.orcs.side.shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shin wrappings, in shadow</title>
+<path d="M63,146 L78,146 L77,168 L64,168 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="152" r="1"/></g>
+</svg>

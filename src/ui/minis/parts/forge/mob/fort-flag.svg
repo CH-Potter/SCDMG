@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -70 40 74" data-part="forge.mob.side.fort-flag">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrap Fort flag: a pipe pole and a ragged hazard flag with the iron-jaw mark</title>
+<rect x="-2" y="-66" width="4" height="66" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M2,-64 L32,-60 L26,-50 L32,-40 L2,-44 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M8,-58 L22,-57 L21,-48 L9,-49 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<path d="M12.6,-57.6 V-48.6 M17,-57.4 V-48.4" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

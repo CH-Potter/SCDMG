@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="61 144 22 30" data-part="forge.undead.side.col-shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far bone shin</title>
+<path d="M65,148 L77,148 L75.6,170 L66,170 Z" fill="#c8bd98" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M64.6,158 L77,158" fill="none" stroke="#44432f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="152" r="1"/></g>
+</svg>

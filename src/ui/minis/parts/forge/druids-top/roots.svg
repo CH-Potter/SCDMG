@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -56 112 112" data-part="forge.druids.top.roots" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Strangling Roots from above: thorny tendrils curling out from the middle, buds at the tips, the team ribbon on the biggest</title>
+<path d="M-2,-8 Q-20,-32 -44,-40 Q-54,-34 -48,-22 Q-30,-20 -12,8 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M8,-2 Q32,-20 38,-48 Q30,-58 20,-48 Q20,-28 -6,-8 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M8,-4 Q36,10 50,36 Q46,48 34,42 Q28,24 0,12 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M2,10 Q-16,34 -42,42 Q-52,38 -44,28 Q-26,24 -12,-2 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="12" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M8,-8 A12,12 0 0 1 -4,11 Q12,4 8,-8 Z" fill="#4a2e19"/>
+<path d="M-30,-34 L-34,-40 L-26,-38 Z M30,-30 L36,-32 L32,-26 Z M26,26 L32,22 L30,30 Z M-26,26 L-32,22 L-30,30 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-46,-26 Q-56,-32 -50,-38 Q-44,-34 -46,-26 Z M24,-48 Q24,-58 32,-54 Q30,-48 24,-48 Z M46,36 Q56,40 50,46 Q44,42 46,36 Z M-42,30 Q-52,34 -46,40 Q-40,36 -42,30 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M12,-24 L22,-30 L26,-22 L16,-16 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M18,-16 L18,-4 L24,-4 L24,-18 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="0" cy="0" r="3" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

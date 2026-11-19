@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -18 10 30" data-part="forge.regiment.top.swagger">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Swagger stick in a gloved fist, from above</title>
+<rect x="-1.4" y="-16" width="2.8" height="26" rx="1.2" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="-15" r="2" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="0" r="3.4" fill="#5d5b45" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 162 32 28" data-part="forge.cult.side.boot-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far soft boot, in shadow</title>
+<path d="M62,165 L78,165 L79,184 L53,184 Q53,177 60,175 Z" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M52,184 L80,184 L80,187.4 L52,187.4 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="170" r="1"/></g>
+</svg>

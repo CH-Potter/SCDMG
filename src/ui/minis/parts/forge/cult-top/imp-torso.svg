@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 -12 30 40" data-part="forge.cult.top.imp-torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Imp from above: the little crimson body, a team sash, the arrow-tipped tail</title>
+<path d="M-2,8 Q-4,18 2,24 L-1,24 L3,31 L7,24 L4,24 Q0,18 2,8 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="0" cy="1" rx="12" ry="10" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M8,-6 A12,10 0 0 1 2,11 Q11,4 8,-6 Z" fill="#6c5a37"/>
+<path class="tag" d="M-13,-3 L-5,-11 L13,4 L5,12 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

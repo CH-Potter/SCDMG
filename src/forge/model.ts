@@ -233,6 +233,18 @@ export function defaultEffect(kind: SupportEffect["kind"], f: Faction): SupportE
       return { kind, move: 2 };
     case "overshield":
       return { kind, amount: 1 };
+    case "armourBuff":
+      return { kind, save: 1 };
+    case "armourBreak":
+      return { kind, save: 1, range: 18 };
+    case "evadeBuff":
+      return { kind, amount: 1, grant: 6 };
+    case "evadeDebuff":
+      return { kind, amount: 1, range: 18 };
+    case "damageBuff":
+      return { kind, amount: 1 };
+    case "weaken":
+      return { kind, dice: 1, range: 12 };
   }
 }
 
@@ -282,6 +294,12 @@ export const EFFECT_INFO: Record<SupportEffect["kind"], { label: string; reactio
   expose: { label: "Expose", reaction: false, help: "An enemy unit one of your models can see within the range gets nothing from cover, hunkering or digging in against shooting this round." },
   silence: { label: "Silence", reaction: false, help: "An enemy unit near your models can't use active abilities, and its reactive abilities don't trigger, this round." },
   overshield: { label: "Overshield", reaction: false, help: "A friendly unit gets extra shield per model, even above its maximum, until the end of the round." },
+  armourBuff: { label: "Armour buff", reaction: false, help: "A friendly unit's saves are better against every attack (shots and blows) this round." },
+  armourBreak: { label: "Armour break", reaction: false, help: "An enemy unit near your models: its saves are worse against every attack this round." },
+  evadeBuff: { label: "Evade buff", reaction: false, help: "A friendly unit's evade rolls get a bonus this round; a unit with no evade evades every attack on the granted roll instead." },
+  evadeDebuff: { label: "Evade penalty", reaction: false, help: "An enemy unit near your models: its evade rolls are worse this round (never worse than 6+)." },
+  damageBuff: { label: "Damage buff", reaction: false, help: "A friendly unit's hits deal extra damage this round." },
+  weaken: { label: "Weaken", reaction: false, help: "An enemy unit near your models rolls fewer dice per model on every attack this round (never fewer than one)." },
   ward: { label: "Ward (reaction)", reaction: true, help: "Armed in advance: the next enemy ranged attack on one of your units this round hits one worse." },
   brace: { label: "Brace (reaction)", reaction: true, help: "Armed in advance: the next friendly unit charged this round gets +1 to saves in that combat." },
   retaliate: { label: "Retaliate (reaction)", reaction: true, help: "Armed in advance: when one of your units is destroyed, each enemy model touching it is hit." },
@@ -344,6 +362,18 @@ export function effectSummary(e: SupportEffect, f: Faction): string {
       return `An enemy unit within ${e.range}" of your models can't use active abilities, and its reactions don't trigger, this round.`;
     case "overshield":
       return `A friendly unit gets +${e.amount} shield per model, even above its maximum, until the end of the round.`;
+    case "armourBuff":
+      return `A friendly unit's saves are ${e.save} better against every attack this round.`;
+    case "armourBreak":
+      return `An enemy unit within ${e.range}" of your models: its saves are ${e.save} worse against every attack this round.`;
+    case "evadeBuff":
+      return `A friendly unit's evade rolls get +${e.amount} this round (no evade: it evades every attack on a ${e.grant}+).`;
+    case "evadeDebuff":
+      return `An enemy unit within ${e.range}" of your models: its evade rolls are ${e.amount} worse this round.`;
+    case "damageBuff":
+      return `A friendly unit's hits deal +${e.amount} damage this round.`;
+    case "weaken":
+      return `An enemy unit within ${e.range}" of your models rolls ${e.dice} fewer ${e.dice === 1 ? "die" : "dice"} per model on its attacks this round (never fewer than one).`;
     case "ward":
       return "Reaction: the next enemy ranged attack on one of your units this round hits one worse.";
     case "brace":

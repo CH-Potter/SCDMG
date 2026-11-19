@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="41 145 18 26" data-part="forge.legion.side.shin-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near shin: a ribbed conduit</title>
+<path d="M44,148 L56,148 L55,168 L45,168 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M44.4,153 H55.6 M44.7,158 H55.3 M45,163 H55" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>

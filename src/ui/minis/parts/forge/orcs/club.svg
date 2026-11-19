@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -24 136 44" data-part="forge.orcs.side.club" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bridge plank club: a split plank, iron bands and old nails, a mooring stone lashed to the end (head left)</title>
+<path d="M14,-9 L118,-5 L118,5 L14,9 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M14,2 L118,1 L118,5 L14,9 Z" fill="#6e4528"/>
+<path d="M-10,-16 Q-12,-22 0,-22 Q16,-22 20,-12 Q24,0 20,12 Q14,22 0,20 Q-12,18 -12,4 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-18 Q24,-8 20,12 Q14,22 4,20 Q18,6 12,-18 Z" fill="#353b41"/>
+<path d="M18,-12 L26,-8 L26,8 L18,12" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M40,-7 L40,7 M70,-6 L70,6" fill="none" stroke="#353b41" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M50,-8 L52,-14 L54,-8 Z M86,-7 L88,-13 L90,-7 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-2" cy="-8" r="1" fill="#b9bfc4"/><circle cx="6" cy="6" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="98" cy="0" r="1"/><circle id="g2" cx="110" cy="0" r="1"/><circle id="muzzle" cx="-12" cy="0" r="1"/></g>
+</svg>

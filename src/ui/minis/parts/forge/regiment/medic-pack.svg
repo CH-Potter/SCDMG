@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 18 42 92" data-part="forge.regiment.side.medic-pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Field medic's tall pack: a white-banded chest of dressings with a lamp on top and a rolled stretcher</title>
+<rect x="80" y="40" width="9" height="66" rx="4.5" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<path d="M64,38 L86,38 L88,104 L68,106 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,38 L86,38 L88,104 L82,104.6 Z" fill="#6c5a37"/>
+<path d="M64.6,58 L86.6,57 L87,69 L65.4,70 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M66,84 L87.4,84" stroke="#141414" stroke-width="1.4"/>
+<rect x="68" y="30" width="10" height="9" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="73" cy="27.6" r="4.4" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<path class="glow" d="M70.4,27.6 H75.6" stroke="#f2b84b" stroke-width="1.6"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

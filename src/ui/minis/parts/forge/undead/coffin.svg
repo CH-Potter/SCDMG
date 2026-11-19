@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -38 34 74" data-part="forge.undead.side.coffin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Coffin-lid shield: a dark plank lid bound in rusted iron, the team field inset, a bronze hourglass</title>
+<path d="M-8,-36 L8,-36 L15,-20 L9,34 L-9,34 L-15,-20 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M0,-36 L8,-36 L15,-20 L9,34 L0,34 Z" fill="#44432f"/>
+<path class="tag" d="M-5,-29 L5,-29 L10,-19 L6,27 L-6,27 L-10,-19 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M0,-29 L5,-29 L10,-19 L6,27 L0,27 Z" fill="#b000b0"/>
+<path d="M-5,-8 L5,-8 L0,1 L5,10 L-5,10 L0,1 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-14,-20 L14,-20 M-11,22 L11,22" fill="none" stroke="#4a5158" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-12" cy="-20" r="1" fill="#b9bfc4"/><circle cx="12" cy="-20" r="1" fill="#b9bfc4"/><circle cx="-9.6" cy="22" r="1" fill="#b9bfc4"/><circle cx="9.6" cy="22" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

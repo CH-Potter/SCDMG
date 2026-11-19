@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-70 -114 140 94" data-part="forge.kin.side.starhawk" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Starhawk Fighter: a seed-shaped hull, a glowing canopy, two vanes swept up and back like a leaf's</title>
+<path d="M10,-56 Q30,-90 56,-108 Q48,-80 34,-54 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M10,-34 Q24,-22 40,-22 Q34,-30 30,-36 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-66,-48 Q-40,-66 0,-66 Q40,-64 62,-46 Q40,-32 0,-32 Q-40,-32 -66,-48 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-60,-44 Q-40,-32 0,-32 Q40,-32 62,-46 Q40,-38 0,-38 Q-36,-38 -60,-44 Z" fill="#6c5a37"/>
+<path d="M-54,-42 Q0,-35 52,-43" fill="none" stroke="#e3d8b6" stroke-width="3" stroke-linecap="round"/>
+<path d="M-40,-58 Q-30,-74 -10,-72 Q-4,-66 -8,-60 Q-24,-56 -40,-58 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-34,-60 Q-28,-69 -14,-68 Q-11,-64 -13,-62 Q-24,-60 -34,-60 Z" fill="#fff2c0"/>
+<path class="glow" d="M56,-49 L67,-46 L56,-42 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M0,-62 Q22,-96 46,-112 Q42,-84 30,-56 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M12,-74 Q26,-96 42,-106 L40,-96 Q28,-86 20,-68 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M30,-56 Q40,-80 45,-109" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/><circle id="exhaust1" cx="66" cy="-46" r="1"/></g>
+</svg>

@@ -128,8 +128,8 @@ export const currentSupply = (u: Unit): number => supplyFor(profileOf(u), aliveM
 /** Supply a unit has lost so far: its full supply minus what its survivors are worth. */
 export const supplyLost = (u: Unit): number => profileOf(u).supply - currentSupply(u);
 
-/** How much a unit counts towards holding an objective: its current supply. */
-export const controlWeight = currentSupply;
+/** How much a unit counts towards holding an objective: its current supply (doubled while it holds the line). */
+export const controlWeight = (u: Unit): number => currentSupply(u) * (u.status.holding ? 2 : 1);
 
 /**
  * Disengaging: a unit worth more supply than all the enemies it's engaged with breaks away cleanly;
@@ -194,8 +194,9 @@ export function eligibleUnits(s: GameState, p: PlayerId): Unit[] {
   const units = onBoard(s, p);
   switch (s.phase) {
     case "movement":
-      // Structures don't move, so they sit out the movement phase, unless one can still lay a barrage marker.
-      return units.filter((u) => !u.status.acted && (!profileOf(u).structure || canLayBarrage(s, u)));
+      // Structures don't move, so they sit out the movement phase, unless one can still lay a barrage
+      // marker or use another movement-phase ability (Smoke Shells, Lay Eggs, Lend Shields).
+      return units.filter((u) => !u.status.acted && (!profileOf(u).structure || canLayBarrage(s, u) || canUseMovementAbility(s, u)));
     case "assault":
       return units.filter(
         (u) =>
@@ -240,6 +241,17 @@ export function canLayBarrage(s: GameState, u: Unit): boolean {
   if (s.phase !== "movement" || !hasAbility(u, "barrage") || u.status.abilityUsed || u.status.silenced) return false;
   if (s.players[u.owner].cp < (ABILITIES.barrage.cp ?? 0)) return false;
   return !isEngaged(s, u);
+}
+
+/** Can this unit still use a movement-phase active ability other than Barrage (one it has, can afford and hasn't used up)? */
+export function canUseMovementAbility(s: GameState, u: Unit): boolean {
+  if (s.phase !== "movement" || u.status.abilityUsed || u.status.silenced || isEngaged(s, u)) return false;
+  return profileOf(u).abilities.some((id) => {
+    const d = ABILITIES[id];
+    if (id === "barrage" || d.kind !== "active" || d.phase !== "movement") return false;
+    if (d.usesPerGame !== undefined && (u.abilityUses[id] ?? 0) >= d.usesPerGame) return false;
+    return s.players[u.owner].cp >= (d.cp ?? 0);
+  });
 }
 
 // ---------- hidden and burrowed ----------

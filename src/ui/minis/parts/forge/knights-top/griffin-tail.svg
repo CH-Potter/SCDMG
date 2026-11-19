@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 18 10 26" data-part="forge.knights.top.griffin-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Griffin tail from above, dark tuft</title>
+<path d="M-2,20 Q-3,30 0,36 Q3,30 2,20 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-2.4,34 Q0,43 2.4,34 Q0,36 -2.4,34 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="21" r="1"/></g>
+</svg>

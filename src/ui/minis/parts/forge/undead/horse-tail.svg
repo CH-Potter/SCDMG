@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 -62 30 30" data-part="forge.undead.side.horse-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A ragged wisp of tail</title>
+<path d="M30,-54 Q44,-57 52,-45 L46,-46 L50,-36 L42,-42 L40,-33 L35,-44 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="32" cy="-50" r="1"/></g>
+</svg>

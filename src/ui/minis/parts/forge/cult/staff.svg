@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -18 140 30" data-part="forge.cult.side.staff" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crooked staff: a gnarled pole with a hooked top and a star lantern (lantern left)</title>
+<path d="M10,-2 Q30,-6 50,-1 Q75,4 100,-1 Q115,-4 126,0 L126,4 Q114,1 100,3.2 Q74,8 50,3 Q30,-2 10,2.4 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M11,-2.2 Q-2,-3 -6,-9 Q-9,-15 -3,-15 Q1,-14 -1,-10 Q1,-5 11,2.2 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-6,-9 L-6,-3" fill="none" stroke="#6e4528" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="-6" cy="1.4" r="4.6" fill="#f2b84b" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-6" cy="1.4" r="2" fill="#fff2c0"/>
+<path d="M58,-1 Q61,3 58,6 M88,-1 Q91,3 88,6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="50" cy="1" r="1"/><circle id="g2" cx="78" cy="2" r="1"/><circle id="muzzle" cx="-6" cy="1.4" r="1"/></g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 2 36 46" data-part="forge.knights.side.chaplain-hat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Chaplain's tall hat: a cream column with a blue band and the gold rising sun</title>
+<path d="M47,37 L48,12 Q60,4 72,12 L73,37 Q60,40 47,37 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,8.6 Q70,10 72,12 L73,37 Q70,38 67,38.4 Z" fill="#44432f"/>
+<path d="M47.4,28 Q60,30 72.6,28 L72.8,35 Q60,37.6 47.2,35 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M54.6,22 Q54.6,17.6 59,17.6 Q63.4,17.6 63.4,22 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M59,16.0 V13.200000000000001 M55.48,18.48 l-2.2,-2.2 M62.52,18.48 l2.2,-2.2 M53.0,20.6 h-3 M65.0,20.6 h3" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M52.6,23.4 H65.4" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

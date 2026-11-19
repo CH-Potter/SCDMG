@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 52 60 112" data-part="forge.kin.side.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kin torso: a lotus breastplate over long porcelain robes, violet hem, the team stole hanging to the hem</title>
+<path d="M66,100 Q84,120 92,160 L70,160 Q70,130 64,104 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M45,102 L77,100 Q82,130 86,158 Q62,162 38,158 Q42,130 45,102 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,101 L77,100 Q82,130 86,158 L76,159 Q74,130 70,101 Z" fill="#c8bd98"/>
+<path d="M60,108 Q60,134 61,158 M70,108 Q72,134 75,158" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M38.6,151 Q62,155 85,151 L86,158 Q62,162 38,158 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45,68 Q46,61 60,60 Q74,61 77,68 L78,98 Q62,104 46,100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,61 Q75,63 77,68 L78,98 Q74,100 71,101 Z" fill="#6c5a37"/>
+<path d="M58,97 Q55,82 64,70 Q73,82 71,98" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M44,96 L78,93 L78,101 L44,104 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M47,60 L54,59.4 L56,148 L51,152 L47.6,148 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M51.6,59.6 L54,59.4 L56,148 L53,150 Z" fill="#b000b0"/>
+<path d="M48,140 L55.6,139 M48,134 L55.4,133" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M49,58 Q60,52 72,56 L74,66 Q61,62 50,68 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -32 40 62" data-part="forge.elves.top.stag-body">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>White stag from above: lean back, pale flanks, team saddle-cloth</title>
+<path d="M0,-28 Q14,-26 16,-8 Q17,14 9,24 Q0,28 -9,24 Q-17,14 -16,-8 Q-14,-26 0,-28 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M10,-22 Q16,-14 16,-8 Q17,14 9,24 Q4,26 2,26 Q14,10 10,-22 Z" fill="#4a2e19"/>
+<path class="tag" d="M-11,-9 Q0,-12 11,-9 L11,8 Q0,11 -11,8 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-11,8 Q0,11 11,8" fill="none" stroke="#9a8458" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

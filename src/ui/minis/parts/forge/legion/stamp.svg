@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -16 44 20" data-part="forge.legion.side.stamp">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crusher foot: a heavy press stamp with hazard stripes (drawn about the ankle)</title>
+<path d="M-6,-14 L8,-14 L10,-9 L-8,-9 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-21,-10 L17,-10 L17,2 L-21,2 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-17,-9 L-13,1 M-9,-9 L-5,1 M-1,-9 L3,1 M7,-9 L11,1" stroke="#6e4528" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-6" r="1"/></g>
+</svg>

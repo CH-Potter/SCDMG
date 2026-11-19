@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 52 46 92" data-part="forge.cult.side.champ-torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Spikeplate cuirass: crimson plate with a gold sunburst and grin on the chest, ray-edged tassets, a team tabard</title>
+<path d="M46,66 L74,64 L78,110 L46,112 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M64,108 L80,106 L82,128 L68,130 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M44,108 L62,108 L61,132 L45,130 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M45,130 L48,136 L51,130.6 L54,137 L57,131.4 L60,136 L61,132" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M49.6,106 L58.4,106 L58.4,138 L54,142.4 L49.6,138 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M43,103 L79,99 L79,108 L43,112 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M42,70 Q43,61 60,60 Q78,61 80,70 L80,98 Q62,104 43,100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M71,60.8 Q78,62 80,70 L80,98 Q75,100 71.6,101 Z" fill="#6c5a37"/>
+<path d="M63.7,80.5 L66.8,81.5 L66.2,83.6 L63,83 Z M62.2,84.3 L64.1,86.9 L62.3,88.3 L60.1,86 Z M58.6,86.5 L58.6,89.8 L56.4,89.9 L56,86.7 Z M54.5,86.2 L52.6,88.9 L50.7,87.6 L52.3,84.8 Z M51.3,83.6 L48.2,84.6 L47.4,82.5 L50.4,81.2 Z M50.3,79.5 L47.2,78.5 L47.8,76.4 L51,77 Z M51.8,75.7 L49.9,73.1 L51.7,71.7 L53.9,74 Z M55.4,73.5 L55.4,70.2 L57.6,70.1 L58,73.3 Z M59.5,73.8 L61.4,71.1 L63.3,72.4 L61.7,75.2 Z M62.7,76.4 L65.8,75.4 L66.6,77.5 L63.6,78.8 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="57" cy="80" r="6.6" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path d="M52.6,79.2 Q53.7,76.7 54.8,79.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M59.2,79.2 Q60.3,76.7 61.4,79.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M53,80.8 Q57,86.3 61,80.8 Q57,83.2 53,80.8 Z" fill="#141414"/>
+<path d="M48,58 L72,56 L74,66 L49,68 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="74" cy="72" r="1" fill="#c8bd98"/><circle cx="74" cy="92" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

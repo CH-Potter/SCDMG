@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 6 46 58" data-part="forge.druids.side.hood">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warden hood: a mossy cowl with a ragged leaf hem and a sprig on top</title>
+<path d="M45,46 Q41,22 60,19 Q79,21 78,44 L81,60 L75,55 L73,62 Q66,52 66,42 Q64,33 56,32.4 Q49,33 48.6,44 L47,50 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,22.6 Q79,27 78,44 L81,60 L75,55 L73,60 Q76,40 70,22.6 Z" fill="#6c5a37"/>
+<path d="M48.6,44 Q49,33 56,32.4 Q64,33 66,42" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M52,24 L55,29 M64,21 L66,27 M73,28 L72,34" fill="none" stroke="#6c5a37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M60,19.4 Q54,10 60,7 Q65,12 60,19.4 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M61,19 Q68,12 73,15 Q68,20 61,19 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="63" cy="14" r="1.8" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

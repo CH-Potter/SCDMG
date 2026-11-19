@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -40 16 44" data-part="forge.cult.top.brute-arm">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>An extra mutant arm from above, reaching forward, talons out</title>
+<path d="M-4,0 L4,0 L5,-20 L2,-30 L-2,-30 L-5,-20 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-2,-30 L-4,-38 L0,-32 Z M0,-31 L0,-39 L1.4,-31 Z M2,-30 L4,-38 L0.4,-32 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

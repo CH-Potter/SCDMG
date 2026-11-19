@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="65 63 20 18" data-part="forge.legion.side.epaulette-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Overseer's far epaulette</title>
+<path d="M69,72 L68.4,78 M73,73.6 L73,79 M77,73.4 L77.6,78.6" stroke="#4a2e19" stroke-width="2.4" stroke-linecap="round"/>
+<ellipse cx="75" cy="70" rx="8" ry="5" fill="#4a2e19" stroke="#141414" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

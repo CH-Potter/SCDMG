@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 52 48 84" data-part="forge.undead.side.col-torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bone Colossus torso: a cage of great ribs packed with skulls, a sternum of femurs, a pelvis of bones and the team rag hanging in front</title>
+<path d="M44,100 Q60,94 78,100 L76,114 Q68,108 61,114 Q54,108 46,114 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M47,107 L64,107 L63,129 L59,122 L56,133 L52,123 L47,131 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M56,107 L64,107 L63,129 L59,122 L56,127 Z" fill="#b000b0"/>
+<path d="M44,66 Q60,56 78,62 Q85,82 76,98 Q60,104 46,98 Q40,82 44,66 Z" fill="#44432f" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="70" cy="89" r="5.6" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<ellipse cx="67.6" cy="88" rx="1.6" ry="2" fill="#141414"/>
+<ellipse cx="72.4" cy="88" rx="1.6" ry="2" fill="#141414"/>
+<circle cx="63" cy="75" r="5" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<ellipse cx="61" cy="74" rx="1.4" ry="1.8" fill="#141414"/>
+<path d="M46,70 Q60,64 76,67.6" fill="none" stroke="#e3d8b6" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44,77 Q60,72 79,76" fill="none" stroke="#e3d8b6" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44,84 Q60,80 80,84" fill="none" stroke="#e3d8b6" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M45,91 Q60,88 78,91" fill="none" stroke="#e3d8b6" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48,97 Q60,95 74,97" fill="none" stroke="#e3d8b6" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44,66 Q60,56 78,62 Q85,82 76,98 Q60,104 46,98 Q40,82 44,66 Z" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M51,63 L56.6,62 L56,99 L51.6,97 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="56" y="54" width="8" height="11" rx="2" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<path d="M56.4,59.4 H63.6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><path d="M70,70 l2,3 M52,80 l2,2" fill="none" stroke="#c8bd98" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

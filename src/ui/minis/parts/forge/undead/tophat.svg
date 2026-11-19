@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 6 38 42" data-part="forge.undead.side.tophat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A battered top hat, crown caved in, a frayed bronze band</title>
+<path d="M44,36 L77,31 L77,35.4 L44.6,40 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50,35 L48,13 L60,15 L70,10 L73,32 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,11.6 L70,10 L73,32 L68,32.6 Z" fill="#44432f"/>
+<path d="M49.4,29 L72.4,25.6 L72.8,30.6 L49.8,34 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M60,15 L61,26" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

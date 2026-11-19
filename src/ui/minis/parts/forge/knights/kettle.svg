@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 18 52 28" data-part="forge.knights.side.kettle">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kettle hat: a polished steel dome with a broad brim and a gold band</title>
+<path d="M36,39 Q60,31 84,39 L82,43 Q60,36 38,43 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M46,38 Q46,22 60,21 Q74,22 74,37 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,22.6 Q74,25 74,37 L68,37 Q70,27 66,22.6 Z" fill="#353b41"/>
+<path d="M46.6,33 Q60,29 73.6,32.6" fill="none" stroke="#6e4528" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M60,21.4 V34" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 10 50 54" data-part="forge.kin.side.mask">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kin hood and mask: a swept-back pointed hood, a smooth porcelain mask with one glowing crescent eye</title>
+<path d="M50,60 Q43,46 45,34 Q48,22 60,20 Q74,19 88,13 Q84,24 80,34 Q78,48 74,56 Q68,62 60,62 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,22 Q81,17 88,13 Q84,24 80,34 Q78,48 74,56 Q70,58 68,58 Q76,44 74,22 Z" fill="#44432f"/>
+<path d="M48,52 Q46,40 49,32 Q54,25 62,26 Q66,40 64,56 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M51,28 Q57,25.6 62,28 Q64,40 62,54 Q57,57 51.6,55 Q47.6,51 47,46 L45,42.6 L47,40 Q46.4,32 51,28 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M58,27 Q62,28 62,28 Q64,40 62,54 Q60,55.6 58,56 Q61,42 58,27 Z" fill="#c8bd98"/>
+<path d="M46.8,36.4 Q51.6,42.6 56.4,36.8 Q51.6,39.2 46.8,36.4 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M48.4,37.4 Q51.6,40.6 54.8,37.6 Q51.6,39 48.4,37.4 Z" fill="#fff2c0"/>
+<path class="detail" d="M50.4,44 L51.4,49.6 L49.4,49.6 Z" fill="#6e4528"/>
+<path d="M47,50 Q44,36 50,28 Q56,22 64,24" fill="none" stroke="#6e4528" stroke-width="2.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 -28 72 136" data-part="forge.regiment.side.banner">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The regimental colour on a tall pole: a fringed square flag with the mud-boot badge, a gilt finial</title>
+<path d="M64,62 L86,64 L88,102 L68,104 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="84" y="-22" width="4" height="124" rx="1.6" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M88,-14 L124,-12 L122,22 L88,20 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M88,14 L122.4,16 L122,22 L88,20 Z" fill="#4a2e19"/>
+<path d="M88,20 L122,22" stroke="#f2b84b" stroke-width="3"/>
+<path d="M98,-6 L106,-6 L106,4 L114,6 L114,11 L98,11 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M86,-22 L82,-28 L90,-28 Z" fill="#f2b84b" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="80" y="-15" width="12" height="3" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

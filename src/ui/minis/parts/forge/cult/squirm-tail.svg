@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 -78 34 40" data-part="forge.cult.side.squirm-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Squirming Thing's tentacle tail, curling up</title>
+<path d="M30,-50 Q44,-50 48,-62 Q50,-73 43,-75 Q38,-72 43,-66 Q42,-57 30,-44 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="44" cy="-58" r="1.2" fill="#c8bd98"/><circle cx="40" cy="-52" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="32" cy="-47" r="1"/></g>
+</svg>

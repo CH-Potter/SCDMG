@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-38 -20 20 22" data-part="forge.regiment.top.crate">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mortar bombs in their open crate, from above</title>
+<rect x="-36" y="-18" width="16" height="18" rx="1.4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<circle class="glow" cx="-32" cy="-13" r="2.4" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-24" cy="-13" r="2.4" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-32" cy="-5" r="2.4" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-24" cy="-5" r="2.4" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="-28" cy="-9" r="1"/></g>
+</svg>

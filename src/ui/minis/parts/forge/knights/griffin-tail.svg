@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 -62 34 36" data-part="forge.knights.side.griffin-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Griffin tail: a lion's tail with a dark tuft</title>
+<path d="M30,-50 Q42,-50 48,-44 Q52,-38 50,-32 Q46,-38 40,-42 Q34,-44 30,-44 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M48,-36 Q56,-34 58,-28 Q52,-26 48,-30 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="32" cy="-47" r="1"/></g>
+</svg>

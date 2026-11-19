@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -4 24 8" data-part="forge.elves.top.knife">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Leaf knife from above, gripped</title>
+<path d="M0,0 Q6,-3 12,-2 L14,0 L12,2 Q6,3 0,0 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="14" y="-1.4" width="6" height="2.8" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="16" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 -6 56 114" data-part="forge.undead.side.standard">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tattered standard: a crooked pole and crossbar, a shredded lavender cloth with a bronze hourglass, a grave lantern hung at the end</title>
+<path d="M64,60 L82,62 L84,98 L68,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="80" y="2" width="4" height="98" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<rect x="72" y="8" width="34" height="3.6" rx="1" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M84,11.6 L104,11.6 L104,42 L100,35 L97,46 L93,37 L89,48 L86,38 L84,42 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M98,11.6 L104,11.6 L104,42 L100,35 L98.4,39 Z" fill="#6c5a37"/>
+<path d="M90,16 L98,16 L94,23 L98,30 L90,30 L94,23 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M73.6,11.6 V15.6" fill="none" stroke="#4a5158" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M69,16 L78,16 L77,27 L70,27 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="73.6" cy="21.6" r="2.6" fill="#fff2c0"/>
+<path d="M68,16 L79,16 L73.6,12.6 Z" fill="#4a5158" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M86,24 l3,1 M100,20 l-2,3" fill="none" stroke="#6c5a37" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

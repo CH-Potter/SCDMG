@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 18 46 88" data-part="forge.druids.side.head-beard">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Archdruid head: an old face under bushy white brows, a long lichen-white beard to the belt</title>
+<path d="M62,26 Q78,30 79,50 L82,74 L74,68 Q69,58 64,52 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M50,53 Q47,49 47,45 L43,44 L46,39 Q47,27 60,26 Q72,27 72,40 Q72,51 66,55 Q60,58 50,53 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,28.6 Q72,32 72,40 Q72,51 66,55 L63.6,55.4 Q69,46 66,28.6 Z" fill="#c8bd98"/>
+<path d="M47,36 Q49,25 61,24 Q72,25 74,34 Q66,30 58,31 Q51,32 47,36 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="44.6" cy="44" r="2.6" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<path d="M45,46 Q42,60 47,78 Q52,96 58,102 Q60,92 63,80 Q67,66 66,50 Q60,54 54,51 Q49,48 45,46 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M58,102 Q60,92 63,80 Q67,66 66,50 L63,52 Q63,72 58,102 Z" fill="#c8bd98"/>
+<path d="M51,58 Q51,72 54,86 M57,56 Q58,70 59,84" fill="none" stroke="#c8bd98" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M45,36 L55,35 L54,39 Q49,39 45,40 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="51.6" cy="41.4" rx="1.6" ry="1.6" fill="#141414"/>
+<path d="M44,46 Q50,44 54,47 Q50,49 44,48 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="54" y="86" width="6" height="5" rx="1" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

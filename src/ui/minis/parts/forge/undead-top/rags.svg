@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -2 34 42" data-part="forge.undead.top.rags">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rag cloak from above: shredded cloth behind the shoulders</title>
+<path d="M-13,2 L13,2 Q18,20 13,36 L9,31 L5,38 L1,31 L-3,38 L-7,31 L-12,36 Q-18,20 -13,2 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,2 L13,2 Q18,20 13,36 L10,33 Q14,18 8,2 Z" fill="#44432f"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

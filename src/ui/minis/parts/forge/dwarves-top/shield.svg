@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -24 22 48" data-part="forge.dwarves.top.shield">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tower shield from above: the thick hexagonal slab edge-on, team face outward</title>
+<path d="M-1,-22 L5,-18 L5,18 L-1,22 L-6,18 L-6,-18 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-4,-17 L-10,-14 L-10,14 L-4,17 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M5,-18 V18" fill="none" stroke="#b9bfc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

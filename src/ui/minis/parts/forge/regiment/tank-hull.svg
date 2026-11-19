@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-58 -180 116 106" data-part="forge.regiment.side.tank-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Stomper Tank: a riveted tank body with a turret, a hull gun and a headlamp, the commander's soup-bowl helmet in the hatch</title>
+<rect x="38" y="-156" width="7" height="26" rx="2" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M-52,-110 L-40,-128 L44,-130 L54,-110 L49,-86 L-42,-84 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M36,-129.6 L44,-130 L54,-110 L49,-86 L40,-85.6 Z" fill="#6c5a37"/>
+<path d="M-48,-104 L52,-106 L50.4,-95 L-45,-93 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-46,-90 Q-38,-94 -30,-89 Q-18,-94 -6,-88 Q8,-93 20,-88 Q34,-93 49,-89 L49,-86 L-42,-84 Z" fill="#44432f"/>
+<circle cx="-44" cy="-114" r="6" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<rect x="-58" y="-116" width="14" height="4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-46" cy="-123" r="3.2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<path d="M-6,-163 Q-6,-171 4,-171 Q14,-171 14,-163 Z" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path d="M-12,-162 Q4,-166 20,-162 Q20,-160 18,-160 L-10,-159.4 Q-12,-160 -12,-162 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-30,-130 L-24,-152 Q-20,-158 -10,-158 L26,-158 Q34,-157 35,-148 L37,-130 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-157.8 L26,-158 Q34,-157 35,-148 L37,-130 L28,-130 Q30,-146 24,-157.8 Z" fill="#6c5a37"/>
+<rect x="-8" y="-162" width="22" height="5" rx="1.4" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-25.6,-147 L35.4,-148 L36.4,-139 L-27.6,-138 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="-36" y="-151" width="9" height="18" rx="2" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M-40,-124 H44 M-46,-100 H50" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="-30" cy="-118" r="1.2" fill="#c8bd98"/><circle cx="-10" cy="-118" r="1.2" fill="#c8bd98"/><circle cx="10" cy="-118" r="1.2" fill="#c8bd98"/><circle cx="30" cy="-118" r="1.2" fill="#c8bd98"/><circle cx="-14" cy="-152" r="1.2" fill="#c8bd98"/><circle cx="20" cy="-152" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-120" r="1"/><circle id="exhaust1" cx="41.5" cy="-158" r="1"/></g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 0 40 60" data-part="forge.legion.side.head-one">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Clank head: a tin dome with one porthole eye, an ear bolt and a ball-tipped antenna</title>
+<path d="M62.6,23 L66.4,8" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<circle class="glow" cx="66.6" cy="6.4" r="3.6" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<path d="M46,54 L46,38 Q46,24 59,24 Q72,24 72,38 L72,54 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,25.6 Q71.4,29 71.4,38 L71.4,53.4 L66.6,53.4 Q69,38 66,25.6 Z" fill="#6c5a37"/>
+<path d="M46,38 H72" stroke="#141414" stroke-width="1.4"/>
+<rect x="44.5" y="50" width="29" height="6" rx="3" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="51" cy="44" r="6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="51" cy="44" r="3.8" fill="#fff2c0"/>
+<circle class="glow" cx="50" cy="43" r="1.6" fill="#f2b84b"/>
+<circle cx="65" cy="44" r="2.6" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="56" cy="29" r="1" fill="#c8bd98"/><circle cx="63" cy="29" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

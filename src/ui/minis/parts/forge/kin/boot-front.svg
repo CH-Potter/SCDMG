@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 164 32 24" data-part="forge.kin.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near boot: a pointed slipper with a violet band</title>
+<path d="M42,166 L54,166 L55,184 L28,184 Q30,178 42,176 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M43,170 L54,170" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

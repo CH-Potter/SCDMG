@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 14 54 52" data-part="forge.orcs.side.wolf-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wolf head: a long snarling muzzle, bared fangs, laid-back ears, an iron collar of spikes at the neck</title>
+<path d="M52,60 Q46,44 54,32 L66,34 Q72,46 68,60 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M58,30 L64,16 L68,32 Z M64,32 L74,20 L72,36 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M66,40 Q58,26 44,30 L28,36 Q24,42 30,44 L46,44 Q42,48 34,48 L40,52 Q56,54 66,40 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30,44 L46,44 Q42,48 34,48 L40,52 Q54,52 60,46 Q48,44 30,44 Z" fill="#44432f"/>
+<path d="M32,44 L34,48 L36,44 Z M40,44 L42,49 L44,44 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="27.4" cy="37.6" rx="2.4" ry="2" fill="#141414"/>
+<path class="glow" d="M43,34 L51,33 L48,37 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M42,32 L52,30" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M50,52 L70,48 L72,56 L52,60 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M54,52 L52,46 L57,51 Z M62,50 L62,44 L65,49 Z M54,59 L52,64 L57,59 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

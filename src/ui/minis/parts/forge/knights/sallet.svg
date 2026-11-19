@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 18 52 46" data-part="forge.knights.side.sallet">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sallet: a sweeping steel helm with a long tail, the visor down (a dark slit) and a steel bevor</title>
+<path d="M54,50 L65,50 L65,60 L54,60 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M44,47 L45,32 Q47,21 60,20 Q74,21 77,32 L90,46 L75,46 L72,54 L50,55 Q45,53 44,47 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,21.6 Q74,23 77,32 L90,46 L80,46 Q78,32 68,21.6 Z" fill="#353b41"/>
+<path d="M44,38.4 L64,37.6 L64,41.4 L44,42.2 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M44.6,46 L60,47 L61,58 L50,58 Q46,54 44.6,46 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M58,21 Q62,30 64,37" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="70" cy="42" r="1" fill="#b9bfc4"/><circle cx="56" cy="52" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

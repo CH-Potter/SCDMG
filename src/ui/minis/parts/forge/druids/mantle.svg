@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 54 42 96" data-part="forge.druids.side.mantle">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Moss cloak behind: shaggy layered leaves, a seed gourd tied at the hip</title>
+<path d="M65,60 L80,62 Q90,98 96,140 L90,134 L86,143 L80,135 L75,142 Q72,108 65,60 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,62 Q90,98 96,140 L90,134 L87,140 Q84,100 76,70 Z" fill="#6c5a37"/>
+<path d="M70,76 L74,82 M72,96 L77,102 M75,116 L80,122" fill="none" stroke="#6c5a37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="82" cy="106" rx="5.6" ry="7.6" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M80,98 L84,98 L83,94 L81,94 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

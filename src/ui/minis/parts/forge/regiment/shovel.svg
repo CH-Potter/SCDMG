@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -12 108 24" data-part="forge.regiment.side.shovel" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Entrenching shovel: a broad spade on an ash shaft with a D grip</title>
+<path d="M-20,-8 L2,-6.4 L4,0 L2,6.4 L-20,8 Q-24,0 -20,-8 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-21.6,3 L3,3 L2,6.4 L-20,8 Z" fill="#353b41"/>
+<rect x="2" y="-2" width="70" height="4" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M72,-7 H80 Q84,-7 84,-3 V3 Q84,7 80,7 H72 Z M75,-3 V3 H80 V-3 Z" fill="#2b2019" stroke="#141414" stroke-width="2" fill-rule="evenodd"/>
+<path class="detail" d="M-14,-4 L-4,-3" stroke="#b9bfc4" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="30" cy="0" r="1"/><circle id="g2" cx="66" cy="0" r="1"/><circle id="muzzle" cx="-20" cy="0" r="1"/></g>
+</svg>

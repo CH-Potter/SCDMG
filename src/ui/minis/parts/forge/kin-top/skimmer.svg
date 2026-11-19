@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -64 40 128" data-part="forge.kin.top.skimmer">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Glide Rider from above: the leaf-shaped hover-blade, the rider's robe and team scarf streaming back</title>
+<path d="M0,-60 Q16,-40 16,0 Q14,40 0,60 Q-14,40 -16,0 Q-16,-40 0,-60 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,-50 Q16,-36 16,0 Q14,40 0,60 Q10,30 6,-50 Z" fill="#6c5a37"/>
+<path d="M0,-56 L0,56" fill="none" stroke="#6e4528" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M-9,-6 Q0,-12 9,-6 Q10,10 4,24 L-4,24 Q-10,10 -9,-6 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-3,-4 L3,-4 Q6,14 3,36 L-3,36 Q0,14 -3,-4 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-12,-4 Q-6,-12 0,-8 Q6,-12 12,-4 Q6,2 0,0 Q-6,2 -12,-4 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-10,-6 L-14,-20 L-10,-22 L-6,-8 Z" fill="#5d5b45" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M0,-14 Q6,-13 6,-7 Q6,-2 2,3 L0,7 L-2,3 Q-6,-2 -6,-7 Q-6,-13 0,-14 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-4,-12 Q0,-15 4,-12 Q0,-10.6 -4,-12 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

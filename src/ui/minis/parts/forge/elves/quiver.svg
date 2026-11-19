@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 40 34 66" data-part="forge.elves.side.quiver">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Moonwood quiver slung across the back, white fletchings up</title>
+<path d="M71,58 L80,55 L92,98 L83,101 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M77,56.4 L80,55 L92,98 L88.6,99.2 Z" fill="#4a2e19"/>
+<path d="M70,57 L68,46 L72,50 Z M74,56 L74,43 L77,49 Z M78,55 L80,44 L81,51 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M73.6,66 L83,63 M78,82 L87,79" fill="none" stroke="#9a8458" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

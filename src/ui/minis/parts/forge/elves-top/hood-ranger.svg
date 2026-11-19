@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -16 40 36" data-part="forge.elves.top.hood-ranger">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hollow-Oak cowl from above: dark and leafy</title>
+<path d="M-7,-3 L-17,4 L-6,4 Z M7,-3 L17,4 L6,4 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-11,-4 Q-11,-13 0,-13 Q11,-13 11,-4 Q11,6 3,10 L0,19 L-3,10 Q-11,6 -11,-4 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-10,-10 L-14,-14 L-7,-12 Z M8,-11 L12,-15 L11,-8 Z M-12,4 L-16,8 L-10,7 Z M10,6 L15,9 L9,10 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-6,-10 Q0,-13 6,-10 Q4,-6 0,-6 Q-4,-6 -6,-10 Z" fill="#c8bd98" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

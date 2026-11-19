@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -22 72 44" data-part="forge.orcs.top.torso-heavy">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tuskguard from above: plated hunched back, spiked pauldrons both sides, team waist rag</title>
+<path class="tag" d="M-15,8 Q0,13 15,8 L14,16 Q0,21 -14,16 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="0" cy="1.6" rx="17" ry="12" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-10,-9 L4,-11 L6,4 L-8,6 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M2,-8 L14,-6 L12,8 L2,8 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<ellipse cx="-19" cy="0" rx="10" ry="12" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="19" cy="0" rx="10" ry="12" fill="#353b41" stroke="#141414" stroke-width="2.4"/>
+<path d="M-22,-6 L-33,-10 L-24,-2 Z M-24,4 L-34,6 L-24,8 Z M22,-6 L33,-10 L24,-2 Z M24,4 L34,6 L24,8 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

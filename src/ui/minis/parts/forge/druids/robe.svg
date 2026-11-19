@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 52 54 128" data-part="forge.druids.side.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Archdruid's robe: long moss robe to the sandals, bark-fur mantle, rope belt, the team stole down the front</title>
+<path d="M45,98 L77,96 Q83,136 88,177 L82,174 L76,178 L68,174 L60,178 L52,174 L46,178 L40,175 Q44,136 45,98 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M67,97 L77,96 Q83,136 88,177 L82,174 L76,178 Q72,136 67,97 Z" fill="#6c5a37"/>
+<path d="M47,69 Q59,63 74,66 L77,100 Q61,104 47,100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M69,65.4 Q72,65.6 74,66 L77,100 Q73,101.6 69.6,102 Z" fill="#6c5a37"/>
+<path d="M42,64 Q60,54 80,62 L81,82 L75,78 L71,86 L64,79 L57,86 L51,78 L45,84 L42,74 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,58.6 Q77,60 80,62 L81,82 L75,78 L72,84 Q75,70 70,58.6 Z" fill="#4a2e19"/>
+<path class="tag" d="M51,62 L58,60.6 L57.6,166 L50.6,166 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45.6,96 L77,93.6 L77,99.6 L45.6,102 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M60,101 Q58,112 62,122" fill="none" stroke="#5d5b45" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><path d="M48,140 Q50,150 48,160 M80,140 Q78,150 80,160" fill="none" stroke="#6c5a37" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

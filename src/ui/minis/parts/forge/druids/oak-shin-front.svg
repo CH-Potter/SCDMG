@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 136 24 36" data-part="forge.druids.side.oak-shin-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Oakheart's near leg: a furrowed bark stump</title>
+<path d="M42,140 L58,140 L57,168 L43,168 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M53,140.6 L57.4,140.6 L56.6,167.4 L52.6,167.4 Z" fill="#4a2e19"/>
+<path d="M47,142 Q46,154 48,166" fill="none" stroke="#4a2e19" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>

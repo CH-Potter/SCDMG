@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-21 -34 42 66" data-part="forge.knights.top.horse-body">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warhorse from above: the blue caparison over its back, gold hem, the team panel, a saddle</title>
+<path d="M0,-30 Q17,-28 19,-8 Q20,16 11,26 Q0,30 -11,26 Q-20,16 -19,-8 Q-17,-28 0,-30 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-24 Q19,-14 19,-8 Q20,16 11,26 Q5,28 3,28 Q17,12 12,-24 Z" fill="#6c5a37"/>
+<path d="M-19,-8 Q-20,16 -11,26 Q0,30 11,26 Q20,16 19,-8" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="tag" d="M-11,4 L11,4 L11,20 L-11,20 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="-7" y="-10" width="14" height="14" rx="3" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

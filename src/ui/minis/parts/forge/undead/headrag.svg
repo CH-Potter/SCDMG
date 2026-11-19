@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 26 52 26" data-part="forge.undead.side.headrag">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A rag knotted round a bare skull, its torn tails whipping back</title>
+<path d="M45,36 Q60,30 74,33.6 L74.4,39.6 Q60,36.6 45.6,42 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M72,35 L88,40 L84,43 L91,49 L80,45 L77,50 L73,40 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M80,45 L91,49 L84,43 Z" fill="#6c5a37"/>
+<circle cx="73" cy="37.4" r="3" fill="#6c5a37" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -16 116 32" data-part="forge.mob.side.spanner" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Zappy spanner: a giant open wrench wound with copper, a spark caught in its jaw (jaw left)</title>
+<rect x="2" y="-3" width="90" height="6" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="68" y="-3.8" width="20" height="7.6" rx="2" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M4,-7 Q-6,-14 -16,-8 L-10,-4 L-4,-4 L-4,4 L-10,4 L-16,8 Q-6,14 4,7 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M20,-4 V4 M24,-4 V4 M28,-4 V4 M32,-4 V4" stroke="#6e4528" stroke-width="2.4"/>
+<circle class="glow" cx="-11" cy="0" r="3.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<path class="glow" d="M-16,-3 L-20,-8 M-16,3 L-21,6" stroke="#fff2c0" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="44" cy="0" r="1"/><circle id="g2" cx="74" cy="0" r="1"/><circle id="muzzle" cx="-12" cy="0" r="1"/></g>
+</svg>

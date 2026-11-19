@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="56 48 40 42" data-part="forge.dwarves.side.pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Square pauldron, far, in shadow</title>
+<path d="M60,58 L88,53 Q93,54 93,59 L92,80 L63,85 Q59,84 59,80 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M61,79 L91,75" fill="none" stroke="#b9bfc4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

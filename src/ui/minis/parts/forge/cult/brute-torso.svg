@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 34 76 106" data-part="forge.cult.side.brute-torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mutant Brute's body: a swollen hunched bulk of pale flesh with glowing star-cracks, crimson rags, a team rag sash</title>
+<path d="M38,74 Q34,44 62,38 Q92,36 96,66 Q98,96 82,112 L46,114 Q34,104 38,74 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,40 Q94,46 96,66 Q98,96 82,112 L74,112 Q90,84 80,40 Z" fill="#c8bd98"/>
+<path class="glow" d="M70,48 L75,58 L70,65 L77,74 M84,56 L88,64" fill="none" stroke="#f2b84b" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M40,100 Q60,108 84,100 L90,136 L78,129 L69,137 L59,129 L48,137 L37,128 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,104 Q80,103 84,100 L90,136 L78,129 Z" fill="#6c5a37"/>
+<path class="tag" d="M39,80 L47,73 L86,103 L80,110 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M40,98 Q62,106 86,96 L86,102 Q62,112 40,104 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M42,58 Q52,66 64,60" fill="none" stroke="#6e4528" stroke-width="4" stroke-linejoin="round"/>
+<path d="M42,58 Q52,66 64,60" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M52,48 l2,4 M56,46 l2,4 M60,45 l2,4" fill="none" stroke="#141414" stroke-width="1" stroke-linejoin="round"/><circle cx="46" cy="90" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

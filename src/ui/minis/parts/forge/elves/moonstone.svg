@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -26 24 52" data-part="forge.elves.side.moonstone" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The floating moonstone: a glowing crystal, the spire's moonbeam</title>
+<path class="glow" d="M0,-22 L9,0 L0,22 L-9,0 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M0,-16 L5,0 L0,14 Z" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-8" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11 -15 22 42" data-part="forge.kin.top.mask-bare">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kin unhooded from above: hair tail behind, violet circlet, brow crystal</title>
+<path d="M0,-12 Q9,-11 9,-2 Q9,6 4,10 Q6,18 2,25 Q-2,18 -3,10 Q-9,6 -9,-2 Q-9,-11 0,-12 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-6,-9 Q0,-14 6,-9 Q0,-6 -6,-9 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="0" cy="-2" rx="8" ry="7.6" fill="none" stroke="#6e4528" stroke-width="2"/>
+<circle class="glow" cx="0" cy="-10" r="1.8" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

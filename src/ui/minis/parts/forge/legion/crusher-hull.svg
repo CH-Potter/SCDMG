@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-52 -186 104 108" data-part="forge.legion.side.crusher-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crusher Walker: a walking factory block with a sawtooth glazed roof, two chimneys, portholes, a furnace mouth and a team band</title>
+<path d="M16,-150 L16,-176 L30,-176 L30,-150 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="13.6" y="-181" width="18.8" height="7" rx="1.4" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M33,-150 L33,-166 L42,-166 L42,-150 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="31.4" y="-170" width="12.2" height="5" rx="1.4" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M16,-166 H30 M16,-158 H30" stroke="#141414" stroke-width="1.4"/>
+<path d="M-46,-150 L-32,-166 L-32,-150 L-18,-166 L-18,-150 L-4,-166 L-4,-150 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="glow" d="M-33.6,-162 L-33.6,-152 L-36,-152 Z M-19.6,-162 L-19.6,-152 L-22,-152 Z M-5.6,-162 L-5.6,-152 L-8,-152 Z" fill="#fff2c0"/>
+<path d="M-48,-150 L44,-150 L48,-140 L48,-84 Q48,-80 44,-80 L-44,-80 Q-48,-80 -48,-84 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M34,-149.4 L44,-149.4 L47.4,-140 L47.4,-84 Q47.4,-80.6 44,-80.6 L34,-80.6 Z" fill="#6c5a37"/>
+<rect x="-50" y="-145" width="100" height="8" rx="3" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="-22" cy="-124" r="6.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-22" cy="-124" r="4" fill="#fff2c0"/>
+<circle cx="-4" cy="-124" r="6.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-4" cy="-124" r="4" fill="#fff2c0"/>
+<circle cx="14" cy="-124" r="6.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="14" cy="-124" r="4" fill="#fff2c0"/>
+<path class="tag" d="M-47.4,-110 L47.4,-110 L47.4,-101 L-47.4,-101 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<path d="M-48,-98 L-28,-98 L-28,-82 L-48,-82 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-46,-92 L-42,-96 L-38,-92 L-34,-96 L-30,-92 L-30,-84 L-46,-84 Z" fill="#f2b84b"/>
+<path d="M-24,-96 V-82 M-16,-96 V-82" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="-40" cy="-132" r="1.2" fill="#c8bd98"/><circle cx="30" cy="-132" r="1.2" fill="#c8bd98"/><circle cx="30" cy="-88" r="1.2" fill="#c8bd98"/><circle cx="0" cy="-88" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-120" r="1"/><circle id="exhaust1" cx="23" cy="-184" r="1"/><circle id="exhaust2" cx="37.5" cy="-172" r="1"/></g>
+</svg>

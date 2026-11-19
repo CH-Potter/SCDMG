@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-52 -52 104 104" data-part="forge.mob.top.fort-heap" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrap Fort from above: the junk mound, tyres, a barrel, the plank deck with a team-painted patch</title>
+<path d="M-46,-30 Q-40,-48 -10,-46 Q30,-50 44,-30 Q52,0 42,32 Q20,50 -12,46 Q-44,44 -48,14 Q-52,-10 -46,-30 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="-34" cy="28" r="11" fill="#25282c" stroke="#141414" stroke-width="2.4"/>
+<circle cx="-34" cy="28" r="4.4" fill="#353b41"/>
+<rect x="-30" y="-30" width="60" height="56" rx="2" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-30,-16 H30 M-30,-2 H30" stroke="#141414" stroke-width="1.4"/>
+<path class="tag" d="M-26,8 L26,8 L26,22 L-26,22 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<circle cx="36" cy="-30" r="9" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<circle cx="36" cy="-30" r="3" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<path d="M30,30 L40,36 M-40,-10 L-34,-20" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

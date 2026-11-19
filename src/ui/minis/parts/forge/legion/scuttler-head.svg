@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-25 -14 32 27" data-part="forge.legion.side.scuttler-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scuttler head: a goggling eye and snipping pincers</title>
+<path d="M-3,-1 Q-13,-9 -23,-4 L-16,-1.4 Q-10,-3 -4,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-3,3 Q-13,10 -22,4 L-15,2 Q-10,5 -4,1 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="-3" cy="-7" r="5.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-3.6" cy="-7" r="3.2" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

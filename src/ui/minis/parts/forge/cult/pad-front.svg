@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 46 46 48" data-part="forge.cult.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near pauldron: a crimson dome edged with blunt gold sun-rays</title>
+<path d="M50.1,82.3 L51.5,90.2 L47.4,91 L46,83 Z M43.9,82.8 L41.2,90.4 L37.2,89 L40,81.4 Z M38.3,80.2 L32.1,85.4 L29.4,82.2 L35.6,77 Z M34.7,75.1 L26.8,76.5 L26,72.4 L34,71 Z M34.2,68.9 L26.6,66.2 L28,62.2 L35.6,65 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<ellipse cx="46" cy="70" rx="14" ry="13" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M59,65 A14,13 0 0 1 41,82.4 Q55,79 59,65 Z" fill="#6c5a37"/>
+<ellipse cx="46" cy="70" rx="8.6" ry="7.6" fill="none" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="41" cy="66" r="1.1" fill="#c8bd98"/><circle cx="51" cy="66" r="1.1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -118 120 112" data-part="forge.druids.side.roots" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Strangling Roots: thick thorny bark tendrils writhing up, leaf buds at the tips, a team ribbon knotted round the tallest</title>
+<path d="M-34,-14 Q-50,-50 -32,-76 Q-18,-92 -8,-80 Q-24,-72 -24,-50 Q-22,-30 -20,-14 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-8,-80 Q-24,-72 -24,-50 Q-22,-30 -20,-14 L-26,-14 Q-30,-50 -14,-78 Z" fill="#4a2e19"/>
+<path d="M-6,-18 Q-6,-70 12,-98 Q22,-112 32,-102 Q16,-90 10,-62 Q8,-36 10,-18 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M32,-102 Q16,-90 10,-62 Q8,-36 10,-18 L4,-18 Q2,-64 22,-100 Z" fill="#4a2e19"/>
+<path d="M22,-14 Q38,-46 54,-52 Q62,-52 58,-44 Q44,-38 34,-14 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-50,-10 Q-58,-28 -52,-40 Q-46,-46 -44,-38 Q-50,-28 -42,-12 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-30,-60 L-36,-64 L-28,-66 Z M-22,-36 L-30,-36 L-24,-42 Z M14,-80 L8,-84 L16,-88 Z M8,-44 L0,-46 L6,-52 Z M44,-40 L44,-48 L50,-44 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-10,-82 Q-6,-92 2,-90 Q-2,-82 -10,-82 Z M32,-102 Q40,-110 46,-104 Q40,-98 32,-102 Z M58,-46 Q66,-50 66,-42 Q60,-40 58,-46 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M2,-60 L18,-66 L19,-56 L3,-50 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M4,-52 L-2,-38 L4,-36 L9,-50 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="26" cy="-98" r="1.8" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/></g>
+</svg>

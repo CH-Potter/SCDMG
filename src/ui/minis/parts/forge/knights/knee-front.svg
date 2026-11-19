@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="41 136 18 19" data-part="forge.knights.side.knee-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Steel knee cop with a fan</title>
+<path d="M42.6,140 Q50,134 57,140 L56,148 L50,153 L44,148 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M52,137.6 Q55,138 57,140 L56,148 L52,151 Z" fill="#353b41"/>
+<circle cx="50" cy="144.6" r="1.6" fill="#6e4528"/>
+<g id="anchors"><circle id="pivot" cx="50" cy="145" r="1"/></g>
+</svg>

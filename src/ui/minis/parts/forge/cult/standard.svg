@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -24 140 48" data-part="forge.cult.side.standard" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Grinning standard: a tall pole crowned with the smiling sun-disc (disc left)</title>
+<rect x="10" y="-2.4" width="104" height="4.8" rx="2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<rect x="7" y="-4.4" width="7" height="8.8" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M-1.3,-13 L1.2,-18.8 L4.7,-17.5 L2.7,-11.4 Z M4.8,-9.9 L9.9,-13.6 L12.2,-10.8 L7.5,-6.6 Z M8.6,-4.2 L14.9,-4.8 L15.5,-1.2 L9.3,0.1 Z M9,2.7 L14.8,5.2 L13.5,8.7 L7.4,6.7 Z M5.9,8.8 L9.6,13.9 L6.8,16.2 L2.6,11.5 Z M0.2,12.6 L0.8,18.9 L-2.8,19.5 L-4.1,13.3 Z M-6.7,13 L-9.2,18.8 L-12.7,17.5 L-10.7,11.4 Z M-12.8,9.9 L-17.9,13.6 L-20.2,10.8 L-15.5,6.6 Z M-16.6,4.2 L-22.9,4.8 L-23.5,1.2 L-17.3,-0.1 Z M-17,-2.7 L-22.8,-5.2 L-21.5,-8.7 L-15.4,-6.7 Z M-13.9,-8.8 L-17.6,-13.9 L-14.8,-16.2 L-10.6,-11.5 Z M-8.2,-12.6 L-8.8,-18.9 L-5.2,-19.5 L-3.9,-13.3 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="-4" cy="0" r="13" fill="#f2b84b" stroke="#141414" stroke-width="2.4"/>
+<path d="M-6.4,8.4 Q-11.1,5.8 -6,4.2" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-5.1,-4.6 Q-9.8,-7.1 -4.7,-8.7" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-3.3,7.9 Q8.3,1.3 -1.6,-7.6 Q2.2,0.7 -3.3,7.9 Z" fill="#141414"/>
+<path d="M60,-2.4 v4.8 M90,-2.4 v4.8" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="66" cy="0" r="1"/><circle id="g2" cx="88" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

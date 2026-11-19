@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 24 46 36" data-part="forge.undead.side.bandage">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A filthy bandage wound round the jaw and crown, one end hanging loose</title>
+<path d="M46,33 Q58,27 72,32 L72,37 Q58,33 46,38.6 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M57,48 L67,46 L68,52 L58,54 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M70,35 L80,46 L76,48 L68,38 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M52,34 l2,-2 M62,32 l2,-1" fill="none" stroke="#c8bd98" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

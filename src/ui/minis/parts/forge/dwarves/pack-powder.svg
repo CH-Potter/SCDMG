@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 44 40 64" data-part="forge.dwarves.side.pack-powder">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Powder pack: an iron-hooped keg of black powder and a horn on a cord</title>
+<path d="M65,61 Q64,56 70,55 L86,54 Q91,55 91,60 Q93,78 90,96 Q89,100 85,100 L70,101 Q66,101 66,96 Q63,78 65,61 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M83,54.4 L86,54 Q91,55 91,60 Q93,78 90,96 Q89,100 85,100 L84,100 Q88,78 83,54.4 Z" fill="#e3d8b6"/>
+<path d="M65.6,66 L91.4,64 M65.6,90 L91.4,88" fill="none" stroke="#25282c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M70,58 V97 M78,57 V97" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M74,50 L80,50 L80,55 L74,55 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M68,78 Q62,92 72,104 Q76,100 72,96 Q68,90 72,80 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

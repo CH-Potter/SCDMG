@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -18 116 36" data-part="forge.legion.side.beam-cannon" data-recoil="6">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Beam arm: a fat tin cannon with a flared emitter cone, a glowing lens and coil bands (muzzle left)</title>
+<path d="M30,-12 L92,-12 Q100,-12 100,-4 L100,6 Q100,14 92,14 L30,14 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30.6,6 L99.4,6 Q99,13.4 92,13.4 L30.6,13.4 Z" fill="#6c5a37"/>
+<path d="M31,-10 L8,-15 L8,17 L31,12 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M19,-12.4 L19,14.6" stroke="#141414" stroke-width="1.4"/>
+<ellipse class="glow" cx="7" cy="1" rx="3" ry="13" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<rect x="44" y="-13.4" width="6" height="28.8" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="54" y="-13.4" width="6" height="28.8" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<circle cx="84" cy="1" r="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="72" cy="1" r="1"/><circle id="muzzle" cx="2" cy="1" r="1"/></g>
+</svg>

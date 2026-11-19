@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -52 30 58" data-part="forge.mob.top.claw">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wrecking claw from above: the boom reaching forward, two hooked fingers</title>
+<rect x="-5" y="-36" width="10" height="38" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="6" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M-4,-36 Q-14,-42 -10,-50 L-6,-46 Q-8,-42 -2,-38 Z M4,-36 Q14,-42 10,-50 L6,-46 Q8,-42 2,-38 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="-7" y="-40" width="14" height="8" rx="2" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

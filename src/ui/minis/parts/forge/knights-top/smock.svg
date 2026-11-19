@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -11 44 26" data-part="forge.knights.top.smock">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Levy from above: drab smock, blue armband, the team kerchief knot at the back</title>
+<ellipse cx="-13" cy="1" rx="7" ry="8.6" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="13" cy="1" rx="7" ry="8.6" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="0" cy="1.4" rx="12.4" ry="9" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M8,-5 A12.4,9 0 0 1 -2,10.4 Q7,6 8,-5 Z" fill="#44432f"/>
+<path d="M-18,-3 L-14,-6 L-11,4 L-15,7 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M-7,-5 L7,-5 L4,10 L0,13 L-4,10 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

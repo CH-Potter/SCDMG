@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="41 136 18 19" data-part="forge.knights.side.patch-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Patched cloth knee</title>
+<path d="M44,140 L55,139 L56,148 L50,151 L44,148 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><path d="M47,142 l5,5 M52,142 l-5,5" fill="none" stroke="#c8bd98" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="50" cy="145" r="1"/></g>
+</svg>

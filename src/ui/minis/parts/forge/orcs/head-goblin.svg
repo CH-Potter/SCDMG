@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 22 70 40" data-part="forge.orcs.side.head-goblin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Goblin head: big bald dome, a long hooked nose, a toothy grin, huge pointed ears</title>
+<path d="M54,48 L65,48 L65,60 L54,60 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M48,55 Q42,48 44,40 Q46,27 58,26 Q71,27 71,40 Q71,51 64,56 Q56,59 48,55 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M65,28.6 Q71,32 71,40 Q71,51 64,56 L61,57 Q68,46 65,28.6 Z" fill="#6c5a37"/>
+<path d="M65,38 L94,30 L84,40 L67,47 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M70,40 L88,33 L81,40 L70,44 Z" fill="#6c5a37"/>
+<path d="M46,39 L29,47 L45,47 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle class="glow" cx="51.6" cy="37.4" r="3" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle cx="50.8" cy="37.6" r="1.2" fill="#141414"/>
+<path d="M45,51 Q51,55 59,51" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48,52 L49.4,54.6 L51,53 Z M53,53.4 L54.4,55.4 L56,53 Z" fill="#e3d8b6"/>
+<path d="M46,33 L56,32" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

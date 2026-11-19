@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 56 40 96" data-part="forge.undead.side.rags">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A shredded grave-cloth cloak hanging from the shoulders</title>
+<path d="M65,60 L80,62 Q88,96 94,140 L89,134 L86,146 L81,134 L77,144 L74,130 Q70,100 65,60 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,62 Q88,96 94,140 L89,134 L86,140 Q84,100 76,70 Z" fill="#44432f"/>
+<path d="M71,72 Q75,100 78,128" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

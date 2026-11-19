@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 29 46 92" data-part="forge.dwarves.side.head-bald">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rune Carver's head: bald and shining, the beard down past his belt in two brass-ringed braids</title>
+<path d="M48 59Q45 55 45 51L43 50L46 46Q46 35 59 34Q71 35 72 46Q72 57 66 61Q58 64 48 59Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66 36.6Q72 39 72 46Q72 57 66 61L63.6 61.4Q69 52 66 36.6Z" fill="#c8bd98"/>
+<path d="M48 39Q58 33 70 38" fill="none" stroke="#c8bd98" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="65.4" cy="49.6" rx="3" ry="3.8" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<path d="M44 51Q37 71 42 93Q46 109 52 119L56 109Q60 119 65 111Q71 93 70 69L68 55Q62 59 56 56Q50 54 46 53Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64 59Q70 65 70 69Q71 93 65 111L62 113Q68 91 64 59Z" fill="#4a2e19"/>
+<path d="M43 53Q50 49.6 57 54Q50 58.6 42 57Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45 46.6Q39 48 41 54Q45 56 48.6 53Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M44.6 42.6L56 40.6L55 45L46 46Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="50.6" cy="47.8" rx="1.6" ry="2" fill="#141414"/>
+<rect x="48" y="111" width="6" height="4" rx="1" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<rect x="57" y="112" width="6" height="4" rx="1" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><path d="M49 65Q50 77 50 91M55 63Q57 77 57 91M62 63Q64 75 63 87" fill="none" stroke="#4a2e19" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

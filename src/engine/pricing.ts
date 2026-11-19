@@ -138,12 +138,12 @@ export const ABILITY_PRICES: Partial<Record<AbilityId, AbilityPrice>> = {
   recall: 1.2,
   grapple: 0.9,
   "bombs-away": (c) => 0.25 * c.p.models,
-  "rocket-hop": 0.6,
+  "rocket-hop": 0.48, // every round since the CP ability pass (was 0.6 at twice a game): the same ⚙, since CP is the limit
   rampage: (c) => 0.3 * c.meleePerDie * c.p.models, // saves one worse, too
   spotter: 1.1,
-  "bubble-shield": 0.9,
+  "bubble-shield": 0.72, // every round (was 0.9 at twice a game): the same ⚙
   "sugar-rush": 0.35,
-  provoke: 0.8,
+  provoke: 0.64, // every round (was 0.8 at twice a game): the same ⚙
   "demo-charge": 1.6,
   // structures
   "burrow-exit": 1.0,
@@ -170,6 +170,29 @@ export const ABILITY_PRICES: Partial<Record<AbilityId, AbilityPrice>> = {
   // the Skitterswarm: first estimates
   corrode: (c) => 0.2 + 0.25 * (c.ranged + c.melee), // every hit that lands softens the target for the rest
   "brood-bond": 1.5, // a refill for every hurt squad around her, every round
+  // the CP ability pass: priced low, since every use costs CP (an exhausted card, once CP is card-bound)
+  "stand-to": (c) => 0.05 + 0.1 * c.ranged, // one full-strength shot, only when charged
+  "hold-the-line": 0.15, // double weight on an objective, for a turn standing still
+  "smoke-shells": 0.3,
+  "steel-core": (c) => 0.12 * c.ranged,
+  "mad-scramble": (c) => 0.05 + 0.1 * c.melee,
+  "eat-through": 0.3,
+  "brood-frenzy": 0.15, // +1 melee die per model on every brood round her
+  "lay-eggs": 0.15,
+  "phase-shift": (c) => 0.05 + 0.08 * c.body,
+  triangulate: 0.15,
+  "bow-out": 0.2,
+  "lend-shields": (c) => 0.05 + 0.05 * c.p.models * c.p.shield,
+  // disruption: burn the enemy's best card for the round
+  "snipe-runner": 0.4,
+  "chew-wires": 0.4,
+  "cutting-remark": 0.4,
+  // dice buffs and debuffs on support units
+  "rivet-plates": 0.3,
+  "star-shell": 0.25,
+  "slime-coat": 0.15,
+  "numbing-sting": 0.3,
+  "exacting-standards": 0.4,
 };
 
 /** Price of an ability the table doesn't know, by kind (unknown ids count as passive). */
@@ -243,6 +266,13 @@ export const EFFECT_PRICES: Partial<
   expose: (e: { range: number }) => 0.6 + 0.01 * e.range,
   silence: (e: { range: number }) => 0.8 + 0.01 * e.range,
   overshield: (e: { amount: number }) => 0.6 * e.amount,
+  // dice buffs and debuffs (the CP ability pass): first estimates
+  armourBuff: (e: { save: number }) => 0.9 * e.save, // like digging in, but against blows too
+  armourBreak: (e: { save: number; range: number }) => 0.8 * e.save + 0.01 * e.range,
+  evadeBuff: (e: { amount: number; grant: number }) => 0.4 * e.amount + 0.1 * (7 - e.grant),
+  evadeDebuff: (e: { amount: number; range: number }) => 0.4 * e.amount + 0.01 * e.range,
+  damageBuff: (e: { amount: number }) => 1.0 * e.amount,
+  weaken: (e: { dice: number; range: number }) => 0.8 * e.dice + 0.01 * e.range,
 };
 
 export const DEFAULT_EFFECT_PRICE = 0.8;

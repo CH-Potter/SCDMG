@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -76 90 60" data-part="forge.knights.side.horse-body" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warhorse under a blue caparison: dagged gold hem, the team panel, a high saddle</title>
+<path d="M-36,-44 Q-38,-62 -16,-64 Q6,-66 26,-62 Q38,-56 37,-44 Q36,-32 24,-28 L-22,-27 Q-34,-30 -36,-44 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-40,-52 Q-38,-68 -14,-68 L24,-67 Q40,-62 42,-48 L43,-21 L34,-25 L26,-19 L17,-25 L8,-19 L-1,-25 L-10,-19 L-19,-25 L-28,-19 L-37,-25 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-67 Q40,-62 42,-48 L43,-21 L34,-25 L30,-22 Q36,-44 24,-67 Z" fill="#6c5a37"/>
+<path d="M-37,-25 L-28,-19 L-19,-25 L-10,-19 L-1,-25 L8,-19 L17,-25 L26,-19 L34,-25 L43,-21" fill="none" stroke="#6e4528" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="tag" d="M12,-65 L36,-62 L38,-30 L12,-30 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M26,-63.6 L36,-62 L38,-30 L26,-30 Z" fill="#b000b0"/>
+<path d="M-27.4,-46 Q-27.4,-51.4 -22,-51.4 Q-16.6,-51.4 -16.6,-46 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-22,-53.0 V-55.8 M-26.32,-50.32 l-2.2,-2.2 M-17.68,-50.32 l2.2,-2.2 M-29.0,-47.4 h-3 M-15.000000000000002,-47.4 h3" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-29.4,-44.6 H-14.600000000000001" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8,-74 L18,-75 L19,-64 L8,-64 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-10,-70 L-4,-70 L-4,-64 L-10,-64 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-40" r="1"/><circle id="neck" cx="-30" cy="-46" r="1"/><circle id="back" cx="2" cy="-64" r="1"/></g>
+</svg>

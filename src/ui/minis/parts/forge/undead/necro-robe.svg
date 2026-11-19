@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 22 54 158" data-part="forge.undead.side.necro-robe" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Necromancer's robe: a long grave-violet robe with a ragged hem, a tall flared collar rising behind the head, a team stole, a skull at the belt</title>
+<path d="M64,66 L68,30 L82,22 L80,40 L87,43 L77,68 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,62 L71,34 L79,30 L74,64 Z" fill="#6c5a37"/>
+<path d="M46,98 L76,96 Q82,136 90,177 L81,172 L74,178 L65,172 L55,178 L46,172 L38,177 Q44,136 46,98 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,97 L76,96 Q82,136 90,177 L81,172 L76,176 Q72,136 66,97 Z" fill="#44432f"/>
+<path d="M41,166 Q62,170 86,166" fill="none" stroke="#9a8458" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M47,69 Q59,62 74,66 L76,100 Q61,104 48,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,64.8 Q72,65.2 74,66 L76,100 Q72,101.6 68.6,102 Z" fill="#44432f"/>
+<path class="tag" d="M62,63.6 L69.4,65 L58,166 L50.6,166 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45.6,96 L77,93.6 L77,100 L45.6,102.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="71" cy="108" r="5" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<ellipse cx="68.6" cy="107.4" rx="1.4" ry="1.8" fill="#141414"/>
+<path d="M68,112 H74" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M51,61 L69,59" fill="none" stroke="#9a8458" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

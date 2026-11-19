@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 145 18 26" data-part="forge.legion.side.shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shin: a ribbed conduit in shade</title>
+<path d="M65,148 L77,148 L76,168 L66,168 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M65.4,154 H76.6 M65.8,161 H76.2" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="71" cy="152" r="1"/></g>
+</svg>
