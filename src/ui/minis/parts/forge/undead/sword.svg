@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -9 66 18" data-part="forge.undead.side.sword" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Notched sword: a nicked, rust-bitten blade with a bronze crossguard (tip left)</title>
+<path d="M0,0 L6,-4 L12,-3 L14.6,-5 L21,-4 L23.6,-6 L44,-4 L44,4 L6,4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,0.6 L44,0.6 L44,4 L6,4 L0,0 Z" fill="#4a5158"/>
+<path d="M28,-4.6 Q33,-6 37,-3.6 Q33,-1 28,-4.6 Z" fill="#6e4528"/>
+<rect x="43" y="-8" width="5" height="16" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect x="48" y="-2.4" width="10" height="4.8" rx="1.2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle cx="59.4" cy="0" r="2.8" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="52" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g>
+</svg>

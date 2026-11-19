@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11 -14 22 24" data-part="forge.druids.top.head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warden head from above: a shaggy mop of loam hair, nose forward</title>
+<path d="M0,-12.4 L3,-9 Q8.6,-7 8.6,-1.6 Q8.6,7 0,7.6 Q-8.6,7 -8.6,-1.6 Q-8.6,-7 -3,-9 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-8.6,-1 Q-9,-9 0,-9.6 Q9,-9 8.6,-1 L9.4,4 L6,3 L5,8 L0,5 L-5,8 L-6,3 L-9.4,4 Z" fill="#5d5b45" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M2,-6 Q6,-10 8,-6 Q5,-4 2,-6 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

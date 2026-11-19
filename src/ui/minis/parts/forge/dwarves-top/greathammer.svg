@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -11 70 22" data-part="forge.dwarves.top.greathammer" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Anvil hammer from above: the anvil head ahead (left), long haft</title>
+<rect x="8" y="-2" width="50" height="4" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<path d="M-8,-9 L12,-9 L12,9 L-8,9 L-5,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-6,-6 H11 M-6,6 H11" fill="none" stroke="#b9bfc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="28" cy="0" r="1"/><circle id="g2" cx="44" cy="0" r="1"/><circle id="muzzle" cx="-7" cy="0" r="1"/></g>
+</svg>

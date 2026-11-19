@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-62 -62 124 124" data-part="forge.dwarves.top.rotor" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Whirlygig rotor from above: four long iron blades round a brass hub (spins)</title>
+<path d="M-3,-4 L-4,-58 L4,-58 L3,-4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-3,4 L-4,58 L4,58 L3,4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-4,-3 L-58,-4 L-58,4 L-4,3 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M4,-3 L58,-4 L58,4 L4,3 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-2,-56 V-40 M2,56 V40 M-56,2 H-40 M56,-2 H40" fill="none" stroke="#b9bfc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="6" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

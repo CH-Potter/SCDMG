@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -72 90 54" data-part="forge.knights.side.griffin-body" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Griffin body: a golden lion's barrel, feathered chest, a blue saddle-cloth with the team</title>
+<path d="M-36,-44 Q-38,-62 -16,-64 Q6,-66 26,-62 Q38,-56 37,-44 Q36,-32 24,-28 L-22,-27 Q-34,-30 -36,-44 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M22,-62 Q38,-56 37,-44 Q36,-32 24,-28 L16,-28 Q32,-36 22,-62 Z" fill="#4a2e19"/>
+<path d="M-38,-46 Q-40,-60 -26,-64 L-18,-52 L-24,-44 L-18,-36 L-28,-30 Q-38,-34 -38,-46 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-34,-52 l4,3 M-34,-42 l4,3 M-30,-36 l4,2" fill="none" stroke="#c8bd98" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-10,-64 Q2,-67 16,-64 L14,-42 Q2,-40 -8,-42 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-6,-63 L12,-63.6 L10.6,-45 L-4.4,-44.6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-8,-42 Q2,-39 14,-42" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-40" r="1"/><circle id="neck" cx="-30" cy="-46" r="1"/><circle id="back" cx="2" cy="-64" r="1"/></g>
+</svg>

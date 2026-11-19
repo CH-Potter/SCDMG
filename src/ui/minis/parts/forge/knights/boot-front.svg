@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 162 36 26" data-part="forge.knights.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Steel sabaton with a pointed toe</title>
+<path d="M40,165 L56,165 L57,183 L28,183 L36,176 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M50,165.6 L55.6,165.6 L56.4,182.4 L50.6,182.4 Z" fill="#353b41"/>
+<path d="M38,178 L56,177 M41,172 L56,171" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

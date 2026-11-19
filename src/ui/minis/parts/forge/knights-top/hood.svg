@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -15 28 40" data-part="forge.knights.top.hood">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Yeoman's hood from above: green cowl, cape, the liripipe and the gold feather</title>
+<path d="M-11.6,-4 Q-11,-13 0,-13 Q11,-13 11.6,-4 Q12,6 4,10 Q2,18 1,24 Q-2,18 -4,10 Q-12,6 -11.6,-4 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,-11 Q11.6,-8 11.6,-4 Q12,6 4,10 L1,24 Q8,4 6,-11 Z" fill="#44432f"/>
+<path d="M-6,-10 Q0,-13 6,-10 Q4,-6 0,-6 Q-4,-6 -6,-10 Z" fill="#c8bd98" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M6,-6 Q12,4 10,14 Q8,6 4,-2 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

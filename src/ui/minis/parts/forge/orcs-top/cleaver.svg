@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -10 42 18" data-part="forge.orcs.top.cleaver" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Cleaver from above (blade left)</title>
+<rect x="14" y="-1.6" width="20" height="3.2" rx="1" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M-4,-2 L16,-3 L16,3 L-4,4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M-4,1 L16,0 L16,3 L-4,4 Z" fill="#4a5158"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="26" cy="0" r="1"/><circle id="g2" cx="30" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

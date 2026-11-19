@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 10 40 40" data-part="forge.elves.side.circlet">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Moon circlet: a silver band with an upturned crescent on the brow</title>
+<path d="M46,36 Q60,30.6 73,35" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44,32 Q38,22 45,14 Q43,23 49,31 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="46.6" cy="26.6" r="2.2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

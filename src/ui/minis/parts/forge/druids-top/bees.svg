@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -22 60 50" data-part="forge.druids.top.bees">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Two bees of the swarm from above, striped abdomens trailing</title>
+<path d="M-20.4,-2.8 Q-21.2,10.0 -14.0,13.2 Q-6.8,10.0 -7.6,-2.8 Q-14.0,-7.6 -20.4,-2.8 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-20.9,1.2 L-7.1,1.2 L-7.1,4.4 L-20.9,4.4 Z" fill="#2b2019"/>
+<path d="M-20.1,7.6 L-7.9,7.6 L-8.7,10.0 L-19.3,10.0 Z" fill="#2b2019"/>
+<circle cx="-14.0" cy="-6.0" r="5.1" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle cx="-14.0" cy="-13.2" r="4.0" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-16.1" cy="-14.8" r="1.3" fill="#fff2c0"/>
+<circle class="glow" cx="-11.9" cy="-14.8" r="1.3" fill="#fff2c0"/>
+<path d="M7.2,5.4 Q6.4,19.0 14.0,22.4 Q21.6,19.0 20.8,5.4 Q14.0,0.3 7.2,5.4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M6.7,9.6 L21.3,9.6 L21.3,13.0 L6.7,13.0 Z" fill="#2b2019"/>
+<path d="M7.5,16.4 L20.5,16.4 L19.6,19.0 L8.4,19.0 Z" fill="#2b2019"/>
+<circle cx="14.0" cy="2.0" r="5.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle cx="14.0" cy="-5.6" r="4.2" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="11.8" cy="-7.3" r="1.4" fill="#fff2c0"/>
+<circle class="glow" cx="16.2" cy="-7.3" r="1.4" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

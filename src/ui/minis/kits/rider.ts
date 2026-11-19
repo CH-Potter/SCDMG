@@ -17,10 +17,23 @@ export interface RiderOpts {
   name: string;
   spec: KitSpec;
   variant: LookVariant;
-  /** Template overrides (optional; leaving them out draws what the kit always drew): the steed's beast parts per view. */
-  steed?: { side?: BeastOpts["parts"]; top?: BeastOpts["parts"] };
-  /** Template overrides: the rider's side-view parts and weapon, and its top-view parts and weapon. */
-  rider?: { helm?: string; torso?: string; pack?: string | null; gear?: string | null; weapon?: HeldWeapon; top?: Pick<HumanoidOpts, "parts" | "weaponTop"> };
+  /** Template overrides (optional; leaving them out draws what the kit always drew): the steed's beast parts per view, and its size (1 = the kit's). */
+  steed?: { side?: BeastOpts["parts"]; top?: BeastOpts["parts"]; scale?: number };
+  /**
+   * Template overrides: the rider's side-view parts, weapon, shoulder plates and extra parts (an
+   * ExtraPart with `absolute: true` is in final frame coords: wings on the mount), and its top-view
+   * parts, weapon and extras.
+   */
+  rider?: {
+    helm?: string;
+    torso?: string;
+    pack?: string | null;
+    gear?: string | null;
+    weapon?: HeldWeapon;
+    pads?: { front: string; back: string };
+    extras?: ExtraPart[];
+    top?: Pick<HumanoidOpts, "parts" | "weaponTop" | "extrasTop">;
+  };
 }
 
 /** Move a rig's parts and limbs (and gait) through a placement: one rig set into another's frame. */
@@ -45,12 +58,12 @@ export function riderSide(o: RiderOpts): RigDef {
   const s = o.spec;
   // the steed: a melee-free beast (its head doesn't lunge: the rider fights), no tail-gun
   const steed = beastSide({ id: `${o.id}.steed`, name: "steed", spec: { ...s, ranged: true, weapon: "none", back: "none", head: s.head === "beast" || s.head === "bug" || s.head === "skull" ? s.head : "beast", headgear: "none", scale: 1, flying: false }, variant: o.variant, ...(o.steed?.side ? { parts: o.steed.side } : {}) });
-  const mount = carry({ ...steed, parts: steed.parts.filter((p) => p.id !== "weapon") }, { x: STAND.origin.x + 6, y: STAND.origin.y, rot: 0, scale: 1.3 }, "s", -20);
+  const mount = carry({ ...steed, parts: steed.parts.filter((p) => p.id !== "weapon") }, { x: STAND.origin.x + 6, y: STAND.origin.y, rot: 0, scale: 1.3 * (o.steed?.scale ?? 1) }, "s", -20);
   // the rider, seated: hips on the saddle, knees forward down the flanks; the steed carries the team cloth
   const r = o.rider ?? {};
   const held = r.weapon ?? sideWeapon((s.weapon === "shield" ? "sword" : kitWeapon(s.weapon)));
   const gear = r.gear === undefined ? (s.headgear === "none" ? null : kitPart("humanoid", "side", `gear-${s.headgear}`)) : r.gear;
-  const extras: ExtraPart[] = gear ? [{ id: "gear", src: gear, bone: "head", z: 19.5 }] : [];
+  const extras: ExtraPart[] = [...(gear ? [{ id: "gear", src: gear, bone: "head" as const, z: 19.5 }] : []), ...(r.extras ?? [])];
   const rider = trooperKitSide({
     id: `${o.id}.side`,
     name: o.name,
@@ -58,8 +71,8 @@ export function riderSide(o: RiderOpts): RigDef {
     helm: r.helm ?? kitPart("humanoid", "side", `head-${s.head === "beast" ? "face" : s.head}`),
     torso: r.torso ?? kitPart("humanoid", "side", "torso-plain"),
     pack: r.pack !== undefined ? r.pack : s.back === "none" || s.back === "wings" ? null : kitPart("humanoid", "side", `back-${s.back}`),
-    padFront: s.armoured ? undefined : null,
-    padBack: s.armoured ? undefined : null,
+    padFront: r.pads ? r.pads.front : s.armoured ? undefined : null,
+    padBack: r.pads ? r.pads.back : s.armoured ? undefined : null,
     extras,
     weapon: { src: held.src, place: turnAbout(held.src, held.place, "g1", o.variant.aim) },
     armF: held.armF && "hand" in held.armF && readPart(held.armF.hand).tagged ? undefined : held.armF,
@@ -76,8 +89,8 @@ export function riderSide(o: RiderOpts): RigDef {
 export function riderTop(o: RiderOpts): RigDef {
   const s = o.spec;
   const steed = beastTop({ id: `${o.id}.steed`, name: "steed", spec: { ...s, ranged: true, weapon: "none", back: "none", head: "beast", headgear: "none", scale: 1, flying: false }, variant: o.variant, ...(o.steed?.top ? { parts: o.steed.top } : {}) });
-  const mount = carry({ ...steed, parts: steed.parts.filter((p) => p.id !== "weapon") }, { x: 0, y: 6, rot: 0, scale: 1.4 }, "s", -10);
-  const man = humanoidTop({ id: `${o.id}.top`, name: o.name, head: s.head === "beast" ? "face" : s.head, headgear: s.headgear, weapon: (s.weapon === "shield" ? "sword" : kitWeapon(s.weapon)), back: s.back === "wings" ? "none" : s.back, aim: o.variant.aim, parts: { torso: { top: kitPart("humanoid", "top", "torso-plain") }, ...o.rider?.top?.parts }, ...(o.rider?.top?.weaponTop ? { weaponTop: o.rider.top.weaponTop } : {}) });
+  const mount = carry({ ...steed, parts: steed.parts.filter((p) => p.id !== "weapon") }, { x: 0, y: 6, rot: 0, scale: 1.4 * (o.steed?.scale ?? 1) }, "s", -10);
+  const man = humanoidTop({ id: `${o.id}.top`, name: o.name, head: s.head === "beast" ? "face" : s.head, headgear: s.headgear, weapon: (s.weapon === "shield" ? "sword" : kitWeapon(s.weapon)), back: s.back === "wings" ? "none" : s.back, aim: o.variant.aim, parts: { torso: { top: kitPart("humanoid", "top", "torso-plain") }, ...o.rider?.top?.parts }, ...(o.rider?.top?.weaponTop ? { weaponTop: o.rider.top.weaponTop } : {}), ...(o.rider?.top?.extrasTop ? { extrasTop: o.rider.top.extrasTop } : {}) });
   let rig: RigDef = { ...man, parts: [...mount.parts, ...man.parts], limbs: [...mount.limbs, ...man.limbs], gait: mount.gait, ground: steed.ground, shadow: { x: 6, y: 10, r: 34 } };
   rig = fitHeight(rig);
   return scaleRig(rig, s.scale);

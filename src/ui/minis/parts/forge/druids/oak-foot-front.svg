@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 158 50 32" data-part="forge.druids.side.oak-foot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Root foot: roots splaying forward and back into the ground</title>
+<path d="M42,162 L58,162 L62,178 L72,186 L60,184 L54,188 L48,184 L38,188 L28,188 L36,180 L40,174 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M54,162.6 L58,162.6 L62,178 L70,185 L60,183 Z" fill="#4a2e19"/>
+<path d="M42,180 L34,186 M50,178 L50,186" fill="none" stroke="#4a2e19" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

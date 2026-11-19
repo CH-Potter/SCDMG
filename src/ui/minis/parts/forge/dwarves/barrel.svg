@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -20 106 40" data-part="forge.dwarves.side.barrel" data-recoil="6">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Grudge Cannon barrel: a fat bronze mortar barrel, flared mouth, iron hoops, a name painted on the shell (mouth left)</title>
+<path d="M-12,-16 L0,-12 L60,-11 Q80,-12 84,0 Q80,12 60,11 L0,12 L-12,16 Q-16,0 -12,-16 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M0,4 L60,4 Q76,5 84,0 Q80,12 60,11 L0,12 L-12,16 Q-14,10 -14,4 Z" fill="#c8bd98"/>
+<path d="M2,-12 V12 M30,-11.6 V11.6 M54,-11 V11" fill="none" stroke="#25282c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-12,-15 Q-16,0 -12,15" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="-13" cy="0" rx="2.6" ry="11" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle cx="42" cy="0" r="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="42" cy="0" r="1"/><circle id="muzzle" cx="-14" cy="0" r="1"/></g>
+</svg>

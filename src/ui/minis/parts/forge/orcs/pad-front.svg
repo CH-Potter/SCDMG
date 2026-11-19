@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 36 42 54" data-part="forge.orcs.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Spiked pauldron, near: a dented iron bowl with three rusty spikes and a rag tie</title>
+<path d="M29,68 Q33,56 48,56 Q60,57 62,66 L58,82 Q44,88 31,83 Q27,76 29,68 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30,78 Q44,84 58,77 L58,82 Q44,88 31,83 Z" fill="#353b41"/>
+<path d="M33,61 L26,46 L39,58 Z M43,57 L42,38 L50,56 Z M54,58 L60,44 L60,61 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M31,73 Q45,77 59,72" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="36" cy="66" r="1" fill="#b9bfc4"/><circle cx="52" cy="64" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

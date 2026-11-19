@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 54 32 32" data-part="forge.orcs.side.pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shoulder: a rust leather pad, in shadow</title>
+<path d="M62,62 Q74,57 87,61 L85,76 Q74,81 63,78 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M64,70 L86,68" fill="none" stroke="#2b2019" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

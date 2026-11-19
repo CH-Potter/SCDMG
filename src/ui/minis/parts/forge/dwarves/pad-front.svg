@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 50 46 46" data-part="forge.dwarves.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Square pauldron, near: a broad slab of enamelled plate with a brass edge and rivets</title>
+<path d="M24,62 L56,56 Q62,57 62,63 L61,87 L28,92 Q23,91 23,86 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,82 L61,78 L61,87 L28,92 Q23,91 23,86 Z" fill="#6c5a37"/>
+<path d="M25.6,85 L60,80.6" fill="none" stroke="#b9bfc4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M27,65 L57,60" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M29,73 L58,68.4" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="28" cy="69" r="1" fill="#b9bfc4"/><circle cx="57" cy="64" r="1" fill="#b9bfc4"/><circle cx="29" cy="79" r="1" fill="#b9bfc4"/><circle cx="58" cy="74" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

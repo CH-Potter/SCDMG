@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -12 140 24" data-part="forge.knights.side.pitchfork" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pitchfork: a long ash shaft and three iron tines (tines left)</title>
+<rect x="6" y="-2.2" width="114" height="4.4" rx="1.6" fill="#4a2e19" stroke="#141414" stroke-width="2"/>
+<rect x="2" y="-10" width="5" height="20" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="-14" y="-10" width="17" height="3" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-16" y="-1.5" width="19" height="3" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-14" y="7" width="17" height="3" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path d="M66,-2.2 v4.4 M98,-2.2 v4.4" fill="none" stroke="#2b2019" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="60" cy="0" r="1"/><circle id="g2" cx="92" cy="0" r="1"/><circle id="muzzle" cx="-16" cy="0" r="1"/></g>
+</svg>

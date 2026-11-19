@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 162 34 26" data-part="forge.druids.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sandal: a bare foot on a bark sole, crossed straps</title>
+<path d="M41,165 L55,165 L56,182 L32,182 Q28,180 30,176 Q36,176 40,173 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M50,165.6 L55,165.6 L55.6,181.4 L50.4,181.4 Z" fill="#c8bd98"/>
+<rect x="28" y="182" width="29.6" height="3.6" rx="1.2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M42,168 L54,175 M37,178 L47,171" fill="none" stroke="#6e4528" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

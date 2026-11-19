@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 54 50 80" data-part="forge.orcs.side.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Orc torso: a barrel of green hide, a scrap plate strapped on, rust-iron belt with a bone buckle, team-coloured loin rag</title>
+<path d="M63,100 L81,98 L85,127 L76,124 L70,130 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M44,102 L62,102 L61,130 L56,125 L52,132 L48,125 L44,130 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M55,102.6 L61.4,102.6 L60.6,128 L56,124 Z" fill="#b000b0"/>
+<path d="M44,70 Q46,59 61,59 Q79,59 83,72 L81,102 Q62,108 43,102 Q39,86 44,70 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M73,60.6 Q81,64 83,72 L81,102 Q77,104 73,105 Q79,84 73,60.6 Z" fill="#6c5a37"/>
+<path d="M46,86 Q54,91 62,86" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M49,65 L69,63 L71,82 L51,86 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M55,66 L58,72 L55,78" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M69,58 L76,61 L52,103 L45,100 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M42,98 L82,94.6 L82,103 L42,106.4 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="51" cy="101.4" r="3.4" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="52" cy="68" r="1" fill="#b9bfc4"/><circle cx="67" cy="66" r="1" fill="#b9bfc4"/><circle cx="53" cy="82" r="1" fill="#b9bfc4"/><circle cx="69" cy="79" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -10 22 30" data-part="forge.knights.top.quiver">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Quiver from above, grey fletchings out</title>
+<path d="M-8,-4 L-3,-7 L8,12 L3,15 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-10,-8 L-7,-6 L-9,-3 Z M-6,-10 L-3,-8 L-6,-5 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

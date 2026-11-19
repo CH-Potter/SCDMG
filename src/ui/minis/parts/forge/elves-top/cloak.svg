@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -2 36 44" data-part="forge.elves.top.cloak">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Cloak from above: the forest cloak spreading behind the shoulders</title>
+<path d="M-14,2 L14,2 Q19,20 13,38 L5,34 L0,40 L-5,34 L-13,38 Q-19,20 -14,2 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,2 L14,2 Q19,20 13,38 L9,36 Q14,20 8,2 Z" fill="#44432f"/>
+<path d="M-6,8 Q-8,22 -6,32 M6,8 Q8,22 6,32" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

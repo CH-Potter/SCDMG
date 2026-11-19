@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -104 128 94" data-part="forge.dwarves.side.gyro" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Whirlygig: a barrel cockpit with brass bands, a goggled bearded pilot leaning over the rim, tail boom and fin, iron skids</title>
+<path d="M-32,-26 L-36,-14 M14,-26 L18,-14" fill="none" stroke="#25282c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-44,-14 L26,-14" fill="none" stroke="#25282c" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M20,-58 L68,-64 L70,-56 L22,-46 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M60,-62 L68,-80 L76,-78 L72,-56 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="-4" y="-98" width="6" height="30" rx="1.4" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M-36,-70 Q-40,-48 -36,-26 L26,-26 Q30,-48 26,-70 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M14,-70 L26,-70 Q30,-48 26,-26 L16,-26 Q20,-48 14,-70 Z" fill="#6c5a37"/>
+<path d="M-26,-70 Q-29,-48 -26,-26 M18,-70 Q21,-48 18,-26" fill="none" stroke="#b9bfc4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="tag" d="M-8,-70 L4,-70 L4,-26 L-8,-26 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="-5" cy="-70" rx="32" ry="5" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M-30,-80 Q-31,-94 -18,-95 Q-6,-94 -6,-82 Q-8,-72 -18,-72 Q-28,-72 -30,-80 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-30,-86 Q-28,-98 -16,-98 Q-6,-97 -5,-86 Q-12,-90 -18,-90 Q-25,-90 -30,-86 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-31,-80 Q-38,-68 -32,-58 L-24,-60 Q-18,-66 -22,-74 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="-26" cy="-86" r="3.8" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-26" cy="-86" r="2" fill="#fff2c0"/>
+<g class="detail"><circle cx="-30" cy="-40" r="1" fill="#b9bfc4"/><circle cx="8" cy="-40" r="1" fill="#b9bfc4"/><circle cx="-30" cy="-56" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-48" r="1"/><circle id="exhaust1" cx="70" cy="-60" r="1"/></g>
+</svg>

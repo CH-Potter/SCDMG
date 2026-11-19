@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 -2 58 108" data-part="forge.knights.side.banner">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kingdom pennant: a gold-tipped pole and a blue swallowtail with the rising sun</title>
+<path d="M64,60 L82,62 L84,98 L68,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="80" y="6" width="4" height="94" rx="1.6" fill="#4a2e19" stroke="#141414" stroke-width="2"/>
+<path d="M84,8 L114,10 L106,22 L114,34 L84,32 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M84,28 L111.6,30.6 L114,34 L84,32 Z" fill="#6c5a37"/>
+<path d="M84.6,9 L113,10.6" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M91,24 Q91,19 96,19 Q101,19 101,24 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M96,17.4 V14.6 M92.0,20.0 l-2.2,-2.2 M100.0,20.0 l2.2,-2.2 M89.4,22.6 h-3 M102.6,22.6 h3" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M89,25.4 H103" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M82,-1 L86,5 L78,5 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

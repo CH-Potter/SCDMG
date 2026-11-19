@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 162 38 26" data-part="forge.orcs.side.foot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bare orc foot: broad green toes and thick bone-yellow claws</title>
+<path d="M40,163 L57,163 L58,184 L27,184 Q23,180 27,175 L36,173 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M50,163.6 L56.6,163.6 L57.4,183.4 L50.6,183.4 Z" fill="#6c5a37"/>
+<path d="M26,184 L22,182 L27,179 Z M32,184 L29,186 L33,180 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M33,178 v6 M39,177 v7" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

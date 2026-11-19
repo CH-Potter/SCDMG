@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -24 112 46" data-part="forge.dwarves.side.mattock" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tunnel mattock: a long haft and a heavy iron pick-and-adze head (head left)</title>
+<rect x="0" y="-2.6" width="96" height="5.2" rx="2" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<path d="M2,-22 Q-8,-10 -6,0 Q-8,10 2,20 L8,18 Q4,10 6,0 Q4,-10 8,-20 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-6,0 Q-8,10 2,20 L8,18 Q4,10 6,0 Z" fill="#353b41"/>
+<path d="M0,-22 L8,-20 L6,-24 Z" fill="#4a5158" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="4" y="-6" width="9" height="12" rx="1.4" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<path d="M48,-2.6 v5.2 M80,-2.6 v5.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="52" cy="0" r="1"/><circle id="g2" cx="80" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

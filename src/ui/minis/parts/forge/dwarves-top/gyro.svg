@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -40 60 104" data-part="forge.dwarves.top.gyro" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Whirlygig from above: the round barrel cockpit, the pilot's capped head and beard forward, tail boom and fin behind</title>
+<path d="M-4,10 L4,10 L5,56 L-5,56 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-12,50 L12,50 L12,58 L-12,58 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="26" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M18,-18 A26,26 0 0 1 -6,25.4 Q24,8 18,-18 Z" fill="#6c5a37"/>
+<path d="M-26,0 A26,26 0 0 1 26,0" fill="none" stroke="#b9bfc4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="tag" d="M-24,6 L24,6 Q22,16 16,20 L-16,20 Q-22,16 -24,6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="0" cy="-2" r="18" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M-6,-10 Q-9,-20 0,-26 Q9,-20 6,-10 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="0" cy="-4" r="8" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<circle cx="-3.4" cy="-10" r="2.6" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<circle cx="3.4" cy="-10" r="2.6" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 54 52 126" data-part="forge.knights.side.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Chaplain's robe: cream to the ankles, the blue stole (team-edged) and a gold sun pendant</title>
+<path d="M46,98 L76,96 Q82,136 88,177 L40,177 Q44,136 46,98 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,97 L76,96 Q82,136 88,177 L74,177 Q72,136 66,97 Z" fill="#44432f"/>
+<path d="M47,69 Q59,62 74,66 L76,100 Q61,104 48,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,64.8 Q72,65.2 74,66 L76,100 Q72,101.6 68.6,102 Z" fill="#44432f"/>
+<path d="M52,62 L60,62 L57,172 L49,172 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M53.6,100 L58.6,100 L57.4,166 L52.4,166 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45,98.6 Q62,102 78,96" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M59.4,82 Q59.4,77.4 64,77.4 Q68.6,77.4 68.6,82 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M64,75.80000000000001 V73.0 M60.32,78.32 l-2.2,-2.2 M67.68,78.32 l2.2,-2.2 M57.8,80.6 h-3 M70.19999999999999,80.6 h3" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M57.4,83.4 H70.6" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M50,60.6 L70,58.6 L72.4,67 L51,69 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

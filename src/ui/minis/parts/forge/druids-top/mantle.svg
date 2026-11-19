@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -2 36 44" data-part="forge.druids.top.mantle">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Moss cloak from above: spreading behind in layered leaves</title>
+<path d="M-14,2 L14,2 Q19,20 14,38 L9,34 L5,40 L0,35 L-5,40 L-9,34 L-14,38 Q-19,20 -14,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,2 L14,2 Q19,20 14,38 L10,35 Q14,20 8,2 Z" fill="#6c5a37"/>
+<path d="M-8,10 L-6,16 M4,14 L6,20 M-4,24 L-2,30" fill="none" stroke="#6c5a37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="10" cy="20" rx="3.4" ry="4.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

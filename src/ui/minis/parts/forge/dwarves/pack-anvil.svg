@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 50 40 54" data-part="forge.dwarves.side.pack-anvil">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rune Carver's anvil, strapped to his back on an iron frame</title>
+<path d="M66,60 L86,62 L88,98 L70,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M62,66 L94,64 L95,71 L86,73 L85,84 L92,90 L68,91 L74,84 L73,74 L63,73 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M85,64.6 L94,64 L95,71 L86,73 L85,84 L92,90 L86,90.6 Q82,80 85,64.6 Z" fill="#353b41"/>
+<path d="M63,68 L93,66" fill="none" stroke="#b9bfc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M78,58 L78,96" fill="none" stroke="#25282c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

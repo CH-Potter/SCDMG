@@ -250,6 +250,42 @@ describe("grimdark templates: their own art for every unit", () => {
   });
 });
 
+describe("fantasy templates: their own art for every unit", () => {
+  const FANTASY_ART = ["elves", "orcs", "undead", "dwarves", "knights", "druids"];
+
+  it("draws every unit of the six templates with the template's own art, in both views, summon-only ones too", () => {
+    for (const key of FANTASY_ART) {
+      expect(TEMPLATE_ART_KEYS, key).toContain(key);
+      for (const p of templateByKey(key)!.faction.profiles)
+        for (const l of artFor(p)!.looks) {
+          expect(l.side.id, p.id).toMatch(new RegExp(`^forge\\.${key}\\.`));
+          expect(l.top.id, p.id).toMatch(new RegExp(`^forge\\.${key}\\.`));
+        }
+    }
+    const roots = templateByKey("druids")!.faction.profiles.find((p) => p.id.endsWith(":roots"))!;
+    expect(roots.structure?.summonOnly).toBe(true);
+    expect(artFor(roots)!.looks[0]!.side.frame).toBe("structure");
+  });
+
+  it("varies the big squads and keeps three looks at most", () => {
+    for (const key of FANTASY_ART)
+      for (const p of templateByKey(key)!.faction.profiles) {
+        const a = artFor(p)!;
+        expect(a.looks.length, p.id).toBeLessThanOrEqual(3);
+        if (p.models >= 4 && !p.structure) expect(a.looks.length, p.id).toBeGreaterThan(1);
+      }
+  });
+
+  it("paints each template's colourway from the faction colour", () => {
+    for (const key of FANTASY_ART) {
+      const p = templateByKey(key)!.faction.profiles[0]!;
+      const own = artFor(p)!;
+      const other = artFor(p, { color: 0xa83a2f, look: templateByKey(key)!.faction.look })!;
+      expect(other.colourway.plate, key).not.toBe(own.colourway.plate);
+    }
+  });
+});
+
 describe("snapshots: the worked example and a generic kit unit", () => {
   const cases: [string, () => { rig: RigDef; cw: ReturnType<typeof artFor> }][] = [
     ["bulwark brothers (side, sergeant)", () => ({ rig: artFor(templateByKey("bulwark")!.faction.profiles[0]!)!.looks[0]!.side, cw: artFor(templateByKey("bulwark")!.faction.profiles[0]!) })],
@@ -269,6 +305,13 @@ describe("snapshots: the worked example and a generic kit unit", () => {
         ["kin", "wardens", "colossus"],
         ["legion", "clankers", "crusher"],
         ["cult", "zealots", "idol"],
+        // the fantasy templates, the same way
+        ["elves", "archers", "spire"],
+        ["orcs", "grunts", "troll"],
+        ["undead", "bones", "colossus"],
+        ["dwarves", "shieldbeards", "cannon"],
+        ["knights", "menatarms", "knights"],
+        ["druids", "wardens", "oakheart"],
       ] as const
     ).flatMap(([key, squad, big]): [string, () => { rig: RigDef; cw: ReturnType<typeof artFor> }][] => {
       const unit = (u: string) => templateByKey(key)!.faction.profiles.find((x) => x.id.endsWith(`:${u}`))!;

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 0 50 108" data-part="forge.elves.side.banner">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Host standard: a slim pole and a long silver leaf pennant with a crescent moon</title>
+<path d="M64,60 L82,62 L84,98 L68,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="80" y="6" width="3.6" height="94" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M83.6,8 L104,9 Q99,32 106,58 L94,49 L83.6,54 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M98,10 L104,9 Q99,32 106,58 L100,53 Q95,30 98,10 Z" fill="#4a2e19"/>
+<path class="glow" d="M91,22 Q86,30 91,38 Q89,30 95,24 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M81.8,0.4 L85,6 L78.6,6 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

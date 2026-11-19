@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -18 40 34" data-part="forge.undead.top.col-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bone Colossus head from above: the great skull among smaller ones, horns curling out to the sides</title>
+<path d="M-6,-4 Q-14,-12 -18,-2 Q-17,6 -10,4 Q-14,0 -10,-3 Z" fill="#c8bd98" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M6,-4 Q14,-12 18,-2 Q17,6 10,4 Q14,0 10,-3 Z" fill="#c8bd98" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="-6" cy="5" r="5" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<circle cx="6" cy="5" r="5" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<path d="M0,-14 Q9,-13 9,-4 Q9,5 0,6 Q-9,5 -9,-4 Q-9,-13 0,-14 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M5,-12 Q9,-9 9,-4 Q9,5 0,6 Q7,0 5,-12 Z" fill="#c8bd98"/>
+<path d="M-6.4,-11 Q-3.4,-15 -1,-11.4 Z M6.4,-11 Q3.4,-15 1,-11.4 Z" fill="#141414"/>
+<circle class="glow" cx="-3.6" cy="-12.4" r="1" fill="#fff2c0"/>
+<circle class="glow" cx="3.6" cy="-12.4" r="1" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

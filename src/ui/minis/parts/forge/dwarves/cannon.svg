@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -112 112 112" data-part="forge.dwarves.side.cannon" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Grudge Cannon emplacement: a squat octagonal bastion of dressed stone and iron, enamel plates, a team band, a brass turntable and trunnion cheeks</title>
+<path d="M-52,0 L-46,-14 L46,-14 L52,0 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-44,-14 L-40,-58 L-26,-72 L26,-72 L40,-58 L44,-14 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M18,-72 L26,-72 L40,-58 L44,-14 L28,-14 Q32,-44 18,-72 Z" fill="#353b41"/>
+<path d="M-42,-36 L42,-36 M-40,-58 L40,-58" fill="none" stroke="#25282c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-20,-14 L-18,-36 M0,-14 L0,-36 M20,-14 L18,-36 M-12,-36 L-12,-58 M12,-36 L12,-58" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path class="tag" d="M-43,-34 L43,-34 L43.6,-24 L-43.6,-24 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-34,-56 L-22,-56 L-22,-40 L-34,-40 Z M22,-56 L34,-56 L34,-40 L22,-40 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M0.0,-55.0 L6.1,-51.5 L6.1,-44.5 L0.0,-41.0 L-6.1,-44.5 L-6.1,-51.5 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M0.0,-51.0 L2.6,-49.5 L2.6,-46.5 L0.0,-45.0 L-2.6,-46.5 L-2.6,-49.5 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="0" cy="-74" rx="30" ry="6" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<path d="M-16,-76 L-12,-100 L12,-100 L16,-76 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="-92" r="5" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<path d="M-24,-14 L-24,-4 L-16,-4 L-16,-14 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-28" cy="-52" r="1" fill="#b9bfc4"/><circle cx="28" cy="-52" r="1" fill="#b9bfc4"/><circle cx="-30" cy="-44" r="1" fill="#b9bfc4"/><circle cx="30" cy="-44" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/><circle id="mount" cx="0" cy="-92" r="1"/></g>
+</svg>

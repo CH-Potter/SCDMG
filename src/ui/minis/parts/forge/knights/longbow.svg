@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -60 56 120" data-part="forge.knights.side.longbow" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Yew longbow: a tall plain D-bow, drawn, a grey-goose arrow nocked (arrow left)</title>
+<path d="M14,-55 L40,0 L14,55" fill="none" stroke="#e3d8b6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14,-57 Q2,-30 2,0 Q2,30 14,57 Q9,30 9,0 Q9,-30 14,-57 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="1" y="-5" width="9" height="10" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M-2,0 H41" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-7,0 L1,-3.6 L1,3.6 Z" fill="#4a5158" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M36,0 L44,-4 L42,0 L44,4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="6" cy="0" r="1"/><circle id="g2" cx="40" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

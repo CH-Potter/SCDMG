@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -40 28 104" data-part="forge.knights.top.trebuchet-arm" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Trebuchet arm from above: the beam, the counterweight box ahead, the sling and boulder behind</title>
+<rect x="-4" y="-24" width="8" height="80" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2.4"/>
+<rect x="-12" y="-38" width="24" height="18" rx="2" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M4,-38 H10 Q12,-38 12,-36 V-22 Q12,-20 10,-20 H4 Z" fill="#6c5a37"/>
+<path d="M-12,-29 H12" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0" cy="58" r="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="0" r="3.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="58" r="1"/></g>
+</svg>

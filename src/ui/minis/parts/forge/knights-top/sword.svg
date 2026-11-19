@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -7 48 14" data-part="forge.knights.top.sword" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Arming sword from above (tip left)</title>
+<path d="M0,0 L5,-2 L30,-2 L30,2 L5,2 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="30" y="-5.4" width="3.4" height="10.8" rx="1" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="33" y="-1.6" width="7" height="3.2" rx="1" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<circle cx="41.4" cy="0" r="2.2" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="36" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -24 140 44" data-part="forge.orcs.side.greatcleaver" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Great cleaver: a slab of scrap steel as big as a door, a row of spikes along its spine, on a long iron haft (blade left)</title>
+<rect x="36" y="-3" width="98" height="6" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-8,-16 L40,-14 L40,14 L-2,18 Q-10,2 -8,-16 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-9,4 L40,2 L40,14 L-2,18 Z" fill="#4a5158"/>
+<path d="M-4,-16 L0,-24 L6,-16 Z M10,-15 L15,-23 L20,-15 Z M24,-15 L29,-22 L34,-14 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-2,-6 L14,-4 L12,4 L30,6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="32" cy="-4" r="3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<path d="M38,-8 L46,-8 L46,8 L38,8 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M84,-3 v6 M90,-3 v6 M112,-3 v6 M118,-3 v6" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="86" cy="0" r="1"/><circle id="g2" cx="114" cy="0" r="1"/><circle id="muzzle" cx="-8" cy="0" r="1"/></g>
+</svg>

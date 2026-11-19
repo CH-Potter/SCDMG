@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 162 34 24" data-part="forge.undead.side.zombie-foot-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shoe</title>
+<path d="M63,166 L77,166 L78,183 L54,183 Q51,178 56,176 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="170" r="1"/></g>
+</svg>

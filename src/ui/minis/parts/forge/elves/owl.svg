@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-46 -122 88 108" data-part="forge.elves.side.owl" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Moonfeather Owl: a round silver body, big moon eyes, ear tufts, team chest-band, talons tucked</title>
+<path d="M-24,-50 Q-30,-84 -2,-90 Q26,-88 30,-58 Q32,-30 10,-22 Q-14,-18 -24,-50 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M14,-86 Q26,-80 30,-58 Q32,-30 10,-22 L4,-22 Q24,-44 14,-86 Z" fill="#4a2e19"/>
+<path d="M-16,-52 Q-6,-44 6,-50 Q8,-34 -2,-28 Q-14,-32 -16,-52 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-10,-44 l3,3 l3,-3 M-6,-36 l3,3 l3,-3" fill="none" stroke="#c8bd98" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-30,-92 Q-34,-118 -10,-118 Q16,-116 14,-92 Q10,-74 -10,-74 Q-28,-76 -30,-92 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-30,-112 L-36,-122 L-22,-114 Z M8,-114 L16,-122 L12,-108 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-26,-96 Q-28,-108 -18,-108 Q-8,-104 -12,-94 Q-20,-88 -26,-96 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="-18" cy="-100" r="5" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<circle cx="-19" cy="-100" r="2.2" fill="#141414"/>
+<path d="M-30,-90 L-38,-86 L-30,-82 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-26,-72 Q-6,-64 18,-72 L16,-62 Q-6,-56 -24,-63 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M2,-82 q4,-2 8,0" fill="none" stroke="#6c5a37" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/></g>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 -30 92 80" data-part="forge.druids.side.oak-crown" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Oakheart's crown: a great round canopy of leaf clumps on a stub of bough, acorns hanging</title>
+<path d="M56,30 L52,14 L60,10 L66,28 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="40" cy="8" r="14" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="88" cy="14" r="14" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="56" cy="-8" r="20" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="78" cy="-8" r="18" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="64" cy="14" r="18" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M90,0 A14,14 0 0 1 98,22 Q94,10 90,0 Z" fill="#6c5a37"/>
+<path class="shade" d="M90,-20 A18,18 0 0 1 94,4 Q92,-8 90,-20 Z" fill="#6c5a37"/>
+<path class="shade" d="M70,26 A18,18 0 0 1 48,24 Q60,30 70,26 Z" fill="#6c5a37"/>
+<path d="M50,-12 q4,-4 8,0 M70,-14 q4,-4 8,0 M36,6 q3,-3 6,0 M60,10 q4,-4 8,0" fill="none" stroke="#6c5a37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="46" cy="22" rx="2.6" ry="3.4" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<ellipse cx="82" cy="26" rx="2.6" ry="3.4" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<path d="M43.4,19 L48.6,19 L48,21 L44,21 Z M79.4,23 L84.6,23 L84,25 L80,25 Z" fill="#6c5a37" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="68" cy="-18" r="1.8" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="40" cy="0" r="1.6" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

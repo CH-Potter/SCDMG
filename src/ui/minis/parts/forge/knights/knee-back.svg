@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="63 137 16 18" data-part="forge.knights.side.knee-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far knee cop, in shadow</title>
+<path d="M64.6,140 Q71,135 77,140 L76,148 L71,153 L65.6,148 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="71" cy="145" r="1"/></g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 52 60 100" data-part="forge.dwarves.side.torso-plain">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Dwarf torso without the tabard (the shield carries the team): a brass hex on the tasset</title>
+<path d="M62,101 L85,98 L88,142 L64,145 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M38,102 L62,102 L62,146 L40,148 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M55,102.6 L61.4,102.6 L61.4,145.4 L55,146 Z" fill="#6c5a37"/>
+<path d="M39.6,143 L61,141.4 M65,140.6 L87,137.6" fill="none" stroke="#b9bfc4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M37,72 Q40,58 60,57 Q80,58 85,71 L87,98 Q62,107 38,100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,58.6 Q82,62 85,71 L87,98 Q82,100.4 76,101.6 Q79,80 74,58.6 Z" fill="#6c5a37"/>
+<path d="M39,68 Q60,60 83,67" fill="none" stroke="#b9bfc4" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M36,95 L87,92 L87,103.6 L36,106.6 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M72.0,92.6 L76.7,95.3 L76.7,100.7 L72.0,103.4 L67.3,100.7 L67.3,95.3 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M53.0,118.4 L57.9,121.2 L57.9,126.8 L53.0,129.6 L48.1,126.8 L48.1,121.2 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M47,58 L73,56 L75.6,66 L48,68 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="41" cy="80" r="1" fill="#b9bfc4"/><circle cx="82" cy="78" r="1" fill="#b9bfc4"/><circle cx="42" cy="92" r="1" fill="#b9bfc4"/><circle cx="84" cy="90" r="1" fill="#b9bfc4"/><circle cx="43" cy="116" r="1" fill="#b9bfc4"/><circle cx="82" cy="112" r="1" fill="#b9bfc4"/><circle cx="43" cy="132" r="1" fill="#b9bfc4"/><circle cx="83" cy="128" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

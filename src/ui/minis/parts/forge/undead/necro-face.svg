@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 22 36 40" data-part="forge.undead.side.necro-face">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Necromancer's face: gaunt and pale, hollow cheeks, eyes lit spectral cyan, a thin pointed beard</title>
+<path d="M54,48 L65,48 L65,60 L54,60 Z" fill="#c8bd98" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50,52 Q46,48 46,44 L44,43 L47,40 Q47,28 59,27 Q70,28 70,40 Q70,50 64,55 Q57,58 50,52 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M65,29.6 Q70,32 70,40 Q70,50 64,55 L62,55.6 Q68,46 65,29.6 Z" fill="#c8bd98"/>
+<path d="M47,50 L52,53 L46,61 Z" fill="#5d5b45" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M49,42 Q53,48 57,45" fill="none" stroke="#c8bd98" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M48,37 L55,35.4" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="51.6" cy="40" rx="2.2" ry="1.6" fill="#141414"/>
+<circle class="glow" cx="51.6" cy="40" r="1" fill="#fff2c0"/>
+<path d="M48,49.4 Q51,50.4 53.6,49.4" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

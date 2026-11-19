@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 18 46 30" data-part="forge.knights.side.cap">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Floppy cloth cap in the Kingdom blue, slouched back</title>
+<path d="M46,38 Q45,22 62,21 Q79,22 84,32 L78,38 Q68,30 58,32 Q50,33 47,40 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M72,23 Q79,25 84,32 L78,38 Q76,30 72,23 Z" fill="#6c5a37"/>
+<path d="M46,38 Q56,32 70,34" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

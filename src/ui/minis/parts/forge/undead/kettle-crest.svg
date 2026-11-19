@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 2 52 46" data-part="forge.undead.side.kettle-crest">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rusted kettle helm with a sergeant's crest of tattered grave cloth</title>
+<path d="M58,24 Q62,6 80,4 Q90,6 90,16 L85,13 L86,22 L80,16 L78,26 L72,18 Q66,20 64,26 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,4 Q90,6 90,16 L85,13 L86,22 L82,18 Q86,10 80,4 Z" fill="#6c5a37"/>
+<path d="M47,40 Q46,24 60,23 Q73,24 73.6,37 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,24.6 Q73,27 73.6,37 L68,38 Q69,30 66,24.6 Z" fill="#353b41"/>
+<path d="M39,42 Q60,35 81,37 L80,41.6 Q60,40 40,46.6 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M52,31 Q56,27.4 60,30 Q57,34 52,31 Z" fill="#6e4528"/>
+<g class="detail"><circle cx="50" cy="43.4" r="1" fill="#b9bfc4"/><circle cx="58" cy="41.4" r="1" fill="#b9bfc4"/><circle cx="66" cy="40" r="1" fill="#b9bfc4"/><circle cx="74" cy="39.4" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

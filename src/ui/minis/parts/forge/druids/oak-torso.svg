@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 40 74 102" data-part="forge.druids.side.oak-torso" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Old Oakheart's trunk: broad and furrowed, moss on the shoulders, a glowing heart-knot, a team ribbon wound round</title>
+<path d="M32,64 Q60,46 88,58 L92,104 Q95,128 89,137 L35,137 Q27,122 29,100 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M76,52 Q83,54 88,58 L92,104 Q95,128 89,137 L80,137 Q87,100 76,52 Z" fill="#4a2e19"/>
+<path d="M42,70 Q38,90 42,116 M66,58 Q72,84 70,128 M82,70 Q85,92 83,114" fill="none" stroke="#4a2e19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M30,66 Q48,48 70,51 L65,62 L58,57 L52,68 L45,61 L38,72 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M78,56 Q86,58 89,64 L84,70 L80,63 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<ellipse cx="55" cy="84" rx="10" ry="12" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path class="glow" d="M55,73 Q64,84 55,96 Q46,84 55,73 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse class="glow" cx="55" cy="85" rx="2.8" ry="4.4" fill="#f2b84b"/>
+<path class="tag" d="M29.6,104 Q62,112 92,102 L92.6,112 Q62,122 30.6,114 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M48,116 L55,118 L51,135 L45,131 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M30,128 L24,140 L34,136 Z M88,130 L96,140 L86,137 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="78" cy="122" r="1.6" fill="#b9bfc4"/><circle cx="40" cy="126" r="1.4" fill="#b9bfc4"/><circle cx="64" cy="70" r="1.2" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 52 30 30" data-part="forge.undead.side.col-pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Skull pauldron, far, in shadow</title>
+<circle cx="70" cy="63" r="5.6" fill="#c8bd98" stroke="#141414" stroke-width="2.4"/>
+<circle cx="82" cy="62" r="5.4" fill="#c8bd98" stroke="#141414" stroke-width="2.4"/>
+<circle cx="76" cy="73" r="5" fill="#c8bd98" stroke="#141414" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

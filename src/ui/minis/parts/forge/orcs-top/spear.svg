@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -6 72 12" data-part="forge.orcs.top.spear" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Spear from above: the jagged head ahead (left), rag flutter</title>
+<rect x="10" y="-1.6" width="52" height="3.2" rx="1" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M-6,0 L2,-4 L12,-2 L12,2 L2,4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M12,0 L16,5 L18,0 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="26" cy="0" r="1"/><circle id="g2" cx="44" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

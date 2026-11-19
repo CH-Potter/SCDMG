@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -12 40 50" data-part="forge.elves.top.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Lorekeeper from above: moonsilver robe spreading behind, the jade stole down the back</title>
+<path d="M-15,0 Q-18,22 -12,34 L12,34 Q18,22 15,0 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,4 Q16,20 12,34 L6,34 Q12,18 8,4 Z" fill="#4a2e19"/>
+<ellipse cx="0" cy="1.4" rx="12.6" ry="9" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="-13" cy="1" rx="6.4" ry="8" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="13" cy="1" rx="6.4" ry="8" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="tag" d="M-4,-6 L4,-6 L5,32 L-5,32 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

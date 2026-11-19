@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 38 42 50" data-part="forge.druids.side.oak-pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Oakheart's near shoulder: a gnarled burl sprouting a leafy twig</title>
+<path d="M38,62 L30,46" fill="none" stroke="#6e4528" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M30,46 Q22,40 26,34 Q32,38 30,46 Z M30,46 Q34,38 40,40 Q36,46 30,46 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M30,64 Q44,54 60,60 L58,80 Q44,88 32,82 Q27,72 30,64 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M31,78 Q44,84 58,76 L58,80 Q44,88 32,82 Z" fill="#4a2e19"/>
+<ellipse cx="44" cy="70" rx="4" ry="3" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

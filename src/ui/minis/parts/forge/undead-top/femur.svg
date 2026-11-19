@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 76 20" data-part="forge.undead.top.femur" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Femur club from above (knob left)</title>
+<rect x="2" y="-3.2" width="56" height="6.4" rx="2" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<circle cx="-1" cy="-3.4" r="5.4" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<circle cx="-1" cy="3.4" r="5.4" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<circle cx="60" cy="-3" r="3.6" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<circle cx="60" cy="3" r="3.6" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<rect x="30" y="-4" width="7" height="8" rx="1" fill="#5d5b45" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="32" cy="0" r="1"/><circle id="g2" cx="46" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

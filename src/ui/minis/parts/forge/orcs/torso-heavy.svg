@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 52 54 82" data-part="forge.orcs.side.torso-heavy">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tuskguard torso: mismatched scrap plates hammered over a huge green chest, a chain belt, team loin rag</title>
+<path d="M63,100 L82,98 L86,128 L77,125 L71,131 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M43,102 L62,102 L61,131 L56,126 L52,133 L48,126 L43,131 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M55,102.6 L61.4,102.6 L60.6,129 L56,125 Z" fill="#b000b0"/>
+<path d="M42,70 Q44,57 61,57 Q81,57 85,71 L83,103 Q62,109 41,103 Q37,86 42,70 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M44,64 L66,60 L68,84 L46,90 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M62,61 L82,64 L83,92 L64,88 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M45,86 L66,82 L67,100 L46,104 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50,70 L53,77 L49,82 M72,70 L76,80" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44,98 Q62,94 82,96" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M40,99 L84,95 L84,104 L40,108 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="48" cy="66" r="1" fill="#b9bfc4"/><circle cx="62" cy="63" r="1" fill="#b9bfc4"/><circle cx="66" cy="66" r="1" fill="#b9bfc4"/><circle cx="80" cy="68" r="1" fill="#b9bfc4"/><circle cx="50" cy="90" r="1" fill="#b9bfc4"/><circle cx="63" cy="87" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

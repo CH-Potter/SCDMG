@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 54 32 32" data-part="forge.druids.side.oak-pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far burl, in shadow</title>
+<path d="M62,62 Q74,56 87,60 L86,76 Q74,84 63,80 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="74" cy="68" rx="3" ry="2.4" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>
