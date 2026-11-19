@@ -17,6 +17,15 @@ export interface StructureKitOpts {
   spec: KitSpec;
   /** Template override: the tower body ("bunker", "pylon", "pod" or a part source). */
   body?: string;
+  // Template overrides below are optional; leaving them out draws exactly what the kit always drew.
+  /** The footing under a permanent structure: a part source, or null for none (default: the kit plinth). */
+  plinth?: string | null;
+  /** The gun, in frame coords: a part and its placement; null for no gun and no beacon (default: the recipe's). */
+  gun?: { src: string; place: PartUse["place"] } | null;
+  /** More parts in frame coords (sandbags, flags, a crown of spikes). */
+  extras?: PartUse[];
+  /** A summoned (temp) structure's body, instead of the kit's standing stone. */
+  ward?: string;
 }
 
 const BODY: Record<KitSpec["look"], string> = { plain: "bunker", cap: "bunker", crystal: "pylon", teeth: "pod" };
@@ -25,13 +34,20 @@ function build(o: StructureKitOpts, view: RigView): RigDef {
   const s = o.spec;
   const parts: PartUse[] = [];
   let weapon: string | undefined;
-  if (s.temp) parts.push({ id: "ward", src: kitPart("structure", view, "ward"), bone: "torso", z: 5 });
+  if (s.temp) parts.push({ id: "ward", src: o.ward ?? kitPart("structure", view, "ward"), bone: "torso", z: 5 });
   else {
     const name = o.body && !o.body.startsWith("<") ? o.body : BODY[s.look] ?? "bunker";
     const body = o.body?.startsWith("<") ? o.body : kitPart("structure", view, name);
-    parts.push({ id: "plinth", src: kitPart("structure", view, "plinth"), bone: "root", z: 1 }, { id: "body", src: body, bone: "torso", z: 5 });
+    const plinth = o.plinth === undefined ? kitPart("structure", view, "plinth") : o.plinth;
+    if (plinth) parts.push({ id: "plinth", src: plinth, bone: "root", z: 1 });
+    parts.push({ id: "body", src: body, bone: "torso", z: 5 });
     const mount = view === "side" ? (readPart(body).anchors.mount ?? { x: 0, y: -90 }) : { x: 0, y: 0 };
-    if (s.ranged) {
+    if (o.gun) {
+      parts.push({ id: "gun", src: o.gun.src, bone: "gun", place: o.gun.place, z: 6 });
+      weapon = "gun";
+    } else if (o.gun === null) {
+      // the template draws its own crown, or nothing
+    } else if (s.ranged) {
       const w = kitWeapon(s.weapon === "bow" || s.weapon === "claws" || s.weapon === "none" || s.weapon === "shield" ? "cannon" : s.weapon);
       const h = view === "side" ? sideWeapon(w) : topWeapon(w);
       const at = view === "side" ? { x: mount.x + 2, y: mount.y - 6 } : { x: 0, y: 0 };
@@ -42,6 +58,7 @@ function build(o: StructureKitOpts, view: RigView): RigDef {
       parts.push({ id: "beacon", src: b, bone: "head", place: view === "side" ? placeAt(b, "pivot", { x: mount.x, y: mount.y - 10 }) : undefined, z: 6, anim: { pulse: 0.08 } });
     }
   }
+  parts.push(...(o.extras ?? []));
   let rig: RigDef = {
     id: `${o.id}.${view}`,
     name: view === "side" ? o.name : `${o.name} (from above)`,
