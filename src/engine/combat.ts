@@ -1,6 +1,6 @@
 // Attack resolution: per-model range/sight, keyword bonuses, wound allocation, saves, reactions.
 
-import { BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT } from "./constants";
+import { BARRAGE_RADIUS, BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT, WIDE_BARRAGE_RADIUS } from "./constants";
 import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf, reacts } from "./profile";
@@ -9,7 +9,7 @@ import { aliveModels, AURA_RANGE, ENGAGE_RANGE, engagedWith, isEngaged, supplyLo
 import { rulesOf, STANDARD_RULES, type HouseRules } from "./houseRules";
 import { consumeReaction } from "./reactions";
 import { hasCover, lineOfSight, platformAt } from "./terrain";
-import type { AttackReport, EvadeCondition, GameEvent, GameState, Model, Unit, Vec, Weapon } from "./types";
+import type { AttackReport, BarrageMarker, EvadeCondition, GameEvent, GameState, Model, Unit, UnitProfile, Vec, Weapon } from "./types";
 
 export type AttackKind = AttackReport["kind"];
 
@@ -346,10 +346,10 @@ export function blastOn(
   s: GameState,
   t: Unit,
   caught: Model[],
-  e: { hit: number; damage: number; ap: number; noEvade?: boolean },
+  e: { hit: number; damage: number; ap: number; noEvade?: boolean; /** A lobbed shell: could a firing model see the unit it caught? */ seen?: boolean },
   events: GameEvent[],
 ): Pick<AttackReport, "hitRolls" | "evadeRolls" | "evadeOn" | "saveRolls" | "saveOn" | "damage" | "modelsKilled"> {
-  const evadeOn = rulesOf(s).evade && !e.noEvade ? evadeTarget(t, defaultConditions("barrage")) : null;
+  const evadeOn = rulesOf(s).evade && !e.noEvade ? shellEvade(s, t, e.seen ?? true) : null;
   const hitRolls: number[] = [];
   const evadeRolls: number[] = [];
   const saveRolls: number[] = [];
@@ -665,6 +665,22 @@ export function scatterShell(s: GameState, a: Unit, weapon: string, aim: Vec, ne
   return landed;
 }
 
+/**
+ * The evade a lobbed shell's target rolls: its card's blast situations, or (Dodge unseen shells house
+ * rule) its own evade when none of the firing models could see it.
+ */
+export function shellEvade(s: GameState, t: Unit, seen: boolean): number | null {
+  if (!seen && rulesOf(s).unseenEvade) return ownEvade(t);
+  return evadeTarget(t, defaultConditions("barrage"));
+}
+
+/** Can the shell's spotters (the firing unit, or with Radio Spotter every friendly unit) see any of these models? */
+export function shellSeen(s: GameState, a: Unit | undefined, models: Model[]): boolean {
+  if (!a) return false;
+  const lookers = hasAbility(a, "radio-spotting") ? onBoard(s, a.owner) : a.onBoard && !a.destroyed ? [a] : [];
+  return lookers.some((u) => aliveModels(u).some((m) => models.some((tm) => lineOfSight(s, m.pos, m.elevation, tm.pos, tm.elevation))));
+}
+
 /** A shell bursting at `p`: every model of every ground unit under it is rolled for, friend or foe. */
 export function burstAt(s: GameState, a: Unit, weapon: string, p: Vec, e: { hit: number; damage: number; ap: number }, events: GameEvent[]): void {
   for (const t of onBoard(s)) {
@@ -673,7 +689,7 @@ export function burstAt(s: GameState, a: Unit, weapon: string, p: Vec, e: { hit:
     const caught = aliveModels(t).filter((m) => dist(m.pos, p) <= SHELL_BURST + r);
     if (!caught.length) continue;
     const at = events.length; // the attack is logged ahead of the damage and morale it causes
-    const rolled = blastOn(s, t, caught, e, events);
+    const rolled = blastOn(s, t, caught, { ...e, seen: shellSeen(s, a, caught) }, events);
     if (rolled.damage > 0) moraleCheck(s, t, events);
     // Sticky Goo slows whoever the burst hurt, friend or foe.
     if (rolled.damage > 0 && reacts(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
@@ -691,7 +707,7 @@ function expectedShells(s: GameState, a: Unit, t: Unit, plan: AttackPlan): numbe
   const spotted = shellSpotted(s, a, aim);
   const { onTarget } = shellOdds(plan.hitOn, spotted, rulesOf(s).scatter);
   const r = radiusOf(t);
-  const evadeOn = rulesOf(s).evade ? evadeTarget(t, defaultConditions("barrage")) : null;
+  const evadeOn = rulesOf(s).evade ? shellEvade(s, t, shellSeen(s, a, aliveModels(t))) : null;
   let burst = 0;
   for (const m of aliveModels(t)) {
     if (dist(m.pos, aim) > SHELL_BURST + r) continue;
@@ -702,6 +718,88 @@ function expectedShells(s: GameState, a: Unit, t: Unit, plan: AttackPlan): numbe
   // A shell that drifts still catches the edge of the unit now and then.
   const drifted = spotted ? 0.35 : 0.15;
   return plan.attackers.length * burst * (onTarget + (1 - onTarget) * drifted);
+}
+
+// ---------- barrage markers ----------
+
+/** The gun a unit lays its barrage with: its lobbed gun, or (Barrage Shells) its hardest-hitting gun that can hit the ground. */
+export function barrageGun(p: UnitProfile): Weapon | undefined {
+  const ranged = p.weapons.filter((w) => !w.melee && w.targets !== "air");
+  return ranged.find((w) => w.traits?.includes("indirect")) ?? [...ranged].sort((a, b) => b.dice * b.damage - a.dice * a.damage)[0];
+}
+
+/** How far from its marker a barrage reaches. */
+export const barrageRadius = (u: Unit): number => (hasAbility(u, "wide-barrage") ? WIDE_BARRAGE_RADIUS : BARRAGE_RADIUS);
+
+/** The marker `u` would lay at `pos` (before any scatter), or null if it has no gun to lay one with. */
+export function barrageMarkerFor(u: Unit, pos: Vec): BarrageMarker | null {
+  const w = barrageGun(profileOf(u));
+  if (!w) return null;
+  // Dice are per model, like a shot: a three-tube battery lays three times the shells.
+  return { uid: u.uid, owner: u.owner, weapon: w.name, pos, radius: barrageRadius(u), dice: w.dice * Math.max(1, aliveModels(u).length), damage: w.damage, ap: w.ap ?? 0 };
+}
+
+/** The models of `t` a marker catches (ground units only: base edge within the radius). */
+export function markerCatches(mk: BarrageMarker, t: Unit): Model[] {
+  if (isFlying(t)) return [];
+  const r = profileOf(t).baseRadius;
+  return aliveModels(t).filter((m) => dist(m.pos, mk.pos) <= mk.radius + r + 1e-9);
+}
+
+/**
+ * A barrage coming down on a unit it caught: the gun's dice are all hits, spread over the caught
+ * models in turn; each may be evaded (blast situations, or its own evade if unseen), then saved.
+ */
+export function barrageOn(
+  s: GameState,
+  a: Unit | undefined,
+  mk: BarrageMarker,
+  t: Unit,
+  caught: Model[],
+  events: GameEvent[],
+): Pick<AttackReport, "hitRolls" | "evadeRolls" | "evadeOn" | "saveRolls" | "saveOn" | "damage" | "modelsKilled"> {
+  const evadeOn = rulesOf(s).evade ? shellEvade(s, t, shellSeen(s, a, caught)) : null;
+  const evadeRolls: number[] = [];
+  const saveRolls: number[] = [];
+  const saveOn: (number | null)[] = [];
+  let damage = 0;
+  let modelsKilled = 0;
+  let i = 0;
+  for (let d = 0; d < mk.dice; d++) {
+    const live = caught.filter((m) => m.alive);
+    if (!live.length) break;
+    const m = live[i++ % live.length]!;
+    if (evadeOn !== null) {
+      const ev = rollD6(s);
+      evadeRolls.push(ev);
+      if (ev >= evadeOn) continue;
+    }
+    const st = saveNeeded(s, t, t, m, mk.ap, false);
+    saveOn.push(st);
+    const sv = st === null ? 0 : rollD6(s);
+    saveRolls.push(sv);
+    if (st !== null && sv >= st) continue;
+    damage += applyDamage(s, t, m, mk.damage, events);
+    if (!m.alive) modelsKilled += 1;
+  }
+  const hitRolls = Array.from({ length: mk.dice }, () => 6); // every die is a hit: shown as sixes
+  return { hitRolls, ...(evadeOn !== null && evadeRolls.length ? { evadeRolls, evadeOn } : {}), saveRolls, saveOn, damage, modelsKilled };
+}
+
+/** Expected damage a marker does to `t` if it's still there at the end of the assault phase (for the AI and previews). */
+export function expectedBarrage(s: GameState, mk: BarrageMarker, t: Unit): number {
+  const caught = markerCatches(mk, t);
+  if (!caught.length) return 0;
+  const a = s.units.find((u) => u.uid === mk.uid);
+  const evadeOn = rulesOf(s).evade ? shellEvade(s, t, shellSeen(s, a, caught)) : null;
+  const pass = evadeOn === null ? 1 : 1 - pAtLeast(evadeOn);
+  let total = 0;
+  for (let d = 0; d < mk.dice; d++) {
+    const m = caught[d % caught.length]!;
+    const save = saveNeeded(s, t, t, m, mk.ap, false);
+    total += pass * (save === null ? 1 : 1 - pAtLeast(save)) * Math.min(mk.damage, m.hp + m.shield);
+  }
+  return Math.min(total, caught.reduce((n, m) => n + m.hp + m.shield, 0));
 }
 
 // ---------- shooting into a melee ----------

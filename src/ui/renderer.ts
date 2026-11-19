@@ -241,6 +241,8 @@ export class BoardRenderer {
   private bakeTimer = 0;
   private objectiveLayer = new Container();
   private flagLayer = new Graphics();
+  /** Barrage markers waiting to come down at the end of the assault phase. */
+  private barrageLayer = new Graphics();
   private labelLayer = new Container();
   private overlayLayer = new Graphics();
   private engageUnder = new Graphics();
@@ -319,6 +321,7 @@ export class BoardRenderer {
     this.modelLayer.sortableChildren = true;
     this.board.addChild(
       this.objectiveLayer,
+      this.barrageLayer,
       this.labelLayer,
       this.fx.under,
       this.overlayLayer,
@@ -624,7 +627,7 @@ export class BoardRenderer {
     this.bannerFx.clear();
     this.labelLayer.removeChildren().forEach((c) => c.destroy());
     this.labels = [];
-    for (const g of [this.overlayLayer, this.topOverlay, this.engageUnder, this.engageOver, this.hoverLayer, this.flagLayer]) g.clear();
+    for (const g of [this.overlayLayer, this.topOverlay, this.engageUnder, this.engageOver, this.hoverLayer, this.flagLayer, this.barrageLayer]) g.clear();
     if (this.boardSprite) {
       this.boardSprite.destroy({ texture: true, textureSource: true });
       this.boardSprite = null;
@@ -865,6 +868,7 @@ export class BoardRenderer {
     this.drawEngaged(s);
     this.drawObjectives(s, !!prev);
     this.drawFlags(s);
+    this.drawBarrages(s);
     if ((!prev || prev.phase !== s.phase || prev.round !== s.round) && !s.over && this.autoPhaseBanners) this.phaseBanner(s.phase, s.round);
   }
 
@@ -980,9 +984,22 @@ export class BoardRenderer {
           this.fx.ring(e.aim, 0.2, 0.9, 0xffffff, t, 0.1); // where it was aimed
           t += this.fx.bounce(e.aim, e.landed, 0xff8a3d, t);
         }
-        this.fx.ring(e.landed, 0.4, SHELL_BURST + 0.4, 0xff8a3d, t, 0.2);
+        // A barrage marker just goes down here (its shells come later); a shot bursts now.
+        if (e.weapon !== "Barrage") this.fx.ring(e.landed, 0.4, SHELL_BURST + 0.4, 0xff8a3d, t, 0.2);
         shell = { uid: e.uid, arrive: t };
         base = t;
+        continue;
+      }
+      if (e.type === "barrageMarker") {
+        if (!e.landed) {
+          this.fx.ring(e.pos, 0.2, e.radius + 0.3, 0xff8a3d, base, 0.12);
+        } else {
+          // The shells walk in on the marker from the sky, then burst over everything under it.
+          const t = base + (this.reduced ? 0 : 450);
+          for (let i = 0; i < 3; i++) this.fx.ring(e.pos, 0.2, e.radius + 0.4, i === 1 ? 0xffffff : 0xff8a3d, t + i * (this.reduced ? 0 : 110), 0.16);
+          shell = { uid: e.uid, arrive: t };
+          base = t;
+        }
         continue;
       }
       if (e.type === "moved") {
@@ -1470,6 +1487,31 @@ export class BoardRenderer {
       g.moveTo(x - 0.3, y + 0.35).arc(x, y, 0.45, 2.2, 3.4).stroke({ width: 0.06, color: 0x8a5424, alpha: 0.8 });
       for (const [dx, dy] of [[-0.2, -0.15], [0.15, 0.1], [-0.05, 0.25]] as const) g.circle(x + dx, y + dy, 0.09).fill(0x3a1e0c);
       g.arc(x, y, 0.4, -2.6, -1.8).stroke({ width: 0.08, color: 0xffffff, alpha: 0.6 });
+    }
+  }
+
+  /** Barrage markers: a hazard-striped ring the size of the area it will shell, ringed in the owner's colour. */
+  private drawBarrages(s: GameState): void {
+    const g = this.barrageLayer.clear();
+    for (const mk of s.barrages ?? []) {
+      const { x, y } = mk.pos;
+      const r = mk.radius;
+      g.circle(x, y, r).fill({ color: 0xff8a3d, alpha: 0.16 });
+      // hazard stripes across the area
+      for (let k = -r; k <= r; k += 0.45) {
+        const h = Math.sqrt(Math.max(0, r * r - k * k));
+        g.moveTo(x + k - h * 0.5, y - h).lineTo(x + k + h * 0.5, y + h);
+      }
+      g.stroke({ width: 0.09, color: 0xff8a3d, alpha: 0.35 });
+      dashCircle(g, x, y, r, Math.max(8, Math.round(r * 10)), 0.55);
+      g.stroke({ width: 0.2, color: INK, alpha: 0.75 });
+      dashCircle(g, x, y, r, Math.max(8, Math.round(r * 10)), 0.55);
+      g.stroke({ width: 0.11, color: 0xff8a3d, alpha: 0.95 });
+      g.circle(x, y, r + 0.22).stroke({ width: 0.08, color: PLAYER_COLORS[mk.owner], alpha: 0.9 });
+      // the crosshair the shells are walking in on
+      const c = Math.min(0.45, r * 0.4);
+      g.moveTo(x - c, y).lineTo(x + c, y).moveTo(x, y - c).lineTo(x, y + c).stroke({ width: 0.12, color: INK, alpha: 0.85 });
+      g.circle(x, y, c * 0.55).stroke({ width: 0.08, color: 0xff8a3d });
     }
   }
 

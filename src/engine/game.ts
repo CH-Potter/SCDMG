@@ -16,7 +16,7 @@ import { deployZones, freshStatus, initialSupports, isStructure, playSupport, re
 import { MAPS, type MapDef } from "./data/maps";
 import { MISSIONS } from "./data/missions";
 import { cleanRules, CLOSE_RANKS_MOVE, OVERWATCH_HIT, REROLL_CP, ROLLED_CHARGE_MAX, rulesOf, type HouseRules } from "./houseRules";
-import { applyDamage, blastOn, burstAt, evadeTarget, expectedDamage, hasTrait, moraleCheck, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
+import { applyDamage, barrageGun, barrageMarkerFor, barrageOn, blastOn, burstAt, corrode, evadeTarget, markerCatches, expectedDamage, hasTrait, moraleCheck, planMelee, planShooting, reportMisses, resolveAttack, planImpact, sacrifice, scatterShell, shellAim, strayPlan, strayTarget, type AttackPlan } from "./combat";
 import { planUnitMove, reviveSpot, type UnitMovePlan } from "./formation";
 import { dist, pointSegmentDistance, segmentNearPolygon } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf, reacts } from "./profile";
@@ -825,12 +825,16 @@ function useAbility(
     }
     case "barrage": {
       if (!point) return "Pick a point";
-      const reach = aliveModels(unit).some((m) => dist(m.pos, point) <= (def.range ?? 24));
-      if (!reach) return `Out of range (${def.range}")`;
-      say(`${name} lobs a barrage!`);
-      // Shells can drift (see scatterShell), and burst on everyone under them.
-      const landed = scatterShell(s, unit, "Barrage", point, 4, events);
-      burstAt(s, unit, "Barrage", landed, { hit: 4, damage: 1, ap: 1 }, events);
+      const gun = barrageGun(profileOf(unit));
+      const mark = barrageMarkerFor(unit, point);
+      if (!gun || !mark) return "It has no gun to lay a barrage with";
+      const reach = aliveModels(unit).some((m) => dist(m.pos, point) <= gun.range);
+      if (!reach) return `Out of range (${gun.range}")`;
+      // The marker goes down now and may drift (see scatterShell); the shells land at the end of the assault phase.
+      say(`${name} marks a barrage for ${gun.name}!`);
+      const landed = scatterShell(s, unit, "Barrage", point, gun.hit, events);
+      s.barrages = [...(s.barrages ?? []), { ...mark, pos: landed }];
+      events.push({ type: "barrageMarker", uid: unit.uid, pos: landed, radius: mark.radius, weapon: mark.weapon, landed: false });
       break;
     }
     case "tunnel": {
@@ -1370,6 +1374,8 @@ function endPhase(s: GameState, events: GameEvent[]): void {
     }
     s.players.forEach((p) => (p.passed = false));
     s.phase = NEXT[s.phase];
+    // The end of the assault phase: the barrages marked this round come down.
+    if (from === "assault") resolveBarrages(s, events);
     if (s.phase === "scoring") {
       runScoring(s, events, from === "combat" ? claim : null);
       claim = null;
@@ -1385,6 +1391,30 @@ function endPhase(s: GameState, events: GameEvent[]): void {
       events.push({ type: "phase", phase: s.phase, round: s.round });
       if (!s.orderChoice && !playerHasOptions(s, s.activePlayer)) s.activePlayer = other(s.activePlayer);
       return;
+    }
+  }
+}
+
+/** Every barrage marker comes down: each ground unit under it, friend or foe, takes the gun's dice as hits. */
+function resolveBarrages(s: GameState, events: GameEvent[]): void {
+  const marks = s.barrages ?? [];
+  if (!marks.length) return;
+  s.barrages = [];
+  for (const mk of marks) {
+    const a = s.units.find((u) => u.uid === mk.uid);
+    events.push({ type: "barrageMarker", uid: mk.uid, pos: mk.pos, radius: mk.radius, weapon: mk.weapon, landed: true });
+    for (const t of onBoard(s)) {
+      const caught = markerCatches(mk, t);
+      if (!caught.length) continue;
+      const at = events.length; // the attack is logged ahead of the damage and morale it causes
+      const rolled = barrageOn(s, a, mk, t, caught, events);
+      if (rolled.damage > 0) moraleCheck(s, t, events);
+      if (a && rolled.damage > 0 && reacts(a, "sticky-goo") && !t.destroyed) t.status.slowedRounds = 2;
+      if (a && rolled.damage > 0) corrode(a, t, events);
+      events.splice(at, 0, {
+        type: "attack",
+        report: { uid: mk.uid, target: t.uid, weapon: `${mk.weapon} (barrage)`, kind: "barrage", attackers: 1, hitOn: 1, ...rolled, unitDestroyed: t.destroyed },
+      });
     }
   }
 }

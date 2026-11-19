@@ -16,6 +16,7 @@
 //   upgrade   ~ cost(with upgrade) - cost(without), at least 1 when it helps
 //   Fizz      ~ CP per round plus the value of each ability's effect, discounted for its CP cost
 
+import { addDerivedAbilities } from "./derived";
 import { BLAST_SQUAD } from "./constants";
 import { ABILITIES } from "./data/abilities";
 import { supportSlots, UNIT_CLASSES } from "./data/unitClasses";
@@ -128,7 +129,10 @@ export const ABILITY_PRICES: Partial<Record<AbilityId, AbilityPrice>> = {
   // active (before the CP and uses discount)
   "patch-up": 0.5,
   hatch: 0.7,
-  barrage: 2.6,
+  // A lobbed gun comes with its barrage (profile.ts), so only a unit given one some other way pays for it.
+  barrage: (c) => (lobs(c.p) ? 0 : 0.4 * c.ranged),
+  // Barrage Shells: the 2" marker (4x the area), and the barrage itself for a unit without a lobbed gun.
+  "wide-barrage": (c) => (lobs(c.p) ? 1.7 : 0.4 + 0.4 * c.ranged),
   tunnel: (c) => 1.5 + 0.6 * c.body,
   blink: 1.4,
   recall: 1.2,
@@ -489,6 +493,11 @@ export function rawUnitValue(p: UnitProfile): UnitParts {
   return { base: W.base, body, guns, move: moveV, abilities, total, ctx };
 }
 
+/** Has a lobbed (indirect) gun. */
+function lobs(p: UnitProfile): boolean {
+  return p.weapons.some((w) => !w.melee && (w.traits ?? []).includes("indirect"));
+}
+
 /** Uses per game: once is worth about half of always. */
 const usesFactor = (uses: number | undefined): number =>
   !uses ? 1 : uses === 1 ? 0.55 : uses === 2 ? 0.8 : 0.9;
@@ -570,7 +579,7 @@ export function withUpgrade(p: UnitProfile, u: UpgradeDef): UnitProfile {
     if (w) out.weapons[u.weapon.index] = { ...w, ...u.weapon.patch };
   }
   if (u.impact && out.impact) out.impact = { ...out.impact, ...u.impact };
-  return out;
+  return addDerivedAbilities(out);
 }
 
 /** ⚙ the upgrade adds: what the unit is worth with it minus without it. At least 1 if it helps at all. */

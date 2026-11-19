@@ -51,7 +51,8 @@ export type AbilityId =
   // active
   | "patch-up" // heal 2 HP on a nearby friendly unit, reviving a model if needed
   | "hatch" // a nearby friendly unit regrows lost models
-  | "barrage" // indirect blast at a point, no line of sight needed
+  | "barrage" // movement phase: mark a point; it's shelled at the end of the assault phase
+  | "wide-barrage" // Barrage Shells: the barrage marker covers 2" (and any unit with a gun can lay one)
   | "tunnel" // vanish and re-emerge anywhere on the ground away from enemies
   | "blink" // teleport up to 10", even onto platforms
   | "recall" // teleport a friendly unit to the user
@@ -536,8 +537,23 @@ export interface GameState {
   openRoster?: { cap?: number; seq: number };
   /** House rules this game is played with (see houseRules.ts). Absent: the standard game. Treat as immutable. */
   rules?: HouseRules;
+  /** Barrage markers laid this round (Barrage, movement phase), shelled at the end of the assault phase. Treat as immutable: replace the array. */
+  barrages?: BarrageMarker[];
   /** AI look-ahead only: rolled charges skip the roll and always reach (the AI weighs the odds itself). */
   aiAssumeChargesLand?: boolean;
+}
+
+/** A barrage marker: every ground unit with a model within `radius`" of `pos` takes `dice` hits at the end of the assault phase. */
+export interface BarrageMarker {
+  /** The unit that laid it (it lands even if that unit is gone by then). */
+  uid: string;
+  owner: PlayerId;
+  weapon: string;
+  pos: Vec;
+  radius: number;
+  dice: number;
+  damage: number;
+  ap: number;
 }
 
 export type Command =
@@ -598,6 +614,8 @@ export type GameEvent =
   | { type: "chargeFailed"; uid: string; target: string; reason: string }
   /** An indirect shell (mortar, Barrage) aimed at `aim` landed at `landed`: on target if `roll` >= `need`, else it drifted `drift` inches (halved when a firing model could see the spot). */
   | { type: "scatter"; uid: string; weapon: string; aim: Vec; landed: Vec; roll: number; need: number; drift: number; spotted: boolean }
+  /** A barrage marker was laid (after any scatter), or its shells came down at the end of the assault phase. */
+  | { type: "barrageMarker"; uid: string; pos: Vec; radius: number; weapon: string; landed: boolean }
   | { type: "hunkered"; uid: string }
   | { type: "held"; uid: string }
   | { type: "ability"; uid: string; ability: AbilityId; text: string }

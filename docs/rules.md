@@ -115,7 +115,7 @@ Every attack, ranged or melee, runs the same sequence:
   - **point-blank:** shots from a unit that is engaged with it;
   - **ranged:** any shooting;
   - **melee:** close combat and impact hits;
-  - **blast:** blast weapons and barrages.
+  - **blast:** blast weapons, lobbed shells and barrages.
   - Nimble infantry tend to dodge point-blank shots, flyers dodge shooting, and small swarms dodge blasts.
   - Evade numbers are 2+ to 6+. Buffs and debuffs move it by one for the round.
 - **Only small, agile units evade** (`src/engine/data/agility.ts`). Structures, heavy units and monsters can't, nor can ground units on bases over 1" or that move under 5"; flyers can, whatever their size, because they dodge by flying. Every small (base up to 0.75"), quick, unarmoured ground unit has at least a basic evade: 6+ against point-blank shots, 5+ if it's light or can jump. Armour is the other way to survive: armoured units don't get the basic evade. The Faction Forge enforces this, and its templates add the basic evade where a unit has none.
@@ -169,7 +169,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Skitt
 - **Active abilities** use the unit's activation in their phase:
   - Patch Up (heal or revive)
   - Hatchlings (the Broodmother and the Brood Tenders: a friendly unit within 3" regrows up to 2 lost models at 1 HP; not while engaged)
-  - Barrage (an indirect shell at a point; it can drift, see *Indirect fire*; friendly fire happens)
+  - Barrage (movement phase, 1 CP: lay a barrage marker that is shelled at the end of the assault phase; see *Barrage markers*)
   - Tunnel (pop up anywhere on the ground ≥6" from enemies)
   - Blink (teleport 10", can land on platforms)
   - Recall Beam (teleport a friendly unit next to the Warden; it can still act afterwards)
@@ -341,14 +341,24 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Skitt
 
 ### Indirect fire
 
-Weapons with the **indirect** trait, and the Barrage ability, lob a shell instead of shooting straight:
+Weapons with the **indirect** trait lob a shell instead of shooting straight:
 
 - **No line of sight needed.** The target only has to be in range. Indirect weapons can't fire while their unit is in a melee, or as overwatch, and they still can't pick out a unit that's already in a melee.
-- **Aim:** the shell is aimed at the target model nearest the middle of the unit (Barrage: the point you pick).
-- **Does it land on target?** Roll a die against the weapon's hit number (4+ for both mortars and Barrage, after the usual modifiers such as Shaken). On a success it lands where it was aimed.
+- **Aim:** the shell is aimed at the target model nearest the middle of the unit (a barrage marker: the point you pick).
+- **Does it land on target?** Roll a die against the weapon's hit number (4+ for both mortars, after the usual modifiers such as Shaken). On a success it lands where it was aimed.
 - **Drift:** otherwise it drifts a d6" in a random direction, staying on the table. If any model in the firing unit can see the aim point, the drift is halved (rounding up), so a spotter makes it far more accurate.
 - **Burst:** where it lands, every model of every ground unit within 2" (base edge) is rolled for, **yours included**: hit on the weapon's hit number, then the target's blast evade, then a save (no cover against a shell from above; hunkering and digging in still count). Each failed save deals the weapon's damage. The weapon's dice count doesn't apply.
+- **Unseen shells can be dodged** (the *Dodge unseen shells* house rule, on in the standard game): if none of the firing models (or, with Radio Spotter, none of your units) can see the models a shell caught, that unit rolls **its own evade**, if its card has one, whatever situations the card lists. A shell fired in sight adds no evade: only the situations on the card count.
 - Each firing model lobs one shell. Sticky Goo slows every unit the burst hurts.
+
+### Barrage markers
+
+Every unit with a lobbed gun (the Pipe Mortar, the Bile Bombard, the Forge mortars and cannons) has **Barrage**. It's a free action in its **movement-phase** activation, so the unit can still move:
+
+- **Lay the marker** (1 CP, once a round): pick a point within the lobbed gun's range. No sight needed. The marker can drift like any shell (its hit number to land on target, else a d6", halved if the firing unit can see the spot), and stays where it lands for everyone to see.
+- **It comes down at the end of the assault phase**, after the shooting and charges. Every ground unit, **friend or foe**, with a model within **1"** of the marker (base edge) takes the gun's **dice as hits** (dice per model × the firing models), shared out over its models under the marker. Each hit is evaded (the blast situations on the card; its own evade if no firing model can see it, see above), then saved, and deals the gun's damage and AP. Flyers aren't caught.
+- It lands even if the unit that laid it is gone by then. Moving out of the marker, or not charging into it, is the counter.
+- **Barrage Shells** (the Militia's Blasting Shells on the Pipe Mortar, Barrage Shells on Big Bertha, and the Forge's shell upgrades): the marker covers **2"** instead of 1". A unit without a lobbed gun that takes them (Big Bertha) lays it with its main gun.
 
 ## Tabletop staples
 
@@ -388,6 +398,7 @@ Pick these in the main menu (step 5, *House rules*). They're saved in your brows
 | Close ranks | Models fight from where they stand. |
 | Supporting rank | Only models in base contact with the enemy fight. |
 | Evade in the scrum | A unit in a melee only evades shots in the situations its card lists. |
+| Dodge unseen shells | A lobbed shell or barrage that bursts out of the firer's sight is evaded only in the situations the target's card lists. |
 | Evade rolls | Every hit goes straight to a save. |
 | Stray shots into melee | You can shoot into a melee freely: misses never hit your own side. |
 | Impact on charge | Ground units roll no impact dice when a charge lands. A flyer's dive still strikes, since it's the flyer's whole attack. |

@@ -17,9 +17,8 @@ import { airdropSpotProblem, canPlaySupport, deployZones, supportTarget } from "
 import { abilityOf } from "./reactions";
 import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
-import { evadeTarget, expectedDamage, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
+import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
-import { SHELL_BURST } from "./constants";
 import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, tableKey, twoDiceAtLeast } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
@@ -44,7 +43,7 @@ import {
   reserves,
 } from "./rules";
 import { allPlaced, platformAt, planRoute, type Placed, type Route } from "./terrain";
-import type { AbilityId, Command, GameState, Objective, PlayerId, SupportEffect, Unit, Vec } from "./types";
+import type { AbilityId, BarrageMarker, Command, GameState, Objective, PlayerId, SupportEffect, Unit, Vec } from "./types";
 
 const other = (p: PlayerId): PlayerId => (p === 0 ? 1 : 0);
 
@@ -332,6 +331,15 @@ export function evaluate(s: GameState, me: PlayerId): number {
     // hurt broods close to her (and, for the other side, pull them apart or kill her).
     if (mothers.length && !prof.structure && u.models.some((m) => !m.alive) && mothers.some((f) => f.owner === u.owner && f.uid !== u.uid && unitGap(f, u) <= AURA_RANGE))
       score += sign * ((prof.cost * MATERIAL) / Math.max(1, prof.models)) * BROOD_REFILL;
+  }
+
+  // Barrage markers still to come down: the damage they'll do to whoever is likely to still be under them.
+  for (const mk of s.barrages ?? []) {
+    for (const t of s.units) {
+      if (!t.onBoard || t.destroyed) continue;
+      const exp = expectedBarrage(s, mk, t);
+      if (exp > 0) score += (t.owner === me ? -1 : 1) * exp * valuePerWound(t) * stayOdds(s, t);
+    }
   }
 
   // Snacks.
@@ -825,42 +833,88 @@ function chargeCandidatesIn(s: GameState, u: Unit): Candidate[] {
   return out;
 }
 
-function barrageCandidates(s: GameState, u: Unit, range: number): Candidate[] {
-  const out: Candidate[] = [];
-  const points: Vec[] = [];
+/**
+ * How likely `t` is to still be where it stands when the barrages come down at the end of the assault
+ * phase: structures and units in a melee stay put; a unit that has already moved this round mostly
+ * stays; one still to move will usually step out of a marker it can see.
+ */
+function stayOdds(s: GameState, t: Unit): number {
+  const p = profileOf(t);
+  if (p.structure || t.status.hunkered) return 1;
+  if (isEngaged(s, t)) return 0.9;
+  // A free melee unit is about to charge somewhere: it won't wait under a marker.
+  if (isMeleeUnit(t)) return s.phase === "movement" && !t.status.acted ? 0.15 : 0.35;
+  const settled = s.phase !== "movement" || t.status.acted;
+  let odds = settled ? 0.8 : effectiveMove(s, t) <= 4 ? 0.55 : 0.3;
+  if (onObjective(s, t)) odds = Math.min(1, odds + 0.15);
+  return odds;
+}
+
+/**
+ * Our own units the enemies under a marker could drag into a fight on top of it: within charge reach
+ * of an enemy melee unit the marker catches, and close enough to the marker for the scrum to spill
+ * under it. Their wounds count as at risk.
+ */
+function scrumRisk(s: GameState, mark: BarrageMarker, me: PlayerId): number {
+  let risk = 0;
+  const caughtMelee = onBoard(s, other(me)).filter((e) => isMeleeUnit(e) && markerCatches(mark, e).length && !isEngaged(s, e));
+  if (!caughtMelee.length) return 0;
+  for (const f of onBoard(s, me)) {
+    if (isFlying(f) || profileOf(f).structure) continue;
+    const near = aliveModels(f).some((m) => dist(m.pos, mark.pos) <= mark.radius + 4);
+    if (!near || !caughtMelee.some((e) => unitGap(e, f) <= likelyChargeRange(s, e))) continue;
+    risk += Math.min(wounds(f), mark.dice * mark.damage * 0.4) * valuePerWound(f);
+  }
+  return risk;
+}
+
+/**
+ * Barrage marker spots: on the enemy units it can reach, scored by the damage it would do to the ones
+ * likely to stay under it, discounted for drift, less twice the damage it would do to our own.
+ */
+function barrageCandidates(s: GameState, u: Unit): Candidate[] {
+  const gun = barrageGun(profileOf(u));
+  if (!gun) return [];
+  const def = ABILITIES.barrage;
+  // Cheap first pass: spots on enemy units within reach, ranked by the enemy models a marker there would catch.
+  const rough: { p: Vec; n: number }[] = [];
+  const seen: Vec[] = [];
   for (const e of onBoard(s, other(u.owner))) {
     if (isFlying(e)) continue;
-    points.push(centroid(e));
-    for (const m of aliveModels(e)) points.push(m.pos);
-  }
-  const seen: Vec[] = [];
-  const scored: { p: Vec; v: number }[] = [];
-  for (const p of points) {
-    if (seen.some((q) => dist(p, q) < 0.8)) continue;
-    seen.push(p);
-    if (!aliveModels(u).some((m) => dist(m.pos, p) <= range)) continue;
-    let v = 0;
-    // The shell may drift (see scatterShell): count the enemy part at its odds of landing near the
-    // mark, but keep the full risk to our own units, so it isn't dropped next to friends.
-    const { onTarget } = shellOdds(4, shellSpotted(s, u, p), rulesOf(s).scatter);
-    const accuracy = onTarget + (1 - onTarget) * 0.2;
-    for (const t of onBoard(s)) {
-      if (isFlying(t)) continue;
-      const r = profileOf(t).baseRadius;
-      const caught = aliveModels(t).filter((m) => dist(m.pos, p) <= SHELL_BURST + r + (t.owner === u.owner ? 3 : 0));
-      if (!caught.length) continue;
-      const save = profileOf(t).armor + 1 - (t.status.hunkered ? 1 : 0);
-      const pFail = save > 6 ? 1 : 1 - pAtLeast(Math.max(2, save));
-      const evadeOn = rulesOf(s).evade ? evadeTarget(t, ["ranged", "blast"]) : null;
-      const exp = caught.length * 0.5 * pFail * (evadeOn === null ? 1 : 1 - pAtLeast(evadeOn));
-      v += t.owner === u.owner ? -exp * valuePerWound(t) * 2 : attackValue(s, t, exp * accuracy);
+    for (const p of [centroid(e), ...aliveModels(e).map((m) => m.pos)]) {
+      if (seen.some((q) => dist(p, q) < 0.8)) continue;
+      seen.push(p);
+      if (!aliveModels(u).some((m) => dist(m.pos, p) <= gun.range)) continue;
+      const mark = barrageMarkerFor(u, p)!;
+      let n = 0;
+      for (const t of onBoard(s)) n += (t.owner === u.owner ? -2 : 1) * markerCatches(mark, t).length;
+      if (n > 0) rough.push({ p, n });
     }
+  }
+  rough.sort((a, b) => b.n - a.n);
+  const out: Candidate[] = [];
+  const scored: { p: Vec; v: number }[] = [];
+  for (const { p } of rough.slice(0, 6)) {
+    const mark = barrageMarkerFor(u, p)!;
+    const { onTarget } = shellOdds(gun.hit, shellSpotted(s, u, p), rulesOf(s).scatter);
+    const accuracy = onTarget + (1 - onTarget) * 0.25;
+    let v = 0;
+    for (const t of onBoard(s)) {
+      const exp = expectedBarrage(s, mark, t);
+      if (exp <= 0) continue;
+      const stay = stayOdds(s, t);
+      // Our own units: the full risk if they're stuck there, less if they can still walk out of it.
+      v += t.owner === u.owner ? -exp * valuePerWound(t) * 2 * stay : attackValue(s, t, exp * accuracy) * stay;
+    }
+    v -= scrumRisk(s, mark, u.owner);
     scored.push({ p, v });
   }
   scored.sort((a, b) => b.v - a.v);
-  for (const { p, v } of scored.slice(0, 4)) {
-    // Shells are limited: hold them for a decent target.
-    out.push({ cmd: { type: "ability", uid: u.uid, ability: "barrage", point: p }, bonus: v - 1.5 });
+  for (const { p, v } of scored.slice(0, 3)) {
+    // A free action within the move: it stacks with the unit's best real action.
+    // Its CP is shared with the supports: keep it for a card play worth more.
+    const reserve = cpReserve(s, u.owner, "barrage", def.cp ?? 0);
+    out.push({ cmd: { type: "ability", uid: u.uid, ability: "barrage", point: p }, bonus: v - (def.cp ?? 0) * CP_VALUE - reserve - 0.3, stack: true, expected: true });
   }
   return out;
 }
@@ -888,7 +942,7 @@ function abilityCandidates(s: GameState, u: Unit): Candidate[] {
         }
       }
     } else if (id === "barrage") {
-      out.push(...barrageCandidates(s, u, def.range ?? 24));
+      out.push(...barrageCandidates(s, u));
     } else if (id === "blink" || id === "tunnel") {
       const leader = aliveModels(u)[0]!;
       const pts: Vec[] = [];

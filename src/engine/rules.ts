@@ -1,5 +1,6 @@
 // Read-only rule queries shared by the reducer, the AI and the UI.
 
+import { ABILITIES } from "./data/abilities";
 import { dist } from "./geometry";
 import { rulesOf } from "./houseRules";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
@@ -188,8 +189,8 @@ export function eligibleUnits(s: GameState, p: PlayerId): Unit[] {
   const units = onBoard(s, p);
   switch (s.phase) {
     case "movement":
-      // Structures don't move, so they sit out the movement phase.
-      return units.filter((u) => !u.status.acted && !profileOf(u).structure);
+      // Structures don't move, so they sit out the movement phase, unless one can still lay a barrage marker.
+      return units.filter((u) => !u.status.acted && (!profileOf(u).structure || canLayBarrage(s, u)));
     case "assault":
       return units.filter(
         (u) =>
@@ -226,4 +227,11 @@ export function playerHasOptions(s: GameState, p: PlayerId): boolean {
   if (s.over || s.players[p].passed) return false;
   if (eligibleUnits(s, p).length > 0) return true;
   return s.phase === "movement" && deployable(s, p).length > 0;
+}
+
+/** Could this unit lay a barrage marker right now (has Barrage, hasn't used an ability this phase, has the CP, isn't in a melee)? */
+export function canLayBarrage(s: GameState, u: Unit): boolean {
+  if (s.phase !== "movement" || !hasAbility(u, "barrage") || u.status.abilityUsed || u.status.silenced) return false;
+  if (s.players[u.owner].cp < (ABILITIES.barrage.cp ?? 0)) return false;
+  return !isEngaged(s, u);
 }

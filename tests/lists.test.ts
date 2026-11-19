@@ -17,7 +17,7 @@ describe("army lists", () => {
 
   it("flags rosters over the limit, with too many copies, or with foreign units", () => {
     const l: SavedList = { ...starterList("militia", "skirmish"), name: "Big" };
-    l.entries = Array.from({ length: 5 }, () => ({ profileId: "mil-bertha", upgrades: ["barrage"] }));
+    l.entries = Array.from({ length: 6 }, () => ({ profileId: "mil-bertha", upgrades: ["barrage"] }));
     const problems = listProblems(l);
     expect(problems.some((p) => p.includes("limit"))).toBe(true);
     expect(problems.some((p) => p.includes("At most"))).toBe(true);

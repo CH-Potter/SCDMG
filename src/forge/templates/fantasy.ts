@@ -651,7 +651,7 @@ const dwarves = template({
       kw: ["structure", "armoured"],
       weapons: [gun("Grudge Shot", 30, 2, 4, { ap: 1, targets: "ground", traits: ["indirect"] })],
       abilities: ["radio-spotting", "entrenched"],
-      upgrades: [up("barrage", "Every Grudge at Once", "Gains Barrage.", { addAbilities: ["barrage"] })],
+      upgrades: [up("barrage", "Every Grudge at Once", "Barrage Shells: its barrage marker covers 2\".", { addAbilities: ["wide-barrage"] })],
       structure: { lifetime: "permanent", fieldDeploy: 6 },
       blurb: "Each shell has a name painted on it. It's usually yours.",
       art: ["structure", "beard", "helmet", "cannon", "none", 0xcf9f42],

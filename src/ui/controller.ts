@@ -2,7 +2,7 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
 
 import { aiCommand } from "../engine/ai";
-import { evadeTarget, expectedDamage, expectedStray, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
+import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
 import { SHELL_BURST } from "../engine/constants";
 import { CLASS_INFO, unitClassOf } from "../engine/data/unitClasses";
 import { ABILITIES } from "../engine/data/abilities";
@@ -1647,7 +1647,7 @@ export class Controller {
       }
       // Spot-picking abilities: Barrage, Blink, Tunnel, Rocket Hop, and Recall's second click.
       const mover = mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget) ?? sel : sel;
-      if (mode.id === "barrage") view.moveRing = { center: leader.pos, radius: def.range ?? 24 };
+      if (mode.id === "barrage") view.moveRing = { center: leader.pos, radius: barrageGun(profileOf(sel))?.range ?? 24 };
       if (mode.id === "blink" || mode.id === "rocket-hop" || mode.id === "crop-dust") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
       if (mode.id === "bale-out") view.moveRing = { center: leader.pos, radius: (def.range ?? 6) + r };
       if (mode.id === "recall") view.moveRing = { center: leader.pos, radius: 4 + r };
@@ -1655,13 +1655,24 @@ export class Controller {
       if (hit && mode.id !== "barrage") return bad(`${def.name}: pick open ground`);
       const why = commandProblem(s, { type: "ability", uid: sel.uid, ability: mode.id, point: hp, target: this.abilityTarget ?? undefined });
       if (mode.id === "barrage") {
+        const gun = barrageGun(profileOf(sel));
+        const mark = barrageMarkerFor(sel, hp);
+        if (!gun || !mark) return bad(`${def.name}: no gun to lay it with`);
         const spotted = shellSpotted(s, sel, hp);
-        const { maxDrift } = shellOdds(4, spotted, rulesOf(s).scatter);
-        view.blast = { center: hp, radius: SHELL_BURST };
-        view.drift = { center: hp, radius: maxDrift + SHELL_BURST };
+        const { maxDrift } = shellOdds(gun.hit, spotted, rulesOf(s).scatter);
+        view.blast = { center: hp, radius: mark.radius };
+        view.drift = { center: hp, radius: maxDrift + mark.radius };
+        // Who'd be under it if nobody moved: the marker lands now, the shells at the end of the assault phase.
+        const under = onBoard(s).filter((u) => markerCatches(mark, u).length > 0);
+        const mine = under.filter((u) => u.owner === sel.owner).map((u) => profileOf(u).name);
+        const theirs = under.filter((u) => u.owner !== sel.owner);
+        const exp = theirs.reduce((n, u) => n + expectedBarrage(s, mark, u), 0);
         return why
           ? bad(`${def.name}: ${why}`)
-          : ok(`Barrage: ${maxDrift ? `lands here on a 4+, else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"}` : "lands here"} · hits every ground model under the blast, yours too`, "target");
+          : ok(
+              `💣 Barrage marker (${def.cp ?? 0} CP): ${maxDrift ? `lands here on a ${gun.hit}+, else drifts up to ${maxDrift}"${spotted ? " (in sight: half drift)" : " (out of sight: full drift)"}` : "lands here"}. End of the assault phase: ${mark.dice} hits (${mark.damage} dmg, AP${mark.ap}) on every ground unit within ${mark.radius}", yours too${theirs.length ? ` · now under it: ${theirs.map((u) => profileOf(u).name).join(", ")} (≈${exp.toFixed(1)} damage if they stay)` : ""}${mine.length ? ` · ⚠ your ${mine.join(", ")}` : ""}`,
+              "target",
+            );
       }
       if (mode.id === "bale-out") {
         view.ghosts = [{ pos: hp, radius: profileFor(BALE_OUT.profileId, []).baseRadius }];

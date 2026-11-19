@@ -140,6 +140,8 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
       return `${esc(unitName(s, e.uid))}'s charge at ${esc(unitName(s, e.target))} falls apart (${esc(e.reason)}).`;
     case "hunkered":
       return `${esc(unitName(s, e.uid))} hunkers down.`;
+    case "barrageMarker":
+      return e.landed ? `💥 The barrage comes down (${e.radius}" around the marker).` : `🎯 Barrage marker laid: ${esc(e.weapon)} shells it at the end of the assault phase (${e.radius}" around it).`;
     case "scatter":
       return e.drift === 0
         ? `💣 ${esc(unitName(s, e.uid))}'s ${esc(e.weapon)} lands right on target (rolled ${e.roll}, needed ${e.need}+).`

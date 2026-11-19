@@ -236,12 +236,15 @@ const militia: Faction = {
   // Drill; the third Grunt squad stays (with a marksman in its place the Militia fell to ~43%).
   // The rework: five-strong armoured squads (one drilled for Overwatch, one with Jump Jets, one at full
   // strength with its Second Section) and a Patch Medic team to keep the line standing.
+  // v0.12 barrage markers: Barrage Shells on Big Bertha now cost ⚙1 (pricing.ts agrees), and the point it
+  // frees gives one Squinter a Field Telephone. At ⚙2 the 7⚙ Bertha came on late and the Militia scored
+  // ~43% against the swarm in Skirmish (~58% with a plain Bertha); this list: ~53%, and 48% against the Concord.
   defaultList: [
     { profileId: "mil-grunts", upgrades: ["overwatch"] },
     { profileId: "mil-grunts", upgrades: ["jets"] },
     { profileId: "mil-grunts", upgrades: ["extra"] },
     { profileId: "mil-bertha", upgrades: ["barrage"] },
-    { profileId: "mil-squinter", upgrades: [] },
+    { profileId: "mil-squinter", upgrades: ["holler"] },
     { profileId: "mil-squinter", upgrades: [] },
     { profileId: "mil-mortar", upgrades: [] },
     { profileId: "mil-medic", upgrades: [] },
@@ -322,7 +325,7 @@ const militia: Faction = {
       ],
       abilities: ["steady-aim", "return-fire"],
       impact: { dice: 1, hit: 4, damage: 2, ap: 1 },
-      upgrades: [{ id: "barrage", name: "Barrage Shells", cost: 2, addAbilities: ["barrage"], text: "Gains Barrage." }],
+      upgrades: [{ id: "barrage", name: "Barrage Shells", cost: 1, addAbilities: ["wide-barrage"], text: "Barrage Shells: she lays a 2\" barrage marker with her cannon." }],
       blurb: "The Haybright combine, walking now, with plate armour, a crew of three and a cannon. Parks, plants its feet, and keeps firing.",
     },
     {
@@ -513,7 +516,7 @@ const militia: Faction = {
       keywords: ["structure", "mech"],
       weapons: [ranged("Mine-Charge Lobber", 30, 3, 4, { ap: 1, targets: "ground", traits: ["indirect"] })],
       abilities: ["radio-spotting"],
-      upgrades: [{ id: "boom-spuds", name: "Blasting Shells", cost: 2, addAbilities: ["barrage"], text: "Gains Barrage." }],
+      upgrades: [{ id: "boom-spuds", name: "Blasting Shells", cost: 2, addAbilities: ["wide-barrage"], text: "Barrage Shells: its barrage marker covers 2\"." }],
       structure: { lifetime: "permanent", fieldDeploy: 6 },
       blurb: "A length of mine drainpipe on a sandbagged base, a crate of blasting charges and a crew with a field telephone. Range: yes.",
     },

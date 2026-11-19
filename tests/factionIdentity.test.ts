@@ -111,7 +111,7 @@ describe("faction pillars in the data", () => {
 
   it("each signature ability belongs to one faction only", () => {
     const own: Record<string, AbilityId[]> = {
-      militia: ["overwatch", "entrenched", "steady-aim", "spotter", "barrage", "demo-charge", "patch-up", "steadying", "rocket-hop", "return-fire", "crop-dust", "bale-out", "radio-spotting", "scrap-cover"],
+      militia: ["overwatch", "entrenched", "steady-aim", "spotter", "wide-barrage", "demo-charge", "patch-up", "steadying", "rocket-hop", "return-fire", "crop-dust", "bale-out", "radio-spotting", "scrap-cover"],
       swarm: ["regen", "regrow", "hatch", "lurk", "rampage", "brood-call", "mending-aura", "tunnel", "burrow-exit", "bombs-away", "corrode", "brood-bond"],
       concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura", "overcharge", "spotlight", "riposte", "pirouette", "phase-out", "twirl-away"],
     };
@@ -123,8 +123,10 @@ describe("faction pillars in the data", () => {
       expect(factionsWith(a), a).toEqual([]);
       expect(munch.profiles.some((p) => abilitiesOf(p).includes(a)), a).toBe(true);
     }
+    // Barrage isn't a faction's: every unit with a lobbed gun has it (Barrage Shells are the Militia's).
+    const shared: AbilityId[] = ["barrage"];
     // Every ability in the library has a home.
-    expect([...Object.values(own).flat(), ...munchOnly].sort()).toEqual(Object.keys(ABILITIES).sort());
+    expect([...Object.values(own).flat(), ...munchOnly, ...shared].sort()).toEqual(Object.keys(ABILITIES).sort());
   });
 
   it("support buffs follow the faction: no effect is a reskin of another faction's", () => {

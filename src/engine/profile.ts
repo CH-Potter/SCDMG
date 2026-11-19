@@ -1,6 +1,7 @@
 // Effective unit profiles: the base profile with the unit's upgrades applied.
 
 import { baseProfile } from "./data/factions";
+import { addDerivedAbilities } from "./derived";
 import type { AbilityId, Keyword, Unit, UnitProfile } from "./types";
 
 const cache = new Map<string, UnitProfile>();
@@ -48,6 +49,7 @@ function lookupProfile(profileId: string, upgrades: string[]): UnitProfile {
       p.impact = { ...p.impact, ...u.impact };
     }
   }
+  addDerivedAbilities(p);
   cache.set(key, p);
   byList.set(upgrades, { profileId, profile: p });
   return p;

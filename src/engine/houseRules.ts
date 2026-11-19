@@ -27,6 +27,8 @@ export interface HouseRules {
   closeRanks: boolean;
   /** Any shot at a unit in a melee lets it roll its own evade, whatever situations its card lists. On by default. */
   engagedEvade: boolean;
+  /** A lobbed shell or barrage at a unit no firing model can see lets it roll its own evade. On by default. */
+  unseenEvade: boolean;
   /** Models in base contact with a squad-mate who is in base contact with the enemy fight too. */
   supportingRank: boolean;
   /** Keyword bonuses become breach dice: a d3 or d6 per attack, that many hits skip the save. */
@@ -59,6 +61,7 @@ export const STANDARD_RULES: Readonly<HouseRules> = Object.freeze({
   closeRanks: true,
   supportingRank: true,
   engagedEvade: true,
+  unseenEvade: true,
   breach: false,
   overwatch: false,
   reroll: false,
@@ -79,6 +82,7 @@ export const CLASSIC_RULES: Readonly<HouseRules> = Object.freeze({
   closeRanks: false,
   supportingRank: false,
   engagedEvade: false,
+  unseenEvade: false,
   chargersFirst: true,
 });
 
@@ -96,6 +100,7 @@ export const HOUSE_RULES: readonly HouseRuleInfo[] = [
   { id: "closeRanks", name: "Close ranks", text: "When a unit fights, each of its models first moves up to 3\" into base contact (or behind a squad-mate who is). Off: models fight from where they stand." },
   { id: "supportingRank", name: "Supporting rank", text: "A model in base contact with a squad-mate who's in base contact with the enemy fights too. Off: only models in base contact fight." },
   { id: "engagedEvade", name: "Evade in the scrum", text: "Any shot at a unit in a melee lets it roll its own evade (if its card has one) before its armour save, whatever situations the card lists. Off: evade only in the listed situations." },
+  { id: "unseenEvade", name: "Dodge unseen shells", text: "A lobbed shell or barrage that bursts on a unit none of the firing models can see lets it roll its own evade (if its card has one) before its armour save. In sight: only the situations its card lists. Off: evade only in the listed situations." },
   { id: "evade", name: "Evade rolls", text: "Nimble units dodge hits in the situations their evade lists. Off: every hit goes to a save." },
   { id: "strays", name: "Stray shots into melee", text: "Without precision, misses fired into a melee roll again at your own unit in it. Off: shoot into melees freely." },
   { id: "impact", name: "Impact on charge", text: "Ground units with impact dice roll them when a charge lands. Off: no impact hits (a flyer's dive still strikes)." },
