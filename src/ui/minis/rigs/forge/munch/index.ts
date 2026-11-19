@@ -313,6 +313,81 @@ function mama(): Look {
   return { side: s, top: scaleRig(t, 0.88) };
 }
 
+// ---------- Piston Foxes ----------
+
+type LegsOut = ReturnType<typeof legs>;
+/** Two leg sets (fur and chrome) as one: limbs together, walk keys merged. */
+const merge = (a: LegsOut, b: LegsOut): LegsOut => ({ limbs: [...a.limbs, ...b.limbs], gait: a.gait.map((k, i) => ({ ...k, ...b.gait[i] })) });
+
+function fox(v: LookVariant): Look {
+  const id = `forge.munch.hoppers.${v.tag}`;
+  const k = v.leader ? 1.08 : 1;
+  const front = legs(
+    "side",
+    [
+      { id: "nF", hip: { x: -16, y: -32 }, knee: { x: -19, y: -16 }, foot: { x: -22, y: 0 }, near: true, a: true },
+      { id: "fF", hip: { x: -10, y: -34 }, knee: { x: -12, y: -17 }, foot: { x: -12, y: 0 }, near: false, a: false },
+    ],
+    { width: [4.6, 3.4], step: 6, lift: 6, z: [8, 1], slot: "suit", farSlot: "suitShade" },
+  );
+  const rear = legs(
+    "side",
+    [
+      { id: "nR", hip: { x: 14, y: -34 }, knee: { x: 25, y: -17 }, foot: { x: 17, y: 0 }, near: true, a: false },
+      { id: "fR", hip: { x: 20, y: -36 }, knee: { x: 31, y: -18 }, foot: { x: 25, y: 0 }, near: false, a: true },
+    ],
+    { width: [3.4, 2.6], step: 6, lift: 6, z: [8, 1], slot: "metal", farSlot: "metalShade" },
+  );
+  const sl = merge(front, rear);
+  const paw = side("paw");
+  const piston = side("piston");
+  const up = v.tag === "b";
+  const tail = side(up ? "fox-tail-up" : "fox-tail");
+  const s = munchRig({
+    id,
+    name: "Piston Fox",
+    view: "side",
+    k: 0.55 * k,
+    limbInk: 1.4,
+    pivots: { torso: { x: 0, y: -40 }, head: { x: -22, y: -50 } },
+    parts: [
+      ...sl.limbs.map((l) => ({ id: `${l.id}-paw`, src: paw, bone: `${l.id}.end` as PartUse["bone"], place: placeAt(paw, "pivot", l.end, 0, 1), z: l.upper.z + 0.5 })),
+      { id: "tail", src: tail, bone: "pelvis", place: placeAt(tail, "pivot", { x: 24, y: -44 }, 0, 1), z: 4, anim: { pulse: 0.05 } },
+      { id: "body", src: side("fox-body"), bone: "torso", z: 5 },
+      { id: "piston", src: piston, bone: "nR.upper", place: placeAt(piston, "pivot", { x: 14, y: -34 }, -32, 1), z: 8.5 },
+      { id: "piston-far", src: piston, bone: "fR.upper", place: placeAt(piston, "pivot", { x: 20, y: -36 }, -32, 0.9), z: 1.5 },
+      { id: "head", src: side("fox-head"), bone: "gun", place: { x: -22, y: -50, rot: up ? 10 : 0 }, z: 9 },
+      ...(v.leader ? [at("booster", side("booster"), "gun", -29, -70, 8.5, { rot: 18, scale: 0.75 })] : []),
+    ],
+    limbs: sl.limbs,
+    gait: sl.gait,
+    weapon: "head",
+  });
+  const tl = merge(
+    legs("top", [{ id: "lF", hip: { x: -7, y: -10 }, knee: { x: -13, y: -12 }, foot: { x: -13, y: -22 }, near: true, a: true }, { id: "rF", hip: { x: 7, y: -10 }, knee: { x: 13, y: -12 }, foot: { x: 13, y: -22 }, near: true, a: false }], { width: [4.4, 3.4], step: 5, lift: 0, z: [1, 1], slot: "suit" }),
+    legs("top", [{ id: "lR", hip: { x: -8, y: 14 }, knee: { x: -14, y: 20 }, foot: { x: -13, y: 28 }, near: true, a: false }, { id: "rR", hip: { x: 8, y: 14 }, knee: { x: 14, y: 20 }, foot: { x: 13, y: 28 }, near: true, a: true }], { width: [3.4, 2.6], step: 5, lift: 0, z: [1, 1], slot: "metal" }),
+  );
+  const t = munchRig({
+    id,
+    name: "Piston Fox",
+    view: "top",
+    k: 0.55 * k,
+    limbInk: 1.4,
+    pivots: { torso: { x: 0, y: 4 }, head: { x: 0, y: -16 } },
+    parts: [
+      { id: "tail", src: top("fox-tail"), bone: "pelvis", place: { x: 0, y: 24, rot: up ? 14 : -8 }, z: 3, anim: { pulse: 0.06 } },
+      { id: "body", src: top("fox-body"), bone: "torso", z: 5 },
+      { id: "head", src: top("fox-head"), bone: "gun", place: { x: 0, y: -16, rot: 0 }, z: 6 },
+      ...(v.leader ? [at("booster", top("booster"), "gun", 0, -20, 6.5)] : []),
+    ],
+    limbs: tl.limbs,
+    gait: tl.gait,
+    weapon: "head",
+    shadow: { x: 4, y: 6, r: 26 },
+  });
+  return scale({ side: s, top: t }, k);
+}
+
 // ---------- burrows and lab kit (structures) ----------
 
 function structure(id: string, name: string, o: { side: PartUse[]; top: PartUse[]; weapon?: string; h: number; r: number; fx?: string }): Look {
@@ -401,5 +476,6 @@ export default defineTemplateArt({
     hole: (ctx) => one(ctx, "dirt", hole),
     pit: (ctx) => one(ctx, "dirt", pit),
     warren: (ctx) => one(ctx, "dirt", sett),
+    hoppers: (ctx) => squad(ctx, "fox", fox),
   },
 });
