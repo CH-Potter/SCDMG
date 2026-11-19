@@ -105,7 +105,7 @@ export type AbilityId =
   | "cutting-remark" // Concord, assault, an enemy unit in sight within 24": a remark so cutting their staff walks out
   // dice buffs and debuffs on support units (the same statuses as the support effects)
   | "rivet-plates" // Militia, movement: a friendly unit within 3" saves one better this round
-  | "star-shell" // Militia, assault: an enemy unit in range of its lobbed gun evades one worse this round
+  | "star-shell" // Militia, assault: an enemy unit in range of its lobbed gun can't evade this round
   | "slime-coat" // Skitterswarm, movement: a friendly unit within 3" evades one better (or on a 6+) this round
   | "numbing-sting" // Skitterswarm, assault: an enemy unit within 10" rolls one fewer die per model this round
   | "exacting-standards" // Concord, movement: a friendly unit within 6" deals +1 damage per hit this round
@@ -462,6 +462,8 @@ export interface UnitStatus {
   damageMod?: number;
   /** Attack dice: each of its models rolls this many more dice on every attack (negative: fewer, never below 1). */
   diceMod?: number;
+  /** Star Shell: lit up, it can't evade anything until the end of the round. */
+  noEvade?: boolean;
 }
 
 export interface Unit {

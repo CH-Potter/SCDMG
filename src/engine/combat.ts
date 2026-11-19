@@ -152,7 +152,7 @@ export function ownEvade(t: Unit): number | null {
 function withEvadeMods(t: Unit, target: number | null): number | null {
   const grant = t.status.evadeGrant ?? 0;
   if (grant > 0 && (target === null || grant < target)) target = grant;
-  if (target === null) return null;
+  if (target === null || t.status.noEvade) return null; // Star Shell: lit up, it can't dodge anything
   const n = target - (t.status.evadeBonus ?? 0);
   return Math.max(2, Math.min(6, n));
 }

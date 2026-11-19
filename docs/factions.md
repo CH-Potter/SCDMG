@@ -25,7 +25,7 @@ The frontier, drafted. After the first bugs came up through the corn in '09, the
 
 **Belongs here**
 - Keywords: infantry, light (scouts, medics, marksmen), mech; a few fearless defenders.
-- Abilities: Overwatch, Entrenched, Steady Aim, Spotter, Barrage, Demo Charge, Patch Up, Steadying Presence, Rocket Hop, Return Fire, Crop Dust, Bale Out, Radio Spotter, Scrap Cover; and, costing CP every round, Stand To (shoot the charger first), Hold the Line (double weight on an objective), Smoke Shells, Steel-Core Rounds, Snipe the Runner (burn a card), Rivet the Plates (armour), Star Shell (evade penalty).
+- Abilities: Overwatch, Entrenched, Steady Aim, Spotter, Barrage, Demo Charge, Patch Up, Steadying Presence, Rocket Hop, Return Fire, Crop Dust, Bale Out, Radio Spotter, Scrap Cover; and, costing CP every round, Stand To (shoot the charger first), Hold the Line (double weight on an objective), Smoke Shells, Steel-Core Rounds, Snipe the Runner (burn a card), Rivet the Plates (armour), Star Shell (no evade).
 - Supports: resources, heal (repairs, no revives), rangedBuff, dugIn, spot (hit one better), smoke (only shot from close by), grant Overwatch, the ward reaction, airdrops (near your models, or anywhere for the drop-ship), the Junk Barricade summon, damageBuff (Heavy Loads), evadeDebuff (Parachute Flares).
 - Stats: hit 4+ (3+ for marksmen); range 20–30"; armour 4 on the line (Bertha 3; light scouts 5); nerve 7; 1–7 models per unit (Rivet Grunts 5, or 7 with their Second Section; Old Guard 4; Outriders and Patch Medics 3; marksmen, machines and structures are single models); cost 2–5. Precision on marksmen and the crop duster; tracking on auto-guns.
 

@@ -549,7 +549,7 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     kind: "active",
     phase: "assault",
     needs: "enemyUnit",
-    text: "Assault phase, a free action: fire a flare over an enemy unit within range of its lobbed gun (no sight needed). Until the end of the round its evade rolls are one worse.",
+    text: "Assault phase, a free action: fire a flare over an enemy unit within range of its lobbed gun (no sight needed). Lit up like noon, it can't evade anything until the end of the round.",
   },
   "slime-coat": {
     id: "slime-coat",

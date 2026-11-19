@@ -1194,15 +1194,25 @@ function useAbility(
       say(`${name}: ${def.name}! ${r.text}`);
       break;
     }
-    case "star-shell":
     case "numbing-sting": {
       const t = targetUid ? unitById(s, targetUid) : undefined;
       if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
-      const range = id === "star-shell" ? (barrageGun(profileOf(unit))?.range ?? 0) : (def.range ?? 10);
+      const range = def.range ?? 10;
       if (unitGap(unit, t) > range) return `Must be within ${range}"`;
       const r = applyDiceEffect(t, UNIT_DICE_EFFECTS[id]!);
       if (r.error) return r.error;
       say(`${name}: ${def.name}! ${r.text}`);
+      break;
+    }
+    case "star-shell": {
+      const t = targetUid ? unitById(s, targetUid) : undefined;
+      if (!t || !t.onBoard || t.owner === unit.owner) return "Pick an enemy unit";
+      const range = barrageGun(profileOf(unit))?.range ?? 0;
+      if (unitGap(unit, t) > range) return `Must be within ${range}" (its lobbed gun's range)`;
+      if (t.status.noEvade) return "It's already lit up";
+      if (!profileOf(t).evade && !(t.status.evadeGrant ?? 0) && !t.status.phased) return "That unit doesn't evade anything";
+      t.status.noEvade = true;
+      say(`${name} fires a star shell over ${profileOf(t).name}: lit up like noon, it can't evade anything this round.`);
       break;
     }
     case "snipe-runner":
@@ -1296,7 +1306,6 @@ export const UNIT_DICE_EFFECTS: Partial<Record<AbilityId, DiceEffect>> = {
   "rivet-plates": { kind: "armourBuff", save: 1 },
   "slime-coat": { kind: "evadeBuff", amount: 1, grant: 6 },
   "exacting-standards": { kind: "damageBuff", amount: 1 },
-  "star-shell": { kind: "evadeDebuff", amount: 1, range: 0 },
   "numbing-sting": { kind: "weaken", dice: 1, range: 0 },
 };
 /** Active abilities a unit can use while it's in a melee. */

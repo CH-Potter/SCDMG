@@ -392,12 +392,16 @@ describe("dice buffs and debuffs", () => {
     expect(evadeTarget(unitById(after, "p0-1")!, ["blast"])).toBe(4); // 5+ made 4+
   });
 
-  it("Star Shell: an enemy's evade one worse (never past 6+); Numbing Sting: one fewer die per model", () => {
+  it("Star Shell: a lit-up enemy can't evade (and one with no evade can't be lit); Numbing Sting: one fewer die per model", () => {
     let s = at(game(["militia", "swarm"], [L("mil-mortar"), L("swarm-skitterlings")]), "assault");
     place(s, "p0-0", { x: 5, y: 3 });
     place(s, "p1-0", { x: 15, y: 25 });
     s = ok(use(s, "p0-0", "star-shell", { target: "p1-0" }));
-    expect(evadeTarget(unitById(s, "p1-0")!, ["blast"])).toBe(6);
+    expect(evadeTarget(unitById(s, "p1-0")!, ["blast"])).toBeNull();
+    const none = at(game(["militia", "swarm"], [L("mil-mortar"), L("swarm-mother")]), "assault");
+    place(none, "p0-0", { x: 5, y: 3 });
+    place(none, "p1-0", { x: 15, y: 25 });
+    expect(use(none, "p0-0", "star-shell", { target: "p1-0" }).ok).toBe(false);
     let w = at(game(["swarm", "militia"], [L("swarm-stingers"), L("mil-grunts")]), "assault");
     place(w, "p0-0", { x: 15, y: 10 });
     const g = place(w, "p1-0", { x: 15, y: 16 });

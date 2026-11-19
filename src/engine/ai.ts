@@ -1126,7 +1126,11 @@ function diceEffectValue(s: GameState, me: PlayerId, t: Unit, e: DiceEffect, cmd
     case "armourBuff": {
       if ((t.status.saveMod ?? 0) > 0) return 0;
       const armor = prof.armor + saveShiftOf(t);
-      return incomingHits(s, t) * Math.max(0, failChance(armor) - failChance(armor - e.save)) * valuePerWound(t);
+      const saved = incomingHits(s, t) * Math.max(0, failChance(armor) - failChance(armor - e.save)) * valuePerWound(t);
+      // As the AI weighs digging in (Sandbag Detail): a unit under the guns, more so on an objective.
+      const fire = threatOn(s, t) + (isEngaged(s, t) ? 2 : 0);
+      const dug = fire > 1 && !prof.structure ? Math.min(3, 0.6 + fire * 0.2 * e.save) + (onObjective(s, t) ? 0.6 : 0) : 0;
+      return Math.max(saved, dug * 0.8);
     }
     case "evadeBuff": {
       if ((t.status.evadeBonus ?? 0) > 0 || (t.status.evadeGrant ?? 0) > 0 || !rulesOf(s).evade) return 0;
@@ -1689,7 +1693,23 @@ const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
   "cutting-remark": (s, u) => burnCandidates(s, u, "cutting-remark"),
   // Dice buffs and debuffs on support units.
   "rivet-plates": (s, u) => diceAbilityCandidates(s, u, "rivet-plates"),
-  "star-shell": (s, u) => diceAbilityCandidates(s, u, "star-shell"),
+  // Light up the evasive target (often a brood in a melee, evading every shot) our guns gain most against.
+  "star-shell"(s, u) {
+    const def = ABILITIES["star-shell"];
+    const gun = barrageGun(profileOf(u));
+    const out: Candidate[] = [];
+    if (!gun || s.players[u.owner].cp < (def.cp ?? 0)) return out;
+    for (const e of onBoard(s, other(u.owner))) {
+      if (e.status.noEvade || unitGap(u, e) > gun.range || concealment(s, u, e)) continue;
+      const cmd: Command = { type: "ability", uid: u.uid, ability: "star-shell", target: e.uid };
+      const after = simulate(s, cmd);
+      if (!after) continue;
+      const gain = shotGain(s, after, u.owner, e.uid);
+      if (gain <= 0) continue;
+      out.push({ cmd, bonus: gain * 1.2 - CP_VALUE - cpReserve(s, u.owner, "star-shell", def.cp ?? 0), stack: true, expected: true });
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  },
   "slime-coat": (s, u) => diceAbilityCandidates(s, u, "slime-coat"),
   "numbing-sting": (s, u) => diceAbilityCandidates(s, u, "numbing-sting"),
   "exacting-standards": (s, u) => diceAbilityCandidates(s, u, "exacting-standards"),
