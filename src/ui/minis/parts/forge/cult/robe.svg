@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 50 58 116" data-part="forge.cult.side.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Grinning robe: a crimson hooded robe to the shins, gold rope belt and hem, a team stole down the front, a sun-disc pin</title>
+<path d="M47,64 Q60,57 73,63 L79,96 L88,156 Q63,163 37,157 L44,98 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,62 Q73,62 73,63 L79,96 L88,156 Q82,158 76,159 L72,98 Z" fill="#6c5a37"/>
+<path d="M54,112 L49,156 M66,113 L68,159" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M37.6,151.6 Q63,158 87.4,151 L88,156 Q63,163 37,157 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M46,70 L53,69 L52,151 L44,151.6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M43.6,100 Q61,106 79.6,99 L80,106 Q61,113 43,107 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M48,107 L46,126" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="46" cy="127.6" r="2.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M45,62 Q60,51 76,59 L81,77 Q62,70 43,77 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,55 Q75,56 76,59 L81,77 Q77,75 73,74 Z" fill="#6c5a37"/>
+<circle cx="63" cy="86" r="4.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M60.6,86.4 Q63,90 65.4,86.4 Q63,88 60.6,86.4 Z" fill="#141414"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

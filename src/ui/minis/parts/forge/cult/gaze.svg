@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -10 26 20" data-part="forge.cult.side.gaze" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Baleful Gaze: a third eye set in gold on the idol's brow (looks left)</title>
+<path d="M0.3,-6.8 L0.4,-9.9 L3.6,-9.9 L3.7,-6.8 Z M8.8,-1.7 L11.9,-1.6 L11.9,1.6 L8.8,1.7 Z M3.7,6.8 L3.6,9.9 L0.4,9.9 L0.3,6.8 Z M-4.8,1.7 L-7.9,1.6 L-7.9,-1.6 L-4.8,-1.7 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="2" cy="0" rx="8" ry="6.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<ellipse class="glow" cx="0" cy="0" rx="5.4" ry="4.4" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<ellipse cx="-1.4" cy="0" rx="1.4" ry="3" fill="#141414"/>
+<g id="anchors"><circle id="pivot" cx="2" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

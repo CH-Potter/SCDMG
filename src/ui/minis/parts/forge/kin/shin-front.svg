@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 140 14 32" data-part="forge.kin.side.shin-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near greave: slim crystal-ceramic</title>
+<path d="M45,142 L53,142 L51.6,168 L46.4,168 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M50.4,142.6 L52.4,142.6 L51,167.4 L49.4,167.4 Z" fill="#6c5a37"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>

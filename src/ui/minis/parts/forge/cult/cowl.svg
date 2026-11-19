@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 0 54 64" data-part="forge.cult.side.cowl">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Zealot cowl: a hood drawn to a long tasselled point, a smile mask with eye holes</title>
+<path d="M44,50 Q39,27 56,21 Q70,16 88,4 Q82,22 79,38 Q81,50 74,62 L54,62 Q46,60 44,50 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,17 Q80,13 88,4 Q82,22 79,38 Q81,50 74,62 L68,62 Q78,40 74,17 Z" fill="#6c5a37"/>
+<path d="M45.5,49 Q44,33 55,30 Q65,31 66,43 Q65,55 55,58 Q47,57 45.5,49 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M45.5,49 Q44,33 55,30 Q65,31 66,43" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M43.5,46 Q42.5,34 51,33.4 Q59,34.4 59,44 Q58.4,53.6 51,55.4 Q44.6,54.6 43.5,46 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M55,35.4 Q59,38 59,44 Q58.4,53.6 51,55.4 Q57,48 55,35.4 Z" fill="#c8bd98"/>
+<ellipse cx="46.6" cy="40.6" rx="1.7" ry="2.3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<ellipse cx="53.6" cy="40.4" rx="1.7" ry="2.3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="46.6" cy="40.6" r="0.8" fill="#fff2c0"/>
+<circle class="glow" cx="53.6" cy="40.4" r="0.8" fill="#fff2c0"/>
+<path d="M43.6,45 Q50,55 57.4,44.6 Q50,50.4 43.6,45 Z" fill="#141414"/>
+<path d="M46,47 L47,49.6 M49.6,48.4 L49.8,51 M53.4,48 L53,50.6" fill="none" stroke="#e3d8b6" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="88" cy="4" r="2.8" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

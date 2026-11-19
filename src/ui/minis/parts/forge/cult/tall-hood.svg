@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 -16 64 96" data-part="forge.cult.side.tall-hood">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Doom Prophet's hood: a towering bent cone with gold bands, a seer's mask and a long white beard</title>
+<path d="M44,50 Q38,26 54,18 Q62,8 72,-2 Q82,-10 96,-13 Q86,4 82,18 Q81,32 80,40 Q81,52 74,62 L54,62 Q46,60 44,50 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,-6 Q88,-11 96,-13 Q86,4 82,18 Q81,32 80,40 Q81,52 74,62 L68,62 Q78,40 76,22 Q78,6 80,-6 Z" fill="#6c5a37"/>
+<path d="M52,19 Q66,24 82,20 M64,7 Q74,10 85,4" fill="none" stroke="#6e4528" stroke-width="3" stroke-linejoin="round"/>
+<path d="M45.5,49 Q44,33 55,30 Q65,31 66,43 Q65,55 55,58 Q47,57 45.5,49 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M45.5,49 Q44,33 55,30 Q65,31 66,43" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M45,53 Q44,66 50,78 Q53,70 57,74 Q58,64 60,56 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M53,58 Q55,66 57,74 Q58,64 60,56 Z" fill="#c8bd98"/>
+<path d="M43.5,46 Q42.5,34 51,33.4 Q59,34.4 59,44 Q58.4,53.6 51,55.4 Q44.6,54.6 43.5,46 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<ellipse cx="46.6" cy="40.6" rx="1.8" ry="2.4" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<ellipse cx="53.6" cy="40.4" rx="1.8" ry="2.4" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="46.6" cy="40.6" r="1.4" fill="#f2b84b"/>
+<circle class="glow" cx="53.6" cy="40.4" r="1.4" fill="#f2b84b"/>
+<path d="M44,46 Q49.5,53.4 56.6,46.4 Q49.5,49.8 44,46 Z" fill="#141414"/>
+<circle cx="96" cy="-13" r="3" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

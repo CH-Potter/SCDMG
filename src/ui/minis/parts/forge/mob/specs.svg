@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 26 48 22" data-part="forge.mob.side.specs">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tinker's headgear: stacked magnifier goggles with a jeweller's loupe</title>
+<path d="M46,35 Q60,31 75,35 L75,39 Q60,36 46,40 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="57" cy="33" r="3.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="33" y="34" width="10" height="7" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="49" cy="37.6" r="6" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<circle class="glow" cx="48.6" cy="37.6" r="3.6" fill="#fff2c0"/>
+<circle class="glow" cx="34" cy="37.6" r="3.2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="36" r="1"/></g>
+</svg>

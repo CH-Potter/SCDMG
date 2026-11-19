@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 -16 76 118" data-part="forge.cult.side.placards">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Prophet's placards: three signs on poles fanned over his back (a grinning sun, a down arrow, a star)</title>
+<path d="M64,58 L84,60 L86,98 L68,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M84,96 L87,96 L117,44 L114,42.4 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M81.4,96 L84.4,96 L104,20 L100.8,19.4 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="78" y="-6" width="3.6" height="104" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M64.1,-10.9 L94,-13 L95.5,8.9 L65.6,11 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M75.1,-1.5 Q76.1,-4.2 77.4,-1.7" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M82.1,-2 Q83,-4.7 84.4,-2.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M75.7,0.1 Q80.3,5.6 84,-0.5 Q80,2.4 75.7,0.1 Z" fill="#141414"/>
+<path d="M72.8,-0.5 Q79.2,-10 86.8,-1.5 Q80.4,8 72.8,-0.5 Z" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M95.9,4.3 L117.1,10.4 L112.1,27.7 L90.9,21.6 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M103,8.4 L108.8,10.1 L106.9,16.8 L110.7,17.9 L102,23.1 L97.3,14.1 L101.1,15.2 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M114.2,25.8 L130.8,37 L121.8,50.2 L105.2,39 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="glow" d="M121.6,32.7 L120.6,37 L124.2,39.8 L119.7,40.2 L118.2,44.4 L116.4,40.3 L112,40.2 L115.3,37.2 L114.1,33 L117.9,35.2 Z" fill="#f2b84b" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

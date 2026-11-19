@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -34 10 68" data-part="forge.legion.side.rotor">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rotor blade seen edge-on (drawn along y: placed across, it squashes as it turns)</title>
+<ellipse cx="0" cy="0" rx="2.6" ry="31" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="0" r="3.6" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

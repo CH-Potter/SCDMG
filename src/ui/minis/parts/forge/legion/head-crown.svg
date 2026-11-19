@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 6 40 56" data-part="forge.legion.side.head-crown">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Overseer's head: a tin dome under a brass crown with a glowing jewel, one porthole eye with a monocle chain</title>
+<path d="M46,54 L46,34 Q46,26 59,26 Q72,26 72,34 L72,54 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,27.6 Q71.4,29 71.4,34 L71.4,53.4 L66.6,53.4 Q69,38 66,27.6 Z" fill="#6c5a37"/>
+<path d="M44.6,34 L44.6,17 L51,24 L55,11 L59,22 L63,11 L67,24 L73.4,17 L73.4,34 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M67,24 L73.4,17 L73.4,34 L67,34 Z" fill="#4a2e19"/>
+<path d="M44.6,29.6 H73.4" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="57" cy="31.8" r="2.4" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<rect x="44.5" y="50" width="29" height="6" rx="3" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="51" cy="42.4" r="6" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="51" cy="42.4" r="3.8" fill="#fff2c0"/>
+<circle class="glow" cx="50" cy="41.4" r="1.6" fill="#f2b84b"/>
+<path d="M54,47 Q58,52 64,49" fill="none" stroke="#6e4528" stroke-width="1.6"/>
+<circle cx="65" cy="42" r="2.6" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

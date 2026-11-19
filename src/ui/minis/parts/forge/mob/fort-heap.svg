@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -112 112 114" data-part="forge.mob.side.fort-heap" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrap Fort: a junk mound, stacked tyres, a corrugated shack with a team-painted door and a plank lookout deck</title>
+<path d="M-52,0 Q-50,-16 -36,-20 L36,-22 Q52,-16 54,0 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-28,-18 L-26,-86 L28,-90 L30,-18 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M18,-89.4 L28,-90 L30,-18 L20,-18 Z" fill="#353b41"/>
+<path d="M-18,-20 L-17,-86 M-8,-20 L-7,-87 M2,-20 L2,-88 M12,-20 L12,-88" stroke="#353b41" stroke-width="2"/>
+<rect x="-27" y="-66" width="56" height="7" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M-20,-66 L-24,-59 M-10,-66 L-14,-59 M0,-66 L-4,-59 M10,-66 L6,-59 M20,-66 L16,-59" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-12,-18 L-12,-48 L8,-50 L8,-18 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<circle cx="4" cy="-32" r="1.6" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<path d="M-30,-92 L-30,-104 M30,-97 L30,-108 M-30,-104 L30,-108" fill="none" stroke="#4a2e19" stroke-width="3"/>
+<path d="M-34,-86 L34,-92 L34,-98 L-34,-92 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="-38" cy="-12" rx="13" ry="7" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="-38" cy="-24" rx="12" ry="6.4" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="-38" cy="-24" rx="5" ry="2.6" fill="#353b41"/>
+<rect x="32" y="-42" width="16" height="24" rx="2" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="32" y="-34" width="16" height="5" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<path d="M-48,-4 L-40,-8 M44,-6 L50,-2 M10,-8 L20,-10" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/><circle id="mount" cx="0" cy="-96" r="1"/></g>
+</svg>

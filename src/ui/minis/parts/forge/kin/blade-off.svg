@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -10 84 20" data-part="forge.kin.side.blade-off">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The off-hand glassblade (drawn about the grip)</title>
+<path d="M0,0 Q20,-9 56,-5 L58,4 Q24,6 0,0 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M0,0 Q24,4 58,1 L58,4 Q24,6 0,0 Z" fill="#4a5158"/>
+<path class="glow" d="M5,-1.4 Q22,-7 53,-4" fill="none" stroke="#fff2c0" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M56,-8 Q60,-9 61,-7 L61,7 Q60,9 56,8 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="61" y="-2.4" width="11" height="4.8" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M72,0 L75,-3.4 L78,0 L75,3.4 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="66" cy="0" r="1"/></g>
+</svg>

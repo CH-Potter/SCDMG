@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -8 62 16" data-part="forge.mob.top.spanner" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Zappy spanner from above (jaw left)</title>
+<rect x="2" y="-1.8" width="46" height="3.6" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path d="M2,-4 Q-4,-7 -10,-4 L-7,-2 L-3,-2 L-3,2 L-7,2 L-10,4 Q-4,7 2,4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M10,-2 V2 M13,-2 V2 M16,-2 V2" stroke="#6e4528" stroke-width="1.6"/>
+<circle class="glow" cx="-6" cy="0" r="2" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="22" cy="0" r="1"/><circle id="g2" cx="38" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

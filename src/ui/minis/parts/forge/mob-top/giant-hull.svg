@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -48 96 96" data-part="forge.mob.top.giant-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Junk Giant from above: the bus roof, the nan statue's head and bun, a team stripe and the exhaust</title>
+<rect x="-42" y="-40" width="84" height="80" rx="10" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M26,-39.4 H32 Q41.4,-39.4 41.4,-30 V30 Q41.4,39.4 32,39.4 H22 Q34,0 26,-39.4 Z" fill="#6c5a37"/>
+<rect x="-42" y="-6" width="84" height="6" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M-32,-6 L-36,0 M-20,-6 L-24,0 M-8,-6 L-12,0 M4,-6 L0,0 M16,-6 L12,0 M28,-6 L24,0" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-36,18 H36 V30 H-36 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<rect x="-22" y="4" width="16" height="10" rx="1.4" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<circle cx="34" cy="-32" r="4" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="-26" r="12" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="-17" r="6" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<path d="M-3,-38 L0,-42 L3,-38" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -8 18 16" data-part="forge.cult.top.gaze" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Baleful Gaze from above: the gold-set third eye (looks left)</title>
+<ellipse cx="1" cy="0" rx="7" ry="6" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<ellipse class="glow" cx="0" cy="0" rx="4.4" ry="3.6" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="1" cy="0" r="1"/><circle id="muzzle" cx="-5" cy="0" r="1"/></g>
+</svg>

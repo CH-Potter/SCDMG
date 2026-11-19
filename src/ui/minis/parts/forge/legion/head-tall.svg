@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 -14 50 76" data-part="forge.legion.side.head-tall">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Clank sergeant's head: a tall double-banded dome, one porthole eye and a pennant on its antenna</title>
+<path d="M62,15 L64.4,-8" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M64.6,-6 L81,-1 L64.2,4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="64.6" cy="-9" r="3.4" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<path d="M46,54 L46,30 Q46,14 59,14 Q72,14 72,30 L72,54 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,15.6 Q71.4,20 71.4,30 L71.4,53.4 L66.6,53.4 Q69,30 66,15.6 Z" fill="#6c5a37"/>
+<rect x="45" y="27" width="28" height="5" rx="2.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect x="44.5" y="50" width="29" height="6" rx="3" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="51" cy="42" r="6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="51" cy="42" r="3.8" fill="#fff2c0"/>
+<circle class="glow" cx="50" cy="41" r="1.6" fill="#f2b84b"/>
+<circle cx="65" cy="42" r="2.6" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="55" cy="21" r="1" fill="#c8bd98"/><circle cx="63" cy="21" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

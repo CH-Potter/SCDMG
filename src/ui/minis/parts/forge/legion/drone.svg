@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-42 -92 84 66" data-part="forge.legion.side.drone">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Repair drone: a flying tin toolbox with a lid latch, a headlamp eye, a spanner in the lid and a rotor mast</title>
+<path d="M-6,-92 L-2,-72 L4,-72 L8,-92 Q2,-86 -6,-92 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="-3" y="-86" width="6" height="16" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-34,-70 L34,-70 L37,-32 Q37,-29 34,-29 L-34,-29 Q-37,-29 -37,-32 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-69.4 L33.4,-69.4 L36.4,-32 Q36.4,-29.6 34,-29.6 L26,-29.6 Z" fill="#6c5a37"/>
+<path d="M-35,-58 L35,-58" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-36,-45 L36.6,-45 L36.8,-38 L-36.4,-38 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<rect x="-7" y="-63" width="14" height="9" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-36" cy="-51" r="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-36.6" cy="-51" r="3" fill="#fff2c0"/>
+<g class="detail"><circle cx="-28" cy="-34" r="1" fill="#c8bd98"/><circle cx="28" cy="-34" r="1" fill="#c8bd98"/><circle cx="-28" cy="-65" r="1" fill="#c8bd98"/><circle cx="28" cy="-65" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-48" r="1"/></g>
+</svg>

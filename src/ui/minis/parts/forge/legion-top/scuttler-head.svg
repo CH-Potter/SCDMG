@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -19 20 24" data-part="forge.legion.top.scuttler-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scuttler head from above: the eye and the pincers forward</title>
+<path d="M-2,-2 Q-9,-9 -4,-17 L-1.4,-11 Q-2.4,-6 0,-3 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M2,-2 Q9,-9 4,-17 L1.4,-11 Q2.4,-6 0,-3 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="0" cy="-1" r="2.8" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

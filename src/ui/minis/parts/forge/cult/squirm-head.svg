@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -30 40 54" data-part="forge.cult.side.squirm-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Squirming Thing's mouth: a round toothed maw with a fringe of feelers (faces left)</title>
+<path d="M-10,-10 Q-20,-26 -31,-20 Q-22,-18 -14,-5 Z M-14,-3 Q-28,-6 -34,3 Q-24,-1 -14,3 Z M-11,7 Q-20,18 -30,17 Q-21,12 -9,11 Z M-2,-10 Q-2,-24 -10,-28 Q-6,-20 -8,-8 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="-8" cy="0" r="11" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M-1,-8 Q3,-4 3,0 Q3,8 -4,10.6 Q1,4 -1,-8 Z" fill="#6c5a37"/>
+<circle cx="-12" cy="0" r="6.4" fill="#44432f" stroke="#141414" stroke-width="2"/>
+<path d="M-17,-3 L-14.6,-2.4 L-16,0 L-13.6,0.6 L-16,3 L-13.4,3.6" fill="none" stroke="#e3d8b6" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="-12" cy="0" r="2.4" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

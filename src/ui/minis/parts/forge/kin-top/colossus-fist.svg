@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -16 28 30" data-part="forge.kin.top.colossus-fist">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Glass fist from above</title>
+<path d="M-11,-12 L9,-13 L12,0 L9,10 L-9,11 L-12,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M9,-13 L12,0 L9,10 L3,10 L5,-12 Z" fill="#6c5a37"/>
+<path class="glow" d="M-4,-4 L0,-9 L3,-2 L0,4 Z" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="64 138 14 14" data-part="forge.legion.side.knee-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far knee: a ball joint</title>
+<circle cx="71" cy="145" r="5" fill="#6c5a37" stroke="#141414" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="71" cy="145" r="1"/></g>
+</svg>

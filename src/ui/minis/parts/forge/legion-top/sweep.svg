@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -7 46 14" data-part="forge.legion.top.sweep" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sweep-beam emitter from above (lens left)</title>
+<path d="M0,-3.4 L38,-3.4 L40,0 L38,3.4 L0,3.4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect class="glow" x="-3" y="-5.6" width="4.4" height="11.2" rx="2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="30" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

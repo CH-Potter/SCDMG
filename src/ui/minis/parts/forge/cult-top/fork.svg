@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 48 12" data-part="forge.cult.top.fork" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tiny pitchfork from above (tines left)</title>
+<rect x="6" y="-1.2" width="34" height="2.4" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M6,-4.6 L-2,-4.6 L-4,-3.6 L-2,-2.6 L6,-2.6 Z M6,-1 L-3,-1 L-5,0 L-3,1 L6,1 Z M6,2.6 L-2,2.6 L-4,3.6 L-2,4.6 L6,4.6 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="16" cy="0" r="1"/><circle id="g2" cx="28" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

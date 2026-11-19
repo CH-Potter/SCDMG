@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-58 -26 116 52" data-part="forge.kin.top.arch">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Veil Arch from above: the step, the two horns and their crest, the veil a line of light, team band</title>
+<rect x="-54" y="-20" width="108" height="40" rx="8" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M30,-19 L46,-19 Q53,-19 53,-12 L53,12 Q53,19 46,19 L36,19 Z" fill="#c8bd98"/>
+<path class="tag" d="M-50,12 L50,12 L50,17 L-50,17 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M-28,0 L28,0" fill="none" stroke="#fff2c0" stroke-width="4" stroke-linecap="round"/>
+<path d="M-40,-6 Q-20,-12 -6,-9 L-6,1 Q-20,-2 -40,6 Z M40,-6 Q20,-12 6,-9 L6,1 Q20,-2 40,6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="-36" cy="0" r="9" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<circle cx="36" cy="0" r="9" fill="#6c5a37" stroke="#141414" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

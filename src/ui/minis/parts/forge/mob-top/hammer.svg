@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -12 64 24" data-part="forge.mob.top.hammer" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Klonkin' Hammer from above (head left)</title>
+<rect x="4" y="-2" width="44" height="4" rx="1.4" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<rect x="-8" y="-10" width="14" height="20" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="-8" y="-10" width="14" height="4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="-12" y="-7" width="4" height="14" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="24" cy="0" r="1"/><circle id="g2" cx="40" cy="0" r="1"/><circle id="muzzle" cx="-12" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -216 112 152" data-part="forge.mob.side.giant-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Junk Giant: a bus stood on end, a fridge-door chest, a wheel, and a stone statue of somebody's nan on top</title>
+<rect x="-10" y="-182" width="20" height="12" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<rect x="34" y="-188" width="7" height="18" rx="1.4" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M-46,-160 Q-46,-172 -34,-172 L34,-172 Q46,-172 46,-160 L46,-86 Q46,-78 38,-78 L-38,-78 Q-46,-78 -46,-86 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M32,-171.6 L34,-171.6 Q45.6,-171.6 45.6,-160 L45.6,-86 Q45.6,-78.4 38,-78.4 L30,-78.4 Q40,-120 32,-171.6 Z" fill="#6c5a37"/>
+<rect x="-42" y="-164" width="84" height="18" rx="2" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M-21,-164 V-146 M0,-164 V-146 M21,-164 V-146" stroke="#9a8458" stroke-width="3"/>
+<circle class="glow" cx="-35" cy="-154" r="2.2" fill="#fff2c0"/>
+<circle class="glow" cx="-28" cy="-154" r="2.2" fill="#fff2c0"/>
+<rect x="-46" y="-142" width="92" height="5" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="-42" y="-134" width="34" height="46" rx="3" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-14,-133.4 L-11,-133.4 Q-8.6,-133.4 -8.6,-131 L-8.6,-91 Q-8.6,-88.6 -11,-88.6 L-14,-88.6 Z" fill="#c8bd98"/>
+<path d="M-42,-118 H-8" stroke="#141414" stroke-width="1.4"/>
+<rect x="-16" y="-130" width="3.4" height="10" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-16" y="-114" width="3.4" height="14" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path class="tag" d="M4,-134 L38,-134 L38,-100 L4,-100 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<path d="M12,-126 L30,-126 L28,-110 L14,-110 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<path d="M17,-126 V-110 M23,-126 V-110" stroke="#141414" stroke-width="1.4"/>
+<rect x="-46" y="-96" width="92" height="8" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M-38,-96 L-42,-88 M-26,-96 L-30,-88 M-14,-96 L-18,-88 M-2,-96 L-6,-88 M10,-96 L6,-88 M22,-96 L18,-88" stroke="#141414" stroke-width="2"/>
+<circle cx="30" cy="-84" r="10" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="30" cy="-84" r="3.6" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<circle cx="7" cy="-206" r="7" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-12,-186 Q-15,-202 -2,-206 Q12,-206 12,-192 Q12,-182 2,-180 L-8,-180 Q-12,-182 -12,-186 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-12,-196 L-17,-192 L-12,-189" fill="#c8bd98" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="-7" cy="-194" r="3.4" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M-12,-185 Q-9,-183 -6,-185" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M-2,-202 Q4,-198 10,-200 M0,-198 Q6,-194 11,-196" fill="none" stroke="#6c5a37" stroke-width="1.4"/>
+<g class="detail"><circle cx="-40" cy="-168" r="1.2" fill="#b9bfc4"/><circle cx="40" cy="-168" r="1.2" fill="#b9bfc4"/><circle cx="-40" cy="-82" r="1.2" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-120" r="1"/><circle id="exhaust1" cx="37.5" cy="-188" r="1"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 2 46 36" data-part="forge.mob.side.crown">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warlord's crown: a hazard band with bent rebar spikes and one big bolt</title>
+<path d="M47,28 L43,8 L50,27 Z M55,26 L54,4 L59,26 Z M64,26 L67,5 L68,27 Z M72,28 L78,10 L75,29 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M44,36 L46,26 L74,25 L77,35 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M52,25.8 L49,35.6 M60,25.6 L57,35.4 M68,25.3 L65,35.2" stroke="#141414" stroke-width="2"/>
+<circle cx="48" cy="31" r="2.6" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="36" r="1"/></g>
+</svg>

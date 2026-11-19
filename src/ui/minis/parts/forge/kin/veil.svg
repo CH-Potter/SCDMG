@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -122 64 112" data-part="forge.kin.side.veil">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The veil inside the arch: a shimmering curtain of light</title>
+<path class="glow" d="M-29,-12 Q-34,-80 0,-120 Q34,-80 29,-12 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-14,-18 Q-8,-60 -14,-98 M0,-16 Q6,-60 0,-110 M14,-18 Q8,-60 14,-98" fill="none" stroke="#f2b84b" stroke-width="2.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-60" r="1"/></g>
+</svg>

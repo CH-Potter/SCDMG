@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 -158 128 140" data-part="forge.kin.side.skimmer" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Glide Rider: a kin rider standing on a curved leaf-shaped hover-blade, robe and team scarf streaming</title>
+<path class="glow" d="M-40,-22 Q0,-13 40,-22 Q0,-27 -40,-22 Z" fill="#fff2c0"/>
+<path d="M6,-34 L16,-64 L24,-62 L16,-34 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-6,-100 Q10,-96 22,-80 Q34,-64 50,-58 Q36,-50 22,-56 Q10,-62 0,-66 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M50,-58 Q36,-50 22,-56" fill="none" stroke="#6e4528" stroke-width="3" stroke-linecap="round"/>
+<path d="M-18,-34 L-12,-52 L0,-68 L9,-61 L-2,-50 L-8,-34 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-60,-40 Q-50,-30 -30,-28 L40,-26 Q56,-26 62,-34 Q50,-20 30,-20 L-30,-20 Q-56,-22 -60,-40 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-56,-26 Q-40,-20 -30,-20 L30,-20 Q50,-20 62,-34 Q50,-24 30,-23.6 L-30,-23.6 Q-46,-24 -56,-26 Z" fill="#6c5a37"/>
+<path d="M-54,-33 Q-10,-26 56,-29" fill="none" stroke="#6e4528" stroke-width="2.2" stroke-linecap="round"/>
+<circle class="glow" cx="-57" cy="-37" r="2.6" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<path d="M-18,-104 Q-10,-112 0,-110 Q8,-106 6,-92 L2,-68 L-14,-66 Q-22,-86 -18,-104 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-6,-104 Q14,-110 30,-100 Q40,-94 48,-102 Q44,-88 28,-91 Q14,-95 -4,-95 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-16,-104 Q-8,-111 0,-104 Q-2,-94 -10,-92 Q-18,-96 -16,-104 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-10,-100 L-30,-91 L-28,-85 L-8,-94 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="-32" cy="-88" r="4.2" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M-24,-108 Q-30,-122 -26,-132 Q-18,-138 -6,-138 Q4,-140 10,-148 Q8,-134 4,-122 Q0,-108 -10,-106 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-27,-129 Q-21,-133 -15,-130 Q-12,-120 -15,-111 Q-20,-109 -24,-113 L-29,-118 L-27,-120 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-28.6,-124 Q-24,-119 -19,-124 Q-24,-122 -28.6,-124 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-60" r="1"/></g>
+</svg>

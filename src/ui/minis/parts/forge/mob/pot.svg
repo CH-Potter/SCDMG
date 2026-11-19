@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 14 52 26" data-part="forge.mob.side.pot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Headgear: a dented cooking pot worn as a helmet, its handle sticking out behind</title>
+<path d="M46,35 L46,22 Q46,17 51,17 L69,17 Q74,17 74,22 L74,35 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,17.4 L69,17.4 Q73.6,17.4 73.6,22 L73.6,34.6 L67,34.6 Z" fill="#353b41"/>
+<path d="M74,22 L89,20 L90,25 L74,28 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="43" y="32" width="34" height="5" rx="1.4" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M54,20 L56,25" stroke="#141414" stroke-width="1.4"/>
+
+<g class="detail"><circle cx="50" cy="28" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="36" r="1"/></g>
+</svg>

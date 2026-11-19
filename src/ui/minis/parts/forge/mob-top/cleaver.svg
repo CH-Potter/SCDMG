@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -8 60 16" data-part="forge.mob.top.cleaver" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sign cleaver from above (head left)</title>
+<rect x="2" y="-1.8" width="46" height="3.6" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path d="M-4,-6 L8,-6 L11,-3 L11,3 L8,6 L-4,6 L-7,3 L-7,-3 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-2,-3.4 L6,-3.4 L8,-1.4 L8,1.4 L6,3.4 L-2,3.4 L-4,1.4 L-4,-1.4 Z" fill="none" stroke="#e3d8b6" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="22" cy="0" r="1"/><circle id="g2" cx="40" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

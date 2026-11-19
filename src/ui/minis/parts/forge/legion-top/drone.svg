@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -32 48 64" data-part="forge.legion.top.drone">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Repair drone from above: the toolbox lid, its latch, a spanner, the headlamp forward, a team stripe</title>
+<rect x="-20" y="-28" width="40" height="56" rx="4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M12,-27.4 H16 Q19.4,-27.4 19.4,-24 V24 Q19.4,27.4 16,27.4 H12 Z" fill="#6c5a37"/>
+<path d="M-20,0 H20" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-19.4,12 L19.4,12 L19.4,20 L-19.4,20 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<rect x="-6" y="-6" width="12" height="6" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="-28" r="4.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="0" cy="-28.6" r="2.6" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

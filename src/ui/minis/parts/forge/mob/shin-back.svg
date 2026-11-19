@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 144 22 26" data-part="forge.mob.side.shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shin: a rusty greave</title>
+<path d="M64,149 L78,148 L77,167 L65,167 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="71" cy="152" r="1"/></g>
+</svg>

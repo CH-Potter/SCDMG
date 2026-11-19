@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 137 16 16" data-part="forge.legion.side.knee-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near knee: a riveted ball joint</title>
+<circle cx="50" cy="145" r="5.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<circle cx="49" cy="144" r="1.8" fill="#4a5158"/>
+<g id="anchors"><circle id="pivot" cx="50" cy="145" r="1"/></g>
+</svg>
