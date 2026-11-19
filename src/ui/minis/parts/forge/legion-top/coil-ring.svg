@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-26 -26 52 52" data-part="forge.legion.top.coil-ring">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Reassembly coil ring from above (pulses)</title>
+<circle cx="0" cy="0" r="23.4" fill="none" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="0" r="17" fill="none" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="0" r="20.2" fill="none" stroke="#6e4528" stroke-width="4.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

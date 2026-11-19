@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 1 28 22" data-part="forge.regiment.top.pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Field pack from above, the rolled blanket across its top</title>
+<rect x="-10" y="5" width="20" height="16" rx="2" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M3,5.6 H9.4 V20.4 H3 Z" fill="#6c5a37"/>
+<rect x="-12" y="3" width="24" height="7" rx="3.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M-6,3.6 V9.4 M6,3.6 V9.4" stroke="#4a2e19" stroke-width="1.8"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

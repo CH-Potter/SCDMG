@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 162 36 28" data-part="forge.legion.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near foot: a boxy tin block with a brass toe strip</title>
+<path d="M36,166 L58,166 L59,182 L33,182 L33,172 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M52,166.8 L57.4,166.8 L58.2,181.2 L53,181.2 Z" fill="#6c5a37"/>
+<path d="M31,182 L61,182 L61,186 L31,186 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M34,175 L48,175" stroke="#6e4528" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

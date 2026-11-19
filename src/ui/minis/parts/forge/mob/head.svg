@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 20 44 50" data-part="forge.mob.side.head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrapjaw head: low green brow, angry little eye, and the bolted-on iron jaw with its square underbite</title>
+<path d="M47,52 Q42,40 47,31 Q56,24 67,27 Q75,32 75,44 Q74,55 66,60 L53,61 Q48,58 47,52 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M67,27 Q75,32 75,44 Q74,55 66,60 L62,60.4 Q71,48 67,27 Z" fill="#6c5a37"/>
+<ellipse cx="65" cy="44" rx="3.4" ry="4.6" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path d="M45,43 Q38,45 42,49 L47,49 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M44,36 L57,40" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<circle class="glow" cx="51" cy="42.4" r="2.4" fill="#fff2c0"/>
+<circle cx="50.6" cy="42.6" r="1.1" fill="#141414"/>
+<path d="M38,51 L62,50 L63,61 Q52,67 41,63 Q37,58 38,51 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M40,60 Q52,63 63,58 L63,61 Q52,67 41,63 Z" fill="#353b41"/>
+<path d="M39.5,51 L39.5,46 L44,46 L44,51 Z M45,51 L45,45.6 L49.4,45.6 L49.4,51 Z M50.4,51 L50.4,46.4 L54.4,46.4 L54.4,51 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="58" cy="56" r="2.6" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="43" cy="57" r="0.9" fill="#b9bfc4"/><circle cx="50" cy="59" r="0.9" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

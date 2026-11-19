@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="43 139 14 13" data-part="forge.regiment.side.knee-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near knee: a trouser knee patch</title>
+<ellipse cx="50" cy="145.4" rx="5.4" ry="4.4" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="50" cy="145" r="1"/></g>
+</svg>

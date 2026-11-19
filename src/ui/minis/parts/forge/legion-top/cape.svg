@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 2 30 18" data-part="forge.legion.top.cape">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Overseer's cape from above, the key shaft poking out</title>
+<path d="M-14,4 Q0,8 14,4 L12,14 L6,12 L0,16 L-6,12 L-12,14 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="-1.8" y="12" width="3.6" height="7" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 58 26 26" data-part="forge.mob.side.pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shoulder: a hazard-striped scrap plate</title>
+<path d="M66,62 L84,63 L84,78 L67,80 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M70,62.2 L66.6,70 M76,62.6 L70,77 M82,63 L75,79" stroke="#141414" stroke-width="2"/>
+<circle cx="80" cy="74" r="1.6" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="70" r="1"/></g>
+</svg>

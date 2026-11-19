@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 -4 50 112" data-part="forge.kin.side.standard">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warden's standard: a crescent finial, a violet streamer and crystals hanging on chains</title>
+<path d="M66,60 L84,62 L85,80 L68,80 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="80" y="2" width="4" height="100" rx="1.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M74,0 Q76,10 82,10 Q88,10 90,0 Q86,6 82,6 Q78,6 74,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="84" y="12" width="20" height="3.6" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M90,16 V24 M100,16 V34" fill="none" stroke="#b9bfc4" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M90,24 L94,30 L90,40 L86,30 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M100,34 L104,40 L100,52 L96,40 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M89,28 L90,26 L91,30 L90,35 Z M99,38 L100,36 L101,41 L100,47 Z" fill="#fff2c0"/>
+<path d="M80,14 Q68,34 76,58 L80,50 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

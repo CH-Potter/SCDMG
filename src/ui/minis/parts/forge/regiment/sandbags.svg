@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -56 100 58" data-part="forge.regiment.side.sandbags" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mortar Pit: a parapet of stacked sandbags with mud at its foot, a crewman's soup-bowl helmet peeking over</title>
+<path d="M10,-30 Q10,-42 20,-42 Q30,-42 30,-30 Z" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path d="M4,-30 Q20,-35 36,-30 Q36,-28 34,-28 L6,-27.4 Q4,-28 4,-30 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-49,-10.4 Q-38,-12.3 -27,-10.4 Q-25.7,-6 -27,-1.6 Q-38,0.3 -49,-1.6 Q-50.3,-6 -49,-10.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-26,-10.4 Q-15,-12.3 -4,-10.4 Q-2.7,-6 -4,-1.6 Q-15,0.3 -26,-1.6 Q-27.3,-6 -26,-10.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-3,-10.4 Q8,-12.3 19,-10.4 Q20.3,-6 19,-1.6 Q8,0.3 -3,-1.6 Q-4.3,-6 -3,-10.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M20,-10.4 Q31,-12.3 42,-10.4 Q43.3,-6 42,-1.6 Q31,0.3 20,-1.6 Q18.7,-6 20,-10.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-38,-21.4 Q-27,-23.3 -16,-21.4 Q-14.7,-17 -16,-12.6 Q-27,-10.7 -38,-12.6 Q-39.3,-17 -38,-21.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-15,-21.4 Q-4,-23.3 7,-21.4 Q8.3,-17 7,-12.6 Q-4,-10.7 -15,-12.6 Q-16.3,-17 -15,-21.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M8,-21.4 Q19,-23.3 30,-21.4 Q31.3,-17 30,-12.6 Q19,-10.7 8,-12.6 Q6.7,-17 8,-21.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-46,-31 Q-36,-32.8 -26,-31 Q-24.8,-27 -26,-23 Q-36,-21.2 -46,-23 Q-47.2,-27 -46,-31 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M14,-31 Q24,-32.8 34,-31 Q35.2,-27 34,-23 Q24,-21.2 14,-23 Q12.8,-27 14,-31 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M-48,-3 Q-30,0 0,-1.6 Q30,0 48,-3 L48,0 L-48,0 Z" fill="#4a2e19"/>
+<path d="M-48,-1 Q-36,-5 -24,-1 Q-10,-5 4,-1 Q18,-5 32,-1 Q40,-4 48,-1 L48,1 L-48,1 Z" fill="#44432f"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-20" r="1"/><circle id="mount" cx="0" cy="-30" r="1"/></g>
+</svg>

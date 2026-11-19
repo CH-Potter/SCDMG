@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 8 64 56" data-part="forge.cult.side.champ-helm">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sunburst helm: a round crimson helm haloed by a crown of blunt gold rays, a glowing grin visor</title>
+<path d="M45.1,40.4 L34,40.1 L34.2,36 L45.2,36.5 Z M45.7,34.3 L35.6,29.9 L37.2,26.2 L47.3,30.8 Z M48.6,28.9 L40.8,21.1 L43.8,18.2 L51.4,26.2 Z M53.2,25 L49,14.8 L52.8,13.3 L56.9,23.5 Z M59.1,23.1 L58.9,12.1 L63.1,12.1 L62.9,23.1 Z M65.1,23.5 L69.2,13.3 L73,14.8 L68.8,25 Z M70.6,26.2 L78.2,18.2 L81.2,21.1 L73.4,28.9 Z M74.7,30.8 L84.8,26.2 L86.4,29.9 L76.3,34.3 Z M76.8,36.5 L87.8,36 L88,40.1 L76.9,40.4 Z M76.6,42.6 L87,46.3 L85.6,50.2 L75.3,46.3 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M53,50 L66,50 L67,60 L52,60 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M45,50 Q42,30 58,26 Q74,25 76,40 Q77,52 68,57 L52,57 Q46,56 45,50 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,27.6 Q76,31 76,40 Q77,52 68,57 L65,57 Q72,44 68,27.6 Z" fill="#6c5a37"/>
+<path d="M44.2,31.6 L75,30.4 L75.4,34.4 L44.4,35.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M45.4,39 L55,38.4" fill="none" stroke="#141414" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path class="glow" d="M44,42.6 Q51.6,51.4 61,42.4 Q51.6,46.6 44,42.6 Z" fill="#f2b84b" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="70" cy="46" r="1.1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

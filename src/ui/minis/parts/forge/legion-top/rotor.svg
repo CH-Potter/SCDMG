@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-33 -6 66 12" data-part="forge.legion.top.rotor">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rotor from above: two tin blades and a brass hub (spins)</title>
+<path d="M-31,-2.4 Q-31,-4.4 -28,-4.4 L28,2 Q31,2.4 31,4 Q31,4.4 28,4.4 L-28,-2 Q-31,-2 -31,-2.4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="4.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

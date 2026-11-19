@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -12 56 24" data-part="forge.mob.side.rattle" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rattle guns: twin pipe barrels on an ammo box (muzzles left)</title>
+<rect x="-4" y="-8" width="30" height="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="-4" y="3" width="30" height="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="-4" cy="-5.5" r="2.6" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-4" cy="5.5" r="2.6" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="22" y="-10" width="22" height="20" rx="2" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="30" y="-10" width="6" height="20" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="34" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

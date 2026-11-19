@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -20 24 32" data-part="forge.regiment.top.chicken-foot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Stomper foot from above: three clawed toes forward, the spur behind</title>
+<path d="M-1.4,4 L1.4,4 L1,11 L-1,11 Z" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<path d="M-3,0 L-10,-15 L-6,-16 L-1,-2 Z M3,0 L10,-15 L6,-16 L1,-2 Z M-2,0 L-1.6,-18 L1.6,-18 L2,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="5" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

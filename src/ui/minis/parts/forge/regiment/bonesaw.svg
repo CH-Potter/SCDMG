@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -10 54 20" data-part="forge.regiment.side.bonesaw" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bonesaw: a toothed field saw with a wooden handle</title>
+<path d="M-34,-1 L2,-6 L2,4 L-34,4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-32,4 l2,3 l2,-3 l2,3 l2,-3 l2,3 l2,-3 l2,3 l2,-3 l2,3 l2,-3 l2,3 l2,-3 l2,3 l2,-3" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M1,-4 L15,-5 L16,5 L1,5 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="8" cy="0" r="1"/><circle id="muzzle" cx="-33" cy="1" r="1"/></g>
+</svg>

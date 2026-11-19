@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 146 20 26" data-part="forge.cult.side.wrap-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shin: cloth wraps in shadow</title>
+<path d="M64,149 L77,149 L76,169 L65,169 Z" fill="#44432f" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M64.4,155 L76.6,152.6 M64.8,161 L76.4,158.6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="152" r="1"/></g>
+</svg>

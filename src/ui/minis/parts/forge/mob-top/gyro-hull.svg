@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -40 88 104" data-part="forge.mob.top.gyro-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Whirlybasher from above: the tub, two goggled pilots, the tail boom and hazard fin</title>
+<rect x="-4" y="18" width="8" height="40" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="-12" y="52" width="24" height="7" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<ellipse cx="0" cy="0" rx="34" ry="28" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-20 Q34,-10 34,0 Q34,16 20,24 Q30,4 24,-20 Z" fill="#353b41"/>
+<ellipse cx="0" cy="0" rx="28" ry="22" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-30,-8 Q-34,4 -28,16 L-22,12 Q-26,4 -24,-6 Z M30,-8 Q34,4 28,16 L22,12 Q26,4 24,-6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="-12" cy="-10" r="8.6" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="-15.6" cy="-15" r="3" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-8.4" cy="-15" r="3" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-15.6" cy="-15" r="1.6" fill="#fff2c0"/>
+<circle class="glow" cx="-8.4" cy="-15" r="1.6" fill="#fff2c0"/>
+<circle cx="12" cy="10" r="8.6" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="12" cy="10" r="5.6" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 56 32 34" data-part="forge.kin.side.pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far lotus pauldron</title>
+<path d="M66,64 Q72,57 82,59 Q90,64 88,76 Q82,86 72,86 Q65,78 66,64 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M70,66 Q76,62 83,64 Q86,72 81,80 Q74,82 71,78 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M72,84 Q80,84 86,76" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

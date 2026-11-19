@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 -4 58 106" data-part="forge.cult.side.banner">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Champion's banner: a crimson swallowtail on a cross-pole with the gold grinning sun</title>
+<path d="M64,58 L84,60 L86,98 L68,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="80" y="2" width="4.4" height="98" rx="1.6" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<rect x="78" y="10" width="36" height="4" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M84,14 L112,14 L112,52 L98,44.6 L84,52 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M104,14 L112,14 L112,52 L104,47.8 Z" fill="#6c5a37"/>
+<path d="M104.1,29.5 L107.4,30.6 L106.8,32.8 L103.4,32.1 Z M102.5,33.6 L104.5,36.4 L102.6,37.9 L100.3,35.3 Z M98.7,35.9 L98.7,39.4 L96.4,39.5 L96,36.1 Z M94.3,35.6 L92.3,38.4 L90.3,37.1 L92,34.1 Z M91,32.8 L87.7,33.8 L86.8,31.6 L90,30.2 Z M89.9,28.5 L86.6,27.4 L87.2,25.2 L90.6,25.9 Z M91.5,24.4 L89.5,21.6 L91.4,20.1 L93.7,22.7 Z M95.3,22.1 L95.3,18.6 L97.6,18.5 L98,21.9 Z M99.7,22.4 L101.7,19.6 L103.7,20.9 L102,23.9 Z M103,25.2 L106.3,24.2 L107.2,26.4 L104,27.8 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="97" cy="29" r="7" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path d="M92.4,28.2 Q93.5,25.5 94.6,28.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M99.4,28.2 Q100.5,25.5 101.6,28.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M92.8,29.8 Q97,35.6 101.2,29.8 Q97,32.4 92.8,29.8 Z" fill="#141414"/>
+<circle cx="82.2" cy="2" r="3.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

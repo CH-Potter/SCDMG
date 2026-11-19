@@ -24,6 +24,11 @@ export interface MachineOpts {
   extras?: PartUse[];
   /** Hover pods: leave out the default engines (the extras carry them). */
   engines?: false;
+  /**
+   * Walkers: the template's own leg parts (default: the kit's knee cap and clamp foot). `knee: null`
+   * drops the knee cap; `footTop` is the top view's foot; `width` the leg capsules (default 13 / 15).
+   */
+  legParts?: { knee?: string | null; foot?: string; footTop?: string; width?: { upper: number; lower: number } };
 }
 
 /** A machine's gun: ranged recipes keep theirs (a staff fires as a lance), melee becomes a blade arm. */
@@ -34,9 +39,9 @@ const gunOf = (s: KitSpec): KitWeapon => (s.weapon === "bow" || s.weapon === "no
 
 export function walkerSide(o: MachineOpts): RigDef {
   const s = o.spec;
-  const w = { upper: 13, lower: 15 };
-  const knee = kitPart("machine", "side", "knee");
-  const foot = kitPart("machine", "side", "foot");
+  const w = o.legParts?.width ?? { upper: 13, lower: 15 };
+  const knee = o.legParts?.knee === null ? undefined : (o.legParts?.knee ?? kitPart("machine", "side", "knee"));
+  const foot = o.legParts?.foot ?? kitPart("machine", "side", "foot");
   const legN: WalkerLeg = { id: "legN", hip: { x: -6, y: -88 }, knee: { x: -22, y: -48 }, foot: { x: -6, y: -2 }, near: true, z: 16, width: w, kneePart: knee, footPart: foot };
   const legF: WalkerLeg = { id: "legF", hip: { x: 10, y: -90 }, knee: { x: -4, y: -50 }, foot: { x: 12, y: -2 }, near: false, z: 1, width: w, kneePart: knee, footPart: foot };
   const parts: PartUse[] = [{ id: "hull", src: o.hull ?? kitPart("machine", "side", "hull"), bone: "torso", z: 10 }];
@@ -67,7 +72,7 @@ export function walkerSide(o: MachineOpts): RigDef {
 
 export function walkerTop(o: MachineOpts): RigDef {
   const s = o.spec;
-  const foot = kitPart("machine", "top", "foot");
+  const foot = o.legParts?.footTop ?? kitPart("machine", "top", "foot");
   const legL: WalkerLeg = { id: "legL", hip: { x: -30, y: 6 }, knee: { x: -46, y: -2 }, foot: { x: -42, y: 14 }, near: true, z: 2, width: { upper: 12, lower: 12 }, footPart: foot };
   const legR: WalkerLeg = { id: "legR", hip: { x: 30, y: 6 }, knee: { x: 46, y: -2 }, foot: { x: 42, y: 14 }, near: true, z: 2.5, width: { upper: 12, lower: 12 }, footPart: foot };
   const parts: PartUse[] = [{ id: "hull", src: o.hull ?? kitPart("machine", "top", "hull"), bone: "torso", z: 5 }, ...(o.extras ?? [])];

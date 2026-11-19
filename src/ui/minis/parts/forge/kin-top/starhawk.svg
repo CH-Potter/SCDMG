@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -66 112 124" data-part="forge.kin.top.starhawk" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Starhawk from above: the seed-shaped hull, canopy forward, two swept vanes with the team stripes</title>
+<path d="M-8,-12 Q-36,4 -52,32 Q-30,26 -8,18 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M8,-12 Q36,4 52,32 Q30,26 8,18 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-14,0 Q-30,12 -42,26 L-34,26 Q-24,16 -12,9 Z M14,0 Q30,12 42,26 L34,26 Q24,16 12,9 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M0,-62 Q14,-40 14,0 Q12,30 0,52 Q-12,30 -14,0 Q-14,-40 0,-62 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,-50 Q14,-34 14,0 Q12,30 0,52 Q10,20 6,-50 Z" fill="#6c5a37"/>
+<path d="M0,-44 Q6,-36 6,-26 Q0,-22 -6,-26 Q-6,-36 0,-44 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M0,-40 Q4,-34 4,-28 Q0,-25 -4,-28 Q-4,-34 0,-40 Z" fill="#fff2c0"/>
+<path d="M0,-18 L0,44" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round"/>
+<circle class="glow" cx="0" cy="50" r="3" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

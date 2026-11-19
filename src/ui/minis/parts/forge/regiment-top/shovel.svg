@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-19 -7 66 14" data-part="forge.regiment.top.shovel" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Entrenching shovel from above (blade left)</title>
+<path d="M-17,-5 L0,-4 L0,4 L-17,5 Q-19,0 -17,-5 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="0" y="-1.4" width="38" height="2.8" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<rect x="38" y="-4" width="7" height="8" rx="2" fill="none" stroke="#2b2019" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="14" cy="0" r="1"/><circle id="g2" cx="34" cy="0" r="1"/><circle id="muzzle" cx="-17" cy="0" r="1"/></g>
+</svg>

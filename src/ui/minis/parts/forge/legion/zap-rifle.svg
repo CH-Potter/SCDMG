@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -18 130 36" data-part="forge.legion.side.zap-rifle" data-recoil="4">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Zap rifle: a ray gun with three stacked brass rings, a glowing capacitor bulb and a tin stock (muzzle left)</title>
+<rect x="0" y="-2.2" width="50" height="4.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<ellipse cx="5" cy="0" rx="2.6" ry="8.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<ellipse cx="13" cy="0" rx="2.6" ry="7" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<ellipse cx="21" cy="0" rx="2.6" ry="5.6" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-3" cy="0" r="3.4" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<path d="M44,-6 Q44,-11 50,-11 L84,-10 Q90,-9 90,-3 L90,5 L44,6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M44.6,1.6 L89.4,1 L89.4,4.4 L44.6,5.4 Z" fill="#6c5a37"/>
+<circle class="glow" cx="68" cy="-12" r="5" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<path d="M62,5 L70,5 L68,15 L61,15 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M89,-5 L118,-7 L119,8 L100,6 L90,5 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M52,-6 V4 M80,-6 V4" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="48.6" cy="0" r="1"/><circle id="g2" cx="85.6" cy="-0.8" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

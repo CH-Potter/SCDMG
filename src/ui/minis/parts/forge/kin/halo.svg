@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -14 60 28" data-part="forge.kin.side.halo">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Star halo: a ring of little four-pointed stars that floats round the Oracle's hood</title>
+<ellipse cx="0" cy="0" rx="25" ry="7" fill="none" stroke="#141414" stroke-width="2.4"/>
+<ellipse class="glow" cx="0" cy="0" rx="25" ry="7" fill="none" stroke="#f2b84b" stroke-width="1.6"/>
+<path class="glow" d="M-25,-4.6 L-23.5,-1.5 L-20.4,0 L-23.5,1.5 L-25,4.6 L-26.5,1.5 L-29.6,0 L-26.5,-1.5 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M-12,1.8000000000000007 L-10.5,4.9 L-7.4,6.4 L-10.5,7.9 L-12,11.0 L-13.5,7.9 L-16.6,6.4 L-13.5,4.9 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M9,2.0 L10.5,5.1 L13.6,6.6 L10.5,8.1 L9,11.2 L7.5,8.1 L4.4,6.6 L7.5,5.1 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M24,-2.9999999999999996 L25.5,0.10000000000000009 L28.6,1.6 L25.5,3.1 L24,6.199999999999999 L22.5,3.1 L19.4,1.6 L22.5,0.10000000000000009 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M4,-10.4 L5.2,-8.0 L7.6,-6.8 L5.2,-5.6 L4,-3.1999999999999997 L2.8,-5.6 L0.3999999999999999,-6.8 L2.8,-8.0 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

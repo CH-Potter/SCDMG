@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -12 90 24" data-part="forge.kin.top.colossus-cannon" data-recoil="4">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Prism cannon from above (muzzle left)</title>
+<path d="M-4,0 L6,-8 L50,-8 L56,0 L50,8 L6,8 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,0 L56,0 L50,8 L6,8 Z" fill="#6c5a37"/>
+<path class="glow" d="M-4,0 L6,-5 L6,5 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M44,-11 L78,-11 Q82,-11 82,-7 L82,7 Q82,11 78,11 L44,11 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="56" y="-11" width="5" height="22" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="66" cy="0" r="1"/><circle id="muzzle" cx="-5" cy="0" r="1"/></g>
+</svg>

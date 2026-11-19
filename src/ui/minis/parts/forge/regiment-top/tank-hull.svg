@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-46 -58 92 114" data-part="forge.regiment.top.tank-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Stomper Tank from above: the riveted body, glacis forward, the turret with the commander's helmet in the hatch, team stripes on the side skirts, the exhaust</title>
+<path d="M-34,-44 L-26,-54 L26,-54 L34,-44 L36,46 Q36,52 30,52 L-30,52 Q-36,52 -36,46 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-54 L26,-54 L34,-44 L36,46 Q36,52 30,52 L24,52 Z" fill="#6c5a37"/>
+<path d="M-34,-44 L34,-44" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-36,-8 L-28,-8 L-28,40 L-36,40 Z M28,-8 L36,-8 L36,40 L28,40 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<rect x="18" y="40" width="10" height="10" rx="2" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="0" r="22" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M14,-17 A22,22 0 0 1 -12,18 Q12,10 14,-17 Z" fill="#6c5a37"/>
+<circle cx="8" cy="6" r="8" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="8" cy="6" r="4.6" fill="#6c5a37" stroke="#141414" stroke-width="1.4"/>
+<path d="M-30,-30 Q-20,-26 -10,-30 M10,-30 Q20,-26 30,-30" fill="none" stroke="#44432f" stroke-width="2.4"/>
+<g class="detail"><circle cx="-28" cy="-20" r="1.2" fill="#c8bd98"/><circle cx="28" cy="-20" r="1.2" fill="#c8bd98"/><circle cx="-28" cy="46" r="1.2" fill="#c8bd98"/><circle cx="0" cy="46" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

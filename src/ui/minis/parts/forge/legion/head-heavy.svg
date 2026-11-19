@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 30 32 30" data-part="forge.legion.side.head-heavy">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Heavy's head: a tiny dome sunk between the shoulders, a glowing slit visor</title>
+<path d="M50,58 L50,47 Q50,39 59,39 Q68,39 68,47 L68,58 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64,40.4 Q67.4,43 67.4,47 L67.4,57.4 L64,57.4 Z" fill="#6c5a37"/>
+<path d="M45,46 L58,46 L58,52 L45,52 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M46.6,47.8 L56.6,47.8 L56.6,50.2 L46.6,50.2 Z" fill="#fff2c0"/>
+<path d="M59,39 L61,33" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<circle class="glow" cx="61.4" cy="32.6" r="2.4" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

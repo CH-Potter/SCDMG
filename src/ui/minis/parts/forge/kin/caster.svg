@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -26 124 52" data-part="forge.kin.side.caster" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Needle caster: a slender crossbow-like caster with violet bow arms and a crystal focus (muzzle left)</title>
+<rect x="-3" y="-1.8" width="40" height="3.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M44,-3 Q36,-14 46,-24 L50,-22 Q42,-13 49,-3 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M44,3 Q36,14 46,24 L50,22 Q42,13 49,3 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M47,-23 L62,0 L47,23" fill="none" stroke="#b9bfc4" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M30,-4 Q70,-8 114,-3 L114,5 Q90,8 70,6 L64,15 L55,15 L56,6 L30,4 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30,1.6 L114,1.6 L114,5 Q90,8 70,6 L56,6 L30,4 Z" fill="#6c5a37"/>
+<path d="M18,0 L26,-7 L36,0 L26,7 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M21,0 L26,-3.6 L32,0 L26,3.6 Z" fill="#fff2c0"/>
+<path d="M84,-5.4 L90,-5.6 L90,6.4 L84,6.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="59" cy="8" r="1"/><circle id="g2" cx="95" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-25 -14 50 42" data-part="forge.regiment.top.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mudfoot from above: greatcoat shoulders, split coat tails, the cross strap and team-coloured shoulder tabs and the scarf ends knotted at the back</title>
+<path d="M-16,3 L-8,6 L-11,26 L-19,22 Z M16,3 L8,6 L11,26 L19,22 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-18.4,19 L-11.4,22 L-11,26 L-19,22 Z M18.4,19 L11.4,22 L11,26 L19,22 Z" fill="#44432f"/>
+<ellipse cx="0" cy="2" rx="15.6" ry="10" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="-15" cy="1" rx="7.6" ry="9.4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="15" cy="1" rx="7.6" ry="9.4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M20,-4.6 A7.6,9.4 0 0 1 12,9.6 Q18,4 20,-4.6 Z" fill="#6c5a37"/>
+<path d="M-13,-6 L11,9" fill="none" stroke="#6e4528" stroke-width="3"/>
+<path class="tag" d="M-21,-5 L-16,-6 L-16,8 L-21,7 Z M21,-5 L16,-6 L16,8 L21,7 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M1,8 L8,9 L7,17 L2,16 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

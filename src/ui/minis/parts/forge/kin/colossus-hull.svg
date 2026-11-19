@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -214 120 142" data-part="forge.kin.side.colossus-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crystal Colossus: a faceted ivory stone statue bristling with crystal, a hollow lantern head with the old ghost glowing inside</title>
+<path d="M18,-176 L26,-206 L33,-180 L40,-198 L45,-170 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-44,-160 L-30,-178 L30,-180 L46,-160 L42,-100 L28,-82 L-30,-82 L-44,-100 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-180 L30,-180 L46,-160 L42,-100 L28,-82 L18,-82 L32,-102 L34,-158 Z" fill="#c8bd98"/>
+<path d="M-30,-178 L-20,-148 L22,-148 L30,-180 M-20,-148 L-28,-100 M22,-148 L30,-104" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M-18,-118 L-12,-150 L-4,-124 L4,-160 L12,-122 L20,-140 L22,-112 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-4,-124 L4,-160 L12,-122 L20,-140 L22,-112 L6,-116 Z" fill="#6c5a37"/>
+<path class="glow" d="M1,-148 L4,-156 L7,-132 L3,-128 Z M-14,-128 L-12,-142 L-9,-126 Z" fill="#fff2c0"/>
+<path d="M-44,-104 L42,-108 L42,-98 L-44,-94 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-31,-100 L-13,-101 L-13,-72 L-22,-79 L-31,-72 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-24,-172 L-26,-192 L-14,-206 L4,-204 L10,-188 L6,-170 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-21,-176 L-22,-190 L-13,-200 L1,-198 L5,-186 L2,-175 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-18,-180 Q-21,-194 -10,-197 Q0,-194 -2,-182 Q-6,-176 -10,-180 Q-14,-176 -18,-180 Z" fill="#fff2c0"/>
+<circle cx="-14" cy="-189" r="1.8" fill="#2b2019"/>
+<circle cx="-6" cy="-189" r="1.8" fill="#2b2019"/>
+<path d="M-52,-150 L-48,-176 L-40,-160 L-34,-186 L-26,-158 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="glow" d="M-37,-166 L-34,-180 L-31,-164 Z" fill="#fff2c0"/>
+<g class="detail"><circle cx="-36" cy="-120" r="1.2" fill="#c8bd98"/><circle cx="32" cy="-130" r="1.2" fill="#c8bd98"/><circle cx="-8" cy="-92" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-120" r="1"/></g>
+</svg>

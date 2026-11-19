@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 -86 30 32" data-part="forge.legion.side.scuttler-tail-flag">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scuttler leader's whip antenna with a brass pennant</title>
+<path d="M18,-58 Q26,-66 30,-77" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M29,-74 L41,-70 L27.6,-66 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="31" cy="-79.4" r="3.6" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="18" cy="-58" r="1"/></g>
+</svg>
