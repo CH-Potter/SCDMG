@@ -198,35 +198,37 @@ export default defineTemplateArt({
     // strikes stinger-first; every wing beats on its own phase
     bees: (ctx) => {
       const cw = druidColourway(ctx.faction.color, "-bee", { chip: "#f2b93a", rivet: "#dfeaee" });
-      const spec = { ...ctx.spec, scale: 1.15, back: "none" as const };
+      // per-model variety: the lead swarm is bigger, the second stance has its lead bee diving low
+      const specOf = (v: LookVariant) => ({ ...ctx.spec, scale: v.leader ? 1.25 : 1.15, back: "none" as const });
+      const dive = (v: LookVariant) => (v.tag === "b" ? { x: 6, y: 14 } : { x: 0, y: 0 });
       const lead = side("bee-lead");
       const leadT = top("bee-lead");
       const w = side("bee-wing");
       const wT = top("bee-wing");
       const wTm = mirrorPart(wT);
       const flap = (phase: number) => ({ flap: 0.9, phase });
-      return one(
+      return squad(
         ctx,
-        {
+        (v) => ({
           side: flyerSide({
-            id: "forge.druids.bees",
+            id: `forge.druids.bees.${v.tag}`,
             name: ctx.profile.name,
-            spec,
-            variant: LONE,
+            spec: specOf(v),
+            variant: v,
             hull: side("bees"),
             engines: false,
-            gun: { src: lead, place: placeAt(lead, "pivot", { x: -22, y: -40 }) },
+            gun: { src: lead, place: placeAt(lead, "pivot", { x: -22 - dive(v).x, y: -40 + dive(v).y }) },
             extras: [
-              { id: "wing-lead", src: w, bone: "gun", place: placeAt(w, "pivot", { x: -27, y: -50 }, 0, 1.2), z: 11, anim: flap(0) },
+              { id: "wing-lead", src: w, bone: "gun", place: placeAt(w, "pivot", { x: -27 - dive(v).x, y: -50 + dive(v).y }, 0, 1.2), z: 11, anim: flap(0) },
               { id: "wing-1", src: w, bone: "torso", place: placeAt(w, "pivot", { x: -15, y: -76 }, 0, 0.85), z: 10.5, anim: flap(0.33) },
               { id: "wing-2", src: w, bone: "torso", place: placeAt(w, "pivot", { x: 14, y: -51 }, 0, 0.9), z: 10.5, anim: flap(0.66) },
             ],
           }),
           top: flyerTop({
-            id: "forge.druids.bees",
+            id: `forge.druids.bees.${v.tag}`,
             name: ctx.profile.name,
-            spec,
-            variant: LONE,
+            spec: specOf(v),
+            variant: v,
             hull: top("bees"),
             engines: false,
             gun: { src: leadT, place: placeAt(leadT, "pivot", { x: 0, y: -26 }) },
@@ -239,7 +241,7 @@ export default defineTemplateArt({
               { id: "wing-2-r", src: wT, bone: "torso", place: { x: 16, y: 2, rot: 60, scale: 0.85 }, z: 6, anim: flap(0.76) },
             ],
           }),
-        },
+        }),
         cw,
       );
     },
