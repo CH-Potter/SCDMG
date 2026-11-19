@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-92 -92 184 184" data-part="forge.munch.top.pit" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Trapdoor Pit from above: the dark mouth, the grassy lid flipped back on its hinge, a team rag tied to it (centre at 0,0)</title>
+<path d="M-80,0 Q-84,-46 -40,-70 Q0,-86 40,-70 Q84,-46 80,0 Q84,46 40,72 Q0,86 -40,72 Q-84,46 -80,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,-40 Q84,-10 80,0 Q84,46 40,72 Q0,86 -40,72 Q30,64 56,34 Q74,6 68,-40 Z" fill="#6c5a37"/>
+<circle cx="0" cy="-10" r="36" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<path d="M-26,-30 Q0,-46 26,-30 Q0,-38 -26,-30 Z" fill="#44432f"/>
+<path d="M-40,40 Q-40,22 0,22 Q40,22 40,40 Q40,74 0,76 Q-40,74 -40,40 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M0,26 L0,72 M0,26 L-30,60 M0,26 L30,60" fill="none" stroke="#c8bd98" stroke-width="2" stroke-linecap="round"/>
+<path d="M-12,18 L12,18 L12,26 L-12,26 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-60,-40 l-6,-8 l9,3 l1,-10 l6,9 M54,52 l8,2 l-4,6 l8,2" fill="#c8bd98" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M38,48 L58,40 L62,48 L56,50 L64,58 L44,56 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

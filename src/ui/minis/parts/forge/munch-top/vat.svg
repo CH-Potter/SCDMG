@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-66 -66 132 132" data-part="forge.munch.top.vat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mutagen Vat from above: the steel lid ringed by glowing glass, four splayed feet, the control box, a team hazard arc (centre at 0,0)</title>
+<path d="M-26,-26 L-52,-52 L-44,-58 L-18,-30 Z M26,-26 L52,-52 L58,-44 L30,-18 Z M-26,26 L-52,52 L-58,44 L-30,18 Z M26,26 L52,52 L44,58 L18,30 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="40" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="glow" d="M-36,-12 Q-30,-30 -12,-36 Q-28,-24 -36,-12 Z M30,20 Q24,30 12,36 Q20,26 30,20 Z" fill="#fff2c0"/>
+<circle cx="0" cy="0" r="33" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<path class="tag" d="M-30,10 Q-22,26 0,30 L0,23 Q-16,20 -23,8 Z M30,10 Q22,26 0,30 L0,23 Q16,20 23,8 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-24,-14 Q-14,-26 2,-27" fill="none" stroke="#b9bfc4" stroke-width="2.6" stroke-linecap="round"/>
+<path d="M-12,12 l-4,4 M12,12 l4,4 M0,-18 l0,-5" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round"/>
+<path d="M40,6 Q52,-10 30,-30" fill="none" stroke="#25282c" stroke-width="5" stroke-linecap="round"/>
+<rect x="38" y="-4" width="16" height="22" rx="3" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<circle cx="46" cy="2" r="2.4" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="46" cy="11" r="2.4" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

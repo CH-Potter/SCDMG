@@ -313,6 +313,82 @@ function mama(): Look {
   return { side: s, top: scaleRig(t, 0.88) };
 }
 
+// ---------- burrows and lab kit (structures) ----------
+
+function structure(id: string, name: string, o: { side: PartUse[]; top: PartUse[]; weapon?: string; h: number; r: number; fx?: string }): Look {
+  const base = { id: `forge.munch.${id}`, name, frame: "structure" as const, k: 1, weapon: o.weapon, ...(o.fx ? { fx: { muzzle: o.fx } } : {}) };
+  return {
+    side: munchRig({ ...base, view: "side", pivots: { torso: { x: 0, y: -o.h / 2 }, head: { x: 0, y: -o.h } }, parts: o.side }),
+    top: munchRig({ ...base, view: "top", pivots: { torso: { x: 0, y: 0 }, head: { x: 0, y: 0 } }, parts: o.top, shadow: { x: 8, y: 10, r: o.r } }),
+  };
+}
+
+const vat = (cw: Colourway): Look =>
+  structure("pod", "Mutagen Vat", {
+    h: 130,
+    r: 60,
+    weapon: "vent",
+    fx: cw.glow,
+    side: [
+      { id: "vat", src: side("vat"), bone: "torso", z: 5 },
+      at("vent", side("vent"), "gun", 0, -124, 6),
+      at("spores", side("spores"), "head", -6, -148, 7, { anim: { float: 4, pulse: 0.08 } }),
+    ],
+    top: [
+      { id: "vat", src: top("vat"), bone: "torso", z: 5 },
+      at("vent", top("vent"), "gun", 0, 0, 6),
+    ],
+  });
+
+const hole = (): Look =>
+  structure("hole", "Gopher Hole", {
+    h: 70,
+    r: 84,
+    side: [
+      { id: "mound", src: side("hole-mound"), bone: "torso", z: 4 },
+      at("gopher", side("gopher"), "head", 4, -24, 5, { anim: { float: 3 } }),
+      { id: "lip", src: side("hole-lip"), bone: "torso", z: 6 },
+    ],
+    top: [
+      { id: "mound", src: top("hole"), bone: "torso", z: 4 },
+      at("gopher", top("gopher"), "head", 0, 0, 5, { anim: { pulse: 0.05 } }),
+    ],
+  });
+
+const pit = (cw: Colourway): Look =>
+  structure("pit", "Trapdoor Pit", {
+    h: 110,
+    r: 80,
+    weapon: "lurker",
+    fx: cw.glow,
+    side: [
+      { id: "pit", src: side("pit"), bone: "torso", z: 4 },
+      at("lurker", side("lurker"), "gun", 0, -24, 5),
+      { id: "lip", src: side("hole-lip"), bone: "torso", place: { x: 0, y: 4, rot: 0, scale: 0.95 }, z: 6 },
+    ],
+    top: [
+      { id: "pit", src: top("pit"), bone: "torso", z: 4 },
+      at("lurker", top("lurker"), "gun", 0, -10, 5),
+    ],
+  });
+
+const sett = (cw: Colourway): Look =>
+  structure("warren", "The Sett Lab", {
+    h: 140,
+    r: 92,
+    weapon: "biters",
+    fx: cw.glow,
+    side: [
+      { id: "sett", src: side("sett"), bone: "torso", z: 4 },
+      at("dish", side("dish"), "head", 16, -108, 3, { anim: { pulse: 0.04 } }),
+      at("biters", side("biters"), "gun", 70, 0, 5),
+    ],
+    top: [
+      { id: "sett", src: top("sett"), bone: "torso", z: 4 },
+      at("biters", side("biters"), "gun", -60, -64, 5, { rot: -30 }),
+    ],
+  });
+
 export default defineTemplateArt({
   key: "munch",
   colourway: (_f, spec) => munchColourway(spec.primary, "beetle"),
@@ -321,5 +397,9 @@ export default defineTemplateArt({
     spitter: (ctx) => squad(ctx, "spider", spider),
     buzz: (ctx) => squad(ctx, "wasp", wasps),
     mama: (ctx) => one(ctx, "badger", mama),
+    pod: (ctx) => one(ctx, "lab", vat),
+    hole: (ctx) => one(ctx, "dirt", hole),
+    pit: (ctx) => one(ctx, "dirt", pit),
+    warren: (ctx) => one(ctx, "dirt", sett),
   },
 });

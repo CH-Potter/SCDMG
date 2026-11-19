@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -40 48 42" data-part="forge.munch.side.spores">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Spore puffs: lumpy mutagen clouds drifting up from the vent (pivot at the lowest puff)</title>
+<path d="M-10,-2 Q-16,-4 -14,-10 Q-16,-16 -8,-17 Q-4,-22 2,-17 Q9,-16 8,-9 Q12,-3 4,-2 Q-2,2 -10,-2 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-8,-8 Q-6,-14 0,-13 Q-4,-10 -8,-8 Z" fill="#fff2c0"/>
+<path d="M6,-24 Q2,-28 6,-32 Q10,-37 15,-33 Q21,-32 19,-26 Q18,-21 12,-22 Q8,-20 6,-24 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-18,-30 Q-21,-33 -18,-36 Q-14,-39 -11,-35 Q-8,-33 -11,-30 Q-14,-28 -18,-30 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="11" cy="-29" r="2" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>
