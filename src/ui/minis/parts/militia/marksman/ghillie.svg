@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="56 28 46 106" data-part="militia.marksman.side.ghillie">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Ghillie cape of dry grass over the pack: tufts above the shoulders, a ragged hem</title>
+<path d="M66,50 L62,34 L70,45 L72,30 L77,44 L83,32 L84,46 L92,38 L89,52 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M62,54 Q73,41 88,47 L94,64 L97,92 L100,120 L95,126 L93,117 L89,130 L85,119 L80,132 L77,120 L72,129 L70,117 L65,123 L63,98 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M86,47 L88,47 L94,64 L97,92 L100,120 L95,126 L93,117 L89,130 L88,118 Q92,90 86,47 Z" fill="#6c5a37"/>
+<path d="M68,58 L72,84 M75,52 L78,90 M82,54 L84,96 M70,92 L74,118 M79,98 L82,124 M88,70 L91,104" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M72,64 L75,96 M85,60 L88,88 M66,80 L67,104" stroke="#44432f" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M64,98 L66,110 M93,98 L96,112" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<g class="detail"><path d="M76,108 l2,-6 M86,110 l-1,-7 M70,72 l3,-5" stroke="#5d5b45" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

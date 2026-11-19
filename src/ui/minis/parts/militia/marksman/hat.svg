@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="35 14 50 48" data-part="militia.marksman.side.hat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wide-brimmed field hat with the team hat band, over a slit-visor mask and a scope eyepiece</title>
+<path d="M66,55 Q76,60 81,66" fill="none" stroke="#25282c" stroke-width="6" stroke-linecap="round"/>
+<path d="M49,36 L70,35 L71,54 Q60,59 50,56 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="glow" d="M51,41.4 L66,40.2 L66,43.4 L51,44.6 Z" fill="#f2b84b"/>
+<circle cx="55.6" cy="52.4" r="3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<path d="M44,40 L52,39 L52,47 L44,48 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="45" cy="44" r="2" fill="#fff2c0"/>
+<path d="M49,32 Q48,18 60,17 Q72,18 71,32 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64,17.8 Q72,19.6 71,32 L66,32.4 Q67.4,23 64,17.8 Z" fill="#6c5a37"/>
+<path class="tag" d="M48.6,27.6 L71.4,27 L71.6,32.4 L48.4,33 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M37,38 Q38,32 48,31.6 L72,31 Q82,31 83,36 Q78,35.4 72,36 L48,36.8 Q41,37 37,38 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M55,22 l3,-2 M63,21 l2,2" stroke="#e3d8b6" stroke-width="0.9"/><circle cx="68" cy="45" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 52 46 82" data-part="militia.veteran.side.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Boiler-plate cuirass over the work-suit: double chest plate, gorget, service bars, heavy tassets</title>
+<path d="M46,66 L74,64 L78,110 L46,112 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M63,109 L80,107 L82,127 L66,129 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M43,111 L59,110 L57,131 L42,128 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M43,124 L57.4,126 L57,131 L42,128 Z" fill="#6c5a37"/>
+<path d="M44,104 L80,100 L80,108 L44,112 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="48" y="103.6" width="8" height="8.4" rx="1" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<rect x="67" y="101.6" width="8" height="8.4" rx="1" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<path d="M42,93 Q61,100 80,92 L80,103 Q61,110 43,103 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M40,67 Q60,58 80,64 L81,93 Q61,101 42,94 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,61.6 Q76,62.4 80,64 L81,93 Q76,95.4 71,96.8 Z" fill="#6c5a37"/>
+<path d="M44,71.6 Q60,64 77,69 L77.6,74 Q60,69.4 44.6,76.6 Z" fill="#6c5a37" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M47,82 L52,79.4 M47,86.6 L52,84 M47,91.2 L52,88.6" stroke="#e3d8b6" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M61,66 L61.6,97" stroke="#141414" stroke-width="1.4"/>
+<g class="detail">
+<circle cx="45" cy="70" r="1.1" fill="#c8bd98"/><circle cx="52" cy="67" r="1.1" fill="#c8bd98"/><circle cx="68" cy="65.4" r="1.1" fill="#c8bd98"/><circle cx="76" cy="67" r="1.1" fill="#c8bd98"/>
+<circle cx="46" cy="98" r="1.1" fill="#c8bd98"/><circle cx="61" cy="101.6" r="1.1" fill="#c8bd98"/><circle cx="76" cy="98" r="1.1" fill="#c8bd98"/><circle cx="49" cy="116" r="1.1" fill="#c8bd98"/>
+<path d="M41,79 l3,1 l-1.6,2.6 Z M77,86 l2.2,-1.6 l0.8,3 Z M69,120 l2.6,0.4 l-1.4,2 Z M56,94 l3,0.4 l-1.6,1.8 Z" fill="#b9bfc4"/>
+</g>
+<path d="M47,58 L73,56 L75,67 L48,69 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/></g>
+</svg>

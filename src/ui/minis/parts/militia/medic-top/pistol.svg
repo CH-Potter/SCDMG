@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -6 30 14" data-part="militia.medic.top.staple-pistol" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Staple pistol from above (muzzle at the left)</title>
+<rect x="-3" y="-2.6" width="4" height="5.2" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="0" y="-2" width="10" height="4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="9" y="-3.4" width="13" height="6.8" fill="#9a8458" stroke="#141414" stroke-width="1.4"/>
+<rect x="11" y="-1.6" width="9" height="3.2" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="18" cy="0" r="1"/><circle id="muzzle" cx="-3" cy="0" r="1"/></g>
+</svg>

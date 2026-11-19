@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -12 34 28" data-part="militia.medic.side.staple-pistol" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Staple pistol (muzzle at the left): staple strip on top, wrapped grip</title>
+<rect x="0" y="-3" width="12" height="6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="-3.5" y="-4.2" width="4.5" height="8.4" rx="1" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M17.6,3 L25,3 L27.4,13.6 L20,14 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M10,-6 L26,-6 L26,4.4 L10,4.4 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M10.8,1.6 H25.2 V3.6 H10.8 Z" fill="#6c5a37"/>
+<rect x="11" y="-10" width="13" height="4" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<path class="detail" d="M13.6,-9.6 V-6.4 M16.6,-9.6 V-6.4 M19.6,-9.6 V-6.4 M22.4,-9.6 V-6.4" stroke="#141414" stroke-width="1"/>
+<circle class="detail" cx="23" cy="-1" r="1" fill="#c8bd98"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="22" cy="8" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

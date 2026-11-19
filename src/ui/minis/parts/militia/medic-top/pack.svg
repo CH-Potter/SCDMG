@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 1 34 32" data-part="militia.medic.top.pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tall field pack from above: blanket roll, cog-and-plus lid, two hop nozzles</title>
+<circle cx="-5" cy="28" r="3.2" fill="#353b41" stroke="#141414" stroke-width="2"/><circle cx="-5" cy="28" r="1.4" fill="#141414"/>
+<circle cx="5" cy="28.6" r="3.2" fill="#25282c" stroke="#141414" stroke-width="2"/><circle cx="5" cy="28.6" r="1.4" fill="#141414"/>
+<rect x="10" y="6" width="7" height="22" rx="3.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M10.6,11 H16.4 M10.6,22 H16.4" stroke="#e3d8b6" stroke-width="2"/>
+<rect x="-12" y="4" width="24" height="22" rx="2" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M4,4.6 H11.4 V25.4 H4 Z" fill="#44432f"/>
+<rect x="-12.6" y="3" width="25.2" height="7" rx="3.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect x="-8" y="12.4" width="16" height="11" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="17.9" r="3.8" fill="none" stroke="#4a2e19" stroke-width="2" stroke-dasharray="1.4 1.1"/>
+<path d="M0,15.9 V19.9 M-2,17.9 H2" stroke="#4a2e19" stroke-width="1.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/><circle id="exhaust1" cx="-5" cy="28" r="1"/><circle id="exhaust2" cx="5" cy="28.6" r="1"/></g>
+</svg>

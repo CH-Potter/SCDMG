@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 52 40 38" data-part="militia.veteran.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Heavy two-tier near pauldron</title>
+<path d="M27,80 Q24,60 44,55 Q58,55 61,66 L57,84 Q41,90 27,80 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M27,80 Q41,90 57,84 L56,79.6 Q41,84 30,76.4 Z" fill="#6c5a37"/>
+<path d="M30,70 Q34,59 45,58.6 Q55,59 58,66 L55.6,73 Q44,66 30,70 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M30,70 Q44,66 55.6,73 L55,75.4 Q43,69 31,73 Z" fill="#6c5a37"/>
+<g class="detail"><circle cx="32" cy="78" r="1.1" fill="#c8bd98"/><circle cx="38" cy="82" r="1.1" fill="#c8bd98"/><circle cx="45" cy="83.4" r="1.1" fill="#c8bd98"/><circle cx="52" cy="82" r="1.1" fill="#c8bd98"/><path d="M42,59.4 l3.4,1 l-2.2,2.2 Z M28,72 l2,1.6 l-2.4,0.8 Z" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>
