@@ -16,23 +16,26 @@ import { bladeOn, insectRig, placed, scytheArm, SHARED, sideLegs, topLegs } from
 const ACID = "#c8ef5a";
 
 export function motherSide(): RigDef {
+  // the legs arch high: every knee well above the body line, then a long thin shin down to a
+  // splayed foot, so they read as an insect's (not as poles); the feet spread past the abdomen
   const legs = sideLegs({
-    hips: [{ x: -32, y: -90 }, { x: -10, y: -86 }, { x: 12, y: -90 }],
-    knees: [{ x: -84, y: -148 }, { x: -20, y: -160 }, { x: 62, y: -154 }],
-    feet: [-134, -40, 120],
+    hips: [{ x: -32, y: -96 }, { x: -10, y: -92 }, { x: 12, y: -96 }],
+    knees: [{ x: -100, y: -192 }, { x: 22, y: -206 }, { x: 84, y: -192 }],
+    feet: [-152, -44, 150],
     far: { x: 30, y: -8 },
-    width: [10.4, 8],
+    width: [10.4, 6.2],
     step: 14,
     lift: 18,
     z: [8, 1],
   });
-  const near = scytheArm("armN", { x: -26, y: -126 }, { x: -54, y: -200 }, { x: -104, y: -186 }, { z: 11, width: [8.6, 7.6] });
-  const far = scytheArm("armF", { x: -14, y: -128 }, { x: -34, y: -196 }, { x: -84, y: -184 }, { z: 2, slot: "suit", width: [7.6, 6.6] });
+  // the scythes are held high and back, over the thorax, so the head and its crown read clear in front
+  const near = scytheArm("armN", { x: -12, y: -128 }, { x: -34, y: -226 }, { x: -100, y: -184 }, { z: 11, width: [8.6, 7.6] });
+  const far = scytheArm("armF", { x: 2, y: -130 }, { x: -14, y: -220 }, { x: -78, y: -182 }, { z: 2, slot: "suit", width: [7.6, 6.6] });
   return insectRig({
     id: "swarm.mother.side",
     name: "The Broodmother",
     view: "side",
-    height: 206,
+    height: 222,
     k: 1.6,
     spits: true,
     limbInk: 2,
@@ -43,8 +46,8 @@ export function motherSide(): RigDef {
       { id: "abdomen", src: abdomenSide, bone: "torso", z: 5 },
       placed("plate", SHARED.plate, "torso", 64, -160, 5.5, 1.9, -22),
       { id: "thorax", src: thoraxSide, bone: "torso", z: 6 },
-      { id: "head", src: headSide, bone: "gun", place: { x: -36, y: -112, rot: 0, scale: 1.4 }, z: 9 },
-      placed("eyes", SHARED.eyes, "gun", -66, -120, 10, 2.3),
+      { id: "head", src: headSide, bone: "gun", place: { x: -38, y: -112, rot: 0, scale: 1.6 }, z: 9 },
+      placed("eyes", SHARED.eyes, "gun", -73, -121, 10, 2.6),
       bladeOn(near, { z: 12, reach: 1.45 }),
     ],
     limbs: [...legs.limbs, far, near],

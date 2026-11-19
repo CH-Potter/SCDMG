@@ -54,8 +54,8 @@ export function shellbackTop(): RigDef {
     k: 0.8,
     pivots: { torso: { x: 0, y: 4 }, head: { x: 0, y: -40 } },
     parts: [
-      { id: "head", src: head, bone: "gun", place: { x: 0, y: -40, rot: 90, scale: 1.3 }, z: 3 },
-      placed("eyes", SHARED.eyes, "gun", 0, -51, 3.5, 0.9),
+      { id: "head", src: head, bone: "gun", place: { x: 0, y: -50, rot: 90, scale: 1.3 }, z: 3 },
+      placed("eyes", SHARED.eyes, "gun", 0, -61, 3.5, 0.9),
       { id: "shell", src: shellTop, bone: "torso", z: 5 },
       placed("plate", SHARED.plate, "torso", 0, 20, 6, 1.1, 90),
     ],

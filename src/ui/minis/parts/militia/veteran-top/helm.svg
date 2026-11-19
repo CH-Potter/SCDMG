@@ -1,12 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 -18 30 31" data-part="militia.veteran.top.helm">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-26 -28 52 52" data-part="militia.veteran.top.helm">
 <!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
-<title>Pot helm from above: wide brim, team band, respirator canister at the front</title>
-<circle cx="0" cy="-14" r="3.2" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
-<circle cx="0" cy="-2" r="13" fill="#6c5a37" stroke="#141414" stroke-width="2.4"/>
-<path class="shade" d="M9,-11 A13,13 0 0 1 -5,10 Q8,4 9,-11 Z" fill="#44432f"/>
-<circle class="tag" cx="0" cy="-2" r="8.8" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
-<circle cx="0" cy="-2" r="6.8" fill="#9a8458" stroke="#141414" stroke-width="1.4"/>
-<path class="shade" d="M4.4,-7 A6.8,6.8 0 0 1 -2.6,4.4 Q4.4,1.8 4.4,-7 Z" fill="#6c5a37"/>
-<g class="detail"><circle cx="-3" cy="-4" r="0.8" fill="#c8bd98"/><circle cx="3" cy="-4" r="0.8" fill="#c8bd98"/></g>
+<title>Pot helm from above: a wide riveted brim (wider than the shoulders), team band, respirator canister peeking out at the front</title>
+<circle cx="0" cy="-24.5" r="3.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="-2" r="23.5" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M16.6,-18.6 A23.5,23.5 0 0 1 -9,19.7 Q14,10 16.6,-18.6 Z" fill="#6c5a37"/>
+<circle cx="0" cy="-2" r="20.5" fill="none" stroke="#141414" stroke-width="1.4"/>
+<g class="detail" fill="#c8bd98"><circle cx="0" cy="-23" r="1"/><circle cx="-18" cy="-13" r="1"/><circle cx="18" cy="-13" r="1"/><circle cx="-18" cy="9" r="1"/><circle cx="18" cy="9" r="1"/><circle cx="0" cy="19" r="1"/></g>
+<circle class="tag" cx="0" cy="-2" r="11.5" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="-2" r="9" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M5.8,-8.9 A9,9 0 0 1 -3.4,6.3 Q5.8,2.4 5.8,-8.9 Z" fill="#6c5a37"/>
 <g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
 </svg>

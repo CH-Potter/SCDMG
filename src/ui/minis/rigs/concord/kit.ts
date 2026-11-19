@@ -225,7 +225,7 @@ export interface CourtierTop {
  * the options (weapon placements, hand positions) are in the parts' own drawn units.
  */
 export function courtierTop(o: CourtierTop & { scale?: number }): RigDef {
-  const K = o.scale ?? 1.4;
+  const K = o.scale ?? 1.75;
   const k = (p: Pt): Pt => ({ x: p.x * K, y: p.y * K });
   const kp = (p: Place): Place => ({ x: p.x * K, y: p.y * K, rot: p.rot, scale: (p.scale ?? 1) * K });
   const wpn = readPart(o.weapon.src);

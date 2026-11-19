@@ -37,7 +37,7 @@ export function veteranSide(sergeant = false): RigDef {
 }
 
 export function veteranTop(sergeant = false): RigDef {
-  const extras: ExtraPart[] = sergeant ? [{ id: "pennant", src: pennantTop, bone: "torso", z: 0.5, place: { x: 8, y: 14, rot: 70 } }] : [];
+  const extras: ExtraPart[] = sergeant ? [{ id: "pennant", src: pennantTop, bone: "torso", z: 6.5, place: { x: 14, y: 8, rot: 55, scale: 1.7 } }] : [];
   return trooperKitTop({
     id: `militia.veteran.top${sergeant ? ".sergeant" : ""}`,
     name: sergeant ? "Sergeant Mabel (from above)" : "Old Guard veteran (from above)",

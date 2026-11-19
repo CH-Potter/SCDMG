@@ -35,17 +35,20 @@ export function wardenSide(): RigDef {
 }
 
 export function wardenTop(): RigDef {
-  const K = 1.4;
+  const K = 1.75;
+  // the staff is held out ahead, its cradle (and the floating crystal) well past the robe's hem;
+  // the hex halo floats round the hood as a full ring, so the outline reads at 32 px
+  const staffAt = { x: -11, y: -10 };
   return courtierTop({
     id: "concord.warden.top",
     name: "Beam Warden (from above)",
     helm: hoodTop,
     collar: collarHighTop,
-    weapon: { src: staffTop, place: { x: -11, y: -12, rot: 90 } },
+    weapon: { src: staffTop, place: { ...staffAt, rot: 90 } },
     under: [{ id: "robe", src: robeTop, z: 0.5 }],
     extra: [
-      { id: "halo", src: haloTop, bone: "head", place: { x: 0, y: 7 * K, rot: 0, scale: K * 1.35 }, z: 5.6 },
-      { id: "crystal", src: crystalTop, bone: "gun", place: { x: -11 * K, y: -13 * K, rot: 0, scale: K * 1.3 }, z: 6.5, anim: { pulse: 0.08 } },
+      { id: "halo", src: haloTop, bone: "head", place: { x: 0, y: 0.5 * K, rot: 0, scale: K }, z: 6.4, anim: { pulse: 0.03 } },
+      { id: "crystal", src: crystalTop, bone: "gun", place: { x: staffAt.x * K, y: (staffAt.y - 29) * K, rot: 0, scale: K * 1.25 }, z: 6.5, anim: { pulse: 0.08 } },
     ],
     height: 40,
     shadow: { x: 4, y: 6, r: 19 },

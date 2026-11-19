@@ -42,12 +42,17 @@ export function medicTop(): RigDef {
   return trooperKitTop({
     id: "militia.medic.top",
     name: "Patch medic (from above)",
-    pack: medicPackTop,
+    // from above the medic is the pack: drawn a size up so the tall taped pack, its blanket roll and
+    // splint case dominate the outline, and the cog-and-plus band is a big pale disc on the near pad
+    pack: null,
     weapon: { src: pistolTop, place: placeAt(pistolTop, "g1", { x: 9, y: -16 }, 90) },
     armR: { grip: "g1" },
     armL: { hand: injectorTop, at: { x: -18, y: -16 }, to: "torso" },
-    extras: [{ id: "band", src: bandTop, bone: "torso", z: 5.5, place: { x: -15, y: 1, rot: 0 } }],
-    shadow: { x: 5, y: 8, r: 23 },
+    extras: [
+      { id: "pack", src: medicPackTop, bone: "torso", z: 0, place: { x: 0, y: -2.5, rot: 0, scale: 1.45 } },
+      { id: "band", src: bandTop, bone: "torso", z: 5.5, place: { x: -15, y: 1, rot: 0, scale: 1.7 } },
+    ],
+    shadow: { x: 5, y: 10, r: 27 },
   });
 }
 
