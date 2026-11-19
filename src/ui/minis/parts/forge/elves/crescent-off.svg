@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -22 82 30" data-part="forge.elves.side.crescent-off" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crescent blade for the off hand, gripped at its hilt</title>
+<path d="M2,-2 Q22,-20 54,-8 L56,1 Q30,-8 4,3 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M4,3 Q30,-8 56,1 L55,-3 Q30,-11 6,0 Z" fill="#4a5158"/>
+<path d="M53,-8 L58,-9 L59,4 L54,4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="58" y="-2.6" width="13" height="5.2" rx="1.4" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<circle cx="73" cy="0" r="3" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="63" cy="0" r="1"/><circle id="g1" cx="63" cy="0" r="1"/><circle id="muzzle" cx="2" cy="-2" r="1"/></g>
+</svg>

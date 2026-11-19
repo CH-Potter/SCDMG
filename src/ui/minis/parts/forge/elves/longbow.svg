@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -60 56 120" data-part="forge.elves.side.longbow" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Moonwood longbow: a tall leaf-tipped recurve, drawn, arrow nocked (arrow points left)</title>
+<path d="M13,-55 L40,0 L13,55" fill="none" stroke="#e3d8b6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13,-57 Q2,-48 7,-30 Q15,-10 14,0 Q15,10 7,30 Q2,48 13,57 Q8,46 12,30 Q21,10 20,0 Q21,-10 12,-30 Q8,-46 13,-57 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M13,-57 L18,-62 L15,-54 Z M13,57 L18,62 L15,54 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<rect x="13" y="-5" width="7" height="10" rx="1.4" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path d="M-2,0 H41" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-7,0 L1,-3.6 L4,0 L1,3.6 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M36,0 L44,-4 L42,0 L44,4 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="16" cy="0" r="1"/><circle id="g2" cx="40" cy="0" r="1"/><circle id="muzzle" cx="-6" cy="0" r="1"/></g>
+</svg>

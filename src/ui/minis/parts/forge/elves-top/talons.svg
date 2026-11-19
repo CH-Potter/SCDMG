@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 24 12" data-part="forge.elves.top.talons" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Talons from above (claws left)</title>
+<path d="M14,-4 L4,-4 Q-4,-4 -4,0 Q-4,4 4,4 L14,4 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="10" y="-3" width="6" height="6" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="12" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

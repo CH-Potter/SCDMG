@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 54 56 92" data-part="forge.elves.side.torso-plain">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Elf torso without the sash (the shield carries the team): a silver leaf brooch instead</title>
+<path d="M64,100 L79,98 Q86,120 93,143 L76,141 Q70,121 64,100 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M76,141 L93,143 L91,137 Q85,124 80,104 Z" fill="#44432f"/>
+<path d="M46,102 L62,102 L61,141 L54,136 L46,141 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M55,102.6 L61.4,102.6 L60.6,139.6 L55,136.4 Z" fill="#6c5a37"/>
+<path d="M47.4,136 L54,132.6 L60.6,136.6" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M47,69 Q59,62 74,66 L76,101 Q61,106 48,101 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,64.8 Q72,65.2 74,66 L76,101 Q72,102.6 68.6,103 Z" fill="#6c5a37"/>
+<path d="M49,80 Q55,85 61,80 Q67,85 74,80" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M49,91 Q55,96 61,91 Q67,96 75,91" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46,98.6 L77,95.6 L77,102.6 L46,105.6 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+
+<path d="M60,70 Q66,76 60,84 Q54,76 60,70 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M50,60.6 L70,58.6 L72.4,67 L51,69 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="72" cy="72" r="1" fill="#b9bfc4"/><circle cx="51" cy="75" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -14 20 28" data-part="forge.elves.top.moonstone" data-recoil="1">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The floating moonstone from above</title>
+<path class="glow" d="M0,-12 L7,0 L0,12 L-7,0 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M0,-8 L4,0 L0,8 Z" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-10" r="1"/></g>
+</svg>

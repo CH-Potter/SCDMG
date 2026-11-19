@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 14 66 50" data-part="forge.elves.side.hood-ranger">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hollow-Oak cowl: a deep moss-dark hood shaggy with leaves, ear tip through it</title>
+<path d="M44,48 Q40,22 60,19 Q76,19 82,30 L96,40 L81,42 Q80,51 76,61 Q68,55 67,43 Q65,32 56,31.6 Q48,32 47.6,44 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,21 Q78,23 82,30 L96,40 L81,42 Q80,51 76,61 Q72,58 70.6,52 Q76,38 70,21 Z" fill="#44432f"/>
+<path d="M47.6,44 Q48,32 56,31.6 Q65,32 67,43" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M50,22 L44,16 L54,18 Z M62,18 L60,12 L67,17 Z M76,24 L80,16 L81,26 Z M42,36 L37,32 L43,30 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M71,38 L88,25 L75,44 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

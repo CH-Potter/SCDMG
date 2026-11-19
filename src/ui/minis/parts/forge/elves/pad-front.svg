@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 54 34 36" data-part="forge.elves.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Leaf pauldron, near: a curled jade leaf with a silver rib</title>
+<path d="M30,66 Q44,56 59,62 L57,79 Q45,88 32,84 Q28,76 30,66 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M31,78 Q44,84 57,76 L57,79 Q45,88 32,84 Z" fill="#6c5a37"/>
+<path d="M33,74 Q44,68 56,66" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

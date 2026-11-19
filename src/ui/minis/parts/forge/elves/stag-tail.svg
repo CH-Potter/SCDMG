@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 -60 16 16" data-part="forge.elves.side.stag-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Stag scut: a short white tail</title>
+<path d="M30,-54 Q38,-58 40,-52 Q38,-46 31,-48 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="32" cy="-50" r="1"/></g>
+</svg>
