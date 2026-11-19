@@ -9,28 +9,30 @@ It runs in the browser or as a portable Windows app. This is an original game: t
 
 Free and open source under the [GNU GPL v3 or later](LICENSE).
 
-![An Assault battle: the Dustline Militia (Big Bertha, Rivet Grunts, a Sky Rustler and a Haymaker Bomber) against the Lumen Concord, drawn in the Ink Rig miniature style, with the dice tray showing the Grand Strider's Prism Cannon hitting the Bomber for 2 damage](docs/images/battle.png)
+![An Assault battle: the Dustline Militia (Big Berthas, Rivet Grunts and more) against the Lumen Concord, drawn in the Ink Rig miniature style. Big Bertha's Thumper Cannon hits the Blink Dancers for 3 damage, and the Supports panel shows 5 CP on ready cards, with the Forward Airstrip card burnt till the round ends](docs/images/battle.png)
 
 **[▶ Play in your browser](https://ch-potter.github.io/SCDMG/)** · **[Download for Windows](https://github.com/CH-Potter/SCDMG/releases/latest)** · [Run it from source](#run-from-source) · [Rules](docs/rules.md) · [Lore](docs/lore.md)
 
 ## What's in it
 
-### New in v0.11: new miniatures, a new army, and tricks to master
+### New in v0.12: every army drawn, and CP you hold in your hand
 
-- **New miniatures.** Every unit of the three armies is redrawn on a new miniature engine, with walk cycles, recoil and wing beats. Pick the side-on **Ink Rig** style or the top-down **Overhead** style with the **Minis** button; Classic is still there.
-- **The Skitterswarm** replaces the Munch as the third army, and the **Dustline Militia** is now a drafted, armoured frontier army.
-- **Army slots:** units are Base, Support, Elite, Flyer or Static, inferred from their stats, and your faction and support cards decide how many of each your list can take (a house rule, on by default).
-- **Barrage markers:** mortars and other lobbed guns mark a spot in the movement phase, and it's shelled at the end of the assault phase, friend or foe. Move out, or don't charge in.
+- **Every Forge template has its own miniatures**, drawn in the **Ink Rig** style, now the default: the grimdark brotherhood, regiment, mob, kin, legion and cult; the fantasy elves, orcs, undead, dwarves, knights and druids; and the Munch.
+- **Card-bound CP.** Your CP is the CP on your ready support cards, and the Supports panel shows it ("✦ 5 CP on ready cards"). Spending CP burns a card until the round ends, abilities and all, and a payment dialog lets you pick which one.
+- **Unit abilities that cost CP**, and **disruption**: units that burn the enemy's dearest ready card for the round.
+- **Dice buffs and debuffs:** better or worse saves, evades, extra damage per hit, and more or fewer attack dice, from unit abilities and support cards.
+- **Barrage markers:** mortars and other lobbed guns mark a spot in the movement phase, and it's shelled at the end of the assault phase, friend or foe.
 - **Hide and seek:** Hidden units can only be picked out from close range until they attack; Swarm units can **burrow** and burst back up; detectors with **Keen Eyes** find both.
-- **Evade, rethought:** only small, agile units dodge, and they can dodge in a melee and against shells fired out of sight.
+- **Properly random dice** in live games, with Undo that still doesn't re-roll.
+- Still fresh from v0.11: every unit redrawn on the new miniature engine (Ink Rig, top-down Overhead or Classic, on the **Minis** button), the **Skitterswarm** as the third army, the drafted **Dustline Militia**, and **army slots**.
 
 ### New in v0.10: house rules, so you play it your way
 
-![The House rules panel in the main menu, with Morale, Breach dice, Overwatch and Random activation order switched on: core rules to switch off on the left, optional tabletop staples to switch on on the right](docs/images/house-rules.webp)
+![The House rules panel in the main menu, with Morale, Breach dice, Overwatch and Random activation order switched on: core rules to switch off on the left, from card-bound CP to shell scatter, optional tabletop staples to switch on on the right](docs/images/house-rules.webp)
 
 Every tabletop group plays a little differently. In the main menu, **step 5, House rules**, you tick the mechanics you want, and the AI plays by the same rules. Your choice is saved in your browser and applies to every battle, campaign included.
 
-- **Switch core mechanics off:** rolled charges, close ranks, supporting rank, evade rolls, stray shots into melee, impact on the charge, difficult terrain, units blocking line of fire, and shell scatter.
+- **Switch core mechanics off:** card-bound CP (bank it instead), unit class limits, evading in the scrum and against unseen shells, rolled charges, close ranks, supporting rank, evade rolls, stray shots into melee, impact on the charge, difficult terrain, units blocking line of fire, and shell scatter.
 - **Switch tabletop staples on:**
   - **Morale and Shaken:** battered units test their nerve.
   - **Breach dice:** anti-armour and anti-air weapons roll a d3 or d6 with the attack, and that many hits skip the save.
@@ -53,7 +55,7 @@ Each faction's design pillars are in [docs/factions.md](docs/factions.md).
 
 ### A tabletop that shows its working
 
-![Aim lines from a squad of Rivet Grunts to the Blink Dancers: one line is clear at 16.1 inches of 22, the rest are blocked by a raised platform](docs/images/aim-line.webp)
+![Aim lines from every model in a squad of Rivet Grunts to a Shimmer Saucer over the raised platform, 10.3 inches of 22, with the odds of the shot in a tooltip and the target's card alongside](docs/images/aim-line.webp)
 
 Select a unit and hover a target to see what would happen before you commit: aim lines from every model, the range, what blocks sight or gives cover, and the odds. Then roll. The dice tray can let you **throw your own dice**, roll them automatically, roll quickly or skip them. The dice are properly random, and Undo takes back your last command without re-rolling them: redo it and they land the same.
 
@@ -91,9 +93,9 @@ Comic-panel intro animations, drawn live with the game's own miniatures, introdu
 
 The **map builder** draws battlefields from platforms, buildings, walls, barricades, cover, ramps, ladders, spawn zones and objectives, with snapping, mirroring for symmetric boards, built-in checks and a play test. Start from a blank board or copy a built-in map.
 
-![The faction forge showing a codex: every unit with its miniature, stats and keywords](docs/images/faction-forge.webp)
+![The faction forge with a copy of the Munch template open: every unit and structure with its own Ink Rig miniature, stats and keywords](docs/images/faction-forge.webp)
 
-The **faction forge** shows every built-in faction's codex, and lets you copy one, start from one of 13 trope templates (armoured super-soldiers, a scrap-built warband, an undead legion, a knightly kingdom, the Munch and more; see [docs/factions.md](docs/factions.md#faction-forge-templates)), or start from scratch to make your own, with custom unit art. Costs, supply, upgrade costs and Fizz are worked out from what you build, with a breakdown (e.g. "⚙5 = body 2.4 + guns 1.2 + abilities 1"), so you can see what each stat, weapon and ability is worth.
+The **faction forge** shows every built-in faction's codex, and lets you copy one, start from one of 13 trope templates, each with its own miniatures (armoured super-soldiers, a scrap-built warband, an undead legion, a knightly kingdom, the Munch and more; see [docs/factions.md](docs/factions.md#faction-forge-templates)), or start from scratch to make your own, with custom unit art. Costs, supply, upgrade costs and Fizz are worked out from what you build, with a breakdown (e.g. "⚙5 = body 2.4 + guns 1.2 + abilities 1"), so you can see what each stat, weapon and ability is worth.
 
 ### Mouse or touch, browser or desktop
 
