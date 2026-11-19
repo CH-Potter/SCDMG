@@ -13,20 +13,22 @@ import { SUPPORTS } from "./data/factions";
 // into weapon range, or into charge range depending on what they're good at.
 
 import { ABILITIES } from "./data/abilities";
-import { airdropSpotProblem, canPlaySupport, deployZones, supportTarget } from "./supports";
+import { airdropSpotProblem, canPlaySupport, cardToBurn, deployZones, supportTarget, type DiceEffect } from "./supports";
+import { supportAbilityValue } from "./pricing";
 import { abilityOf } from "./reactions";
 import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
-import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
+import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, isFearless, nerveOf, PHASE_EVADE, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
 import { HIDDEN_RANGE } from "./constants";
-import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, tableKey, twoDiceAtLeast } from "./game";
+import { applyCommand, BALE_OUT, bestTwoOfThreeAtLeast, canSee, chargeBonus, chargeNeed, chargeOdds, closeRanksPreview, CROP_DUST, cropDustCaught, disruptProblem, LAY_EGGS, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, smokeCaught, SMOKE_SHELLS, standsTo, standToPlan, tableKey, twoDiceAtLeast, UNIT_DICE_EFFECTS } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileFor, profileOf, reacts } from "./profile";
 import {
   aliveModels,
   controlWeight,
+  concealment,
   supplyFor,
   deployable,
   effectiveMove,
@@ -772,9 +774,10 @@ const likelyChargeRange = (s: GameState, u: Unit): number => (rulesOf(s).rolledC
 
 function chargeCandidates(s: GameState, u: Unit): Candidate[] {
   const rules = rulesOf(s);
+  if (u.status.holding) return []; // holding the line: it stays put
   // Rolled charges and overwatch roll dice the AI mustn't peek at: judge the charge as if it lands,
-  // then weigh it by the odds of the roll and the overwatch it will face.
-  if (rules.rolledCharges || rules.overwatch) {
+  // then weigh it by the odds of the roll and the overwatch (or Stand To) it will face.
+  if (rules.rolledCharges || rules.overwatch || onBoard(s, other(u.owner)).some(standsTo)) {
     const sure: GameState = { ...s, rules: { ...rules, overwatch: false }, aiAssumeChargesLand: true };
     const base = baseEval(s, u.owner);
     return chargeCandidatesIn(sure, u).map((c): Candidate | null => {
@@ -784,11 +787,13 @@ function chargeCandidates(s: GameState, u: Unit): Candidate[] {
       const dodge = rules.rolledCharges && reacts(e, "pirouette") && !e.reactionsUsed.includes("pirouette") && !isEngaged(s, e) ? (ABILITIES.pirouette.range ?? 3) : 0;
       const need = raw === null ? null : raw + dodge;
       if (need === null || need > ROLLED_CHARGE_MAX) return null;
-      const odds = rules.rolledCharges ? twoDiceAtLeast(need) : 1;
+      const odds = rules.rolledCharges ? chargeOdds(u, need) : 1;
       const after = c.after ?? simulate(sure, c.cmd);
       const position = after ? evaluate(after, u.owner) - base : 0;
       const ow = rules.overwatch ? overwatchPlan(s, e, u) : null;
-      const shot = ow ? expectedDamage(s, e, u, ow.plan, false) * valuePerWound(u) : 0;
+      // Stand To: a unit braced for it shoots first, at full accuracy, whether the charge lands or not.
+      const st = standsTo(e) ? standToPlan(s, e, u) : null;
+      const shot = (ow ? expectedDamage(s, e, u, ow.plan, false) * valuePerWound(u) : 0) + (st ? expectedDamage(s, e, u, st.plan, false) * valuePerWound(u) : 0);
       return { cmd: c.cmd, bonus: odds * (c.bonus + position) - shot, expected: true };
     }).filter((c): c is Candidate => c !== null);
   }
@@ -1068,6 +1073,155 @@ function returnFireRisk(s: GameState, u: Unit, e: Unit, exp: number): number {
 
 type AbilityAi = (s: GameState, u: Unit) => Candidate[];
 
+// ---------- the CP ability pass: shared valuations ----------
+
+/** How much worse `e`'s saves are right now from statuses (Corrode, Eat Through, Rampage, armour buffs). */
+const saveShiftOf = (e: Unit): number => (e.status.corroded ? 1 : 0) + (e.status.melting ? 1 : 0) + (e.status.reckless ? 1 : 0) - (e.status.saveMod ?? 0);
+
+/** Expected melee damage from `u` on `e` (charging), with extra dice per model, `worse` saves and extra damage per hit. */
+function meleeExp(u: Unit, e: Unit, extra = 0, worse = 0, dmg = 0): number {
+  let best = 0;
+  for (const w of meleeWeapons(u)) {
+    if (!meleeCanHit(u, e, w.targets)) continue;
+    const b = weaponBonus(w, e);
+    const dice = Math.max(1, w.dice + b.dice + 1 + u.status.meleeBonus + (u.status.diceMod ?? 0) + extra);
+    const pFail = failChance(profileOf(e).armor + w.ap + b.ap + saveShiftOf(e) + worse);
+    best = Math.max(best, aliveModels(u).length * dice * pAtLeast(w.hit) * pFail * Math.max(1, w.damage + b.damage + (u.status.damageMod ?? 0) + dmg));
+  }
+  return best;
+}
+
+/** Our units that will hit `t` in melee this round: in a fight with it, or ready to charge it. */
+function meleeOn(s: GameState, me: PlayerId, t: Unit): Unit[] {
+  if (isFlying(t)) return [];
+  return onBoard(s, me).filter((f) => {
+    if (!meleeWeapons(f).some((w) => meleeCanHit(f, t, w.targets))) return false;
+    if (engagedWith(s, f).some((x) => x.uid === t.uid)) return true;
+    return s.phase !== "combat" && !f.status.acted && !f.status.disengaged && !f.status.holding && unitGap(f, t) <= likelyChargeRange(s, f) + 1;
+  });
+}
+
+/** Extra melee value our units get on `t` with its saves `worse` worse. */
+function meleeSaveGain(s: GameState, me: PlayerId, t: Unit, worse: number): number {
+  let gain = 0;
+  for (const f of meleeOn(s, me, t)) gain += Math.max(0, attackValue(s, t, meleeExp(f, t, 0, worse)) - attackValue(s, t, meleeExp(f, t)));
+  return gain;
+}
+
+/** Rough hits coming at our unit `t` this round: enemy guns in reach, and the enemies it's fighting. */
+function incomingHits(s: GameState, t: Unit): number {
+  let hits = Math.min(threatOn(s, t), wounds(t) * 3) * 0.6;
+  for (const e of engagedWith(s, t)) for (const w of meleeWeapons(e).slice(0, 1)) hits += aliveModels(e).length * w.dice * pAtLeast(w.hit);
+  return hits;
+}
+
+/**
+ * Eval points a dice buff or debuff on `t` is worth to player `me` this round (support cards and the
+ * unit abilities that share the statuses). `cmd` is the play itself, for the effects judged by
+ * simulating our shots against the debuffed target.
+ */
+function diceEffectValue(s: GameState, me: PlayerId, t: Unit, e: DiceEffect, cmd: Command): number {
+  const prof = profileOf(t);
+  switch (e.kind) {
+    case "armourBuff": {
+      if ((t.status.saveMod ?? 0) > 0) return 0;
+      const armor = prof.armor + saveShiftOf(t);
+      return incomingHits(s, t) * Math.max(0, failChance(armor) - failChance(armor - e.save)) * valuePerWound(t);
+    }
+    case "evadeBuff": {
+      if ((t.status.evadeBonus ?? 0) > 0 || (t.status.evadeGrant ?? 0) > 0 || !rulesOf(s).evade) return 0;
+      const gain = prof.evade ? e.amount / 6 : pAtLeast(e.grant);
+      return incomingHits(s, t) * gain * failChance(prof.armor + saveShiftOf(t)) * valuePerWound(t);
+    }
+    case "damageBuff": {
+      if ((t.status.damageMod ?? 0) > 0) return 0;
+      let gain = 0;
+      for (const x of onBoard(s, other(me))) {
+        if (s.phase !== "combat" && !t.status.acted) {
+          for (const w of rangedWeapons(t)) {
+            const plan = planShooting(s, t, x, w);
+            if (typeof plan === "string") continue;
+            gain = Math.max(gain, attackValue(s, x, expectedDamage(s, t, x, { ...plan, damage: plan.damage + e.amount }, false)) - attackValue(s, x, expectedDamage(s, t, x, plan, false)));
+          }
+        }
+        if (meleeOn(s, me, x).some((f) => f.uid === t.uid)) gain = Math.max(gain, attackValue(s, x, meleeExp(t, x, 0, 0, e.amount)) - attackValue(s, x, meleeExp(t, x)));
+      }
+      return gain;
+    }
+    case "armourBreak":
+    case "evadeDebuff": {
+      const after = simulate(s, cmd);
+      if (!after) return 0;
+      const shots = s.phase === "combat" ? 0 : shotGain(s, after, me, t.uid);
+      return shots + (e.kind === "armourBreak" ? meleeSaveGain(s, me, t, e.save) : 0);
+    }
+    case "weaken": {
+      // What its attacks on us lose: its best shot (if it can still shoot) and its blows in a fight.
+      let loss = 0;
+      const free = s.phase !== "combat" && !t.status.acted;
+      for (const u of onBoard(s, me)) {
+        if (free) {
+          for (const w of rangedWeapons(t)) {
+            const plan = planShooting(s, t, u, w);
+            if (typeof plan === "string") continue;
+            const fewer = { ...plan, attackers: plan.attackers.map((a) => ({ ...a, dice: Math.max(1, a.dice - e.dice) })) };
+            loss = Math.max(loss, attackValue(s, u, expectedDamage(s, t, u, plan, false)) - attackValue(s, u, expectedDamage(s, t, u, fewer, false)));
+          }
+        }
+        if (engagedWith(s, t).some((x) => x.uid === u.uid) || (free && meleeWeapons(t).length && unitGap(t, u) <= likelyChargeRange(s, t))) {
+          loss = Math.max(loss, attackValue(s, u, meleeExp(t, u)) - attackValue(s, u, meleeExp(t, u, -e.dice)));
+        }
+      }
+      return loss;
+    }
+  }
+}
+
+/** A card-burning ability (Snipe the Runner, Chew the Wires, Cutting Remark): the CP it takes off them and the best play it denies. */
+function burnValue(s: GameState, me: PlayerId): number {
+  const victim = other(me);
+  const id = cardToBurn(s, victim);
+  const card = id ? SUPPORTS[id] : undefined;
+  if (!card) return 0;
+  const cp = s.players[victim].cp;
+  if (cp <= 0) return 0;
+  // Early in the round they still have most of it to spend.
+  const left = s.phase === "movement" ? 1 : s.phase === "assault" ? 0.7 : 0.4;
+  // Only the card's plays they could still make this round: affordable, and in a phase still to come.
+  const later: string[] = s.phase === "movement" ? ["movement", "assault", "combat", "any"] : s.phase === "assault" ? ["assault", "combat", "any"] : ["combat", "any"];
+  const playable = card.abilities.filter((a) => a.cp <= cp && later.includes(a.timing) && !(("fromRound" in a.effect) && (a.effect.fromRound ?? 1) > s.round));
+  const denied = Math.max(0, ...playable.map((a) => supportAbilityValue(a)));
+  return (Math.min(card.cp, cp) * CP_VALUE + denied * 1.5) * left;
+}
+
+/** Candidates for a unit ability that puts a dice buff or debuff on a unit (Rivet the Plates, Numbing Sting...). */
+function diceAbilityCandidates(s: GameState, u: Unit, id: AbilityId): Candidate[] {
+  const def = ABILITIES[id];
+  const e = UNIT_DICE_EFFECTS[id];
+  if (!e || s.players[u.owner].cp < (def.cp ?? 0)) return [];
+  const friendly = def.needs === "friendlyUnit";
+  const range = id === "star-shell" ? (barrageGun(profileOf(u))?.range ?? 0) : (def.range ?? 6);
+  const reserve = cpReserve(s, u.owner, id, def.cp ?? 0);
+  const out: Candidate[] = [];
+  for (const t of onBoard(s, friendly ? u.owner : other(u.owner))) {
+    if (t.uid !== u.uid && unitGap(u, t) > range) continue;
+    if (!friendly && concealment(s, u, t)) continue;
+    const cmd: Command = { type: "ability", uid: u.uid, ability: id, target: t.uid };
+    const v = diceEffectValue(s, u.owner, t, e, cmd);
+    if (v <= 0) continue;
+    out.push({ cmd, bonus: v * 0.8 - (def.cp ?? 0) * CP_VALUE - reserve, stack: true, expected: true });
+  }
+  return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+}
+
+/** Candidates for a card-burning unit ability. */
+function burnCandidates(s: GameState, u: Unit, id: AbilityId): Candidate[] {
+  const def = ABILITIES[id];
+  if (s.players[u.owner].cp < (def.cp ?? 0) || disruptProblem(s, u, id)) return [];
+  const v = burnValue(s, u.owner) - (def.cp ?? 0) * CP_VALUE - cpReserve(s, u.owner, id, def.cp ?? 0);
+  return [{ cmd: { type: "ability", uid: u.uid, ability: id }, bonus: v, stack: true, expected: true }];
+}
+
 const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
   // Drag an enemy off an objective, into our guns, or into charge reach.
   grapple(s, u) {
@@ -1324,6 +1478,220 @@ const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
     }
     return out;
   },
+  // ---------- the CP ability pass ----------
+  // Stand to when a melee unit can reach us this round: the shot it eats on the way in.
+  "stand-to"(s, u) {
+    const def = ABILITIES["stand-to"];
+    if (s.players[u.owner].cp < (def.cp ?? 0) || u.status.standingTo) return [];
+    const guns = rangedWeapons(u).filter((w) => !w.traits?.includes("indirect"));
+    if (!guns.length) return [];
+    let v = 0;
+    for (const e of onBoard(s, other(u.owner))) {
+      if (isFlying(e) || profileOf(e).structure || !meleeWeapons(e).some((w) => meleeCanHit(e, u, w.targets)) || isEngaged(s, e)) continue;
+      if (unitGap(e, u) > effectiveMove(s, e) + likelyChargeRange(s, e)) continue;
+      const ep = profileOf(e);
+      let exp = 0;
+      for (const w of guns) {
+        if (w.targets === "air") continue;
+        const b = weaponBonus(w, e);
+        exp = Math.max(exp, aliveModels(u).length * (w.dice + b.dice) * pAtLeast(w.hit) * failChance(ep.armor + w.ap + b.ap) * Math.min(w.damage + b.damage, ep.hp + ep.shield));
+      }
+      // Melee units come for us; a mixed unit might not.
+      v = Math.max(v, attackValue(s, e, exp) * (isMeleeUnit(e) ? 0.55 : 0.2));
+    }
+    if (v <= 0) return [];
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "stand-to" }, bonus: v - CP_VALUE - cpReserve(s, u.owner, "stand-to", def.cp ?? 0), stack: true, expected: true }];
+  },
+  // Plant the feet on an objective the enemy can contest: the evaluation sees the doubled weight.
+  "hold-the-line"(s, u) {
+    const def = ABILITIES["hold-the-line"];
+    if (s.players[u.owner].cp < (def.cp ?? 0) || !onObjective(s, u) || isEngaged(s, u)) return [];
+    const contested = onBoard(s, other(u.owner)).some((e) => !isFlying(e) && !profileOf(e).structure && unitGap(e, u) <= effectiveMove(s, e) + 3);
+    if (!contested) return [];
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "hold-the-line" }, bonus: -CP_VALUE - cpReserve(s, u.owner, "hold-the-line", def.cp ?? 0) }];
+  },
+  // Smoke over the friends the enemy's long guns can reach from beyond 12".
+  "smoke-shells"(s, u) {
+    const def = ABILITIES["smoke-shells"];
+    const gun = barrageGun(profileOf(u));
+    if (!gun || s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    const out: Candidate[] = [];
+    for (const f of onBoard(s, u.owner)) {
+      if (isFlying(f) || f.status.smoked) continue;
+      const p = centroid(f);
+      if (!aliveModels(u).some((m) => dist(m.pos, p) <= gun.range)) continue;
+      let v = 0;
+      for (const hid of smokeCaught(s, u.owner, p)) {
+        let blocked = 0;
+        for (const t of onBoard(s, other(u.owner))) {
+          if (t.status.acted || !rangedWeapons(t).length) continue;
+          const gap = unitGap(t, hid);
+          if (gap <= SMOKE_SHELLS.range) continue;
+          const reachIt = Math.max(...rangedWeapons(t).map((w) => (w.targets === "air" ? 0 : w.range)));
+          if (gap > reachIt + effectiveMove(s, t)) continue;
+          blocked += firepower(t) * 0.6;
+        }
+        v += Math.min(blocked, wounds(hid)) * valuePerWound(hid) * 0.8;
+      }
+      if (v > 0) out.push({ cmd: { type: "ability", uid: u.uid, ability: "smoke-shells", point: p }, bonus: v - CP_VALUE - cpReserve(s, u.owner, "smoke-shells", def.cp ?? 0), stack: true, expected: true });
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  },
+  // Steel-core rounds for a shot at armour: the gain of +1 AP on the best target.
+  "steel-core"(s, u) {
+    const def = ABILITIES["steel-core"];
+    if (s.players[u.owner].cp < (def.cp ?? 0) || u.status.apBonus) return [];
+    let gain = 0;
+    for (const e of onBoard(s, other(u.owner))) {
+      for (const w of rangedWeapons(u)) {
+        const plan = planShooting(s, u, e, w);
+        if (typeof plan === "string") continue;
+        gain = Math.max(gain, attackValue(s, e, expectedDamage(s, u, e, { ...plan, ap: plan.ap + 1 }, false)) - attackValue(s, e, expectedDamage(s, u, e, plan, false)));
+      }
+    }
+    if (gain <= 0) return [];
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "steel-core" }, bonus: gain - CP_VALUE - cpReserve(s, u.owner, "steel-core", def.cp ?? 0), stack: true, expected: true }];
+  },
+  // Three dice for a long charge: the better odds of landing it, times what it's worth.
+  "mad-scramble"(s, u) {
+    const def = ABILITIES["mad-scramble"];
+    if (s.players[u.owner].cp < (def.cp ?? 0) || u.status.scrambling || !rulesOf(s).rolledCharges || u.status.disengaged || u.status.shaken || u.status.holding) return [];
+    let gain = 0;
+    for (const e of onBoard(s, other(u.owner))) {
+      if (isFlying(e) || !meleeWeapons(u).some((w) => meleeCanHit(u, e, w.targets))) continue;
+      if (unitGap(u, e) > chargeRange(s, u) + 1) continue;
+      const need = chargeNeed(s, u, e, tableOf(s));
+      if (need === null || need <= 4) continue;
+      gain = Math.max(gain, (bestTwoOfThreeAtLeast(need) - twoDiceAtLeast(need)) * attackValue(s, e, chargeDamage(u, e, 0)));
+    }
+    if (gain <= 0) return [];
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "mad-scramble" }, bonus: gain * 0.8 - CP_VALUE - cpReserve(s, u.owner, "mad-scramble", def.cp ?? 0), stack: true, expected: true }];
+  },
+  // Acid on the target the rest of the swarm (and our guns) are about to hit.
+  "eat-through"(s, u) {
+    const def = ABILITIES["eat-through"];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    const out: Candidate[] = [];
+    for (const e of onBoard(s, other(u.owner))) {
+      if (e.status.melting || unitGap(u, e) > (def.range ?? 12) || concealment(s, u, e) || !canSee(s, u, e)) continue;
+      const cmd: Command = { type: "ability", uid: u.uid, ability: "eat-through", target: e.uid };
+      const after = simulate(s, cmd);
+      if (!after) continue;
+      const gain = shotGain(s, after, u.owner, e.uid) + meleeSaveGain(s, u.owner, e, 1);
+      if (gain <= 0) continue;
+      out.push({ cmd, bonus: gain * 0.7 - CP_VALUE - cpReserve(s, u.owner, "eat-through", def.cp ?? 0), stack: true, expected: true });
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  },
+  // The Broodmother's shriek: an extra die per model on every brood round her that fights this round.
+  "brood-frenzy"(s, u) {
+    const def = ABILITIES["brood-frenzy"];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    let gain = 0;
+    for (const f of onBoard(s, u.owner)) {
+      if (f.uid === u.uid || profileOf(f).structure || unitGap(u, f) > (def.range ?? 6)) continue;
+      let best = 0;
+      for (const e of onBoard(s, other(u.owner))) {
+        if (!meleeOn(s, u.owner, e).some((x) => x.uid === f.uid)) continue;
+        // A charge may not land: count a fight already on in full, a charge at even odds.
+        const sure = engagedWith(s, f).some((x) => x.uid === e.uid) ? 1 : 0.5;
+        best = Math.max(best, (attackValue(s, e, meleeExp(f, e, 1)) - attackValue(s, e, meleeExp(f, e))) * sure);
+      }
+      gain += best;
+    }
+    if (gain <= 0) return [];
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "brood-frenzy" }, bonus: gain * 0.8 - (def.cp ?? 0) * CP_VALUE - cpReserve(s, u.owner, "brood-frenzy", def.cp ?? 0), stack: true, expected: true }];
+  },
+  // Eggs in the path of an enemy ground unit coming for us or for an objective it wants.
+  "lay-eggs"(s, u) {
+    const def = ABILITIES["lay-eggs"];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    const reachOf = (def.range ?? 3) + profileOf(u).baseRadius - 0.2;
+    const theirs = onBoard(s, other(u.owner));
+    const clearOf = (p: Vec) => theirs.every((t) => aliveModels(t).every((m) => dist(m.pos, p) - profileOf(t).baseRadius >= LAY_EGGS.minEnemyDistance + 0.2));
+    const out: Candidate[] = [];
+    const c = centroid(u);
+    for (const t of theirs) {
+      if (isFlying(t) || profileOf(t).structure || isEngaged(s, t)) continue;
+      const tc = centroid(t);
+      if (dist(c, tc) > reach(t) + 6) continue;
+      for (const k of [reachOf, reachOf * 0.6]) {
+        const p = towards(c, tc, k);
+        if (!clearOf(p)) continue;
+        const v = 0.9 + Math.min(1.2, aliveModels(t).length * 0.2) + (isMeleeUnit(t) ? 0.5 : 0);
+        out.push({ cmd: { type: "ability", uid: u.uid, ability: "lay-eggs", point: p }, bonus: v - CP_VALUE - cpReserve(s, u.owner, "lay-eggs", def.cp ?? 0), stack: true, expected: true });
+      }
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  },
+  // Slip out of phase before the guns that can reach us fire.
+  "phase-shift"(s, u) {
+    const def = ABILITIES["phase-shift"];
+    if (s.players[u.owner].cp < (def.cp ?? 0) || u.status.phased || !rulesOf(s).evade) return [];
+    const ev = profileOf(u).evade;
+    const own = ev && ev.against.includes("ranged") ? ev.target : null;
+    const shifted = own === null || own > PHASE_EVADE ? PHASE_EVADE : own - 1;
+    const gainChance = pAtLeast(shifted) - (own === null ? 0 : pAtLeast(own));
+    const hits = Math.min(threatOn(s, u), wounds(u) * 3) * 0.6;
+    const v = hits * gainChance * failChance(profileOf(u).armor + saveShiftOf(u)) * valuePerWound(u);
+    if (v <= 0) return [];
+    return [{ cmd: { type: "ability", uid: u.uid, ability: "phase-shift" }, bonus: v - CP_VALUE - cpReserve(s, u.owner, "phase-shift", def.cp ?? 0), stack: true, expected: true }];
+  },
+  // Lock on to the evasive (or brawling) target our shooters gain the most against.
+  triangulate(s, u) {
+    const def = ABILITIES.triangulate;
+    const out: Candidate[] = [];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return out;
+    for (const e of onBoard(s, other(u.owner))) {
+      if (e.status.triangulated || unitGap(u, e) > (def.range ?? 24) || concealment(s, u, e) || !canSee(s, u, e)) continue;
+      const cmd: Command = { type: "ability", uid: u.uid, ability: "triangulate", target: e.uid };
+      const after = simulate(s, cmd);
+      if (!after) continue;
+      const gain = shotGain(s, after, u.owner, e.uid);
+      if (gain <= 0) continue;
+      out.push({ cmd, bonus: gain * 0.6 - CP_VALUE - cpReserve(s, u.owner, "triangulate", def.cp ?? 0), stack: true, expected: true });
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  },
+  // Bow out of a fight we're losing (or that pins a gun): the evaluation and follow-up judge where to.
+  "bow-out"(s, u) {
+    const def = ABILITIES["bow-out"];
+    if (s.players[u.owner].cp < (def.cp ?? 0) || !isEngaged(s, u)) return [];
+    const range = (def.range ?? 6) - 0.3;
+    const leader = aliveModels(u)[0]!;
+    const foes = engagedWith(s, u);
+    const fc = { x: foes.reduce((n, f) => n + centroid(f).x, 0) / foes.length, y: foes.reduce((n, f) => n + centroid(f).y, 0) / foes.length };
+    const d = dist(leader.pos, fc);
+    const away = d > 1e-6 ? { x: leader.pos.x + ((leader.pos.x - fc.x) / d) * range, y: leader.pos.y + ((leader.pos.y - fc.y) / d) * range } : leader.pos;
+    const pts = [away, ...goals(s, u).slice(0, 3).map((g) => towards(leader.pos, g, range))];
+    const cost = CP_VALUE + cpReserve(s, u.owner, "bow-out", def.cp ?? 0);
+    return pts.map((p) => ({ cmd: { type: "ability", uid: u.uid, ability: "bow-out", point: p }, bonus: -cost, follow: u.uid }));
+  },
+  // Pour our shields into a friend about to take more fire than we are.
+  "lend-shields"(s, u) {
+    const def = ABILITIES["lend-shields"];
+    if (s.players[u.owner].cp < (def.cp ?? 0)) return [];
+    const pool = aliveModels(u).reduce((n, m) => n + m.shield, 0);
+    if (!pool) return [];
+    const exposure = threatOn(s, u) > 0 ? 0.5 : 0.1;
+    const out: Candidate[] = [];
+    for (const f of onBoard(s, u.owner)) {
+      if (f.uid === u.uid || unitGap(u, f) > (def.range ?? 6)) continue;
+      const v = Math.min(pool, incomingHits(s, f)) * valuePerWound(f) * 0.6 - pool * valuePerWound(u) * exposure - CP_VALUE - cpReserve(s, u.owner, "lend-shields", def.cp ?? 0);
+      out.push({ cmd: { type: "ability", uid: u.uid, ability: "lend-shields", target: f.uid }, bonus: v, stack: true, expected: true });
+    }
+    return out.sort((a, b) => b.bonus - a.bonus).slice(0, 2);
+  },
+  // Disruption: burn the enemy's best ready card.
+  "snipe-runner": (s, u) => burnCandidates(s, u, "snipe-runner"),
+  "chew-wires": (s, u) => burnCandidates(s, u, "chew-wires"),
+  "cutting-remark": (s, u) => burnCandidates(s, u, "cutting-remark"),
+  // Dice buffs and debuffs on support units.
+  "rivet-plates": (s, u) => diceAbilityCandidates(s, u, "rivet-plates"),
+  "star-shell": (s, u) => diceAbilityCandidates(s, u, "star-shell"),
+  "slime-coat": (s, u) => diceAbilityCandidates(s, u, "slime-coat"),
+  "numbing-sting": (s, u) => diceAbilityCandidates(s, u, "numbing-sting"),
+  "exacting-standards": (s, u) => diceAbilityCandidates(s, u, "exacting-standards"),
 };
 
 /** Open roster: eval points off a recruit for each copy of it already on the table. */
@@ -1421,7 +1789,7 @@ function candidatesFor(s: GameState, me: PlayerId): Candidate[] {
   } else if (s.phase === "assault") {
     for (const u of units) {
       candidates.push(...attackCandidates(s, u), ...chargeCandidates(s, u), ...abilityCandidates(s, u));
-      if (!u.status.disengaged) candidates.push(...moveCandidates(s, u, "advance", 16));
+      if (!u.status.disengaged && !u.status.holding) candidates.push(...moveCandidates(s, u, "advance", 16));
       candidates.push({ cmd: { type: "hunker", uid: u.uid }, bonus: 0 });
       candidates.push({ cmd: { type: "hold", uid: u.uid }, bonus: 0 });
     }
@@ -1768,6 +2136,14 @@ export function aiSupportCommand(s: GameState): Command | null {
           });
           if (tricks) v += 1 + profileOf(t).cost * 0.1;
           consider({ ...base, target: t.uid }, v);
+        }
+      } else if (e.kind === "armourBuff" || e.kind === "armourBreak" || e.kind === "evadeBuff" || e.kind === "evadeDebuff" || e.kind === "damageBuff" || e.kind === "weaken") {
+        // Dice buffs and debuffs: what the round's attacks gain or lose, less the CP over a 1-CP play.
+        if (s.phase === "combat" && e.kind !== "armourBuff" && e.kind !== "armourBreak" && e.kind !== "damageBuff" && e.kind !== "weaken") continue;
+        const friendly = need === "friendlyUnit";
+        for (const t of friendly ? mine : theirs) {
+          const cmd = { ...base, target: t.uid };
+          consider(cmd, diceEffectValue(s, me, t, e, cmd) * 1.3 - (a.cp - 1) * CP_VALUE);
         }
       } else if (need === "none") {
         // Reactions: arm them when the enemy is close and we can spare the CP.

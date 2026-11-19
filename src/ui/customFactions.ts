@@ -367,8 +367,20 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
         return { kind, move: num(o.move) };
       case "overshield":
         return { kind, amount: num(o.amount) };
+      case "armourBuff":
+        return { kind, save: num(o.save) };
+      case "armourBreak":
+        return { kind, save: num(o.save), range: num(o.range) };
+      case "evadeBuff":
+        return { kind, amount: num(o.amount), grant: num(o.grant) };
+      case "evadeDebuff":
+        return { kind, amount: num(o.amount), range: num(o.range) };
+      case "damageBuff":
+        return { kind, amount: num(o.amount) };
+      case "weaken":
+        return { kind, dice: num(o.dice), range: num(o.range) };
       default:
-        return { kind };
+        return { kind: kind as "recharge" | "overwatch" | "ward" | "brace" };
     }
   };
   const ability = (a: Obj, where: string): SupportAbilityDef => {

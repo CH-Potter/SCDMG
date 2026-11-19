@@ -47,6 +47,88 @@ export function initialSupports(ids: string[]): { cp: number; supports: { id: st
 
 export const isStructure = (u: Unit): boolean => !!profileOf(u).structure;
 
+/** The dice buffs and debuffs: the support effects (and the unit abilities that share their statuses). */
+export type DiceEffect = Extract<SupportEffect, { kind: "armourBuff" | "armourBreak" | "evadeBuff" | "evadeDebuff" | "damageBuff" | "weaken" }>;
+
+/** Does this unit roll any evade at all right now (its card, a granted evade, or Phase Shift)? */
+const evades = (t: Unit): boolean => !!profileOf(t).evade || (t.status.evadeGrant ?? 0) > 0 || !!t.status.phased;
+
+/**
+ * Put a dice buff or debuff on `t` until the end of the round (support cards and unit abilities both
+ * use this). Returns an error, or the log text. Range and sight are the caller's to check.
+ */
+export function applyDiceEffect(t: Unit, e: DiceEffect): { error?: string; text: string } {
+  const st = t.status;
+  const name = profileOf(t).name;
+  switch (e.kind) {
+    case "armourBuff":
+      if ((st.saveMod ?? 0) > 0) return { error: "Its armour is already shored up", text: "" };
+      st.saveMod = (st.saveMod ?? 0) + e.save;
+      return { text: `${name}'s saves are ${e.save} better this round.` };
+    case "armourBreak":
+      if ((st.saveMod ?? 0) < 0) return { error: "Its armour is already cracked", text: "" };
+      st.saveMod = (st.saveMod ?? 0) - e.save;
+      return { text: `${name}'s saves are ${e.save} worse this round.` };
+    case "evadeBuff":
+      if ((st.evadeBonus ?? 0) > 0 || (st.evadeGrant ?? 0) > 0) return { error: "It's already nimbler this round", text: "" };
+      if (profileOf(t).evade) {
+        st.evadeBonus = (st.evadeBonus ?? 0) + e.amount;
+        return { text: `${name}'s evade rolls get +${e.amount} this round.` };
+      }
+      st.evadeGrant = e.grant;
+      return { text: `${name} evades every attack on a ${e.grant}+ this round.` };
+    case "evadeDebuff":
+      if (!evades(t)) return { error: "That unit doesn't evade anything", text: "" };
+      if ((st.evadeBonus ?? 0) < 0) return { error: "Its evade is already off", text: "" };
+      st.evadeBonus = (st.evadeBonus ?? 0) - e.amount;
+      return { text: `${name}'s evade rolls are ${e.amount} worse this round.` };
+    case "damageBuff":
+      if (!profileOf(t).weapons.length) return { error: "That unit has no weapons", text: "" };
+      if ((st.damageMod ?? 0) > 0) return { error: "It already hits harder this round", text: "" };
+      st.damageMod = (st.damageMod ?? 0) + e.amount;
+      return { text: `${name}'s hits deal +${e.amount} damage this round.` };
+    case "weaken":
+      if (!profileOf(t).weapons.length) return { error: "That unit has no weapons", text: "" };
+      if ((st.diceMod ?? 0) < 0) return { error: "It's already weakened", text: "" };
+      st.diceMod = (st.diceMod ?? 0) - e.dice;
+      return { text: `${name} rolls ${e.dice} fewer ${e.dice === 1 ? "die" : "dice"} per model on its attacks this round.` };
+  }
+}
+
+/**
+ * The enemy card a disruption ability (Snipe the Runner, Chew the Wires, Cutting Remark) burns when
+ * the user doesn't pick one: `player`'s ready card with the most CP, then the dearest in Fizz, then
+ * the first in their list. Undefined if every card is already exhausted.
+ */
+export function cardToBurn(s: GameState, player: PlayerId): string | undefined {
+  let best: { id: string; cp: number; fizz: number } | undefined;
+  for (const c of s.players[player].supports) {
+    if (c.exhausted) continue;
+    const def = SUPPORTS[c.id];
+    if (!def) continue;
+    if (!best || def.cp > best.cp || (def.cp === best.cp && def.fizz > best.fizz)) best = { id: c.id, cp: def.cp, fizz: def.fizz };
+  }
+  return best?.id;
+}
+
+/**
+ * Burn one of `player`'s support cards for the round: it's exhausted (its abilities are off until the
+ * round's refresh) and, for now, `player` loses the CP it brought this round (not below 0).
+ * Returns an error, or null. The one place a unit ability takes an enemy card off the table.
+ */
+export function exhaustEnemyCard(s: GameState, player: PlayerId, cardId: string, events: GameEvent[]): string | null {
+  const pl = s.players[player];
+  const card = pl.supports.find((c) => c.id === cardId);
+  if (!card) return "They don't have that card";
+  if (card.exhausted) return "That card is already exhausted";
+  const def = SUPPORTS[cardId];
+  pl.supports = pl.supports.map((c) => (c.id === cardId ? { ...c, exhausted: true } : c));
+  // Banked CP for now: the card's CP for the round goes with it. (Card-bound CP replaces this.)
+  pl.cp = Math.max(0, pl.cp - (def?.cp ?? 0));
+  events.push({ type: "cardBurned", player, support: cardId });
+  return null;
+}
+
 /** What the support ability needs as a target. */
 export function supportTarget(a: SupportAbilityDef): "none" | "friendlyUnit" | "enemyUnit" | "point" | "reservePoint" | "unitPoint" {
   switch (a.effect.kind) {
@@ -62,7 +144,14 @@ export function supportTarget(a: SupportAbilityDef): "none" | "friendlyUnit" | "
     case "haste":
     case "resonate":
     case "overshield":
+    case "armourBuff":
+    case "evadeBuff":
+    case "damageBuff":
       return "friendlyUnit";
+    case "armourBreak":
+    case "evadeDebuff":
+    case "weaken":
+      return "enemyUnit";
     case "teleport":
       return "unitPoint";
     case "slow":
@@ -413,6 +502,19 @@ export function playSupport(s: GameState, cmd: Extract<Command, { type: "support
     case "overshield": {
       for (const m of aliveModels(target!)) m.shield += e.amount;
       text = `${card.name}: ${ability.name}! ${profileOf(target!).name} glows with +${e.amount} shield.`;
+      break;
+    }
+    case "armourBuff":
+    case "armourBreak":
+    case "evadeBuff":
+    case "evadeDebuff":
+    case "damageBuff":
+    case "weaken": {
+      const t = target!;
+      if ("range" in e && !aliveModels(t).some((m) => nearestFriendlyDistance(s, cmd.player, m.pos) <= e.range)) return `Must be within ${e.range}" of one of your models`;
+      const r = applyDiceEffect(t, e);
+      if (r.error) return r.error;
+      text = `${card.name}: ${ability.name}! ${r.text}`;
       break;
     }
     case "slow": {

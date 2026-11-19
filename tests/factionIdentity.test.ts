@@ -111,9 +111,9 @@ describe("faction pillars in the data", () => {
 
   it("each signature ability belongs to one faction only", () => {
     const own: Record<string, AbilityId[]> = {
-      militia: ["overwatch", "entrenched", "steady-aim", "spotter", "wide-barrage", "demo-charge", "patch-up", "steadying", "rocket-hop", "return-fire", "crop-dust", "bale-out", "radio-spotting", "scrap-cover"],
-      swarm: ["regen", "regrow", "hatch", "lurk", "rampage", "brood-call", "mending-aura", "tunnel", "burrow-exit", "bombs-away", "corrode", "brood-bond", "burrow"],
-      concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura", "overcharge", "spotlight", "riposte", "pirouette", "phase-out", "twirl-away"],
+      militia: ["overwatch", "entrenched", "steady-aim", "spotter", "wide-barrage", "demo-charge", "patch-up", "steadying", "rocket-hop", "return-fire", "crop-dust", "bale-out", "radio-spotting", "scrap-cover", "stand-to", "hold-the-line", "smoke-shells", "steel-core", "snipe-runner", "rivet-plates", "star-shell"],
+      swarm: ["regen", "regrow", "hatch", "lurk", "rampage", "brood-call", "mending-aura", "tunnel", "burrow-exit", "bombs-away", "corrode", "brood-bond", "burrow", "mad-scramble", "eat-through", "brood-frenzy", "lay-eggs", "chew-wires", "slime-coat", "numbing-sting"],
+      concord: ["blink", "recall", "radiance", "refraction", "bubble-shield", "provoke", "ward-aura", "overcharge", "spotlight", "riposte", "pirouette", "phase-out", "twirl-away", "phase-shift", "triangulate", "bow-out", "lend-shields", "cutting-remark", "exacting-standards"],
     };
     // The Munch's own tricks left the built-ins with them: they live on in the Munch template (and any custom faction).
     const munchOnly: AbilityId[] = ["sticky-goo", "sugar-rush", "pop", "grapple", "eye-peck"];
@@ -140,6 +140,8 @@ describe("faction pillars in the data", () => {
       spot: "militia",
       smoke: "militia",
       overwatch: "militia",
+      damageBuff: "militia",
+      evadeDebuff: "militia",
       meleeBuff: "swarm",
       regrow: "swarm",
       rattle: "swarm",
@@ -147,6 +149,8 @@ describe("faction pillars in the data", () => {
       retaliate: "swarm",
       haste: "swarm",
       blind: "swarm",
+      evadeBuff: "swarm",
+      weaken: "swarm",
       recharge: "concord",
       aimBuff: "concord",
       teleport: "concord",
@@ -156,6 +160,8 @@ describe("faction pillars in the data", () => {
       expose: "concord",
       silence: "concord",
       overshield: "concord",
+      armourBuff: "concord",
+      armourBreak: "concord",
     };
     for (const f of BUILT_IN_FACTION_IDS)
       for (const e of effects(f)) if (e.kind !== "summon" && e.kind !== "airdrop") expect(owner[e.kind], `${f}: ${e.kind}`).toBe(f);

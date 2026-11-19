@@ -59,6 +59,12 @@ export const EFFECT_KINDS = [
   "expose",
   "silence",
   "overshield",
+  "armourBuff",
+  "armourBreak",
+  "evadeBuff",
+  "evadeDebuff",
+  "damageBuff",
+  "weaken",
 ] as const;
 
 /** The CP pool cap (mirrors CP_CAP in engine/supports.ts): an ability costing more could never be played. */
@@ -554,6 +560,22 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
         return int(where, "extra move", e.move, [1, 6]);
       case "overshield":
         return int(where, "shield per model", e.amount, [1, 3]);
+      case "armourBuff":
+        return int(where, "save bonus", e.save, [1, 2]);
+      case "armourBreak":
+        int(where, "save penalty", e.save, [1, 2]);
+        return real(where, "armour break range", e.range, LIMITS.range);
+      case "evadeBuff":
+        int(where, "evade bonus", e.amount, [1, 2]);
+        return int(where, "granted evade", e.grant, [3, 6]);
+      case "evadeDebuff":
+        int(where, "evade penalty", e.amount, [1, 2]);
+        return real(where, "evade penalty range", e.range, LIMITS.range);
+      case "damageBuff":
+        return int(where, "extra damage", e.amount, [1, 2]);
+      case "weaken":
+        int(where, "fewer dice", e.dice, [1, 2]);
+        return real(where, "weaken range", e.range, LIMITS.range);
       default:
         return; // recharge, overwatch, ward, brace: no parameters
     }

@@ -2,6 +2,7 @@
 
 import { BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT } from "../engine/constants";
 import { ABILITIES } from "../engine/data/abilities";
+import { SUPPORTS } from "../engine/data/factions";
 import { profileOf } from "../engine/profile";
 import { unitById } from "../engine/rules";
 import type { AttackReport, EvadeCondition, GameEvent, GameState, Keyword, Phase, Unit, Weapon, UnitProfile, WeaponTrait } from "../engine/types";
@@ -168,6 +169,8 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
       return e.how === "cp" ? `📣 ${esc(unitName(s, e.uid))} is rallied.` : `${esc(unitName(s, e.uid))} pulls itself together.`;
     case "summoned":
       return `${esc(unitName(s, e.uid))} appears.`;
+    case "cardBurned":
+      return `🔥 ${who(e.player)}: ${esc(SUPPORTS[e.support]?.name ?? e.support)} is knocked out until the end of the round.`;
     case "expired":
       return `${esc(unitName(s, e.uid))} fades away.`;
     case "recharged":
@@ -198,6 +201,14 @@ export function abilityStatusTags(u: Unit): string[] {
   if (st.silenced) tags.push("🤐 silenced (no abilities or reactions)");
   if (st.overcharged) tags.push("⚡ overcharged (+1 damage on its shots)");
   if (st.overwatching) tags.push("👀 on overwatch (Top Cover)");
+  if (st.standingTo) tags.push("🪖 standing to (shoots the first unit to charge it)");
+  if (st.holding) tags.push("🚩 holding the line (can't move; double supply on objectives)");
+  if (st.apBonus) tags.push(`🔩 steel-core rounds (+${st.apBonus} AP)`);
+  if (st.scrambling) tags.push("🦗 mad scramble (charge: best 2 of 3 dice)");
+  if (st.melting) tags.push("🫠 eaten through (saves two worse with the acid)");
+  if (st.corroded && !st.melting) tags.push("🧪 corroded (saves one worse)");
+  if (st.phased) tags.push("👻 phase-shifted (evades shots on 4+)");
+  if (st.triangulated) tags.push("📐 triangulated (shots at it: precision +1, tracking +1)");
   if (st.precisionBonus || st.trackingBonus)
     tags.push(`🔍 ${[st.precisionBonus ? `precision +${st.precisionBonus}` : "", st.trackingBonus ? `tracking +${st.trackingBonus}` : ""].filter(Boolean).join(", ")}`);
   const max = profileOf(u).shield;

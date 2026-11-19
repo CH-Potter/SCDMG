@@ -15,7 +15,9 @@
 // cheap: re-asking about the same state and command is a map lookup.
 
 import { ABILITIES } from "./data/abilities";
-import { applyCommand } from "./game";
+import { barrageGun } from "./combat";
+import { applyCommand, disruptProblem } from "./game";
+import { rulesOf } from "./houseRules";
 import { profileOf } from "./profile";
 import { abilityOf } from "./reactions";
 import {
@@ -215,10 +217,13 @@ function abilityProblem(s: GameState, u: Unit, id: AbilityId): string | null {
   if (u.status.silenced) return "Silenced: it can't use abilities this round";
   const cp = def.cp ?? 0;
   if (s.players[u.owner].cp < cp) return `${def.name} needs ${cp} CP (you have ${s.players[u.owner].cp})`;
-  if (isEngaged(s, u) && id !== "patch-up") return "Can't do that while engaged";
+  if (isEngaged(s, u) && id !== "patch-up" && id !== "bow-out") return "Can't do that while engaged";
   // Things the ability checks before the spot is known.
   if (id === "tunnel" && s.round === 1) return "Tunnelling can't start until round 2";
-  if (id === "rampage" && !profileOf(u).weapons.some((w) => w.melee)) return "This unit has no melee weapon";
+  if ((id === "rampage" || id === "mad-scramble") && !profileOf(u).weapons.some((w) => w.melee)) return "This unit has no melee weapon";
+  if (id === "mad-scramble" && !rulesOf(s).rolledCharges) return "Charges aren't rolled in this game";
+  if (id === "snipe-runner" || id === "chew-wires" || id === "cutting-remark") return disruptProblem(s, u, id) ?? commandProblem(s, { type: "ability", uid: u.uid, ability: id });
+  if (id === "smoke-shells" && !barrageGun(profileOf(u))) return "It has no gun to lob smoke with";
   if (!def.needs) return commandProblem(s, { type: "ability", uid: u.uid, ability: id });
   if (def.needs === "enemyUnit" || def.needs === "friendlyUnit") {
     const a: UnitAction = { kind: "ability", id };

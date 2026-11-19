@@ -136,15 +136,30 @@ export function engagementBlock(s: GameState, a: Unit, t: Unit): string | null {
 /** The evade target the defender rolls against attacks that count as any of `conditions`, or null if none apply. */
 export function evadeTarget(t: Unit, conditions: EvadeCondition[]): number | null {
   const ev = profileOf(t).evade;
-  if (!ev || !ev.against.some((c) => conditions.includes(c))) return null;
-  return Math.max(2, Math.min(6, ev.target - (t.status.evadeBonus ?? 0)));
+  let target = ev && ev.against.some((c) => conditions.includes(c)) ? ev.target : null;
+  // Phase Shift: shots (not blows in close combat) are evaded on a 4+, or one better.
+  if (t.status.phased && conditions.some((c) => c !== "melee")) target = phasedEvade(target);
+  return withEvadeMods(t, target);
 }
 
-/** A unit's own evade number (with buffs), in any situation, or null if its card has no evade. */
+/** A unit's own evade number (with buffs), in any situation, or null if its card has no evade. Only used against shots. */
 export function ownEvade(t: Unit): number | null {
   const ev = profileOf(t).evade;
-  return ev ? Math.max(2, Math.min(6, ev.target - (t.status.evadeBonus ?? 0))) : null;
+  return withEvadeMods(t, t.status.phased ? phasedEvade(ev?.target ?? null) : (ev?.target ?? null));
 }
+
+/** An evade number after a granted evade (the better of the two) and evade buffs or penalties (never worse than 6+). */
+function withEvadeMods(t: Unit, target: number | null): number | null {
+  const grant = t.status.evadeGrant ?? 0;
+  if (grant > 0 && (target === null || grant < target)) target = grant;
+  if (target === null) return null;
+  const n = target - (t.status.evadeBonus ?? 0);
+  return Math.max(2, Math.min(6, n));
+}
+
+/** Phase Shift's evade against shots: 4+, or one better than the unit's own if that's already 4+ or better. */
+export const PHASE_EVADE = 4;
+const phasedEvade = (own: number | null): number => (own === null || own > PHASE_EVADE ? PHASE_EVADE : own - 1);
 
 /**
  * The evade a shot's target rolls. With the "Evade in the scrum" house rule, a unit in a melee rolls
@@ -220,7 +235,7 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
       any = true;
     }
     if (any) {
-      let dice = w.dice + bonus.dice + a.status.rangedBonus;
+      let dice = w.dice + bonus.dice + a.status.rangedBonus + (a.status.diceMod ?? 0);
       if (hasTrait(w, "blast") && aliveModels(t).length >= BLAST_SQUAD) dice += 1;
       if (hasAbility(a, "steady-aim") && !a.status.moved) dice += 1;
       attackers.push({ model: am, dice: Math.max(1, dice) });
@@ -245,11 +260,13 @@ export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: At
     attackers,
     targets: [...targets],
     hitOn,
-    damage: w.damage + bonus.damage + (a.status.overcharged ? 1 : 0),
-    ap: effectiveAp(w, t, bonus.ap),
+    damage: Math.max(1, w.damage + bonus.damage + (a.status.overcharged ? 1 : 0) + (a.status.damageMod ?? 0)),
+    // Steel-Core Rounds: extra AP after armour has had its say.
+    ap: effectiveAp(w, t, bonus.ap) + (a.status.apBonus ?? 0),
     rending: hasTrait(w, "rending"),
-    precision: precisionOf(a, w),
-    tracking: trackingOf(a, w),
+    // Triangulate: every shot at a locked-on target gets precision +1 and tracking +1.
+    precision: precisionOf(a, w) + (t.status.triangulated ? 1 : 0),
+    tracking: trackingOf(a, w) + (t.status.triangulated ? 1 : 0),
     evadeOn: conditions && rules.evade ? evadeVsShot(s, t, conditions, kind) : null,
     ...(indirect ? { indirect: true } : {}),
     ...(breach && !indirect ? { breach } : {}),
@@ -293,14 +310,14 @@ export function planMelee(a: Unit, t: Unit, w: Weapon, rules: Readonly<HouseRule
     }
     if (!touching.length) continue;
     touching.forEach((tm) => targets.add(tm));
-    attackers.push({ model: am, dice: Math.max(1, w.dice + bonus.dice + (a.status.charged ? 1 : 0) + a.status.meleeBonus) });
+    attackers.push({ model: am, dice: Math.max(1, w.dice + bonus.dice + (a.status.charged ? 1 : 0) + a.status.meleeBonus + (a.status.diceMod ?? 0)) });
   }
   if (!attackers.length) return "Not in base contact with that unit";
   return {
     attackers,
     targets: [...targets],
     hitOn: Math.min(6, w.hit + (a.status.shaken ? 1 : 0)),
-    damage: w.damage + bonus.damage,
+    damage: Math.max(1, w.damage + bonus.damage + (a.status.damageMod ?? 0)),
     ap: effectiveAp(w, t, bonus.ap),
     rending: hasTrait(w, "rending"),
     precision: precisionOf(a, w),
@@ -323,7 +340,7 @@ export const SCRAP_COVER_RANGE = 2;
 
 /** The save roll a model needs (null = no save). */
 export function saveNeeded(s: GameState, a: Unit, t: Unit, tm: Model, ap: number, melee: boolean, from?: Model): number | null {
-  let save = profileOf(t).armor + ap + (t.status.reckless ? 1 : 0) + (t.status.corroded ? 1 : 0);
+  let save = profileOf(t).armor + ap + (t.status.reckless ? 1 : 0) + (t.status.corroded ? 1 : 0) + (t.status.melting ? 1 : 0) - (t.status.saveMod ?? 0);
   if (!melee) {
     // Spotlit (exposed) units get nothing from cover, hunkering or digging in. A friendly Scrap Cover
     // structure gives cover like terrain does.
@@ -812,7 +829,7 @@ export function expectedBarrage(s: GameState, mk: BarrageMarker, t: Unit): numbe
  * friends in the melee).
  */
 export function strayTarget(s: GameState, a: Unit, t: Unit, w: Weapon): Unit | null {
-  if (!rulesOf(s).strays || w.melee || precisionOf(a, w) >= 1 || hasTrait(w, "indirect")) return null;
+  if (!rulesOf(s).strays || w.melee || precisionOf(a, w) >= 1 || t.status.triangulated || hasTrait(w, "indirect")) return null;
   const friends = engagedWith(s, t).filter((u) => u.owner === a.owner && u.uid !== a.uid);
   if (!friends.length) return null;
   return friends.reduce((x, y) => (unitGap(a, y) < unitGap(a, x) ? y : x));
