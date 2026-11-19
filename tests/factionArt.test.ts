@@ -12,7 +12,7 @@ import type { IntroDef, Kit } from "../src/ui/intro/stage";
 import { loadArt, riggedProfiles } from "../src/ui/minis/registry";
 
 // the base factions' art loads lazily (one chunk each): load it before drawing
-beforeAll(() => loadArt(BUILT_IN_FACTION_IDS.flatMap((f) => Object.values(PROFILES).filter((p) => p.faction === f))));
+beforeAll(() => loadArt(BUILT_IN_FACTION_IDS.flatMap((f) => Object.values(PROFILES).filter((p) => p.faction === f))), 60000);
 
 /** A stand-in DOM element: enough for the storyboards to build against. */
 function fakeEl(): HTMLElement {

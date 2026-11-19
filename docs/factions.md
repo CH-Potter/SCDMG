@@ -167,4 +167,6 @@ Each template has 6 to 10 units spread over the unit classes, each with two or m
 
 The **Skitterswarm** began as a grimdark template and grew into a built-in faction (v0.11). **The Munch** took the other road: when the swarm replaced them as a base faction they moved to the forge whole (every unit, card, ability and line of flavour), in their own "Dustline veterans" group. Their units carry no parts recipes, so they're drawn with the Munch's own critter painters. Their haste ability is now the *Implant Jolt*. Sticky Goo, Sugar Rush, Pop!, Reel In and Eye Peck are theirs; they stay in the engine for the template and for any custom faction.
 
+On the new miniature engine (Ink Rig and Overhead) every template unit is drawn by the generic kits, and a template can have its own art, bound by template and unit key so started and copied factions keep it: see [docs/minis.md](minis.md). The Bulwark Brotherhood is the worked example.
+
 The templates brought a few new miniature parts that any custom unit can use: a **rider** body (on a cartoon steed), **skull**, **bug** and **bearded** heads, **hood** and **plumed helm** headgear, a **bow**, **sword and shield** or **axe** to hold, and **wings** on the back. The dev gallery shows the templates' miniatures at `gallery.html?faction=templates`.

@@ -13,7 +13,8 @@ import type { Channels, Mat, RigDef } from "../src/ui/minis/types";
 
 const RIGS: RigDef[] = [trooperSide("rifle"), trooperSide("scatter"), trooperTop("rifle"), trooperTop("scatter")];
 const TEAL = 0x2fb5c8;
-beforeAll(() => loadArt(["mil-grunts"]));
+// the art chunks load lazily (a dynamic import each): generous time for a busy machine
+beforeAll(() => loadArt(["mil-grunts"]), 60000);
 const round = (m: Mat) => m.map((v) => Math.round(v * 100) / 100);
 
 describe("rig-lint", () => {

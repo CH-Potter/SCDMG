@@ -23,7 +23,7 @@ export { catalogue, kitPart, maybeKitPart, type CatalogueEntry, type KitSlot } f
 export { humanoidSide, humanoidTop, sideWeapon, topWeapon, kitWeapon, HUMANOID_FRAME, type HumanoidOpts, type HeldWeapon, type HeldWeaponTop, type KitWeapon } from "./humanoid";
 export { beastSide, beastTop, type BeastOpts } from "./beast";
 export { walkerSide, walkerTop, flyerSide, flyerTop, type MachineOpts } from "./machine";
-export { riderSide, riderTop } from "./rider";
+export { riderSide, riderTop, type RiderOpts } from "./rider";
 export { structureSide, structureTop, type StructureKitOpts } from "./structure";
 export { standeeSide, standeeTop } from "./standee";
 export { fitHeight, leanAbout, mirrorPart, rigId, scaleRig, turnAbout } from "./util";

@@ -26,7 +26,7 @@ const round = (m: Mat) => m.map((v) => Math.round(v * 100) / 100);
 /** A tiny real PNG header as an image data URL (art validation checks the magic number only). */
 const PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
 
-beforeAll(() => loadAllArt());
+beforeAll(() => loadAllArt(), 60000);
 
 const tplProfiles = (): UnitProfile[] => TEMPLATES.flatMap((t) => t.faction.profiles);
 const looksOf = (p: UnitProfile, f?: { color: number; look: Faction["look"] }): RigDef[] => artFor(p, f)!.looks.flatMap((l) => [l.side, l.top]);

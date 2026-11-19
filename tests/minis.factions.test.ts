@@ -15,7 +15,7 @@ import { COLOURWAYS, FACTION_COLOURWAYS, resolveSlots, SLOT_KEYS } from "../src/
 import type { Mat, RigDef } from "../src/ui/minis/types";
 
 const BASE = ["militia", "swarm", "concord"] as const;
-beforeAll(() => loadArt(BASE.flatMap((f) => FACTIONS[f]!.profiles)));
+beforeAll(() => loadArt(BASE.flatMap((f) => FACTIONS[f]!.profiles)), 60000);
 const TEAL = 0x2fb5c8;
 const round = (m: Mat) => m.map((v) => Math.round(v * 100) / 100);
 
