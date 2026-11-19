@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -9 68 18" data-part="forge.dwarves.top.forgehammer" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Forge hammer from above: the glowing head ahead (left)</title>
+<rect x="6" y="-1.8" width="50" height="3.6" rx="1" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<rect x="-8" y="-7" width="15" height="14" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect class="glow" x="-5" y="-4" width="9" height="8" rx="1" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="20" cy="0" r="1"/><circle id="g2" cx="34" cy="0" r="1"/><circle id="muzzle" cx="-8" cy="0" r="1"/></g>
+</svg>

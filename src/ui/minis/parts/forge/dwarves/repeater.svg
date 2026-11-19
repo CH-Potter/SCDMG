@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -12 66 24" data-part="forge.dwarves.side.repeater" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Steam repeater: three short barrels on a brass boiler drum, a pressure pipe (muzzles left)</title>
+<rect x="-8" y="-7" width="34" height="4.4" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-8" y="-2.2" width="34" height="4.4" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-8" y="2.6" width="34" height="4.4" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-10" y="-8" width="4" height="16" rx="1" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<rect x="24" y="-9" width="22" height="18" rx="5" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<path d="M30,-9 V9 M38,-9 V9" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M44,-6 Q52,-8 50,0" fill="none" stroke="#25282c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="34" cy="0" r="1"/><circle id="muzzle" cx="-10" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -14 134 28" data-part="forge.dwarves.side.musket" data-recoil="6">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Boomstick: a long heirloom musket, brass-banded, with a flared bell muzzle (muzzle left)</title>
+<path d="M60,-3 L82,-4 L118,-2 Q120,6 114,9 L88,6 L72,6 Q64,8 60,4 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M60,2 L88,4 L114,7 Q118,6 119,3 Q118,8 114,9 L88,6 L72,6 Q64,8 60,4 Z" fill="#e3d8b6"/>
+<rect x="-2" y="-3.4" width="74" height="6.4" rx="1" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-12,-9 L0,-4 L0,4 L-12,9 Q-14,0 -12,-9 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M18,-3.4 v6.4 M42,-3.4 v6.4 M64,-3 v6" fill="none" stroke="#b9bfc4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M66,-3 L74,-9 L78,-8 L74,-2 Z" fill="#353b41" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-12,-8 Q-14,0 -12,8" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="36" cy="0" r="1"/><circle id="g2" cx="76" cy="2" r="1"/><circle id="muzzle" cx="-13" cy="0" r="1"/></g>
+</svg>

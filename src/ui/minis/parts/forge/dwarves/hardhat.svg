@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 21 46 34" data-part="forge.dwarves.side.hardhat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tunnel hardhat: a rounded enamelled dome, a brass brim and a lit miner's lamp</title>
+<path d="M45 45Q45 28 60 27Q74 28 75 43Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66 28Q74 30 75 43L69 43.6Q71 35 66 28Z" fill="#6c5a37"/>
+<path d="M54 28Q52 35 52 44" fill="none" stroke="#b9bfc4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 45L80 42.6L80.6 47L39.6 49.6Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="39.6" y="31" width="9" height="10" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="40.6" cy="36" r="3.8" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="40.2" cy="35.6" r="1.6" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="53" r="1"/></g>
+</svg>

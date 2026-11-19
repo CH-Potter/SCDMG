@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -36 48 72" data-part="forge.dwarves.side.shield">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hold tower shield: a tall hexagon of enamelled plate, a team field and a brass cog boss</title>
+<path d="M0,-34 L22,-21 L22,21 L0,34 L-22,21 L-22,-21 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M0,-23 L13.4,-14 L13.4,14 L0,23 L-13.4,14 L-13.4,-14 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M0,-23 L13.4,-14 L13.4,14 L0,23 Z" fill="#b000b0"/>
+<circle cx="0" cy="0" r="8" fill="#b9bfc4" stroke="#141414" stroke-width="2"/>
+<path d="M0.0,-3.6 L3.1,-1.8 L3.1,1.8 L0.0,3.6 L-3.1,1.8 L-3.1,-1.8 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="0" cy="-30" r="1" fill="#b9bfc4"/><circle cx="19" cy="-18" r="1" fill="#b9bfc4"/><circle cx="19" cy="18" r="1" fill="#b9bfc4"/><circle cx="0" cy="30" r="1" fill="#b9bfc4"/><circle cx="-19" cy="18" r="1" fill="#b9bfc4"/><circle cx="-19" cy="-18" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

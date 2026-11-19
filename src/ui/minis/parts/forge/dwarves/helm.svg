@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 21 42 42" data-part="forge.dwarves.side.helm">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hold helm: a flat-topped square helm, iron lid, brass band and hex boss, cheek plate and nasal bar</title>
+<path d="M45 53L45 37Q45 31 52 30L68 30Q75 31 75 37L75 54L68 56L67 47Q60 43 52 45L51 52Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M69 30.6Q75 32 75 37L75 54L70 55.4Q72 43 69 30.6Z" fill="#6c5a37"/>
+<rect x="42" y="25" width="36" height="6" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M45.4 40L74.6 40" fill="none" stroke="#b9bfc4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M45 43L51.6 44L52.6 58L46 56.6Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M43.6 42L47 42L47 54L44.6 54Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M64 43.6L67 45.3L67 48.7L64 50.4L61 48.7L61 45.3Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="56" cy="35" r="1" fill="#b9bfc4"/><circle cx="71" cy="35" r="1" fill="#b9bfc4"/><circle cx="72" cy="51" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="53" r="1"/></g>
+</svg>
