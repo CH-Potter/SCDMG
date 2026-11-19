@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -62 80 70" data-part="forge.munch.side.crow-wing">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crow wing: a long ragged wing raised up and back, primaries splayed like fingers (pivot at the shoulder)</title>
+<path d="M-2,2 Q4,-30 30,-50 Q50,-62 70,-58 L60,-50 L72,-46 L60,-40 L68,-34 L54,-30 L60,-22 L44,-20 L46,-12 L30,-12 Q14,-6 4,6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30,-12 Q14,-6 4,6 L2,0 Q16,-14 44,-20 L46,-12 Z" fill="#6c5a37"/>
+<path d="M14,-20 Q30,-34 52,-44 M18,-12 Q34,-22 54,-30" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M10,-30 Q24,-44 44,-52" fill="none" stroke="#b9bfc4" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

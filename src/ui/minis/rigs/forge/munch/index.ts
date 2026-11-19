@@ -7,7 +7,7 @@
 // Not the Skitterswarm: fur and farm bugs with lab parts, round and lumpy, never violet chitin and
 // scythes. Built on this folder's frame helpers (frame.ts) and the kits' rig utilities.
 
-import { defineTemplateArt, placeAt, scaleRig, squadLooks, type ArtContext, type LookVariant, type UnitArt } from "../../../kits";
+import { defineTemplateArt, mirrorPart, placeAt, scaleRig, squadLooks, type ArtContext, type LookVariant, type UnitArt } from "../../../kits";
 import type { PartUse, RigDef } from "../../../types";
 import type { Colourway } from "../../../slots";
 import { munchColourway, type Coat } from "./colours";
@@ -388,6 +388,179 @@ function fox(v: LookVariant): Look {
   return scale({ side: s, top: t }, k);
 }
 
+// ---------- Stink Mortar ----------
+
+function skunk(cw: Colourway): Look {
+  const id = "forge.munch.lobber";
+  const paw = side("claw-paw");
+  const sl = legs(
+    "side",
+    [
+      { id: "nF", hip: { x: -58, y: -38 }, knee: { x: -68, y: -20 }, foot: { x: -64, y: -2 }, near: true, a: true },
+      { id: "nR", hip: { x: 56, y: -38 }, knee: { x: 66, y: -20 }, foot: { x: 60, y: -2 }, near: true, a: false },
+      { id: "fF", hip: { x: -44, y: -42 }, knee: { x: -54, y: -22 }, foot: { x: -48, y: -2 }, near: false, a: false },
+      { id: "fR", hip: { x: 70, y: -42 }, knee: { x: 80, y: -22 }, foot: { x: 76, y: -2 }, near: false, a: true },
+    ],
+    { width: [18, 14], step: 10, lift: 8, z: [8, 1] },
+  );
+  const mortar = side("mortar");
+  const tail = side("skunk-tail");
+  const s = munchRig({
+    id,
+    name: "Stink Mortar",
+    view: "side",
+    k: 1.3,
+    spits: true,
+    limbInk: 2,
+    pivots: { torso: { x: 0, y: -60 }, head: { x: -84, y: -56 } },
+    parts: [
+      ...sl.limbs.map((l) => ({ id: `${l.id}-paw`, src: paw, bone: `${l.id}.end` as PartUse["bone"], place: placeAt(paw, "pivot", { x: l.end.x + 3, y: 0 }, 0, 0.85), z: l.upper.z + 0.5 })),
+      { id: "tail", src: tail, bone: "pelvis", place: placeAt(tail, "pivot", { x: 84, y: -62 }, 0, 1), z: 4, anim: { pulse: 0.03 } },
+      { id: "body", src: side("skunk-body"), bone: "torso", z: 5 },
+      { id: "mortar", src: mortar, bone: "gun", place: placeAt(mortar, "pivot", { x: 8, y: -114 }, 42, 1.1), z: 6 },
+      { id: "head", src: side("skunk-head"), bone: "head", place: { x: -84, y: -54, rot: 0 }, z: 9 },
+    ],
+    limbs: sl.limbs,
+    gait: sl.gait,
+    weapon: "mortar",
+    fx: { muzzle: cw.glow },
+  });
+  const tl = legs(
+    "top",
+    bothSides([
+      { id: "lF", hip: { x: -38, y: -50 }, knee: { x: -58, y: -56 }, foot: { x: -62, y: -72 }, a: true },
+      { id: "lR", hip: { x: -38, y: 60 }, knee: { x: -58, y: 66 }, foot: { x: -60, y: 82 }, a: false },
+    ]),
+    { width: [16, 13], step: 9, lift: 0, z: [1, 1] },
+  );
+  const t = munchRig({
+    id,
+    name: "Stink Mortar",
+    view: "top",
+    k: 1.3,
+    spits: true,
+    limbInk: 2,
+    pivots: { torso: { x: 0, y: 0 }, head: { x: 0, y: -80 } },
+    parts: [
+      { id: "tail", src: top("skunk-tail"), bone: "pelvis", place: { x: 0, y: 86, rot: 0 }, z: 3, anim: { pulse: 0.03 } },
+      { id: "body", src: top("skunk-body"), bone: "torso", z: 5 },
+      { id: "mortar", src: mortar, bone: "gun", place: placeAt(mortar, "pivot", { x: 0, y: 4 }, 90, 1.05), z: 6 },
+    ],
+    limbs: tl.limbs,
+    gait: tl.gait,
+    weapon: "mortar",
+    fx: { muzzle: cw.glow },
+    shadow: { x: 8, y: 12, r: 80 },
+  });
+  return { side: s, top: scaleRig(t, 0.86) };
+}
+
+// ---------- Steel-Jaw Crows ----------
+
+function crow(v: LookVariant): Look {
+  const id = `forge.munch.flapjaw.${v.tag}`;
+  const lift = v.tag === "b" ? -22 : 0;
+  const wing = side("crow-wing");
+  const s = munchRig({
+    id,
+    name: "Steel-Jaw Crow",
+    view: "side",
+    frame: "hover",
+    k: 0.9,
+    pivots: { torso: { x: 0, y: -60 }, head: { x: -26, y: -66 } },
+    parts: [
+      at("wing-far", wing, "torso", 0, -72, 2, { rot: lift - 6, scale: 0.9, anim: { flap: 0.55, phase: 0.08 } }),
+      { id: "body", src: side("crow-body"), bone: "torso", z: 5 },
+      { id: "head", src: side("crow-head"), bone: "gun", place: { x: -28, y: -66, rot: v.tag === "b" ? 8 : 0 }, z: 7 },
+      at("wing-near", wing, "torso", 4, -68, 8, { rot: lift, anim: { flap: 0.55 } }),
+    ],
+    weapon: "head",
+    limbInk: 1.6,
+  });
+  const wt = top("crow-wing");
+  const t = munchRig({
+    id,
+    name: "Steel-Jaw Crow",
+    view: "top",
+    frame: "hover",
+    k: 0.9,
+    pivots: { torso: { x: 0, y: 0 }, head: { x: 0, y: -22 } },
+    parts: [
+      at("wing-l", mirrorPart(wt), "torso", -10, -6, 3, { rot: v.tag === "b" ? 10 : 0, anim: { flap: 0.5 } }),
+      at("wing-r", wt, "torso", 10, -6, 3, { rot: v.tag === "b" ? -10 : 0, anim: { flap: 0.5, phase: 0.08 } }),
+      { id: "body", src: top("crow-body"), bone: "torso", z: 5 },
+      { id: "head", src: top("crow-head"), bone: "gun", place: { x: 0, y: -22, rot: 0 }, z: 6 },
+    ],
+    weapon: "head",
+    shadow: { x: 6, y: 10, r: 40 },
+  });
+  return { side: s, top: t };
+}
+
+// ---------- Brood Scorpion ----------
+
+function scorpion(): Look {
+  const id = "forge.munch.nanny";
+  const near = [
+    [-20, -30, -38],
+    [-8, -12, -16],
+    [4, 10, 12],
+    [16, 28, 36],
+  ];
+  const sl = legs(
+    "side",
+    near.flatMap(([h, k, f], i) => [
+      { id: `n${i}`, hip: { x: h!, y: -18 }, knee: { x: k!, y: -30 }, foot: { x: f!, y: 0 }, near: true, a: i % 2 === 0 },
+      { id: `f${i}`, hip: { x: h! + 6, y: -21 }, knee: { x: k! + 6, y: -33 }, foot: { x: f! + 7, y: 0 }, near: false, a: i % 2 === 1 },
+    ]),
+    { width: [3, 2.4], step: 5, lift: 6, z: [8, 1] },
+  );
+  const s = munchRig({
+    id,
+    name: "Brood Scorpion",
+    view: "side",
+    k: 0.7,
+    limbInk: 1.4,
+    pivots: { torso: { x: 0, y: -26 }, head: { x: -30, y: -26 } },
+    parts: [
+      at("tail", side("scorpion-tail"), "pelvis", 30, -26, 4, { scale: 1.05 }),
+      { id: "body", src: side("scorpion-body"), bone: "torso", z: 5 },
+      at("dome", side("dome"), "torso", 4, -38, 6, { anim: { pulse: 0.03 } }),
+      at("claws", side("claws"), "gun", -30, -24, 9),
+    ],
+    limbs: sl.limbs,
+    gait: sl.gait,
+    weapon: "claws",
+  });
+  const tl = legs(
+    "top",
+    bothSides([
+      { id: "l1", hip: { x: -12, y: -10 }, knee: { x: -26, y: -16 }, foot: { x: -30, y: -28 }, a: true },
+      { id: "l2", hip: { x: -14, y: -2 }, knee: { x: -30, y: -2 }, foot: { x: -38, y: -4 }, a: false },
+      { id: "l3", hip: { x: -14, y: 6 }, knee: { x: -30, y: 10 }, foot: { x: -38, y: 14 }, a: true },
+      { id: "l4", hip: { x: -12, y: 14 }, knee: { x: -26, y: 22 }, foot: { x: -32, y: 34 }, a: false },
+    ]),
+    { width: [3, 2.4], step: 4, lift: 0, z: [1, 1] },
+  );
+  const t = munchRig({
+    id,
+    name: "Brood Scorpion",
+    view: "top",
+    k: 0.7,
+    limbInk: 1.4,
+    pivots: { torso: { x: 0, y: 0 }, head: { x: 0, y: -22 } },
+    parts: [
+      { id: "body", src: top("scorpion-body"), bone: "torso", z: 5 },
+      at("claws", top("claws"), "gun", 0, -20, 6),
+    ],
+    limbs: tl.limbs,
+    gait: tl.gait,
+    weapon: "claws",
+    shadow: { x: 4, y: 6, r: 34 },
+  });
+  return { side: s, top: t };
+}
+
 // ---------- burrows and lab kit (structures) ----------
 
 function structure(id: string, name: string, o: { side: PartUse[]; top: PartUse[]; weapon?: string; h: number; r: number; fx?: string }): Look {
@@ -477,5 +650,8 @@ export default defineTemplateArt({
     pit: (ctx) => one(ctx, "dirt", pit),
     warren: (ctx) => one(ctx, "dirt", sett),
     hoppers: (ctx) => squad(ctx, "fox", fox),
+    lobber: (ctx) => one(ctx, "skunk", skunk),
+    flapjaw: (ctx) => squad(ctx, "crow", crow),
+    nanny: (ctx) => one(ctx, "scorpion", scorpion),
   },
 });
