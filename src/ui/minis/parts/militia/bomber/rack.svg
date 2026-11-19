@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="98 88 86 32" data-part="militia.bomber.side.rack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber: the belly rack of ore buckets packed with blasting powder</title>
+<path d="M102,92 L180,88 L180,93 L102,97 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M106,96 L106,100 M126,95 L126,99 M154,94 L154,98 M172,93 L172,97" stroke="#141414" stroke-width="1.4"/>
+<path d="M103,100 L119,100 L117,116 L105,116 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M120,99 L134,99 L132,115 L122,115 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M148,98 L162,98 L160,114 L150,114 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M165,97 L179,97 L177,113 L167,113 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M112,100 L119,100 L117,116 L111,116 Z M128,99 L134,99 L132,115 L127,115 Z M156,98 L162,98 L160,114 L155,114 Z M173,97 L179,97 L177,113 L172,113 Z" fill="#353b41"/>
+<path d="M104,100 Q108,96 112,99 Q116,96 118,100 Z M121,99 Q125,95 128,98 Q131,95 133,99 Z M149,98 Q153,94 156,97 Q159,94 161,98 Z M166,97 Q170,93 173,96 Q176,93 178,97 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M104,106 h14 M121,105 h12 M149,104 h12 M166,103 h12" stroke="#e3d8b6" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="140" cy="94" r="1"/></g>
+</svg>

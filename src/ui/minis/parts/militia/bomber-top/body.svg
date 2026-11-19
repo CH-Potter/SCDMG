@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -92 44 200" data-part="militia.bomber.top.body" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber from above: the boxy fuselage, glasshouse nose and cargo hatch (nose up)</title>
+<path d="M-14,-86 L14,-86 L18,-60 L18,40 L8,104 L-8,104 L-18,40 L-18,-60 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M10,-86 L14,-86 L18,-60 L18,40 L8,104 L4,104 L12,40 Z" fill="#6c5a37"/>
+<path class="glow" d="M-12,-84 L12,-84 L14,-66 L-14,-66 Z" fill="#f2b84b"/>
+<path d="M-12,-84 L12,-84 L14,-66 L-14,-66 Z M0,-84 V-66 M-13,-75 H13" fill="none" stroke="#141414" stroke-width="1.4"/>
+<circle cx="0" cy="-72" r="4.5" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<rect x="-12" y="8" width="24" height="36" rx="2" fill="#6c5a37" stroke="#141414" stroke-width="2"/>
+<path d="M0,8 V44" stroke="#141414" stroke-width="1.4"/>
+<ellipse cx="0" cy="80" rx="7" ry="9" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><path d="M-8,52 l8,5 l8,-5 v4 l-8,5 l-8,-5 Z" fill="#e3d8b6" opacity="0.85"/><circle cx="-15" cy="-40" r="1" fill="#c8bd98"/><circle cx="15" cy="-40" r="1" fill="#c8bd98"/><circle cx="-15" cy="30" r="1" fill="#c8bd98"/><circle cx="15" cy="30" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

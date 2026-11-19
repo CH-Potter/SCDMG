@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-92 -16 116 30" data-part="militia.turret.guns" data-recoil="5">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rivet Repeater: three long rifles clamped to one breech block, a crank wheel and an ammo hopper (muzzles left, pivot at the post)</title>
+<rect x="-86" y="-8.6" width="80" height="3.6" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-80" y="-2.4" width="74" height="3.6" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-86" y="3.8" width="80" height="3.6" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-89" y="-9.6" width="5" height="5.6" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="-83" y="-3.4" width="5" height="5.6" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="-89" y="2.8" width="5" height="5.6" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="-58" y="-11" width="7" height="20" rx="1" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M-14,-10 L10,-12 L12,10 L-14,10 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-14,3 L11.4,3 L12,10 L-14,10 Z" fill="#353b41"/>
+<path d="M-10,-10 L-8,-15 L4,-15 L6,-11 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="15" cy="2" r="6" fill="none" stroke="#141414" stroke-width="2"/>
+<path d="M15,2 L19,-3 L22,-3" fill="none" stroke="#141414" stroke-width="2" stroke-linecap="round"/>
+<g class="detail"><circle cx="-8" cy="-5" r="1.1" fill="#c8bd98"/><circle cx="6" cy="-6" r="1.1" fill="#c8bd98"/><circle cx="-8" cy="6" r="1.1" fill="#c8bd98"/><path d="M-70,-7.4 h14" stroke="#b9bfc4" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-90" cy="-1" r="1"/></g>
+</svg>

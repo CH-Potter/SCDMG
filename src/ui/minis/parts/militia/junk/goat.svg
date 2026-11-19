@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="108 96 54 42" data-part="militia.junk.side.goat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The goat: standing on the ore, stubby tail up, legs locked (body only; the head turns)</title>
+<path d="M120,118 L119,134 M126,120 L126,135 M144,119 L146,133 M150,117 L153,131" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M118,113 Q116,102 128,101 L146,101 Q156,101 156,110 Q156,121 144,121 L126,121 Q118,121 118,113 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M120,116 Q130,119 142,117 Q152,117 155,112 Q155,121 144,121 L126,121 Q119,121 120,116 Z" fill="#c8bd98"/>
+<path d="M134,102 Q140,100 146,104 Q148,110 140,111 Q132,110 134,102 Z" fill="#6e4528"/>
+<path d="M155,104 L160,97 L158,106 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M118,133 h3 M124,134 h3 M144,132 h3 M150,130 h3" stroke="#2b2019" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="122" cy="108" r="1"/></g>
+</svg>

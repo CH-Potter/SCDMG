@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="74 62 66 40" data-part="militia.bertha.side.cab">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Big Bertha: the driver's cab, lamp-lit, the driver's helm in the window</title>
+<path d="M79,100 L77,78 L88,67 L134,67 L136,100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M122,67 L134,67 L136,100 L123,100 Z" fill="#6c5a37"/>
+<path class="glow" d="M83,77 L91,70 L114,70 L114,91 L83,91 Z" fill="#f2b84b"/>
+<path class="glow" d="M86,76 L92,72 L100,72 L88,84 Z" fill="#fff2c0"/>
+<path d="M95,91 Q95,79 103,78 Q111,79 111,91 Z" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<path d="M96,84 L110,83" stroke="#fff2c0" stroke-width="1.6"/>
+<path d="M83,77 L91,70 L114,70 L114,91 L83,91 Z" fill="none" stroke="#141414" stroke-width="2"/>
+<path d="M99,70 L99,91" stroke="#141414" stroke-width="1.4"/>
+<rect x="118" y="73" width="12" height="13" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="86" y="63" width="16" height="5" rx="1.5" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="90" cy="65.5" r="1.8" fill="#fff2c0"/>
+<circle class="glow" cx="98" cy="65.5" r="1.8" fill="#fff2c0"/>
+<g class="detail"><circle cx="81" cy="96" r="1.1" fill="#c8bd98"/><circle cx="132" cy="96" r="1.1" fill="#c8bd98"/><circle cx="131" cy="71" r="1.1" fill="#c8bd98"/><path d="M120,75 l4,4" stroke="#b9bfc4" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="112" cy="100" r="1"/></g>
+</svg>

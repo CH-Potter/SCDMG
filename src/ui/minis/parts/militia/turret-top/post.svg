@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -16 40 66" data-part="militia.turret.top.post">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrap Turret from above: the pivot drum and the tractor seat on its spring arm</title>
+<path d="M0,6 L0,30" stroke="#25282c" stroke-width="6" stroke-linecap="round"/>
+<path d="M0,6 L0,30" stroke="#4a5158" stroke-width="2.8" stroke-linecap="round"/>
+<path d="M-12,28 Q-13,44 0,46 Q13,44 12,28 Q0,24 -12,28 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M6,26.4 Q9,27 12,28 Q13,44 0,46 Q8,40 6,26.4 Z" fill="#4a2e19"/>
+<circle cx="0" cy="0" r="11" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="0" r="4" fill="#25282c"/>
+<g class="detail"><circle cx="-4" cy="36" r="1" fill="#2b2019"/><circle cx="4" cy="36" r="1" fill="#2b2019"/><circle cx="0" cy="40" r="1" fill="#2b2019"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

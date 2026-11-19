@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-86 -86 172 172" data-part="militia.fieldworks.top.sandbags" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A ring of sandbags from above, open at the back (centre at the origin)</title>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(0 0 0)"/>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(36 0 0)"/>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(72 0 0)"/>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(108 0 0)"/>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(-36 0 0)"/>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(-72 0 0)"/>
+<rect x="-14" y="-82" width="28" height="18" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4" transform="rotate(-108 0 0)"/>
+<g class="shade">
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(0 0 0)"/>
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(36 0 0)"/>
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(72 0 0)"/>
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(108 0 0)"/>
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(-36 0 0)"/>
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(-72 0 0)"/>
+<rect x="-10" y="-71" width="22" height="6" rx="3" fill="#6c5a37" transform="rotate(-108 0 0)"/>
+</g>
+<g class="detail"><path d="M-2,-80 l3,4" stroke="#6e4528" stroke-width="1" transform="rotate(0 0 0)"/><path d="M-2,-80 l3,4" stroke="#6e4528" stroke-width="1" transform="rotate(72 0 0)"/><path d="M-2,-80 l3,4" stroke="#6e4528" stroke-width="1" transform="rotate(-72 0 0)"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

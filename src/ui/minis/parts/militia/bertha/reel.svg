@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-38 -38 76 76" data-part="militia.bertha.reel">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Harvester reel seen end-on: six spokes, wooden bats and spring tines (turns about its hub)</title>
+<path d="M28,0 L14,24.2 L-14,24.2 L-28,0 L-14,-24.2 L14,-24.2 Z" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M-28,0 L28,0 M-14,-24.2 L14,24.2 M14,-24.2 L-14,24.2" stroke="#141414" stroke-width="2.4"/>
+<path d="M-28,0 L28,0 M-14,-24.2 L14,24.2 M14,-24.2 L-14,24.2" stroke="#4a5158" stroke-width="1.2"/>
+<path d="M31,-4 L35,6 M17,26 L12,36 M-15,29 L-26,30 M-31,4 L-35,-6 M-17,-26 L-12,-36 M15,-29 L26,-30" stroke="#353b41" stroke-width="2"/>
+<rect x="23" y="-4.5" width="10" height="9" rx="1" fill="#6e4528" stroke="#141414" stroke-width="2" transform="rotate(0 28 0)"/>
+<rect x="9" y="19.7" width="10" height="9" rx="1" fill="#6e4528" stroke="#141414" stroke-width="2" transform="rotate(60 14 24.2)"/>
+<rect x="-19" y="19.7" width="10" height="9" rx="1" fill="#6e4528" stroke="#141414" stroke-width="2" transform="rotate(120 -14 24.2)"/>
+<rect x="-33" y="-4.5" width="10" height="9" rx="1" fill="#6e4528" stroke="#141414" stroke-width="2" transform="rotate(180 -28 0)"/>
+<rect x="-19" y="-28.7" width="10" height="9" rx="1" fill="#6e4528" stroke="#141414" stroke-width="2" transform="rotate(240 -14 -24.2)"/>
+<rect x="9" y="-28.7" width="10" height="9" rx="1" fill="#6e4528" stroke="#141414" stroke-width="2" transform="rotate(300 14 -24.2)"/>
+<circle cx="0" cy="0" r="8" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="0" r="3" fill="#25282c"/>
+<g class="detail"><circle cx="-3" cy="-3" r="1.2" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-32 -50 64 22" data-part="militia.turret.top.shield">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrap Turret from above: the curved boiler-plate shield, the crew stripe (team tag) along its top edge</title>
+<path d="M-28,-32 Q0,-48 28,-32 L26,-30 Q0,-42 -26,-30 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g class="tag"><path d="M-22,-35 Q0,-45.6 22,-35 L21,-33.2 Q0,-43 -21,-33.2 Z" fill="#ff00ff"/></g>
+<g class="detail"><circle cx="-18" cy="-36" r="1" fill="#c8bd98"/><circle cx="18" cy="-36" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-36" r="1"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -34 12 68" data-part="militia.biplane.prop">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wooden propeller seen edge-on, in its blur disc (squashes along its length as it turns)</title>
+<ellipse class="glow" cx="0" cy="0" rx="4.2" ry="31" fill="#b9bfc4" opacity="0.35"/>
+<path d="M0,-30 Q3.4,-16 2,0 Q3.4,16 0,30 Q-3.4,16 -2,0 Q-3.4,-16 0,-30 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M0,-28 L0,-24 M0,24 L0,28" stroke="#e3d8b6" stroke-width="2"/>
+<circle cx="0" cy="0" r="3" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

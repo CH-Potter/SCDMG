@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-66 -74 132 72" data-part="militia.bomber.top.nacelles">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber from above: the two engine nacelles out on the wings</title>
+<path d="M-58,-62 Q-50,-70 -42,-62 L-42,-8 L-58,-8 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M42,-62 Q50,-70 58,-62 L58,-8 L42,-8 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-46,-64 Q-43,-63 -42,-62 L-42,-8 L-46,-8 Z M54,-64 Q57,-63 58,-62 L58,-8 L54,-8 Z" fill="#353b41"/>
+<path d="M-58,-56 H-42 M42,-56 H58" stroke="#141414" stroke-width="1.4"/>
+<rect x="-55" y="-50" width="4" height="30" rx="1.5" fill="#25282c"/>
+<rect x="51" y="-50" width="4" height="30" rx="1.5" fill="#25282c"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-36" r="1"/><circle id="exhaust1" cx="-53" cy="-20" r="1"/><circle id="exhaust2" cx="53" cy="-20" r="1"/></g>
+</svg>

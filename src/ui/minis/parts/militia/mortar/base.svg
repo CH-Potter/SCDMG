@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 98 162 70" data-part="militia.mortar.side.base" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pipe Mortar: base plate and bipod, a crate of blasting charges and the field telephone</title>
+<path d="M92,118 L80,162 M98,120 L96,162" stroke="#25282c" stroke-width="5" stroke-linecap="round"/>
+<path d="M92,118 L80,162 M98,120 L96,162" stroke="#4a5158" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M84,140 L97,141" stroke="#141414" stroke-width="2"/>
+<path d="M106,156 L142,156 L144,164 L104,164 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M150,108 Q148,98 152,100 M158,108 Q160,100 164,102" fill="none" stroke="#2b2019" stroke-width="1.6"/>
+<rect x="140" y="108" width="40" height="50" rx="1.5" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M168,108 L180,108 L180,158 L168,158 Z" fill="#4a2e19"/>
+<g class="tag"><rect x="141.2" y="113" width="37.6" height="7" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/></g>
+<path d="M140,124 H180 M140,142 H180" stroke="#141414" stroke-width="1.4"/>
+<path d="M160,127 L163,132 L169,131 L165,135 L168,140 L162,137 L157,141 L158,135 L153,132 L159,132 Z" fill="#e3d8b6"/>
+<rect x="148" y="104" width="5" height="6" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<rect x="157" y="104" width="5" height="6" fill="#4a2e19" stroke="#141414" stroke-width="1.4"/>
+<rect x="26" y="134" width="24" height="22" rx="2" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M42,134 L50,134 L50,156 L42,156 Z" fill="#4a2e19"/>
+<path d="M24,132 Q28,124 38,126 Q48,124 52,132 L48,134 Q38,129 28,134 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="47" cy="146" r="3" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<path d="M50,146 L55,141" stroke="#141414" stroke-width="2"/>
+<path d="M26,152 Q18,156 22,162 Q28,166 40,164" fill="none" stroke="#2b2019" stroke-width="1.6"/>
+<g class="detail"><circle cx="34" cy="142" r="2" fill="#e3d8b6"/><circle cx="144" cy="112" r="1" fill="#c8bd98"/><circle cx="176" cy="112" r="1" fill="#c8bd98"/><circle cx="144" cy="154" r="1" fill="#c8bd98"/><circle cx="176" cy="154" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="124" cy="160" r="1"/></g>
+</svg>

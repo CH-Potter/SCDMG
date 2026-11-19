@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="104 74 50 58" data-part="militia.turret.side.gunner">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scrap Turret: the gunner on turret duty, hunched on the tractor seat, hands on the cranks</title>
+<path d="M130,103 L130,128 L150,127 L148,101 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M129,99 Q138,94 149,99 L149,113 Q139,117 129,113 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M142,96.6 Q146,97.4 149,99 L149,113 Q146,114.6 143,115.4 Z" fill="#6c5a37"/>
+<path d="M132,104 L118,112 L112,110" fill="none" stroke="#25282c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M132,104 L118,112 L112,110" fill="none" stroke="#5d5b45" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="111" cy="110" r="3.6" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M131,94 L147,93 L147,99 Q139,102 132,100 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M128,93 Q127,79 138,78 Q149,79 149,92 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M143,79.4 Q149,82 149,92 L144,92.4 Q145.4,85 143,79.4 Z" fill="#6c5a37"/>
+<path d="M127,92.6 L150,91" stroke="#25282c" stroke-width="2.4"/>
+<path class="glow" d="M129,89.4 L136,89" stroke="#f2b84b" stroke-width="2"/>
+<circle cx="130" cy="84" r="3" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="129.6" cy="84" r="1.6" fill="#fff2c0"/>
+<g class="detail"><path d="M143,104 l3,3 l3,-3 M143,108 l3,3 l3,-3" fill="none" stroke="#e3d8b6" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="140" cy="128" r="1"/></g>
+</svg>

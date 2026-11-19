@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 50 66 30" data-part="militia.bomber.side.engine">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber: the near engine nacelle between the wings, exhaust pipe on top</title>
+<path d="M60,57 Q53,66 60,75 L104,75 L111,66 L104,57 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M57,70 Q58,73 60,75 L104,75 L108,70 Z" fill="#353b41"/>
+<path d="M60,57 Q53,66 60,75 L67,75 L67,57 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M76,57 V75 M90,57 V75" stroke="#141414" stroke-width="1.4"/>
+<path d="M70,54 L100,54 L102,57 L70,57 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M60,66 L52,66" stroke="#141414" stroke-width="2.4"/>
+<g class="detail"><circle cx="84" cy="61" r="1" fill="#c8bd98"/><circle cx="98" cy="61" r="1" fill="#c8bd98"/><path d="M80,72 l4,0 l-2,2 Z" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="84" cy="66" r="1"/><circle id="exhaust1" cx="101" cy="54" r="1"/></g>
+</svg>

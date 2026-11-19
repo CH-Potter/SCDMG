@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="54 10 122 92" data-part="militia.bomber.side.wings">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber: the big upper wing and the lower wing edge-on, three bays of struts</title>
+<path d="M92,23 L94,42 M108,23 L106,43" stroke="#141414" stroke-width="2"/>
+<rect x="74" y="23" width="3.6" height="66" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="118" y="22" width="3.6" height="68" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="156" y="21" width="3.6" height="69" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><path d="M78,26 L118,86 M118,26 L78,86 M122,26 L156,86 M156,26 L122,86" stroke="#b9bfc4" stroke-width="0.8"/></g>
+<path d="M58,21 Q62,13 84,13 L170,15 L172,22 L60,24 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M59,22 L171,20 L172,22 L60,24 Z" fill="#44432f"/>
+<path d="M58,93 Q62,88 80,88 L156,89 L158,95 L60,97 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M59,95 L157,93 L158,95 L60,97 Z" fill="#44432f"/>
+<g class="detail"><path d="M100,14 v7 M136,14.5 v6 M100,89 v6 M136,89.5 v5" stroke="#44432f" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="115" cy="55" r="1"/></g>
+</svg>
