@@ -322,14 +322,15 @@ describe("disruption: burning an enemy support card", () => {
   });
 
   it("Snipe the Runner burns their best card, only if the marksman hasn't moved", () => {
-    let s = at(withCards(), "assault");
+    let s = at(withCards(), "movement");
     place(s, "p0-0", { x: 10, y: 5 });
     place(s, "p1-0", { x: 15, y: 30 });
     s = ok(use(s, "p0-0", "snipe-runner"));
     expect(s.players[0].cp).toBe(7);
     expect(s.players[1].supports.find((c) => c.id === "con-portal")!.exhausted).toBe(true);
     expect(s.players[1].cp).toBe(2);
-    const moved = at(withCards(), "assault");
+    expect(unitById(s, "p0-0")!.status.acted).toBe(true); // settling in is its movement
+    const moved = at(withCards(), "movement");
     place(moved, "p0-0", { x: 10, y: 5 });
     unitById(moved, "p0-0")!.status.moved = true;
     expect(use(moved, "p0-0", "snipe-runner").ok).toBe(false);
@@ -349,7 +350,7 @@ describe("disruption: burning an enemy support card", () => {
   });
 
   it("the exhausted card can't be played until the round's refresh", () => {
-    let s = at(withCards(), "assault");
+    let s = at(withCards(), "movement");
     place(s, "p0-0", { x: 10, y: 5 });
     place(s, "p1-0", { x: 15, y: 30 });
     s = ok(use(s, "p0-0", "snipe-runner"));

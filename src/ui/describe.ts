@@ -209,6 +209,11 @@ export function abilityStatusTags(u: Unit): string[] {
   if (st.corroded && !st.melting) tags.push("🧪 corroded (saves one worse)");
   if (st.phased) tags.push("👻 phase-shifted (evades shots on 4+)");
   if (st.triangulated) tags.push("📐 triangulated (shots at it: precision +1, tracking +1)");
+  if (st.saveMod) tags.push(st.saveMod > 0 ? `🛡 saves ${st.saveMod} better` : `💔 saves ${-st.saveMod} worse`);
+  if (st.evadeGrant) tags.push(`💨 evades everything on a ${st.evadeGrant}+`);
+  if (st.evadeBonus) tags.push(st.evadeBonus > 0 ? `💨 evade +${st.evadeBonus}` : `🎯 evade ${st.evadeBonus}`);
+  if (st.damageMod) tags.push(`💥 ${st.damageMod > 0 ? "+" : ""}${st.damageMod} damage per hit`);
+  if (st.diceMod) tags.push(`🎲 ${st.diceMod > 0 ? "+" : ""}${st.diceMod} attack ${Math.abs(st.diceMod) === 1 ? "die" : "dice"} per model`);
   if (st.precisionBonus || st.trackingBonus)
     tags.push(`🔍 ${[st.precisionBonus ? `precision +${st.precisionBonus}` : "", st.trackingBonus ? `tracking +${st.trackingBonus}` : ""].filter(Boolean).join(", ")}`);
   const max = profileOf(u).shield;

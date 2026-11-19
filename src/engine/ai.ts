@@ -1209,7 +1209,7 @@ function diceAbilityCandidates(s: GameState, u: Unit, id: AbilityId): Candidate[
     const cmd: Command = { type: "ability", uid: u.uid, ability: id, target: t.uid };
     const v = diceEffectValue(s, u.owner, t, e, cmd);
     if (v <= 0) continue;
-    out.push({ cmd, bonus: v * 0.8 - (def.cp ?? 0) * CP_VALUE - reserve, stack: true, expected: true });
+    out.push({ cmd, bonus: v * 1.2 - (def.cp ?? 0) * CP_VALUE - reserve, stack: true, expected: true });
   }
   return out.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
 }
@@ -1219,7 +1219,8 @@ function burnCandidates(s: GameState, u: Unit, id: AbilityId): Candidate[] {
   const def = ABILITIES[id];
   if (s.players[u.owner].cp < (def.cp ?? 0) || disruptProblem(s, u, id)) return [];
   const v = burnValue(s, u.owner) - (def.cp ?? 0) * CP_VALUE - cpReserve(s, u.owner, id, def.cp ?? 0);
-  return [{ cmd: { type: "ability", uid: u.uid, ability: id }, bonus: v, stack: true, expected: true }];
+  // Snipe the Runner is the marksman's whole movement; the others are free actions.
+  return [{ cmd: { type: "ability", uid: u.uid, ability: id }, bonus: v, ...(id === "snipe-runner" ? {} : { stack: true, expected: true }) }];
 }
 
 const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
@@ -1594,7 +1595,7 @@ const NEW_ABILITY_AI: Partial<Record<AbilityId, AbilityAi>> = {
       for (const e of onBoard(s, other(u.owner))) {
         if (!meleeOn(s, u.owner, e).some((x) => x.uid === f.uid)) continue;
         // A charge may not land: count a fight already on in full, a charge at even odds.
-        const sure = engagedWith(s, f).some((x) => x.uid === e.uid) ? 1 : 0.5;
+        const sure = engagedWith(s, f).some((x) => x.uid === e.uid) ? 1 : 0.6;
         best = Math.max(best, (attackValue(s, e, meleeExp(f, e, 1)) - attackValue(s, e, meleeExp(f, e))) * sure);
       }
       gain += best;

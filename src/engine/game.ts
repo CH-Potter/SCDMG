@@ -1215,6 +1215,7 @@ function useAbility(
       const e = exhaustEnemyCard(s, victim, card, events);
       if (e) return e;
       const cardName = SUPPORTS[card]?.name ?? card;
+      if (id === "snipe-runner") unit.status.acted = true; // settling in is the marksman's movement
       say(
         id === "snipe-runner"
           ? `${name} picks off a dispatch runner: ${cardName} is out of the fight this round.`
@@ -1316,13 +1317,13 @@ export function disruptProblem(s: GameState, u: Unit, id: AbilityId): string | n
   return null;
 }
 
-/** Stand To: the gun (and plan) a unit standing to fires at `charger`, hitting as normal, or null. */
+/** Stand To: the gun (and plan) a unit standing to fires at `charger`, in a snap volley (hitting one worse), or null. */
 export function standToPlan(s: GameState, t: Unit, charger: Unit): { weapon: Weapon; plan: AttackPlan } | null {
   if (t.destroyed || !t.onBoard || charger.destroyed || isEngaged(s, t)) return null;
   let best: { weapon: Weapon; plan: AttackPlan; value: number } | null = null;
   for (const w of profileOf(t).weapons) {
     if (w.melee || hasTrait(w, "indirect")) continue;
-    const plan = planShooting(s, t, charger, w);
+    const plan = planShooting(s, t, charger, w, "overwatch"); // a snap volley: one worse
     if (typeof plan === "string") continue;
     const value = expectedDamage(s, t, charger, plan, false);
     if (!best || value > best.value) best = { weapon: w, plan, value };

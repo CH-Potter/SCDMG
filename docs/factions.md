@@ -25,8 +25,8 @@ The frontier, drafted. After the first bugs came up through the corn in '09, the
 
 **Belongs here**
 - Keywords: infantry, light (scouts, medics, marksmen), mech; a few fearless defenders.
-- Abilities: Overwatch, Entrenched, Steady Aim, Spotter, Barrage, Demo Charge, Patch Up, Steadying Presence, Rocket Hop, Return Fire, Crop Dust, Bale Out, Radio Spotter, Scrap Cover.
-- Supports: resources, heal (repairs, no revives), rangedBuff, dugIn, spot (hit one better), smoke (only shot from close by), grant Overwatch, the ward reaction, airdrops (near your models, or anywhere for the drop-ship), the Junk Barricade summon.
+- Abilities: Overwatch, Entrenched, Steady Aim, Spotter, Barrage, Demo Charge, Patch Up, Steadying Presence, Rocket Hop, Return Fire, Crop Dust, Bale Out, Radio Spotter, Scrap Cover; and, costing CP every round, Stand To (shoot the charger first), Hold the Line (double weight on an objective), Smoke Shells, Steel-Core Rounds, Snipe the Runner (burn a card), Rivet the Plates (armour), Star Shell (evade penalty).
+- Supports: resources, heal (repairs, no revives), rangedBuff, dugIn, spot (hit one better), smoke (only shot from close by), grant Overwatch, the ward reaction, airdrops (near your models, or anywhere for the drop-ship), the Junk Barricade summon, damageBuff (Heavy Loads), evadeDebuff (Parachute Flares).
 - Stats: hit 4+ (3+ for marksmen); range 20–30"; armour 4 on the line (Bertha 3; light scouts 5); nerve 7; 1–7 models per unit (Rivet Grunts 5, or 7 with their Second Section; Old Guard 4; Outriders and Patch Medics 3; marksmen, machines and structures are single models); cost 2–5. Precision on marksmen and the crop duster; tracking on auto-guns.
 
 **Arrival:** the **Rust Bucket Drop-Ship** lands a reserve unit anywhere on the table from round 2, at least 8" from enemies, for just 1 CP. It's the Skirmish starter's arrival card. The **Forward Airstrip** drops one within 12" of your models for 3 CP, and it's the Assault starter's.
@@ -50,8 +50,8 @@ Bugs that slept for ages deep under the Dustline, round the Wellspring, until th
 
 **Belongs here**
 - Keywords: beast, infantry, light; monsters; a jumping ambusher; flyers that sting.
-- Abilities: Regen, Regrow, Hatchlings, Lurk, Rampage, Brood Call, Mending Spores, Tunnel, Burrow Exit, Bombs Away!, Corrode, Brood Bond.
-- Supports: meleeBuff, haste (Skitter Rush), regrow (Quickening), rattle, blind, slow (Caustic Snare), retaliate (Acid Blood), summons (Egg Clutch, Tunnel Mouth), and its own airdrop (Surface Breach).
+- Abilities: Regen, Regrow, Hatchlings, Lurk, Rampage, Brood Call, Mending Spores, Tunnel, Burrow Exit, Bombs Away!, Corrode, Brood Bond; and, costing CP every round, Mad Scramble (best two of three charge dice), Eat Through (acid that stacks), Brood Frenzy, Lay Eggs, Chew the Wires (burn a card), Slime Coat (evade), Numbing Sting (fewer attack dice).
+- Supports: meleeBuff, haste (Skitter Rush), regrow (Quickening), rattle, blind, slow (Caustic Snare), retaliate (Acid Blood), summons (Egg Clutch, Tunnel Mouth), its own airdrop (Surface Breach), evadeBuff (Fresh Moult) and weaken (Numbing Haze).
 - Stats: melee hit 4+ (monsters 3+); armour 6 (Shellbacks and monsters 4–5); nerve 6–7; cost 2–6, lowest per model.
 
 **Arrival:** **Undertunnels** in both starter sets: *Surface Breach* bursts a reserve up within 10" of the swarm (at least 5" from enemies, from round 2), or *Open a Tunnel* opens a Tunnel Mouth for the round (also from round 2). **The Brood Spire** is the permanent burrow, bought in the list.
@@ -73,8 +73,8 @@ Smug aliens who have come down in saucers to claim the valley. Domed heads in fi
 
 **Belongs here**
 - Keywords: armoured, infantry, flying, monster.
-- Abilities: Blink, Recall Beam, Radiance, Refraction, Bubble Shield, Provoke, Glimmer Field, Overcharge, Spotlight, Riposte, Pirouette, Twirl Away, Phase Out.
-- Supports: recharge, resonate, overshield, aimBuff, expose, silence, teleport (Gate Step, Flash Step), brace, blast (Sunbeam), the Glimmer Dome summon, and the Grand Portal airdrop.
+- Abilities: Blink, Recall Beam, Radiance, Refraction, Bubble Shield, Provoke, Glimmer Field, Overcharge, Spotlight, Riposte, Pirouette, Twirl Away, Phase Out; and, costing CP every round, Phase Shift (evade shots on 4+), Triangulate (precision and tracking on a target), Bow Out (leave a melee by teleport), Lend Shields, Cutting Remark (burn a card), Exacting Standards (+1 damage).
+- Supports: recharge, resonate, overshield, aimBuff, expose, silence, teleport (Gate Step, Flash Step), brace, blast (Sunbeam), the Glimmer Dome summon, the Grand Portal airdrop, armourBuff (Hardlight Plating) and armourBreak (Structural Critique). Corrode is the swarm's acid; the Concord crack armour by critique.
 - Stats: hit 3+; shields 1–3 per model; armour 4–5 (Grand Strider 3); nerve 8–9; cost 3–7, highest per model; precision 1–2 and tracking 1 on most guns.
 
 **Arrival:** the **Grand Portal** beams a reserve unit in within 4" of one of your units (at least 3" from enemies) from round 2, arriving with +1 shield per model for the round. It is in both the Skirmish and Assault starter supports: a few elites need it to reach the long board's many objectives. So is the Court of Disdain, whose Point Out Flaws lands the Lancers' misses and whose Withering Review switches off the Militia's Overwatch and Return Fire. The Assault starter also brings the Light Gate (not the Star Lens), to get a few elites to the long board's objectives.
@@ -91,17 +91,20 @@ Smug aliens who have come down in saucers to claim the valley. Domed heads in fi
 | Militia | Forward Airstrip | Supply Drop (airdrop near your models), Top Cover (grant Overwatch) |
 | Militia | Rust Bucket Drop-Ship | Bumpy Landing (airdrop anywhere), Sandbag Drop (dig in) |
 | Militia | Ammo Wagon | Crate of Rivets (ranged dice), Sandbag Detail (dig in) |
+| Militia | Powder Store | Heavy Loads (+1 damage per hit), Parachute Flares (evade penalty) |
 | Skitterswarm | Brood Hum | Gnashing Frenzy (melee dice), Skitter Rush (haste +2") |
 | Skitterswarm | Egg Chamber | Lay a Clutch (lurking Egg Clutch), Quickening (regrow 2) |
 | Skitterswarm | Undertunnels | Surface Breach (airdrop near the swarm), Open a Tunnel (Tunnel Mouth) |
 | Skitterswarm | Pheromone Cloud | Skin-Crawl (rattle), Spore Fog (blind) |
 | Skitterswarm | Acid Glands | Acid Blood (retaliate), Caustic Snare (slow) |
+| Skitterswarm | Moulting Pit | Fresh Moult (evade buff, or a 6+ evade), Numbing Haze (weaken: one fewer die) |
 | Concord | Mirror Spire | Refocus (recharge), Glimmer Dome (summon) |
 | Concord | Choir of Light | Hold Fast (brace reaction), Resonance (recharge 1 in a 6" group) |
 | Concord | Star Lens | Sunbeam (blast), Glaring Light (expose) |
 | Concord | Court of Disdain | Point Out Flaws (precision and tracking), Withering Review (silence) |
 | Concord | Light Gate | Gate Step (teleport a unit 8"), Flash Step (teleport 4" in the assault phase) |
 | Concord | Grand Portal | Step Through (airdrop beside a friend, +1 shield), Afterglow (overshield) |
+| Concord | Hardlight Forge | Hardlight Plating (armour buff), Structural Critique (armour break) |
 
 ## Unit abilities at a glance
 
@@ -109,38 +112,38 @@ Every unit has at least two abilities (structures at least one). Most cards and 
 
 | Faction | Unit | Abilities |
 | --- | --- | --- |
-| Militia | Rivet Grunts | Entrenched, Demo Charge (+ Overwatch or Rocket Hop from upgrades) |
-| Militia | Patch Medic | Patch Up, Entrenched, Rocket Hop, Steadying Presence |
-| Militia | Big Bertha | Steady Aim, Return Fire (+ Barrage) |
+| Militia | Rivet Grunts | Entrenched, Demo Charge, Stand To, Hold the Line (+ Overwatch from an upgrade) |
+| Militia | Patch Medic | Patch Up, Entrenched, Rocket Hop, Steadying Presence, Rivet the Plates |
+| Militia | Big Bertha | Steady Aim, Return Fire, Stand To (+ Barrage) |
 | Militia | Sky Rustler | Spotter, Crop Dust |
-| Militia | Ridgeline Marksman | Steady Aim, Entrenched (+ Overwatch or Spotter) |
+| Militia | Ridgeline Marksman | Steady Aim, Entrenched, Steel-Core Rounds, Snipe the Runner (+ Overwatch, Spotter or Hidden) |
 | Militia | Tumbleweed Outriders | Demo Charge, Rocket Hop |
-| Militia | Old Guard Veterans | Entrenched, Steadying Presence (+ Overwatch) |
+| Militia | Old Guard Veterans | Entrenched, Steadying Presence, Hold the Line, Stand To (+ Overwatch) |
 | Militia | Haymaker Bomber | Return Fire, Bale Out |
-| Militia | Scrap Turret | Overwatch |
-| Militia | Pipe Mortar | Radio Spotter (+ Barrage) |
+| Militia | Scrap Turret | Overwatch (+ Steel-Core Rounds) |
+| Militia | Pipe Mortar | Radio Spotter, Smoke Shells, Star Shell, Barrage |
 | Militia | Junk Barricade | Scrap Cover |
-| Skitterswarm | Skitterlings | Regrow, Rampage (+ Tunnel with Burrowers) |
-| Skitterswarm | Acid Spitters | Corrode, Regrow |
-| Skitterswarm | Shellback Brood | Corrode, Regen |
-| Skitterswarm | Trapjaw Lurker | Lurk, Tunnel (+ Corrode) |
-| Skitterswarm | The Broodmother | Brood Bond, Brood Call, Hatchlings (+ Corrode) |
-| Skitterswarm | Deep Borer | Tunnel, Rampage (+ Regen) |
-| Skitterswarm | Stinger Swarm | Corrode, Bombs Away! |
-| Skitterswarm | Bile Bombard | Corrode, Regen |
-| Skitterswarm | Brood Tenders | Hatchlings, Mending Spores |
+| Skitterswarm | Skitterlings | Regrow, Rampage, Mad Scramble (+ Tunnel with Burrowers) |
+| Skitterswarm | Acid Spitters | Corrode, Regrow, Eat Through |
+| Skitterswarm | Shellback Brood | Corrode, Regen, Burrow, Mad Scramble |
+| Skitterswarm | Trapjaw Lurker | Lurk, Tunnel, Burrow, Chew the Wires (+ Corrode) |
+| Skitterswarm | The Broodmother | Brood Bond, Brood Call, Hatchlings, Brood Frenzy (+ Corrode) |
+| Skitterswarm | Deep Borer | Tunnel, Rampage, Mad Scramble (+ Regen) |
+| Skitterswarm | Stinger Swarm | Corrode, Bombs Away!, Numbing Sting |
+| Skitterswarm | Bile Bombard | Corrode, Regen, Chew the Wires, Barrage |
+| Skitterswarm | Brood Tenders | Hatchlings, Mending Spores, Lay Eggs, Slime Coat |
 | Skitterswarm | Brood Spire | Burrow Exit, Regen |
 | Skitterswarm | Acid Geyser | Corrode, Regen |
 | Skitterswarm | Egg Clutch / Tunnel Mouth | Lurk / Burrow Exit |
-| Concord | Phase Guard | Blink, Riposte |
-| Concord | Ray Lancer | Overcharge, Phase Out |
-| Concord | Shimmer Saucer | Refraction, Bubble Shield |
-| Concord | Beam Warden | Radiance, Recall Beam |
-| Concord | His Radiance, the Grand Strider | Refraction, Provoke (+ Radiance) |
-| Concord | Blink Dancers | Twirl Away, Pirouette (+ Blink) |
-| Concord | Jetwing Scouts | Spotlight, Overcharge (+ Refraction) |
-| Concord | Shield Pylon | Radiance |
-| Concord | Sunray Tower | Overcharge |
+| Concord | Phase Guard | Blink, Riposte, Phase Shift |
+| Concord | Ray Lancer | Overcharge, Phase Out, Cutting Remark (+ Bow Out) |
+| Concord | Shimmer Saucer | Refraction, Bubble Shield, Triangulate |
+| Concord | Beam Warden | Radiance, Recall Beam, Lend Shields, Exacting Standards |
+| Concord | His Radiance, the Grand Strider | Refraction, Provoke, Bow Out (+ Radiance) |
+| Concord | Blink Dancers | Twirl Away, Pirouette, Phase Shift (+ Blink) |
+| Concord | Jetwing Scouts | Spotlight, Overcharge (+ Refraction or Triangulate) |
+| Concord | Shield Pylon | Radiance, Lend Shields |
+| Concord | Sunray Tower | Overcharge, Triangulate |
 | Concord | Glimmer Dome | Glimmer Field |
 
 ## Faction forge templates

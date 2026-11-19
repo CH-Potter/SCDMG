@@ -398,7 +398,7 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     name: "Stand To",
     kind: "active",
     phase: "movement",
-    text: "Movement phase, a free action: the unit stands to. The first time an enemy unit declares a charge at it this round, it shoots the charger with its best gun before the charge is rolled, hitting as normal (not with a lobbed gun, and not while it's in a melee).",
+    text: "Movement phase, a free action: the unit stands to. The first time an enemy unit declares a charge at it this round, it shoots the charger with its best gun before the charge is rolled, in a snap volley that hits one worse (not with a lobbed gun, and not while it's in a melee).",
   },
   "hold-the-line": {
     id: "hold-the-line",
@@ -510,8 +510,8 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     cp: 1,
     name: "Snipe the Runner",
     kind: "active",
-    phase: "assault",
-    text: "Assault phase, a free action, only if this unit hasn't moved this round: it picks off the enemy's dispatch runner. Their ready support card with the most CP is exhausted until the end of the round (its abilities and its CP are lost).",
+    phase: "movement",
+    text: "Movement phase, instead of moving: the marksman settles in and picks off the enemy's dispatch runner. Their ready support card with the most CP is exhausted until the end of the round (its abilities and its CP are lost).",
   },
   "chew-wires": {
     id: "chew-wires",
