@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 146 22 26" data-part="forge.bulwark.side.shin-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far greave, in shadow</title>
+<path d="M63,149 L79,149 L77,169 L65,169 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="152" r="1"/></g>
+</svg>

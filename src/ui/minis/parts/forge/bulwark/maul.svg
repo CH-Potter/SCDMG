@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -20 110 40" data-part="forge.bulwark.side.maul" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Breaching maul: a vault-door ram on a long haft (head left)</title>
+<rect x="8" y="-3" width="86" height="6" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-8,-16 L20,-16 L22,16 L-8,16 Q-10,0 -8,-16 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-16 L20,-16 L22,16 L13,16 Z" fill="#6c5a37"/>
+<circle cx="5" cy="0" r="6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M5,-6 V6 M-1,0 H11" stroke="#6e4528" stroke-width="2"/>
+<path d="M-8,-16 L-8,16" stroke="#6e4528" stroke-width="3"/>
+<path d="M50,-3 v6 M88,-3 v6" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="52" cy="0" r="1"/><circle id="g2" cx="82" cy="0" r="1"/><circle id="muzzle" cx="-9" cy="0" r="1"/></g>
+</svg>

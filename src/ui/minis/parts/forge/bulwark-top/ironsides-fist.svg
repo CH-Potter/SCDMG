@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -16 24 30" data-part="forge.bulwark.top.ironsides-fist">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crusher fist from above (knuckles forward)</title>
+<rect x="-9" y="-14" width="18" height="22" rx="3" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-9,-14 H9" stroke="#6e4528" stroke-width="3"/>
+<rect x="-6" y="6" width="12" height="6" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="8" r="1"/></g>
+</svg>

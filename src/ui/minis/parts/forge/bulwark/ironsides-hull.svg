@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -176 112 110" data-part="forge.bulwark.side.ironsides-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Old Ironsides: a walking vault with a porthole, behind it the old brother's scowl and moustache</title>
+<path d="M-46,-150 Q-46,-168 -28,-168 L30,-168 Q48,-168 48,-150 L50,-90 Q50,-78 36,-78 L-34,-78 Q-48,-78 -48,-92 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30,-167 Q48,-168 48,-150 L50,-90 Q50,-78 36,-78 L28,-78 Q40,-120 30,-167 Z" fill="#6c5a37"/>
+<path d="M-48,-104 L50,-108 L50,-98 L-48,-94 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="-18" cy="-136" r="20" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<circle cx="-18" cy="-136" r="15" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<path d="M-32,-140 Q-30,-150 -18,-151 Q-6,-150 -4,-140 Z" fill="#c8bd98"/>
+<path d="M-28,-142 L-21,-140 M-14,-140 L-7,-142" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M-30,-130 Q-24,-134 -18,-130 Q-12,-134 -6,-130 Q-12,-126 -18,-128 Q-24,-126 -30,-130 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M-30,-147 Q-24,-152 -16,-152" fill="none" stroke="#fff2c0" stroke-width="2"/>
+<path class="tag" d="M14,-166 L28,-166 L29,-110 L22,-104 L15,-110 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="-18" cy="-92" r="8" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-18,-99 V-85 M-25,-92 H-11" stroke="#6e4528" stroke-width="2"/>
+<g class="detail"><circle cx="-40" cy="-160" r="1.2" fill="#c8bd98"/><circle cx="40" cy="-160" r="1.2" fill="#c8bd98"/><circle cx="-42" cy="-86" r="1.2" fill="#c8bd98"/><circle cx="42" cy="-86" r="1.2" fill="#c8bd98"/><circle cx="0" cy="-160" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-120" r="1"/></g>
+</svg>

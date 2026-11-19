@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 162 36 28" data-part="forge.bulwark.side.boot-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near armoured sabaton: a squared toe cap on a deep sole</title>
+<path d="M38,165 L57,165 L58,184 L29,184 L30,176 L37,173 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M50,165 L57,165 L58,184 L51,184 Z" fill="#6c5a37"/>
+<path d="M28,184 L59,184 L59,188 L28,188 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M30,177 L44,176" fill="none" stroke="#6e4528" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="48 162 34 28" data-part="forge.bulwark.side.boot-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far armoured sabaton, in shadow</title>
+<path d="M60,165 L78,165 L79,184 L51,184 L52,176 L59,173 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M50,184 L80,184 L80,188 L50,188 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="170" r="1"/></g>
+</svg>

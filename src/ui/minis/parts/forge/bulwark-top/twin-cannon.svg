@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-5 -12 50 24" data-part="forge.bulwark.top.twin-cannon" data-recoil="4">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Twin autocannon from above (muzzles left)</title>
+<rect x="-3" y="-8" width="24" height="5" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="-3" y="3" width="24" height="5" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="18" y="-10" width="24" height="20" rx="3" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M26,-10 V10" stroke="#6e4528" stroke-width="2.6"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="32" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

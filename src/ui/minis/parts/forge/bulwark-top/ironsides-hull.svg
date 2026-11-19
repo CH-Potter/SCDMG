@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-46 -46 92 92" data-part="forge.bulwark.top.ironsides-hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Old Ironsides from above: the vault's lid, a gold band, the team stole draped over it</title>
+<rect x="-40" y="-38" width="80" height="76" rx="12" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M24,-37.4 H28 Q39.4,-37.4 39.4,-26 V26 Q39.4,37.4 28,37.4 H18 Q30,0 24,-37.4 Z" fill="#6c5a37"/>
+<path d="M-40,-6 H40" stroke="#6e4528" stroke-width="4"/>
+<path class="tag" d="M8,-38 L20,-38 L20,38 L8,38 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-14" cy="-24" r="9" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-14" cy="-24" r="4" fill="#fff2c0"/>
+<g class="detail"><circle cx="-32" cy="30" r="1.2" fill="#c8bd98"/><circle cx="32" cy="30" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>
