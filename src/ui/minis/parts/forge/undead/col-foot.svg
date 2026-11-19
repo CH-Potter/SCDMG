@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 162 38 26" data-part="forge.undead.side.col-foot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A great bone foot with hooked claws</title>
+<path d="M44,165 L56,165 L58,183 L32,184 Q26,184 26,180 L40,176 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M51,165.6 L55.6,165.6 L57.4,182.4 L51.6,182.6 Z" fill="#c8bd98"/>
+<path d="M30,178 L24,184 L32,183 Z M37,178 L32,185 L39,183 Z" fill="#c8bd98" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

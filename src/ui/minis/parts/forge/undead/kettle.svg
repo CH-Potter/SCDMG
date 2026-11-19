@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 18 44 30" data-part="forge.undead.side.kettle">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Rusted kettle helm: a dented iron dome on a wide drooping brim, bronze rust blooming through</title>
+<path d="M47,40 Q46,24 60,23 Q73,24 73.6,37 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,24.6 Q73,27 73.6,37 L68,38 Q69,30 66,24.6 Z" fill="#353b41"/>
+<path d="M39,42 Q60,35 81,37 L80,41.6 Q60,40 40,46.6 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M52,31 Q56,27.4 60,30 Q57,34 52,31 Z M64,34 Q68,32 70,35 Q67,37 64,34 Z" fill="#6e4528"/>
+<path d="M63,25 Q61.4,29 64,32.6" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="50" cy="43.4" r="1" fill="#b9bfc4"/><circle cx="58" cy="41.4" r="1" fill="#b9bfc4"/><circle cx="66" cy="40" r="1" fill="#b9bfc4"/><circle cx="74" cy="39.4" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

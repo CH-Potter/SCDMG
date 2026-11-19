@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 146 16 22" data-part="forge.undead.side.zombie-shin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Torn trouser cuff, frayed</title>
+<path d="M44.6,149 L55,149 L54,160 L51,156.6 L48.6,162 L45.6,157.6 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>

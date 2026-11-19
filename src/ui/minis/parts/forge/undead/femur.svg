@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -18 136 36" data-part="forge.undead.side.femur" data-recoil="3">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Femur club: a giant's thighbone, knobbed and cracked, a rag wrapped at the grip (knob left)</title>
+<path d="M4,-6.4 L108,-4.4 L108,4.4 L4,6.4 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M4,1.6 L108,1 L108,4.4 L4,6.4 Z" fill="#c8bd98"/>
+<circle cx="-2" cy="-7" r="9.4" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<circle cx="-1" cy="8" r="8.4" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<circle cx="111" cy="-4.4" r="6" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<circle cx="111" cy="4.6" r="6" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<rect x="58" y="-7" width="12" height="14" rx="1.4" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<path d="M60,-7 l4,14 M65,-7 l4,14" fill="none" stroke="#44432f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M24,-5.6 l4,4 l-2,3 M86,-4.6 l3,3" fill="none" stroke="#c8bd98" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="62" cy="0" r="1"/><circle id="g2" cx="92" cy="0" r="1"/><circle id="muzzle" cx="-10" cy="0" r="1"/></g>
+</svg>

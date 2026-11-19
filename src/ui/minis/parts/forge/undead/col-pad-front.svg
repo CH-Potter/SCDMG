@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 52 34 34" data-part="forge.undead.side.col-pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A pauldron of three piled skulls, near</title>
+<circle cx="36" cy="66" r="6.4" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="33.4" cy="65.4" rx="1.7" ry="2.1" fill="#141414"/>
+<path d="M33,70 H38" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="50" cy="62" r="6.4" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="47.4" cy="61.4" rx="1.7" ry="2.1" fill="#141414"/>
+<path d="M47,66 H52" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="43" cy="76" r="6" fill="#e3d8b6" stroke="#141414" stroke-width="2.4"/>
+<ellipse cx="40.4" cy="75.6" rx="1.6" ry="2" fill="#141414"/>
+<path d="M40,80 H45" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle class="glow" cx="32.6" cy="65.4" r="0.9" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

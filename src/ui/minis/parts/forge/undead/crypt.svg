@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 -158 128 160" data-part="forge.undead.side.crypt" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crypt Gate: a squat stone mausoleum, ivory pillars, an hourglass pediment, an iron-barred door glowing cyan, team banners hung each side, grave railings on the steps</title>
+<path d="M-63,0 L-59,-10 L59,-10 L63,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M38,-10 L59,-10 L63,0 L42,0 Z" fill="#353b41"/>
+<path d="M-53,-10 L-51,-18 L51,-18 L53,-10 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-45,-18 L-45,-114 L45,-114 L45,-18 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-114 L45,-114 L45,-18 L24,-18 Z" fill="#6c5a37"/>
+<rect x="-46" y="-112" width="11" height="94" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<rect x="35" y="-112" width="11" height="94" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<path d="M-54,-114 L0,-150 L54,-114 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-54,-120 L54,-120 L54,-112 L-54,-112 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-7,-143 L7,-143 L0,-134.6 L7,-126 L-7,-126 L0,-134.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-23,-18 L-23,-76 Q-23,-97 0,-97 Q23,-97 23,-76 L23,-18 Z" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="glow" d="M-17,-18 L-17,-38 Q0,-50 17,-38 L17,-18 Z" fill="#f2b84b"/>
+<path d="M-15,-18 V-80 M-7.6,-18 V-87 M0,-18 V-89 M7.6,-18 V-87 M15,-18 V-80" fill="none" stroke="#353b41" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-21,-52 H21" fill="none" stroke="#4a5158" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-23,-18 L-23,-76 Q-23,-97 0,-97 Q23,-97 23,-76 L23,-18" fill="none" stroke="#141414" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="0" cy="-104" r="5.6" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<ellipse cx="-2.2" cy="-104.6" rx="1.4" ry="1.8" fill="#141414"/>
+<ellipse cx="2.2" cy="-104.6" rx="1.4" ry="1.8" fill="#141414"/>
+<path class="tag" d="M-34,-112 L-24,-112 L-24,-64 L-27,-70 L-29,-62 L-31,-70 L-34,-64 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M24,-112 L34,-112 L34,-64 L31,-70 L29,-62 L27,-70 L24,-64 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M30,-112 L34,-112 L34,-64 L31,-70 L30,-68 Z" fill="#b000b0"/>
+<path d="M-61,-10 V-30 M-56,-10 V-31 M-51,-18 V-32 M51,-18 V-32 M56,-10 V-31 M61,-10 V-30" fill="none" stroke="#353b41" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-62,-26 H-50 M50,-26 H62" fill="none" stroke="#353b41" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-63,-30 L-61,-35 L-59,-30 Z M-58,-31 L-56,-36 L-54,-31 Z M54,-31 L56,-36 L58,-31 Z M59,-30 L61,-35 L63,-30 Z" fill="#4a5158" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M-30,-40 l4,6 l-2,5 M12,-108 l3,4" fill="none" stroke="#6c5a37" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-80" r="1"/></g>
+</svg>

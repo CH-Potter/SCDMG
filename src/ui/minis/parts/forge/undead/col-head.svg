@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 4 62 60" data-part="forge.undead.side.col-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bone Colossus head: a heap of skulls round one great skull with cyan eye-fire, two curling bone horns</title>
+<rect x="53" y="48" width="13" height="12" rx="2" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<path d="M64,32 Q70,16 84,14 Q96,16 94,30 Q90,38 82,34 Q88,28 84,24 Q76,24 72,36 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M74,22 l4,4 M84,18 l1,5 M90,26 l-4,2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="68" cy="26" r="8" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<ellipse cx="65" cy="25" rx="2" ry="2.4" fill="#141414"/>
+<circle cx="48" cy="26" r="7" fill="#c8bd98" stroke="#141414" stroke-width="2"/>
+<ellipse cx="45" cy="26" rx="1.8" ry="2.2" fill="#141414"/>
+<path d="M45,50 Q38,34 54,27 Q70,26 70,42 Q70,49 65,51 L64,56 L49,56 L48,52 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M63,28.6 Q70,32 70,42 Q70,49 65,51 L63.4,55.6 L60,55.6 Q66,44 63,28.6 Z" fill="#c8bd98"/>
+<ellipse cx="49.6" cy="40" rx="4.8" ry="5.2" fill="#141414"/>
+<circle class="glow" cx="49" cy="40.4" r="2.2" fill="#fff2c0"/>
+<path d="M44,46.4 L41.6,50 L45.6,50.2 Z" fill="#141414"/>
+<path d="M48,52 H65 M51,50.6 v5 M55,50.4 v5.4 M59,50.4 v5.4 M62.6,50.4 v5.2" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M46,32 Q36,22 40,8 Q46,14 44,20 Q48,26 52,28 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M42,16 l3,1 M41,22 l4,0" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

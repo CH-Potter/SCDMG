@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 162 34 24" data-part="forge.undead.side.zombie-foot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A split shoe, a grey toe poking out</title>
+<path d="M41,166 L55,166 L56,183 L32,183 Q29,178 34,176 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M29,178.6 L34,176.6 L34.6,183 L29,183 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M41,168 H55" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

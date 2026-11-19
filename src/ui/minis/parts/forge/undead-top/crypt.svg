@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -56 112 104" data-part="forge.undead.top.crypt" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crypt Gate from above: the gabled stone roof, the ivory ridge and skull finial, front steps glowing from the door, a team pall laid over the ridge, grave railings</title>
+<rect x="-52" y="-54" width="104" height="18" rx="3" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path class="glow" d="M-14,-54 L14,-54 L14,-46 L-14,-46 Z" fill="#f2b84b"/>
+<rect x="-46" y="-40" width="92" height="82" rx="4" fill="#6c5a37" stroke="#141414" stroke-width="2.4"/>
+<path d="M-46,-36 Q-46,-40 -42,-40 L0,-40 L0,42 L-42,42 Q-46,42 -46,38 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-36,-40 V42 M-24,-40 V42 M-12,-40 V42 M12,-40 V42 M24,-40 V42 M36,-40 V42" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M0,-40 V42" fill="none" stroke="#e3d8b6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="-48" y="-44" width="96" height="7" rx="1" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-18,-6 L18,-6 L16,8 L12,4 L8,11 L4,4 L0,11 L-4,4 L-8,11 L-12,4 L-16,8 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M0,-6 L18,-6 L16,8 L12,4 L8,11 L4,4 L0,11 Z" fill="#b000b0"/>
+<circle cx="0" cy="-41" r="5" fill="#e3d8b6" stroke="#141414" stroke-width="2"/>
+<ellipse cx="-1.8" cy="-42" rx="1.1" ry="1.4" fill="#141414"/>
+<ellipse cx="1.8" cy="-42" rx="1.1" ry="1.4" fill="#141414"/>
+<path d="M-54,-34 V46 H54 V-34" fill="none" stroke="#353b41" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-54" cy="-20" r="1.6" fill="#4a5158"/><circle cx="-54" cy="0" r="1.6" fill="#4a5158"/><circle cx="-54" cy="20" r="1.6" fill="#4a5158"/><circle cx="54" cy="-20" r="1.6" fill="#4a5158"/><circle cx="54" cy="0" r="1.6" fill="#4a5158"/><circle cx="54" cy="20" r="1.6" fill="#4a5158"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>
