@@ -7,7 +7,7 @@
 import { LORE_FACTIONS, WORLD, leaderOf, type LoreFactionId } from "../../engine/data/lore";
 import { wordmarkSvg } from "../art/emblems";
 import { esc } from "../describe";
-import { barnDoor, barnFront, creekCutaway, hallMast, HOLLOW_EGGS, hole, hollow, lawn, lightGate, mound, orbit, pumpkin, rays, scoreCard, starLens, valley } from "./backdrops";
+import { barnDoor, barnFront, callUpNotice, creekCutaway, hallMast, HOLLOW_EGGS, hole, hollow, lawn, lightGate, mound, orbit, pumpkin, rays, scoreCard, starLens, valley } from "./backdrops";
 import type { IntroDef, Kit, SceneDef } from "./stage";
 
 // ---------------------------------------------------------------- shared bits
@@ -94,7 +94,7 @@ function beam(k: Kit, x: number, top: number, bottom: number, w: number, at: num
 }
 
 /** The faction title card: sunburst, emblem, name, tagline, the leader's line, and a lineup of miniatures on the table. */
-function titleCard(k: Kit, fid: LoreFactionId, o: { a: string; b: string; name: [string, string]; lineup: string[] }): void {
+function titleCard(k: Kit, fid: LoreFactionId, o: { a: string; b: string; name: [string, string]; lineup: string[]; k?: number }): void {
   const L = LORE_FACTIONS[fid];
   const leader = leaderOf(fid);
   const r = k.add("ix-rays", "", rays(o.a, o.b));
@@ -112,7 +112,7 @@ function titleCard(k: Kit, fid: LoreFactionId, o: { a: string; b: string; name: 
   const n = o.lineup.length;
   o.lineup.forEach((id, i) => {
     const x = 9 + (i * 82) / Math.max(1, n - 1);
-    const m = k.mini(id, { x, y: 95, k: 8.5, base: true, bob: true, z: 60 + i });
+    const m = k.mini(id, { x, y: 95, k: o.k ?? 10, base: true, bob: true, z: 60 + i });
     enter(k, m, "bottom", 1300 + i * 120, 420, 40);
   });
   k.sfx("jingle", 260, 0.8);
@@ -305,14 +305,23 @@ const militiaScenes = (): SceneDef[] => {
         k.backdrop(valley({ sky: "dawn", hall: true, fence: true, pump: true }));
         const m = hallMast();
         rings(k, m.x, m.y, 26, "#fff3c0", 3, 100);
-        marking(k, "DUSTLINE MUSTER · HQ", 40, 74, -3, 150);
-        k.bubble("Muster roll! First Section!", m.x + 1.5, m.y - 4, { at: 450, w: 34 });
+        // The call-up goes up on the post: every family's name, every name ticked.
+        const notice = art(k, callUpNotice(), 15, 52, 30, 45, 70);
+        k.anim(notice, [{ transform: "translateY(-80cqh) rotate(-14deg)" }, { transform: "translateY(1cqh) rotate(-2deg)", offset: 0.8 }, { transform: "translateY(0) rotate(-3deg)" }], {
+          at: 150,
+          dur: 480,
+          ease: "cubic-bezier(.3,1.2,.5,1)",
+        });
+        k.burst("CALL-UP!", 31, 22, { size: 13, at: 560, rot: -8, color: "#f28c28" });
+        marking(k, "DUSTLINE MUSTER · HQ", 50, 70, -3, 300);
+        k.bubble("Muster roll! First Section!", m.x + 1.5, m.y - 4, { at: 700, w: 34 });
         k.bubble("All sections, fall in at the Crossing!", m.x + 3, m.y + 22, { at: 1500, w: 30, shout: true });
         // A dispatch rider is already on the way with the orders.
-        const rider = k.mini("mil-riders", { x: 26, y: 93, k: 14, z: 80 });
-        k.anim(rider, [{ transform: "translateX(-60cqw)" }, { transform: "translateX(0)" }], { at: 1700, dur: 700, ease: "cubic-bezier(.3,.8,.4,1)" });
-        k.dust(20, 92, 2300, 9);
-        k.sfx("rally", 450, 0.7);
+        const rider = k.mini("mil-riders", { x: 32, y: 95, k: 14, z: 80 });
+        k.anim(rider, [{ transform: "translateX(-70cqw)" }, { transform: "translateX(0)" }], { at: 1700, dur: 700, ease: "cubic-bezier(.3,.8,.4,1)" });
+        k.dust(26, 94, 2300, 9);
+        k.sfx("thunk", 560, 0.7);
+        k.sfx("rally", 700, 0.7);
         k.sfx("whoosh", 1700, 0.6);
       },
     },
@@ -320,9 +329,11 @@ const militiaScenes = (): SceneDef[] => {
       dur: 3000,
       caption: c[1] ?? "Every family sends its hands: squads fall in, riveted into their armour.",
       build: (k) => {
-        k.backdrop(valley({ sky: "day", fence: true, road: "dirt", clouds: true, silo: true }));
+        // Drill on the Grange Hall green: section by section, by the numbers.
+        k.backdrop(valley({ sky: "day", hall: true, fence: true, clouds: true }));
         marking(k, "3RD HAYBRIGHT SECTION", 6, 56, -2, 0);
-        marking(k, "OLD GUARD", 62, 50, 3, 700);
+        marking(k, "OLD GUARD · RECALLED", 58, 50, 3, 700);
+        k.bubble("Section... HALT! Dress that line!", 70, 30, { at: 1350, w: 30, right: true });
         // The squad falls in: one step at a time, in a line, no bobbing about.
         [8, 19, 30, 41].forEach((x, i) => {
           const g = k.mini("mil-grunts", { x, y: 91, k: 14 });
@@ -404,7 +415,7 @@ const militiaScenes = (): SceneDef[] => {
     {
       dur: 3700,
       caption: c[4] ?? "Dustline Militia: rivets, rifles and a very long memory.",
-      build: (k) => titleCard(k, "militia", { a: "#f28c28", b: "#f6a548", name: ["DUSTLINE", "MILITIA"], lineup: ["mil-grunts", "mil-squinter", "mil-bertha", "mil-grannies", "mil-medic", "mil-riders"] }),
+      build: (k) => titleCard(k, "militia", { a: "#6b5c3c", b: "#7b6a46", name: ["DUSTLINE", "MILITIA"], lineup: ["mil-grunts", "mil-squinter", "mil-bertha", "mil-grannies", "mil-medic", "mil-riders"] }),
     },
   ];
 };
@@ -548,7 +559,7 @@ const swarmScenes = (): SceneDef[] => {
     {
       dur: 3700,
       caption: c[4] ?? "The Skitterswarm: the ground is hungry.",
-      build: (k) => titleCard(k, "swarm", { a: "#2a1c24", b: "#3d2a36", name: ["SKITTER", "SWARM"], lineup: ["swarm-skitterlings", "swarm-spitters", "swarm-shellbacks", "swarm-mother", "swarm-lurker", "swarm-tenders"] }),
+      build: (k) => titleCard(k, "swarm", { a: "#2b1838", b: "#3b2350", k: 12, name: ["SKITTER", "SWARM"], lineup: ["swarm-skitterlings", "swarm-spitters", "swarm-shellbacks", "swarm-mother", "swarm-lurker", "swarm-tenders"] }),
     },
   ];
 };
@@ -646,7 +657,7 @@ const concordScenes = (): SceneDef[] => {
     {
       dur: 3700,
       caption: c[4]!,
-      build: (k) => titleCard(k, "concord", { a: "#2c2f58", b: "#3e3a7a", name: ["LUMEN", "CONCORD"], lineup: ["con-guard", "con-lancer", "con-facet", "con-dancers", "con-warden", "con-sylph"] }),
+      build: (k) => titleCard(k, "concord", { a: "#232848", b: "#30376a", name: ["LUMEN", "CONCORD"], lineup: ["con-guard", "con-lancer", "con-facet", "con-dancers", "con-warden", "con-sylph"] }),
     },
   ];
 };
@@ -661,7 +672,7 @@ const FACTION_INTROS: Record<LoreFactionId, () => IntroDef> = {
   swarm: () => ({
     id: "swarm",
     title: LORE_FACTIONS.swarm.name,
-    cast: ["swarm-skitterlings", "swarm-tenders", "swarm-mother", "swarm-spitters", "swarm-stingers", "swarm-shellbacks", "swarm-borer"],
+    cast: ["swarm-skitterlings", "swarm-tenders", "swarm-mother", "swarm-spitters", "swarm-stingers", "swarm-shellbacks", "swarm-lurker"],
     scenes: swarmScenes(),
   }),
   concord: () => ({
