@@ -32,7 +32,7 @@ import {
   type LookVariant,
   type UnitArt,
 } from "../../../kits";
-import { lightOf, numToHex } from "../../../color";
+import { hexToOklch, lightOf, mixHex, numToHex, oklchToHex } from "../../../color";
 import type { Colourway } from "../../../slots";
 import type { PartUse, RigDef } from "../../../types";
 
@@ -56,8 +56,13 @@ const BRASS = 0xc89b4a;
 function legionColourway(primary: number, glow: number): Colourway {
   const base = colourwayOf(primary, BRASS, "plain");
   const g = numToHex(glow);
+  // tin toys are bright: a mid-tone bellows cloth and a lighter gunmetal than the kit's, so the
+  // limbs don't read as a dark blot under the tin at table zoom
+  const p = hexToOklch(base.plate);
   return {
     ...base,
+    suit: oklchToHex({ l: Math.max(0.36, Math.min(0.5, p.l * 0.66)), c: Math.min(0.05, p.c * 0.5), h: p.h }),
+    metal: mixHex(base.metal, base.plate, 0.3),
     id: `legion-${numToHex(primary).slice(1)}-${g.slice(1)}`,
     name: "Tin Can Legion",
     glow: lightOf(g, 0.1),
