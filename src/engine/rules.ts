@@ -1,6 +1,7 @@
 // Read-only rule queries shared by the reducer, the AI and the UI.
 
 import { ABILITIES } from "./data/abilities";
+import { DETECT_RANGE, HIDDEN_RANGE, SURFACE_MOVE } from "./constants";
 import { dist } from "./geometry";
 import { rulesOf } from "./houseRules";
 import { hasAbility, hasKeyword, isFlying, profileOf } from "./profile";
@@ -53,6 +54,8 @@ export function modelsEngage(a: Unit, am: Model, b: Unit, bm: Model): boolean {
 
 export function unitsEngage(a: Unit, b: Unit): boolean {
   if (a.owner === b.owner || !a.onBoard || !b.onBoard) return false;
+  // A burrowed unit is under the ground: nobody fights it, and it fights nobody.
+  if (a.status.burrowed || b.status.burrowed) return false;
   // modelsEngage for every pair of living models, with the radii looked up once.
   const ra = radiusOf(a);
   const rb = radiusOf(b);
@@ -101,6 +104,8 @@ export function effectiveMove(s: GameState, u: Unit): number {
   }
   mv += u.status.hasted ?? 0;
   if (u.status.slowedRounds > 0) mv -= 2;
+  // Surfacing: a burrowed unit comes up with a short move.
+  if (u.status.burrowed) mv = Math.min(mv, SURFACE_MOVE);
   return Math.max(1, mv);
 }
 
@@ -147,7 +152,7 @@ export function nearEnemyHome(s: GameState, owner: PlayerId, p: Vec): boolean {
 export function objectivePresence(s: GameState, o: Objective): [number, number] {
   const v: [number, number] = [0, 0];
   for (const u of onBoard(s)) {
-    if (isFlying(u) || profileOf(u).structure || u.status.shaken) continue;
+    if (isFlying(u) || profileOf(u).structure || u.status.shaken || u.status.burrowed) continue;
     const r = radiusOf(u);
     if (aliveModels(u).some((m) => m.elevation === o.elevation && dist(m.pos, o.pos) <= o.radius + r + EPS)) {
       v[u.owner] += controlWeight(u);
@@ -160,7 +165,7 @@ export function objectivePresence(s: GameState, o: Objective): [number, number] 
 export function allObjectivePresence(s: GameState): [number, number][] {
   const out = s.objectives.map((): [number, number] => [0, 0]);
   for (const u of s.units) {
-    if (!u.onBoard || u.destroyed || isFlying(u) || profileOf(u).structure || u.status.shaken) continue;
+    if (!u.onBoard || u.destroyed || isFlying(u) || profileOf(u).structure || u.status.shaken || u.status.burrowed) continue;
     const r = radiusOf(u);
     let weight: number | undefined;
     s.objectives.forEach((o, i) => {
@@ -196,6 +201,7 @@ export function eligibleUnits(s: GameState, p: PlayerId): Unit[] {
         (u) =>
           !u.status.acted &&
           !u.status.hunkered &&
+          !u.status.burrowed &&
           (!isEngaged(s, u) || profileOf(u).weapons.some((w) => !w.melee)) &&
           (!u.status.disengaged || hasKeyword(u, "light")) &&
           (!profileOf(u).structure || profileOf(u).weapons.some((w) => !w.melee)),
@@ -234,4 +240,27 @@ export function canLayBarrage(s: GameState, u: Unit): boolean {
   if (s.phase !== "movement" || !hasAbility(u, "barrage") || u.status.abilityUsed || u.status.silenced) return false;
   if (s.players[u.owner].cp < (ABILITIES.barrage.cp ?? 0)) return false;
   return !isEngaged(s, u);
+}
+
+// ---------- hidden and burrowed ----------
+
+/** Is a detector (Keen Eyes) of the other side within range of `t`? Then it can't hide or stay buried from that side. */
+export function detected(s: GameState, t: Unit): boolean {
+  return onBoard(s).some((d) => d.owner !== t.owner && hasAbility(d, "detector") && unitGap(d, t) <= DETECT_RANGE + EPS);
+}
+
+/** Hidden right now: it has Hidden, hasn't given itself away this round, and no enemy detector is near. */
+export const isHidden = (s: GameState, t: Unit): boolean => hasAbility(t, "hidden") && !t.status.revealed && !t.status.burrowed && !detected(s, t);
+
+/**
+ * Why `by` (an enemy unit, or null for a support card played from off the table) can't pick out `t`:
+ * burrowed and undetected, or hidden and further than HIDDEN_RANGE. Null if it can.
+ */
+export function concealment(s: GameState, by: Unit | null, t: Unit): string | null {
+  if (by && by.owner === t.owner) return null;
+  if (t.status.burrowed && !detected(s, t)) return `Burrowed: only a detector (Keen Eyes) within ${DETECT_RANGE}" can find it`;
+  if (isHidden(s, t) && (!by || unitGap(by, t) > HIDDEN_RANGE + EPS)) {
+    return by ? `Hidden: get within ${HIDDEN_RANGE}" or bring a detector (Keen Eyes) within ${DETECT_RANGE}"` : "Hidden: a card can't find it unless a detector (Keen Eyes) is within " + DETECT_RANGE + '"';
+  }
+  return null;
 }

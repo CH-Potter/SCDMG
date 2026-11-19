@@ -343,7 +343,7 @@ const militia: Faction = {
       keywords: ["flying", "light", "mech"],
       evade: { target: 5, against: ["ranged"] },
       weapons: [ranged("Chain Popper", 16, 3, 4, { precision: 1, bonuses: [{ vs: "light", dice: 1 }] })],
-      abilities: ["spotter", "crop-dust"],
+      abilities: ["spotter", "crop-dust", "detector"],
       upgrades: [
         {
           id: "flak",
@@ -421,6 +421,7 @@ const militia: Faction = {
           weapon: { index: 0, patch: { bonuses: [{ vs: "heavy", damage: 1 }] } },
           text: "Varmint Rifle deals +1 damage to heavy targets.",
         },
+        { id: "ghillie", name: "Ghillie Cloak", cost: 1, addAbilities: ["hidden"], text: "Gains Hidden: a cloak of dry grass and burlap. Enemies must get within 6\" to pick it out, until it fires." },
       ],
       blurb: "The corps' sharpshooters, led by the Squinter, who hasn't blinked since the harvest of '09. Long rifle, a ghillie of dry grass, and a tally on the stock.",
     },
@@ -515,7 +516,7 @@ const militia: Faction = {
       baseRadius: 0.9,
       keywords: ["structure", "mech"],
       weapons: [ranged("Mine-Charge Lobber", 30, 3, 4, { ap: 1, targets: "ground", traits: ["indirect"] })],
-      abilities: ["radio-spotting"],
+      abilities: ["radio-spotting", "detector"],
       upgrades: [{ id: "boom-spuds", name: "Blasting Shells", cost: 2, addAbilities: ["wide-barrage"], text: "Barrage Shells: its barrage marker covers 2\"." }],
       structure: { lifetime: "permanent", fieldDeploy: 6 },
       blurb: "A length of mine drainpipe on a sandbagged base, a crate of blasting charges and a crew with a field telephone. Range: yes.",
@@ -690,13 +691,16 @@ const swarm: Faction = {
   ],
   // v0.12 balance pass: the Lurker without Acid Drool, now that it costs ⚙3. The Bile Bombard in its
   // place played about the same; the Acid Geyser cost the swarm ~6 points against the Militia.
+  // v0.11 release (barrage markers, burrowing): the Bile Bombard after all. Its lobbed gun now lays
+  // barrage markers, and the Lurker did ~0.1 damage a game. 5-seed Skirmish: the Concord 54.9% against
+  // the swarm (55.1% with the Lurker), the Militia 53.4%.
   defaultList: [
     { profileId: "swarm-skitterlings", upgrades: ["eggs"] },
     { profileId: "swarm-skitterlings", upgrades: ["burrowers"] },
     { profileId: "swarm-spitters", upgrades: ["glands"] },
     { profileId: "swarm-shellbacks", upgrades: [] },
     { profileId: "swarm-mother", upgrades: ["sacs"] },
-    { profileId: "swarm-lurker", upgrades: [] },
+    { profileId: "swarm-bombard", upgrades: [] },
     { profileId: "swarm-stingers", upgrades: [] },
   ],
   profiles: [
@@ -762,7 +766,7 @@ const swarm: Faction = {
       evade: { target: 6, against: ["pointBlank"] },
       nerve: 7,
       weapons: [melee("Crusher Mandibles", 2, 4, { ap: 1 })],
-      abilities: ["corrode", "regen"],
+      abilities: ["corrode", "regen", "burrow"],
       upgrades: [{ id: "plates", name: "Thick Plates", cost: 1, addKeywords: ["armoured"], text: "Becomes armoured (ignores 1 AP from weapons not built to crack armour)." }],
       blurb: "Beetles with shells like upturned bathtubs and acid in their jaws. They walk into the guns, and the guns go first.",
     },
@@ -784,7 +788,7 @@ const swarm: Faction = {
       evade: { target: 5, against: ["pointBlank"] }, // it springs clear
       nerve: 7,
       weapons: [melee("Trapjaw", 3, 3, { ap: 1 })],
-      abilities: ["lurk", "tunnel"],
+      abilities: ["lurk", "tunnel", "burrow"],
       upgrades: [{ id: "drool", name: "Acid Drool", cost: 1, addAbilities: ["corrode"], text: "Gains Corrode." }],
       blurb: "That isn't a rock. That was never a rock. It has been waiting under there since last spring.",
     },
@@ -803,7 +807,7 @@ const swarm: Faction = {
       keywords: ["beast", "monster", "heavy", "fearless"],
       weapons: [ranged("Larva Lob", 12, 2, 4, { traits: ["blast"] }), melee("Egg-Tooth Jaws", 3, 3, { damage: 2, ap: 1 })],
       // The swarm's centre: Brood Bond refills every hurt brood within 6" each round, hurt or not.
-      abilities: ["brood-bond", "brood-call", "hatch"],
+      abilities: ["brood-bond", "brood-call", "hatch", "detector"],
       upgrades: [{ id: "sacs", name: "Acid Sacs", cost: 1, addAbilities: ["corrode"], text: "Gains Corrode." }],
       blurb: "Mostly abdomen, entirely in charge. Every bug on the table is one of hers, and while she lives, none of them stay dead.",
     },
@@ -1236,7 +1240,7 @@ const concord: Faction = {
       evade: { target: 6, against: ["ranged"] },
       nerve: 8,
       weapons: [ranged("Flicker Cannon", 18, 3, 4, { tracking: 1, ap: 1, bonuses: [{ vs: "flying", dice: 1 }], traits: ["blast"] })],
-      abilities: ["refraction", "bubble-shield"],
+      abilities: ["refraction", "bubble-shield", "detector"],
       upgrades: [],
       blurb: "Glides about looking expensive. Is expensive.",
     },
@@ -1343,6 +1347,7 @@ const concord: Faction = {
       upgrades: [
         { id: "encore", name: "Encore", cost: 1, addModels: 1, text: "+1 model." },
         { id: "afterimage", name: "Afterimage", cost: 1, addAbilities: ["blink"], text: "Gains Blink." },
+        { id: "mirage", name: "Mirage Veil", cost: 1, addAbilities: ["hidden"], text: "Gains Hidden: they dance inside a shimmer of bent light. Enemies must get within 6\" to pick them out, until they strike." },
       ],
       blurb: "Pirouette onto the roof, stab you, curtsey. Applause is expected.",
     },
@@ -1380,7 +1385,7 @@ const concord: Faction = {
       baseRadius: 0.9,
       keywords: ["structure"],
       weapons: [ranged("Judgement Ray", 32, 2, 3, { precision: 1, tracking: 1, damage: 2, ap: 2, bonuses: [{ vs: "heavy", damage: 1 }], traits: ["rending"] })],
-      abilities: ["overcharge"],
+      abilities: ["overcharge", "detector"],
       upgrades: [],
       structure: { lifetime: "permanent", fieldDeploy: 6 },
       blurb: "A monument to good taste that fires on anyone who lacks it. So: everyone.",

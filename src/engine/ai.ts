@@ -19,6 +19,7 @@ import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
 import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
+import { HIDDEN_RANGE } from "./constants";
 import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, tableKey, twoDiceAtLeast } from "./game";
 import { planUnitMove } from "./formation";
 import { dist, pointInPolygon, pointInZone, towards } from "./geometry";
@@ -34,6 +35,8 @@ import {
   isEngaged,
   meleeCanHit,
   allObjectivePresence,
+  detected,
+  isHidden,
   objectivePresence,
   onBoard,
   presenceController,
@@ -412,7 +415,11 @@ export function evaluate(s: GameState, me: PlayerId): number {
       }
     }
     let threat = 0;
+    // Under the ground nobody can reach it; hidden, only enemies close enough to pick it out can.
+    const buried = u.status.burrowed && !detected(s, u);
+    const hiddenNow = !buried && isHidden(s, u);
     enemies.forEach((_, i) => {
+      if (buried || (hiddenNow && gaps[i]![1] > HIDDEN_RANGE)) return;
       if (gaps[i]![1] <= enemyReach[i]!) threat += enemyFire[i]!;
     });
     const cover = u.status.hunkered ? 0.75 : 1;
@@ -488,12 +495,15 @@ function attackValue(s: GameState, t: Unit, exp: number): number {
 
 /** Best attack value a unit could make in the coming assault phase from where it stands. */
 function followUp(s: GameState, u: Unit): number {
-  if (!u.onBoard || u.destroyed || u.status.hunkered || isEngaged(s, u)) return 0;
+  if (!u.onBoard || u.destroyed || u.status.hunkered || u.status.burrowed || isEngaged(s, u)) return 0;
   const enemies = onBoard(s, other(u.owner));
   const prof = profileOf(u);
   const canShoot = !u.status.disengaged || hasKeyword(u, "light");
   let best = 0;
   for (const e of enemies) {
+    // Out of reach for anything but a lucky blast: burrowed, or hidden beyond pick-out range.
+    if (e.status.burrowed && !detected(s, e)) continue;
+    if (isHidden(s, e) && unitGap(u, e) > HIDDEN_RANGE) continue;
     // A flyer's dive (its impact) or the wasps' bomb run: no melee follows, so count it in full.
     if (divesAt(u, e) && !u.status.disengaged && unitGap(u, e) <= effectiveMove(s, u) + 0.8) {
       const imp = prof.impact;
@@ -940,6 +950,16 @@ function abilityCandidates(s: GameState, u: Unit): Candidate[] {
         if (lost > 0 && !isEngaged(s, u) && (f.uid === u.uid || unitGap(u, f) <= (def.range ?? 3))) {
           out.push({ cmd: { type: "ability", uid: u.uid, ability: id, target: f.uid }, bonus: 0.5 });
         }
+      }
+    } else if (id === "burrow") {
+      // Going under is the unit's movement: the evaluation weighs the fire it escapes against the
+      // objectives it lets go and the attacks it gives up (it surfaces later with a short move).
+      if (!u.status.burrowed) {
+        // Credit the shots it dodges this round (the evaluation only nudges units away from threats),
+        // and a Lurk ambush waiting under the ground for enemies coming its way.
+        const dodged = Math.min(threatOn(s, u), wounds(u)) * valuePerWound(u) * 0.25;
+        const ambush = hasAbility(u, "lurk") && enemies.some((e) => !isFlying(e) && unitGap(u, e) <= 10) ? 0.6 : 0;
+        out.push({ cmd: { type: "ability", uid: u.uid, ability: "burrow" }, bonus: dodged + ambush - 1 });
       }
     } else if (id === "barrage") {
       out.push(...barrageCandidates(s, u));

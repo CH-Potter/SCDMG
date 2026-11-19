@@ -7,7 +7,7 @@ import { planUnitMove, reviveSpot } from "./formation";
 import { dist, ngon } from "./geometry";
 import { hasAbility, isFlying, profileFor, profileOf } from "./profile";
 import { REACTION_TRIGGER, abilityOf } from "./reactions";
-import { aliveModels, canAffordDeploy, isEngaged, onBoard, unitById, unitGap, HOME_EXCLUSION, nearEnemyHome } from "./rules";
+import { aliveModels, canAffordDeploy, concealment, isEngaged, onBoard, unitById, unitGap, HOME_EXCLUSION, nearEnemyHome } from "./rules";
 import { lineOfSight, platformAt } from "./terrain";
 import type { Command, GameEvent, GameState, PlayerId, SupportAbilityDef, SupportEffect, Unit, UnitStatus, Vec } from "./types";
 
@@ -243,6 +243,10 @@ export function playSupport(s: GameState, cmd: Extract<Command, { type: "support
   const need = supportTarget(ability);
   if (need === "friendlyUnit" && (!target || !target.onBoard || target.owner !== cmd.player)) return "Pick one of your units";
   if (need === "enemyUnit" && (!target || !target.onBoard || target.owner === cmd.player)) return "Pick an enemy unit";
+  if (need === "enemyUnit" && target) {
+    const concealed = concealment(s, null, target);
+    if (concealed) return concealed;
+  }
   if (need === "point" && !cmd.point) return "Pick a point";
   if (need === "reservePoint") {
     if (!target || target.onBoard || target.destroyed || target.owner !== cmd.player) return "Pick a unit from your reserves";

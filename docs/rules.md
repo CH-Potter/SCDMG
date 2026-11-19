@@ -1,4 +1,4 @@
-# Super Cool Desktop Miniatures Game: rules (v0.12)
+# Super Cool Desktop Miniatures Game: rules (v0.11)
 
 This is the design reference for the engine in `src/engine/`. Every number here lives in data or a named constant, so tuning is easy. Distances are in inches. **Skirmish** is played on a 35"×35" table and **Assault** on a 70"×35" table. Each mode has its own missions, maps and roster limits (see `src/engine/data/modes.ts`).
 
@@ -63,7 +63,7 @@ With the **Unit class limits** house rule (on in the standard game), a list must
 | The Skitterswarm | Skitterlings 10, Stinger Swarm 5, Acid Spitters 4, Shellback Brood 4, Brood Tenders 2 | The Broodmother and the Deep Borer (monsters), Trapjaw Lurker, Bile Bombard, Brood Spire, Acid Geyser, egg clutches and tunnel mouths |
 | Lumen Concord | Phase Guard 3, Blink Dancers 3, Jetwing Scouts 2 | Ray Lancer (sniper), Beam Warden (support leader), Grand Strider (monster), Shimmer Saucer (vehicle), pylon, obelisk, ward |
 
-- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Skitterlings are worth 3 supply (a brood loses 1 for every 3 or 4 bugs), and the other squads 2 (the Phase Guard too, since the v0.12 balance pass).
+- A squad's **supply** shrinks with its losses (see *Objectives and missions*), so squad supply is set to suit the squad's size: Skitterlings are worth 3 supply (a brood loses 1 for every 3 or 4 bugs), and the other squads 2 (the Phase Guard too, since the v0.11 balance pass).
 - To move a unit, pick a **leader** model and move it up to the unit's Move along a legal path.
 - The rest of the squad follows and **spreads out like a real squad**, not a block. Each follower travels at most Move + 2".
   - **Snap to cover:** within about 3" of the leader's spot, followers take free spots in cover: inside scrub, craters or rubble, or tucked behind a barricade on the side away from the enemy. "The enemy" means the nearest few enemy units, or their deployment zone if none are on the table yet.
@@ -153,7 +153,7 @@ Weapons can carry **bonuses vs keywords** (extra dice, damage or AP). Examples: 
 
 ## Factions
 
-Each faction has its own play style: the **Dustline Militia** shoot, the **Skitterswarm** swarm into melee around their Broodmother, and the **Lumen Concord** field a few elite specialists. Abilities and support effects belong to one faction's style (Overwatch and digging in for the Militia, acid, regrowth and burrowing for the swarm, shields, precision and teleporting for the Concord), with a little overlap. See `docs/factions.md` for the pillars. The Munch, a built-in faction until v0.12, are a Faction Forge template now.
+Each faction has its own play style: the **Dustline Militia** shoot, the **Skitterswarm** swarm into melee around their Broodmother, and the **Lumen Concord** field a few elite specialists. Abilities and support effects belong to one faction's style (Overwatch and digging in for the Militia, acid, regrowth and burrowing for the swarm, shields, precision and teleporting for the Concord), with a little overlap. See `docs/factions.md` for the pillars. The Munch, a built-in faction until v0.11, are a Faction Forge template now.
 
 ## Abilities
 
@@ -300,7 +300,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Skitt
 - **Costs:** the computed Fizz (`src/engine/pricing.ts`) for the Rust Bucket Drop-Ship (4, was 3), Light Gate (4, was 3), Weather Vane (3, was 2) and Brood Nest (4, was 3), and the computed cost for upgrades no starter list uses: Sidecar, Extra-Ripe Shells and Lustre Core 1 (were 2). Unit costs stay hand-set where the sims back them. The Patch Medic stays ⚙2/◆1 (it is weak). The Grand Strider stays ⚙7 (the Concord Assault list is balanced on it). The Lancer, Saucer and Dancers stay as they are, because the Concord are balanced on them.
 - Checked by AI-vs-AI simulation at 3 seeds (684 Skirmish and 378 Assault games). Skirmish: Concord–Militia 52.4%, Concord–Munch 45.6%, Militia–Munch 49.3%. Assault: 53.6%, 53.6% and 54.0%. At 3 seeds a pairing is good to about ±3 points (Skirmish) and ±4.5 (Assault).
 
-**Added in v0.12 (the base-faction pass):** the base factions are now the **Dustline Militia**, **The Skitterswarm** and the **Lumen Concord**.
+**Added in v0.11 (the base-faction pass):** the base factions are now the **Dustline Militia**, **The Skitterswarm** and the **Lumen Concord**.
 - **The Skitterswarm replaces the Munch.** A bug tide from under the valley around one Broodmother: Skitterlings (10), Acid Spitters, Shellback Brood, the Trapjaw Lurker, the Broodmother, the Deep Borer, the Stinger Swarm, the Bile Bombard, Brood Tenders, the Brood Spire and the Acid Geyser; cards Brood Hum, Egg Chamber, Undertunnels, Pheromone Cloud and Acid Glands; faction slot +1 Base. It plays differently from the Munch: no impact on the line bugs and no goo. Instead:
   - **Corrode** (new, passive): when the unit's attack (a shot, a shell, melee or impact) deals damage, the target's saves are one worse until the end of the round (no stacking). The acid softens a target for everything else that hits it.
   - **Brood Bond** (new, passive; the Broodmother): at the end of the round every other friendly unit within 6" that has lost models regrows one, even if it was hurt this round (in place of its own Regrow). The army fights in a knot around her and comes apart when she falls. The AI keeps hurt broods near her.
@@ -310,7 +310,7 @@ Each faction has its own play style: the **Dustline Militia** shoot, the **Skitt
 - **The Militia are a drafted, drilled army now** (the Dustline Muster), in riveted work-suit armour. Rivet Grunts are five troopers at armour 4 (was seven at 5; the *Second Section* upgrade brings them to seven), and lose *light*; the Patch Medics and the Old Guard Veterans (were the Front Porch Grannies) wear armour 4 too. Renamed: Ridgeline Marksman (was Squinter), Tumbleweed Outriders, Haymaker Bomber, Pipe Mortar; cards Grange Hall Command, Motor Pool, Smoke Detail, Forward Airstrip; Supply Drop, Sandbag Detail. The Skirmish starter fields three five-strong squads (one with Picket Drill, one with Jump Jets, one with its Second Section) and a Patch Medic team.
 - Quick AI-vs-AI check (1 seed, standard house rules; no balance pass yet). Skirmish: Concord–Militia 38.2%, Concord–Skitterswarm 53.3%, Militia–Skitterswarm 57.2%. Assault: 47.6%, 40.5% and 26.2%. The swarm wins on objectives and regrowth but deals the least damage of the three (about 10 a Skirmish game); the Militia are short in Assault. The full rebalance comes next.
 
-**The v0.12 balance pass** (the standard house rules, Unit class limits on):
+**The v0.11 balance pass** (the standard house rules, Unit class limits on):
 - **Open a Tunnel waits for round 2**, like every other arrival card. In round 1 of an Assault game the swarm had the 3 CP to open a Tunnel Mouth up to 12" ahead, bring reserves up beside it and field-deploy the Brood Spire next to them, a third of the way up the long board. It scored about 69% in Assault (94% on Long Ridge Highway); this change alone took it to about even. Summon cards can now have a first round (`fromRound`), as airdrops already could.
 - **Tunnel costs 1 CP (was 2), and the AI plays it as the free action it is:** the unit pops up, then still moves and charges. The AI used to weigh Tunnel as the unit's whole activation, at a flat 4 points, and supports spent the swarm's CP first, so it came up about once in 30 Skirmish games and once in 11 Assault games. Now it's about once in 8 Skirmish games and once an Assault game, and the Burrowers upgrade gets used. The Trapjaw Lurker costs ⚙3 (was 2) to match (`pricing.ts`: 3.5); the Skirmish starter drops its Acid Drool to stay at ⚙30.
 - **The AI values Afterglow at the wounds it may soak, less its second CP.** It was valued at 1.6 times those wounds with no CP cost, so it took most of the Concord's CP (about 4 plays a Skirmish game, 2 CP each) and Step Through came up about once in two games. Now it's about 1 Afterglow and 2 Step Throughs a game. The Concord got a lot stronger (about 63% against the Militia in Skirmish), so:
@@ -358,7 +358,21 @@ Every unit with a lobbed gun (the Pipe Mortar, the Bile Bombard, the Forge morta
 - **Lay the marker** (1 CP, once a round): pick a point within the lobbed gun's range. No sight needed. The marker can drift like any shell (its hit number to land on target, else a d6", halved if the firing unit can see the spot), and stays where it lands for everyone to see.
 - **It comes down at the end of the assault phase**, after the shooting and charges. Every ground unit, **friend or foe**, with a model within **1"** of the marker (base edge) takes the gun's **dice as hits** (dice per model × the firing models), shared out over its models under the marker. Each hit is evaded (the blast situations on the card; its own evade if no firing model can see it, see above), then saved, and deals the gun's damage and AP. Flyers aren't caught.
 - It lands even if the unit that laid it is gone by then. Moving out of the marker, or not charging into it, is the counter.
-- **Barrage Shells** (the Militia's Blasting Shells on the Pipe Mortar, Barrage Shells on Big Bertha, and the Forge's shell upgrades): the marker covers **2"** instead of 1". A unit without a lobbed gun that takes them (Big Bertha) lays it with its main gun.
+- **Barrage Shells** (the Militia's Blasting Shells on the Pipe Mortar, Barrage Shells on Big Bertha, and the Forge's shell upgrades): the marker covers **2"** instead of 1". A unit without a lobbed gun that takes them (Big Bertha) lays it with its main gun. Big Bertha's cost ⚙1.
+- A structure with Barrage (the Pipe Mortar) gets a movement-phase activation while it can lay a marker: lay one, or hold.
+
+### Hidden, detectors and burrowing
+
+- **Hidden** (passive; the Ridgeline Squinter's Ghillie Cloak and the Blink Dancers' Mirage Veil, ⚙1 each):
+  - Enemies can only shoot it, charge it or pick it out with an ability from within **6"** (base edge to base edge). Support cards can't pick it out at all.
+  - It gives itself away when it **attacks**: once it shoots, fights, charges or uses an ability on an enemy, it's *revealed* and can be targeted from any range until the end of the round.
+  - Barrage markers and blasts still catch it: they hit an area, not a target.
+- **Keen Eyes** (passive; the detector: the Sky Rustler and Pipe Mortar, the Broodmother, the Shimmer Saucer and Sunray Tower): hidden and burrowed enemies within **8"** of it can be targeted by its whole side, from any range.
+- **Burrow** (active, movement phase; the Trapjaw Lurker and Shellback Brood):
+  - Instead of moving, the unit **goes under** where it stands (it must be on the ground). That's its activation.
+  - While burrowed it can't be shot, charged or picked out by anything, unless an enemy detector is within 8"; even then it can't be charged. It can't shoot, fight, use abilities or hold objectives, and it isn't in anyone's melee. Barrage markers and blasts still catch it. A Lurker still lashes out from under the ground.
+  - In a later movement phase it **surfaces** with a move of up to **3"** (not into base contact), and may then shoot or charge in that round's assault phase. Or it holds and stays under.
+- On the table, a hidden unit is drawn faded inside a broken green ring, and a burrowed one as a mound of dirt. Each shows normally once a detector finds it.
 
 ## Tabletop staples
 

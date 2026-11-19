@@ -103,6 +103,25 @@ export const ABILITIES: Record<AbilityId, AbilityDef> = {
     needs: "point",
     text: `Movement phase, once a round, a free action: lay a barrage marker at a point in range of its lobbed gun (no sight needed; it may drift). At the end of the assault phase every ground unit, friend or foe, with a model within 1" of it takes that gun's dice as hits, at its damage and AP, then saves. Every unit with a lobbed gun has it.`,
   },
+  hidden: {
+    id: "hidden",
+    name: "Hidden",
+    kind: "passive",
+    text: 'Enemies can only shoot, charge or pick it out with an ability from within 6", until it attacks (then it\'s revealed until the end of the round), or a detector of theirs is within 8" of it. Barrages and blasts still catch it.',
+  },
+  detector: {
+    id: "detector",
+    name: "Keen Eyes",
+    kind: "passive",
+    text: 'Hidden and burrowed enemies within 8" of this unit can be targeted by your whole side, from any range.',
+  },
+  burrow: {
+    id: "burrow",
+    name: "Burrow",
+    kind: "active",
+    phase: "movement",
+    text: 'Movement phase, instead of moving: it goes under the ground. While burrowed it can\'t be shot, charged or picked out (unless an enemy detector is within 8"), can\'t shoot, fight or hold objectives, and isn\'t in anyone\'s melee. Barrages and blasts still catch it. In a later movement phase it surfaces with a move of up to 3", and may charge that round.',
+  },
   "wide-barrage": {
     id: "wide-barrage",
     name: "Barrage Shells",

@@ -78,6 +78,9 @@ export type AbilityId =
   | "eye-peck" // a dive that deals damage leaves the target's shooting one worse this round
   | "twirl-away" // always disengages cleanly
   | "radio-spotting" // shells count as spotted when any friendly unit can see the aim point
+  | "hidden" // can't be picked out from more than 6" away until it attacks (or a detector finds it)
+  | "detector" // Keen Eyes: hidden and burrowed enemies within 8" can be targeted by its whole side
+  | "burrow" // movement phase: go under; it surfaces with a move of up to 3"
   // passive (added with the Skitterswarm)
   | "corrode" // attacks that deal damage leave the target's saves one worse this round
   | "brood-bond" // aura: end of round, friendly units within 6" regrow a lost model even if they were hurt
@@ -394,6 +397,10 @@ export interface UnitStatus {
   overcharged?: boolean;
   /** Top Cover: has Overwatch until the end of the round. */
   overwatching?: boolean;
+  /** Hidden: it gave itself away by attacking, so it can be targeted from any range until the end of the round. */
+  revealed?: boolean;
+  /** Burrow: under the ground until it surfaces (see rules.ts concealment). */
+  burrowed?: boolean;
 }
 
 export interface Unit {
@@ -617,6 +624,8 @@ export type GameEvent =
   /** A barrage marker was laid (after any scatter), or its shells came down at the end of the assault phase. */
   | { type: "barrageMarker"; uid: string; pos: Vec; radius: number; weapon: string; landed: boolean }
   | { type: "hunkered"; uid: string }
+  /** Burrow: the unit went under the ground, or came back up. */
+  | { type: "burrowed"; uid: string; under: boolean }
   | { type: "held"; uid: string }
   | { type: "ability"; uid: string; ability: AbilityId; text: string }
   | { type: "passed"; player: PlayerId }

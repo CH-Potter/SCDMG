@@ -378,6 +378,14 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
       }
     }
 
+    // burrow: something has to dig, and it has to be able to walk out again
+    const abilityList = Array.isArray(p.abilities) ? p.abilities : [];
+    const upgradeAbilities = Array.isArray(p.upgrades) ? p.upgrades.flatMap((u) => (isObj(u) && Array.isArray(u.addAbilities) ? u.addAbilities : [])) : [];
+    if ([...abilityList, ...upgradeAbilities].includes("burrow")) {
+      if (isObj(s)) errs.push(`${where}: structures can't burrow`);
+      if (Array.isArray(p.keywords) && p.keywords.includes("flying")) errs.push(`${where}: flyers can't burrow`);
+    }
+
     // impact on charge
     if (p.impact !== undefined) {
       const im = p.impact;

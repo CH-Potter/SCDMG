@@ -18,7 +18,7 @@ import { SHELL_BURST } from "../engine/constants";
 import { factionOf } from "../engine/data/factions";
 import { dist } from "../engine/geometry";
 import { isFlying, profileOf } from "../engine/profile";
-import { aliveModels, modelsEngage, presenceController } from "../engine/rules";
+import { aliveModels, detected, isHidden, modelsEngage, presenceController } from "../engine/rules";
 import { planRoute, type ShotMarkKind } from "../engine/terrain";
 import type { AttackReport, GameEvent, GameState, Model, Objective, Phase, Unit, UnitProfile, Vec } from "../engine/types";
 import { figureSpec, IDLE_BREATH, rotates, type FigureKind, type FigureSpec, type Look } from "./art/figures";
@@ -1262,7 +1262,10 @@ export class BoardRenderer {
         }
       }
       const st = u.status;
-      const flags = `${spent ? 1 : 0}${ready ? 1 : 0}${st.hunkered ? 1 : 0}${st.slowedRounds > 0 ? 1 : 0}${st.braced ? 1 : 0}${st.shaken ? 1 : 0}`;
+      // Under the ground, or hidden (a detector near it shows it as found: drawn normally).
+      const burrowed = !!st.burrowed && !detected(s, u);
+      const hidden = !burrowed && isHidden(s, u);
+      const flags = `${spent ? 1 : 0}${ready ? 1 : 0}${st.hunkered ? 1 : 0}${st.slowedRounds > 0 ? 1 : 0}${st.braced ? 1 : 0}${st.shaken ? 1 : 0}${st.burrowed ? (burrowed ? 2 : 1) : 0}${hidden ? 1 : 0}`;
       for (const m of u.models) {
         if (!m.alive) continue;
         const v = this.models.get(`${u.uid}:${m.id}`);
@@ -1276,12 +1279,12 @@ export class BoardRenderer {
         v.shaken = st.shaken;
         v.hunkered = st.hunkered;
         v.idle = false;
-        this.drawStatus(v, u, m, prof, { sel, leader, slowed: st.slowedRounds > 0, braced: st.braced });
+        this.drawStatus(v, u, m, prof, { sel, leader, slowed: st.slowedRounds > 0, braced: st.braced, burrowed: !!st.burrowed, hidden });
       }
     }
   }
 
-  private drawStatus(v: ModelView, u: Unit, m: Model, prof: UnitProfile, o: { sel: boolean; leader: boolean; slowed: boolean; braced: boolean }): void {
+  private drawStatus(v: ModelView, u: Unit, m: Model, prof: UnitProfile, o: { sel: boolean; leader: boolean; slowed: boolean; braced: boolean; burrowed?: boolean; hidden?: boolean }): void {
     const r = prof.baseRadius;
     const ry = r * BASE_RY;
     const team = PLAYER_COLORS[u.owner];
@@ -1310,8 +1313,25 @@ export class BoardRenderer {
     v.figSprite.tint = grey;
     v.base.tint = v.spent ? 0xa09a94 : 0xffffff;
     v.tag.visible = v.spent && m.id === u.models.find((x) => x.alive)?.id;
+    // Burrowed: the figure is a ghost under a mound of dirt. Hidden: half seen, in a broken ring.
+    const figAlpha = o.burrowed ? 0.18 : o.hidden ? 0.5 : 1;
+    v.figSprite.alpha = figAlpha;
+    if (v.rig) v.rig.figure.alpha = figAlpha;
+    v.cast.alpha = figAlpha;
     // in front: sandbags for hunkered models, goo for slowed ones
     const f = v.fore.clear();
+    if (o.burrowed) {
+      f.ellipse(0.04, 0.06, r + 0.12, ry + 0.1).fill({ color: INK, alpha: 0.45 });
+      f.ellipse(0, 0, r + 0.08, ry + 0.06).fill(0x8a6a44).stroke({ width: 0.07, color: INK });
+      f.ellipse(-r * 0.15, -ry * 0.25, r * 0.6, ry * 0.45).fill({ color: 0xb08a5c, alpha: 0.9 });
+      for (const [x, y] of [[-0.45, 0.1], [0.3, -0.2], [0.1, 0.35], [0.5, 0.2]] as const) f.circle(x * r, y * ry, 0.06).fill(0x4a3420);
+    }
+    if (o.hidden) {
+      dashCircle(f, 0, 0.04, r + 0.34, 10, 0.45, 0, ry + 0.32);
+      f.stroke({ width: 0.15, color: INK, alpha: 0.6 });
+      dashCircle(f, 0, 0.04, r + 0.34, 10, 0.45, 0, ry + 0.32);
+      f.stroke({ width: 0.08, color: 0xb8d8a0, alpha: 0.95 });
+    }
     if (o.slowed) {
       for (const [x, s] of [[-0.5, 0.16], [0.1, 0.2], [0.5, 0.13]] as const) {
         f.ellipse(x * r, ry * 0.75, s * 1.4, s * 0.8).fill({ color: 0x8fd33a, alpha: 0.9 }).stroke({ width: 0.04, color: INK });

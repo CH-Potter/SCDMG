@@ -43,6 +43,7 @@ import {
   HOME_EXCLUSION,
   nearEnemyHome,
   radiusOf,
+  concealment,
 } from "./rules";
 import { cleanupRound, dropCarriedFlag, economyState, scoreRound, setupMission, updateFlags } from "./scoring";
 import { allPlaced, checkPlacement, elevationFor, lineOfSight, type Placed } from "./terrain";
@@ -351,7 +352,11 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (isEngaged(s, unit)) return "Engaged units must disengage instead";
       const e = moveUnit(s, unit, cmd.leader, cmd.to, effectiveMove(s, unit), false);
       if (e) return e;
-      if (endsEngaged(s, unit)) return "Only a charge can move into base contact";
+      // A burrowed unit's move is its way back up (at most SURFACE_MOVE).
+      const surfaced = !!unit.status.burrowed;
+      if (surfaced) unit.status.burrowed = false;
+      if (endsEngaged(s, unit)) return surfaced ? "Can't surface in base contact: come up clear of the enemy" : "Only a charge can move into base contact";
+      if (surfaced) events.push({ type: "burrowed", uid: unit.uid, under: false });
       events.push({ type: "moved", uid: unit.uid, kind: cmd.type });
       break;
     }
@@ -367,6 +372,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       break;
     }
     case "hunker":
+      if (unit.status.burrowed) return "It's under the ground: move it to surface, or hold";
       unit.status.hunkered = true;
       events.push({ type: "hunkered", uid: unit.uid });
       break;
@@ -393,6 +399,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (unit.status.disengaged && !hasKeyword(unit, "light")) return "Exhausted from disengaging: only light units can still shoot";
       const plan = planShooting(s, unit, target, w);
       if (typeof plan === "string") return plan;
+      unit.status.revealed = true; // a hidden unit gives itself away by shooting
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
       if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
       if (cmd.reroll) {
@@ -432,6 +439,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       }
       const plan = planMelee(unit, target, w, rulesOf(s));
       if (typeof plan === "string") return plan;
+      unit.status.revealed = true;
       if (cmd.reroll) {
         const e = payReroll(s, unit, plan);
         if (e) return e;
@@ -513,6 +521,9 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   // Flyers never get stuck in a melee: a ground unit can't charge one, and a flyer's charge is a
   // dive that strikes with its impact and leaves both sides free.
   if (isFlying(target)) return "Flyers can't be charged: shoot them down";
+  if (target.status.burrowed) return "Burrowed: it can't be charged (shoot it while a detector can find it)";
+  const concealed = concealment(s, unit, target);
+  if (concealed) return concealed;
   const dive = isFlying(unit);
   if (dive) {
     if (!profileOf(unit).impact) return "Flyers fight from range: this one has no dive attack";
@@ -523,6 +534,7 @@ function charge(s: GameState, unit: Unit, targetUid: string, events: GameEvent[]
   const bonus = chargeBonus(s, unit);
   const declared = planCharge(s, unit, target, rules.rolledCharges ? ROLLED_CHARGE_MAX + bonus : undefined);
   if (typeof declared === "string") return declared;
+  unit.status.revealed = true; // charging gives a hidden unit away
   // Declared: from here on dice are rolled, so the charge happens (or fails) and can't be taken back.
   // Pirouette: the target steps away before the charge is rolled.
   const dodged = pirouette(s, target, unit, events);
@@ -787,6 +799,13 @@ function useAbility(
   const cpCost = def.cp ?? 0;
   if (s.players[unit.owner].cp < cpCost) return `${def.name} needs ${cpCost} CP (you have ${s.players[unit.owner].cp})`;
   if (isEngaged(s, unit) && id !== "patch-up") return "Can't do that while engaged";
+  if (unit.status.burrowed && id !== "burrow") return "It's under the ground: surface first";
+  if (def.needs === "enemyUnit" && targetUid) {
+    const t = unitById(s, targetUid);
+    const concealed = t && concealment(s, unit, t);
+    if (concealed) return concealed;
+    unit.status.revealed = true; // picking out an enemy gives a hidden unit away
+  }
   const name = profileOf(unit).name;
   const say = (text: string) => events.push({ type: "ability", uid: unit.uid, ability: id, text });
 
@@ -821,6 +840,15 @@ function useAbility(
       const n = regrowModels(s, t, HATCH_MODELS);
       if (n === 0) return "That unit has no lost models to regrow";
       say(`${name} hatches ${n} fresh ${n === 1 ? "critter" : "critters"} into ${profileOf(t).name}.`);
+      break;
+    }
+    case "burrow": {
+      if (unit.status.burrowed) return "Already burrowed: move it to surface";
+      if (aliveModels(unit).some((m) => m.elevation !== 0)) return "It must be on the ground to burrow";
+      unit.status.burrowed = true;
+      unit.status.acted = true; // going under is its activation
+      say(`${name} burrows out of sight.`);
+      events.push({ type: "burrowed", uid: unit.uid, under: true });
       break;
     }
     case "barrage": {

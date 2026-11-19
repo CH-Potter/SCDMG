@@ -5,7 +5,7 @@ import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
 import { hasAbility, hasKeyword, isFlying, profileOf, reacts } from "./profile";
 import { nextRandom, rollD6 } from "./rng";
-import { aliveModels, AURA_RANGE, ENGAGE_RANGE, engagedWith, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, modelsInReach, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
+import { aliveModels, AURA_RANGE, concealment, ENGAGE_RANGE, engagedWith, isEngaged, supplyLost, meleeCanHit, modelGap, modelsEngage, modelsInReach, onBoard, radiusOf, unitGap, unitsEngage } from "./rules";
 import { rulesOf, STANDARD_RULES, type HouseRules } from "./houseRules";
 import { consumeReaction } from "./reactions";
 import { hasCover, lineOfSight, platformAt } from "./terrain";
@@ -184,6 +184,8 @@ function wardedAgainst(s: GameState, t: Unit): boolean {
 
 export function planShooting(s: GameState, a: Unit, t: Unit, w: Weapon, kind: AttackKind = "shoot"): AttackPlan | string {
   if (w.melee) return "That's a melee weapon";
+  const concealed = concealment(s, a, t);
+  if (concealed) return concealed;
   if (!rangedCanHit(w, t)) return isFlying(t) ? `${w.name} can't hit flyers` : `${w.name} only hits flyers`;
   const indirect = hasTrait(w, "indirect");
   if (indirect && kind !== "shoot") return `${w.name} is lobbed: it can only be fired as a normal shot`;

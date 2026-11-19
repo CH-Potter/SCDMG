@@ -3,7 +3,7 @@ import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 
 import { aiCommand } from "../engine/ai";
 import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
-import { SHELL_BURST } from "../engine/constants";
+import { HIDDEN_RANGE, SHELL_BURST } from "../engine/constants";
 import { CLASS_INFO, unitClassOf } from "../engine/data/unitClasses";
 import { ABILITIES } from "../engine/data/abilities";
 import { factionOf, supportOf } from "../engine/data/factions";
@@ -46,7 +46,7 @@ import {
   RALLY_CP,
 } from "../engine/game";
 import { dist, pointInZone } from "../engine/geometry";
-import { isFlying, profileFor, profileOf } from "../engine/profile";
+import { hasAbility, isFlying, profileFor, profileOf } from "../engine/profile";
 import {
   aliveModels,
   canAffordDeploy,
@@ -60,6 +60,8 @@ import {
   reserves,
   supplyUsed,
   unitById,
+  detected,
+  isHidden,
 } from "../engine/rules";
 import { lineOfSight, platformAt, planRoute, shotLine } from "../engine/terrain";
 import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec, Weapon } from "../engine/types";
@@ -1912,6 +1914,8 @@ export class Controller {
       u.status.disengaged && "😮‍💨 exhausted (disengaged)",
       u.status.slowedRounds > 0 && "slowed",
       u.status.shaken && "😱 shaken",
+      u.onBoard && u.status.burrowed && (detected(s, u) ? "🕳️ burrowed (found by a detector)" : "🕳️ burrowed"),
+      u.onBoard && hasAbility(u, "hidden") && !u.status.burrowed && (isHidden(s, u) ? "🌿 hidden" : u.status.revealed ? "🌿 revealed this round" : "🌿 found by a detector"),
       !u.onBoard && "in reserve",
     ].filter(Boolean);
     const rallyWhy = u.status.shaken && u.owner === HUMAN && this.humanTurn() ? commandProblem(s, { type: "rally", player: HUMAN as 0, target: u.uid }) : "no";
@@ -2005,7 +2009,7 @@ export class Controller {
     const mv = effectiveMove(s, sel);
     if (s.phase === "movement") {
       out.push(`<p class="hint" style="margin:0">Click a model to make it the leader (★), then click where it should go. The rest follow within 2".</p>`);
-      out.push(btn("move", `🏃 Move (up to ${mv}")`, m.kind === "move", "", why({ kind: "move" })));
+      out.push(btn("move", sel.status.burrowed ? `🕳️ Surface (move up to ${mv}")` : `🏃 Move (up to ${mv}")`, m.kind === "move", "", why({ kind: "move" })));
       const dis = why({ kind: "disengage" });
       out.push(btn("disengage", `🏃 Disengage (up to ${mv}")${dis ? "" : `<small class="odds">${esc(disengageText(s, sel))}</small>`}`, m.kind === "disengage", "", dis));
       out.push(...abilityButtons());
@@ -2070,6 +2074,8 @@ export class Controller {
     if (u.onBoard && eligibleUnits(s, u.owner).includes(u)) bits.push("✅ can act");
     else if (u.onBoard) bits.push("💤 done this phase");
     if (u.status.shaken) bits.push("😱 Shaken");
+    if (u.onBoard && u.status.burrowed) bits.push(detected(s, u) ? "🕳️ burrowed, but a detector has found it" : "🕳️ burrowed: can't be targeted");
+    if (u.onBoard && !u.status.burrowed && isHidden(s, u)) bits.push(`🌿 hidden: only targetable within ${HIDDEN_RANGE}"`);
     if (u.onBoard && isEngaged(s, u)) bits.push("⚔ engaged");
     if (u.status.hunkered) bits.push("🧱 hunkered");
     if (u.onBoard && u.status.disengaged && s.phase !== "combat") bits.push("😮‍💨 exhausted: sits out the assault phase");

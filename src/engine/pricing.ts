@@ -154,6 +154,12 @@ export const ABILITY_PRICES: Partial<Record<AbilityId, AbilityPrice>> = {
   "bale-out": 0.6,
   "scrap-cover": 0.6,
   "radio-spotting": 0.3,
+  // Hidden: safe from long-range fire until it attacks; worth more on a gun that sits back and shoots.
+  hidden: (c) => 0.5 + 0.3 * c.ranged,
+  // Keen Eyes: answers the other side's hidden and burrowed units; most games it has none to find.
+  detector: 0.15,
+  // Burrow: a free hiding place for the body, and an ambush; it gives up a turn going under.
+  burrow: (c) => 0.2 + 0.06 * c.body,
   "eye-peck": 0.3,
   overcharge: (c) => 0.4 * c.ranged, // +1 damage for a round, paid for with shields
   spotlight: 0.9,
