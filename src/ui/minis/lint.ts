@@ -22,6 +22,16 @@ export const PART_BUDGET = {
   extent: 140,
 };
 
+/**
+ * The budget for a part marked `data-budget="large"`: hulls, abdomens and towers of monsters,
+ * walkers and structures, whose figures run 220 to 290 u (the Hard Ink scale bands).
+ */
+export const LARGE_PART_BUDGET = {
+  bytes: 9000,
+  elements: 72,
+  extent: 260,
+};
+
 const ALLOWED_TAGS = new Set(["svg", "g", "path", "rect", "circle", "ellipse", "line", "polyline", "polygon", "title", "desc"]);
 const ALLOWED_CLASSES = new Set(["shade", "detail", "glow", "tag"]);
 const PAINT = ["fill", "stroke"] as const;
@@ -53,7 +63,8 @@ export function lintPart(src: string, name = "part", opts: PartLintOptions = {})
   if (root.attrs.xmlns !== "http://www.w3.org/2000/svg") add("parse", "missing the SVG xmlns");
   if (!root.attrs["data-part"]) add("parse", "missing data-part (the library name)");
   if (!comments.some((c) => LICENCE.test(c))) add("licence", "missing the GPL-3.0-or-later SPDX licence header");
-  if (src.length > PART_BUDGET.bytes) add("budget", `${src.length} bytes, budget ${PART_BUDGET.bytes}`);
+  const budget = root.attrs["data-budget"] === "large" ? LARGE_PART_BUDGET : PART_BUDGET;
+  if (src.length > budget.bytes) add("budget", `${src.length} bytes, budget ${budget.bytes}`);
 
   let info;
   try {
@@ -62,7 +73,7 @@ export function lintPart(src: string, name = "part", opts: PartLintOptions = {})
     add("parse", (e as Error).message);
     return out;
   }
-  if (info.box.w > PART_BUDGET.extent || info.box.h > PART_BUDGET.extent) add("budget", `viewBox ${info.box.w}x${info.box.h} over ${PART_BUDGET.extent}`);
+  if (info.box.w > budget.extent || info.box.h > budget.extent) add("budget", `viewBox ${info.box.w}x${info.box.h} over ${budget.extent}`);
   for (const a of ["pivot", ...(opts.anchors ?? [])]) if (!info.anchors[a]) add("anchor", `missing anchor "${a}"`);
   for (const [id, p] of Object.entries(info.anchors)) {
     const b = info.box;
@@ -93,7 +104,7 @@ export function lintPart(src: string, name = "part", opts: PartLintOptions = {})
       }
     });
   }
-  if (elements > PART_BUDGET.elements) add("budget", `${elements} elements, budget ${PART_BUDGET.elements}`);
+  if (elements > budget.elements) add("budget", `${elements} elements, budget ${budget.elements}`);
   return out;
 }
 
@@ -114,10 +125,21 @@ export function lintRig(rig: RigDef): LintIssue[] {
     }
   }
   if (tags !== 1) out.push({ part: rig.id, rule: "team", msg: `${tags} parts carry the team tag: a figure has exactly one` });
+  if (rig.weapon && !rig.parts.some((p) => p.id === rig.weapon)) out.push({ part: rig.id, rule: "anchor", msg: `weapon part "${rig.weapon}" is missing` });
+  const ids = new Set(rig.limbs.map((l) => l.id));
   for (const l of rig.limbs) {
     const r = limbRest(l);
     if (r.l1 < 2 || r.l2 < 2) out.push({ part: `${rig.id}/${l.id}`, rule: "anchor", msg: "limb bones shorter than 2 u" });
     if (!rig.parts.some((p) => p.bone.startsWith(`${l.id}.`)) && l.kind === "arm") out.push({ part: `${rig.id}/${l.id}`, rule: "anchor", msg: "an arm with no hand part" });
+    if (l.grip && !rig.weapon) out.push({ part: `${rig.id}/${l.id}`, rule: "anchor", msg: "a grip with no weapon to hold" });
   }
+  if (rig.frame === "structure" && rig.limbs.some((l) => l.kind === "leg")) out.push({ part: rig.id, rule: "anchor", msg: "structures have no legs" });
+  for (const [i, k] of (rig.gait ?? []).entries())
+    for (const id of Object.keys(k)) if (!ids.has(id)) out.push({ part: rig.id, rule: "anchor", msg: `gait key ${i} moves "${id}", which is not a limb` });
+  for (const p of rig.parts)
+    for (const b of [p.bone]) {
+      const limb = b.split(".")[0]!;
+      if (b.includes(".") && !ids.has(limb)) out.push({ part: `${rig.id}/${p.id}`, rule: "anchor", msg: `rides bone "${b}" of a limb that doesn't exist` });
+    }
   return out;
 }

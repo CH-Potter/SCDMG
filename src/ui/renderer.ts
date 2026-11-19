@@ -1114,7 +1114,7 @@ export class BoardRenderer {
     if (glass) mini.addChild(glass);
     // New-engine miniature (Miniatures setting): its footprint joins the flat base layer and its
     // figure replaces the sprite; the HUD, rings and effects around it stay as they are.
-    const rig = createRigMini(prof.id, PLAYER_COLORS[u.owner], prof.baseRadius);
+    const rig = createRigMini(prof.id, PLAYER_COLORS[u.owner], prof.baseRadius, undefined, Math.max(0, u.models.indexOf(m)));
     if (rig) {
       for (const c of [base, cast, figSprite, flash, stand]) if (c) c.visible = false;
       fig.addChild(rig.figure);
@@ -1670,6 +1670,12 @@ export class BoardRenderer {
     v.fig.position.set(ox, pop ? 0 : oy);
     v.fig.scale.set(1, 1);
     v.fig.rotation = 0;
+    // off-screen minis skip posing entirely (their base and figure are hidden until they're back)
+    const { ppi, x: cx, y: cy } = this.cam;
+    const sx = v.root.x * ppi + cx;
+    const sy = v.root.y * ppi + cy;
+    const pad = (v.r + 3) * ppi;
+    const onScreen = sx > -pad && sy > -pad && sx < this.app.screen.width + pad && sy < this.app.screen.height + pad;
     rig.update(dt, {
       ppi: this.cam.ppi,
       walking: !!v.path,
@@ -1678,7 +1684,7 @@ export class BoardRenderer {
       reduced: this.reduced,
       x: v.root.x,
       y: v.root.y + (pop ? oy : 0),
-      visible: v.root.visible,
+      visible: v.root.visible && onScreen,
       alpha: v.root.alpha,
     });
   }

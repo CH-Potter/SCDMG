@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 9 100 74" data-part="concord.strider.side.grand-collar">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>His Radiance's giant fan collar: eleven gold and pearl blades, crystal-tipped, team gem at the throat</title>
+<g stroke="#141414" stroke-width="2" stroke-linejoin="round">
+<path d="M56.1,57.5 L31.5,46.4 L21.7,37 L34.7,40.8 L56.6,56.6 Z" fill="#9a8458"/>
+<path d="M57.8,55.1 L37.5,37.2 L30.9,25.4 L42.2,32.8 L58.6,54.3 Z" fill="#6e4528"/>
+<path d="M60.2,53.3 L45.9,30.3 L43.1,17.1 L51.7,27.5 L61.1,52.8 Z" fill="#9a8458"/>
+<path d="M62.9,52.2 L56,26.1 L57.2,12.6 L62.4,25.1 L64,52.1 Z" fill="#6e4528"/>
+<path d="M65.9,52 L66.9,25.1 L72,12.5 L73.3,25.9 L66.9,52.2 Z" fill="#9a8458"/>
+<path d="M68.7,52.7 L77.7,27.2 L86.1,16.7 L83.5,30 L69.7,53.2 Z" fill="#6e4528"/>
+<path d="M71.3,54.2 L87.3,32.5 L98.5,24.8 L92.1,36.8 L72.1,54.9 Z" fill="#6c5a37"/>
+<path d="M73.3,56.4 L94.9,40.3 L107.9,36.2 L98.3,45.8 L73.8,57.3 Z" fill="#4a2e19"/>
+<path d="M74.6,59.1 L100,50 L113.5,49.9 L101.5,56.2 L74.8,60.1 Z" fill="#6c5a37"/>
+<path d="M75,62 L102,60.7 L114.9,64.6 L101.6,67.1 L74.9,63 Z" fill="#4a2e19"/>
+<path d="M74.6,64.9 L100.7,71.6 L112,79.1 L98.5,77.6 L74.2,65.9 Z" fill="#6c5a37"/>
+</g>
+<g class="glow" fill="#fff2c0" stroke="#141414" stroke-width="1.4"><circle cx="24.6" cy="39.4" r="2.4"/><circle cx="44.2" cy="21" r="2.4"/><circle cx="66.6" cy="16.2" r="2.4"/><circle cx="86.6" cy="20.8" r="2.4"/><circle cx="104" cy="37.6" r="2.4"/><circle cx="110.6" cy="64.2" r="2.4"/></g>
+<path d="M48,66 Q64,50 80,62 L78,70 Q64,60 51,72 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M50,62 L54,57 L58,62 L54,67.6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M54,62 L58,62 L54,67.6 Z" fill="#b000b0"/>
+<g id="anchors"><circle id="pivot" cx="65" cy="62" r="1"/></g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="45 14 42 47" data-part="concord.courtier.side.helm-aviator">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Jetwing helm: mask, swept-back gold fin, lavender goggle lens</title>
+<path d="M60,34 L84,17 L78,28 L70,38 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,32 L84,17 L78,28 L70,38 Z" fill="#4a2e19"/>
+<path d="M65,40 L73,44 L72,55 L65,58 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50,38 L57,32 L68,32 L72,40 L71,51 L64,58 L55,58 L50,52 L48,45 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M65,32 L68,32 L72,40 L71,51 L64,58 L62,58 L66,48 Z" fill="#6c5a37"/>
+<path d="M47,41 L58,39.4 L59,48 L48,49 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M49,42.6 L56.6,41.6 L57.2,46.4 L49.6,47.2 Z" fill="#f2b84b"/>
+<path d="M59,43.6 L70,42" stroke="#44432f" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="57" r="1"/></g>
+</svg>

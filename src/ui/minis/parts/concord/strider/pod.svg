@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="96 112 108 66" data-part="concord.strider.side.pod" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The throne pod: an inverted cut gem of pearl, gold rim, a glowing crystal core and hip sockets</title>
+<path d="M100,122 L200,122 L196,132 L172,160 L150,174 L128,160 L104,132 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M150,132 L196,132 L172,160 L150,174 Z" fill="#6c5a37"/>
+<path d="M104,132 L196,132 M128,160 L150,132 L172,160 M150,132 L150,174" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M140,140 L150,134 L160,140 L156,154 L150,160 L144,154 Z" fill="#f2b84b" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M146,142 L150,139 L154,142" fill="none" stroke="#fff2c0" stroke-width="1.6"/>
+<path d="M98,116 L202,116 L200,124 L100,124 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M150,116 L202,116 L200,124 L150,124 Z" fill="#4a2e19"/>
+<g fill="#4a5158" stroke="#141414" stroke-width="2"><circle cx="112" cy="132" r="5"/><circle cx="188" cy="132" r="5"/></g>
+<g class="detail"><circle cx="110" cy="120" r="1" fill="#c8bd98"/><circle cx="130" cy="120" r="1" fill="#c8bd98"/><circle cx="170" cy="120" r="1" fill="#c8bd98"/><circle cx="190" cy="120" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="150" cy="130" r="1"/></g>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 92 154 78" data-part="militia.rider.side.chassis" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Armoured dirt bike (front at the left): riveted fairing and headlamp, boxy tank, saddle, side pipe, skid plate, handlebar</title>
+<path d="M108,147 L148,162 L146,169 L105,154 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M30,164 L38,166 L53,115 L46,113 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M35,165.4 L38,166 L53,115 L50.4,114.4 Z" fill="#353b41"/>
+<rect x="84" y="131" width="30" height="25" rx="2" fill="#353b41" stroke="#141414" stroke-width="2.4"/>
+<path d="M88,137 H110 M88,142 H110 M88,147 H110" stroke="#25282c" stroke-width="2.2"/>
+<path d="M80,155 L118,155 L112,166 L86,166 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M118,109 L158,113 L160,128 L121,128 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M121,123 L159.4,123.6 L160,128 L121,128 Z" fill="#6c5a37"/>
+<path d="M96,111 L130,108.6 Q135,108.6 134,115 L98,118.6 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M98,116 L134,112.6 L134,115 L98,118.6 Z" fill="#4a2e19"/>
+<path d="M58,105 L100,103 L104,126 L64,132 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M62,124 L103,119.6 L104,126 L64,132 Z" fill="#6c5a37"/>
+<path d="M66,108 L96,106.6" stroke="#6c5a37" stroke-width="2.4"/>
+<path d="M104,147 L128,139.6 L161,133 L162,139.4 L130,146 L106,153.4 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M142,131.4 L164,129 L165.4,140 L143.4,142.4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M20,150 Q34,136 52,146 L50,151 Q34,142 23,154 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M45,112 L49,111 L53.6,97.6 L50.2,97 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M36,104 L60,96 L70,130 L46,140 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M62,103 L60,96 L70,130 L64,132.6 Z" fill="#6c5a37"/>
+<circle cx="45" cy="113" r="6.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="44.4" cy="113" r="3.8" fill="#fff2c0"/>
+<path d="M49,124 L62,120 L65,131.6 L52,135.6 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M54,125.6 L60,123.8 L57.6,132.6" fill="none" stroke="#4a2e19" stroke-width="1.8" stroke-linejoin="round"/>
+<g class="detail">
+<circle cx="40" cy="106" r="1.1" fill="#c8bd98"/><circle cx="57" cy="100.6" r="1.1" fill="#c8bd98"/><circle cx="66" cy="127" r="1.1" fill="#c8bd98"/>
+<circle cx="62" cy="108" r="1.1" fill="#c8bd98"/><circle cx="98" cy="106" r="1.1" fill="#c8bd98"/><circle cx="101" cy="122" r="1.1" fill="#c8bd98"/>
+<circle cx="124" cy="112" r="1.1" fill="#c8bd98"/><circle cx="155" cy="115" r="1.1" fill="#c8bd98"/>
+<path d="M70,111 l3,-1 l-0.6,2.6 Z M150,124 l2.6,0.4 l-1.6,2 Z M28,148 l2.4,-1 l0.2,2.4 Z" fill="#b9bfc4"/>
+<path d="M60,116 h14 M120,119 h10" stroke="#6c5a37" stroke-width="1"/>
+</g>
+<g id="anchors"><circle id="pivot" cx="90" cy="130" r="1"/><circle id="exhaust1" cx="166" cy="135" r="1"/><circle id="bar" cx="52" cy="99" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 -7 22 14" data-part="militia.bomber.chute" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The release chute the buckets tip through (mouth at the left; placed pointing down)</title>
+<path d="M-12,-5 L4,-3.6 L4,3.6 L-12,5 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="-13" y="-6" width="3" height="12" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-14" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-64 -46 128 50" data-part="swarm.hive.side.nest">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Egg nest from the side: a low cup of chewed resin with an ivory spit rim and crumbs</title>
+<path d="M-58,0 Q-62,-24 -44,-34 L44,-34 Q62,-24 58,0 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M58,0 L0,0 Q34,-6 44,-26 Q58,-20 58,0 Z" fill="#44432f"/>
+<path d="M-50,-34 Q0,-44 50,-34 Q52,-28 46,-26 Q0,-34 -46,-26 Q-52,-28 -50,-34 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-46,-14 L-36,-20 L-32,-12 Z M30,-12 L40,-18 L44,-10 Z M-6,-8 L4,-12 L6,-6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-48,-22 Q-40,-30 -28,-32" fill="none" stroke="#c8bd98" stroke-width="2.2" stroke-linecap="round"/>
+<g class="detail"><circle cx="-20" cy="-18" r="1.4" fill="#c8bd98"/><circle cx="18" cy="-20" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-20" r="1"/></g>
+</svg>

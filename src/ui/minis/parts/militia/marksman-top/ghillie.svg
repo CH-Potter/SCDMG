@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-25 -10 50 46" data-part="militia.marksman.top.ghillie">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Ghillie cape of dry grass from above: a ragged fan over the back</title>
+<path d="M-20,-4 Q0,-9 20,-4 L23,8 L19,13 L22,20 L15,22 L16,30 L9,27 L6,34 L0,28 L-6,34 L-9,27 L-16,30 L-15,22 L-22,20 L-19,13 L-23,8 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M6,-6 Q16,-6 20,-4 L23,8 L19,13 L22,20 L15,22 L16,30 L9,27 L6,34 L4,24 Q10,8 6,-6 Z" fill="#6c5a37"/>
+<path d="M-14,4 L-16,20 M-8,6 L-9,26 M-2,6 L-1,24 M10,4 L13,22 M16,4 L18,16" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M-11,10 L-12,24 M6,8 L8,26 M2,12 L3,28" stroke="#44432f" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

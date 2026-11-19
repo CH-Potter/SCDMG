@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="54 108 92 94" data-part="concord.monument.side.sunray-tower">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sunray Tower: a stepped deco ziggurat, pearl and navy tiers, gold fins and chevrons, the team gem mid-tier</title>
+<path d="M62,182 L57,146 L66,158 L68,182 Z M138,182 L143,146 L134,158 L132,182 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M58,200 L142,200 L140,182 L60,182 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M114,182 L140,182 L142,200 L114,200 Z" fill="#6c5a37"/>
+<path d="M68,182 L132,182 L130,160 L70,160 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M112,160 L130,160 L132,182 L112,182 Z" fill="#44432f"/>
+<path d="M76,180 L84,166 L92,180 M108,180 L116,166 L124,180" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M78,160 L122,160 L120,136 L80,136 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M106,136 L120,136 L122,160 L106,160 Z" fill="#6c5a37"/>
+<path d="M90,136 L110,136 L106,112 L94,112 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M100,112 L106,112 L110,136 L100,136 Z" fill="#4a2e19"/>
+<path d="M60,182 L140,182 M70,160 L130,160 M80,136 L120,136" stroke="#6e4528" stroke-width="2.4"/>
+<path class="glow" d="M86,154 L114,154 L113,142 L87,142 Z" fill="#f2b84b"/>
+<path class="glow" d="M89,150 L111,150" stroke="#fff2c0" stroke-width="1.4"/>
+<path class="tag" d="M95,171 L100,165.6 L105,171 L100,176.4 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="66" cy="191" r="1" fill="#c8bd98"/><circle cx="100" cy="191" r="1" fill="#c8bd98"/><circle cx="134" cy="191" r="1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="100" cy="196" r="1"/></g>
+</svg>

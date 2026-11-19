@@ -128,7 +128,7 @@ describe("ink limbs and posing", () => {
       const pose = poseRig(rig, c);
       for (const l of rig.limbs.filter((x) => x.grip)) {
         const hand = pose.limbs.get(l.id)!.end;
-        const grip = apply(pose.mats.get(rig.weapon)!, grips[l.grip!]!);
+        const grip = apply(pose.mats.get(rig.weapon!)!, grips[l.grip!]!);
         const rest = limbRest(l);
         // within reach the hand is exactly on the grip (pose.limbs is in frame coords, mats in rig space)
         const g = { x: grip.x + rig.origin.x, y: grip.y + rig.origin.y };
@@ -230,7 +230,7 @@ describe("registry and the Miniatures setting", () => {
     expect(RIGGED_PROFILES).toContain("mil-grunts");
     expect(rigsFor("mil-grunts")?.side.view).toBe("side");
     expect(rigsFor("mil-grunts")?.top.view).toBe("top");
-    expect(rigsFor("mil-bertha")).toBeNull();
+    expect(rigsFor("no-such-unit")).toBeNull();
   });
 
   it("defaults to Classic and persists the choice", () => {

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 36 206 62" data-part="militia.bomber.side.fuselage" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber: the boxy cargo fuselage, glasshouse cockpit and cargo windows (nose to the left)</title>
+<path d="M38,58 L62,40 L196,44 L236,56 L236,64 L196,84 L68,94 L38,86 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M39,78 L120,80 L200,76 L236,63 L236,64 L196,84 L68,94 L38,86 Z" fill="#6c5a37"/>
+<path class="glow" d="M42,58 L62,44 L80,44 L80,60 Z" fill="#f2b84b"/>
+<path class="glow" d="M46,56 L60,47 L66,47 L52,58 Z" fill="#fff2c0"/>
+<path d="M64,58 Q64,50 71,49 Q78,50 78,58 Z" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<path d="M42,58 L62,44 L80,44 L80,60 Z M62,44 L64,59" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="104" y="52" width="10" height="9" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="120" y="52" width="10" height="9" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<rect x="136" y="52" width="10" height="9" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<path d="M156,50 L184,50 L184,78 L156,80 Z" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M96,44 L98,90 M196,45 L196,83" stroke="#141414" stroke-width="1.4"/>
+<path d="M186,46 L200,47 L200,40 Q193,37 186,40 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail">
+<path d="M160,58 l10,5 l10,-5 v4 l-10,5 l-10,-5 Z" fill="#e3d8b6" opacity="0.85"/>
+<circle cx="100" cy="48" r="1" fill="#c8bd98"/><circle cx="150" cy="47" r="1" fill="#c8bd98"/><circle cx="190" cy="48" r="1" fill="#c8bd98"/><circle cx="100" cy="86" r="1" fill="#c8bd98"/><circle cx="150" cy="84" r="1" fill="#c8bd98"/>
+<path d="M90,70 l5,-1 l-2,3 Z M210,58 l4,0 l-2,2 Z" fill="#b9bfc4"/>
+</g>
+<g id="anchors"><circle id="pivot" cx="120" cy="70" r="1"/></g>
+</svg>

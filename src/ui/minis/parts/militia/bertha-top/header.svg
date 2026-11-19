@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-76 -96 152 48" data-part="militia.bertha.top.header" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Big Bertha from above: the cutting header across the front and the reel over it</title>
+<path d="M-40,-52 L-46,-70 M40,-52 L46,-70" stroke="#25282c" stroke-width="6" stroke-linecap="round"/>
+<path d="M-40,-52 L-46,-70 M40,-52 L46,-70" stroke="#4a5158" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M-74,-78 L-66,-90 L66,-90 L74,-78 L68,-58 L-68,-58 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-70,-66 L70,-66 L68,-58 L-68,-58 Z" fill="#6c5a37"/>
+<rect x="-62" y="-86" width="124" height="18" rx="8" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M-50,-86 V-68 M-30,-86 V-68 M-10,-86 V-68 M10,-86 V-68 M30,-86 V-68 M50,-86 V-68" stroke="#6e4528" stroke-width="3.4"/>
+<path d="M-62,-77 H62" stroke="#141414" stroke-width="1.4"/>
+<path d="M-66,-90 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 l4,-5 l4,5 Z" fill="#353b41" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-60" cy="-62" r="1.1" fill="#c8bd98"/><circle cx="0" cy="-62" r="1.1" fill="#c8bd98"/><circle cx="60" cy="-62" r="1.1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-70" r="1"/></g>
+</svg>

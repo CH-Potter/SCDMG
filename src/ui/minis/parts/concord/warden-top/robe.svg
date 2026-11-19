@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -18 40 38" data-part="concord.warden.top.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The bell robe from above: a navy octagon with a pearl tabard and a gold hem</title>
+<path d="M-7,-16 L7,-16 L17,-6 L17,8 L7,18 L-7,18 L-17,8 L-17,-6 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M17,-6 L17,8 L7,18 L-7,18 L0,8 Z" fill="#44432f"/>
+<path d="M-7,-16 L7,-16 L17,-6 L17,8 L7,18 L-7,18 L-17,8 L-17,-6 Z" fill="none" stroke="#6e4528" stroke-width="2"/>
+<path d="M-4.6,-15.4 L4.6,-15.4 L3,-6 L-3,-6 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

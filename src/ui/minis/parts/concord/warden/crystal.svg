@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -16 20 32" data-part="concord.warden.crystal">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The warden's floating crystal: a long cut gem, lit from inside</title>
+<path d="M0,-14 L7,-4 L5,9 L0,14 L-5,9 L-7,-4 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M0,-14 L7,-4 L5,9 L0,14 Z" fill="#f2b84b"/>
+<path d="M-7,-4 L0,-1 L7,-4 M0,-1 L0,14" fill="none" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M-3.6,-6 L-1,-10" stroke="#e3d8b6" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

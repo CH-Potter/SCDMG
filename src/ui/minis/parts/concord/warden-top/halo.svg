@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-17 -17 34 34" data-part="concord.warden.top.halo">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hex halo from above: a gold hexagon ring floating round the hood, crystal lights at three corners</title>
+<path d="M0,-15 L13,-7.5 L13,7.5 L0,15 L-13,7.5 L-13,-7.5 Z M0,-11 L-9.5,-5.5 L-9.5,5.5 L0,11 L9.5,5.5 L9.5,-5.5 Z" fill="#6e4528" fill-rule="evenodd" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M13,-7.5 L13,7.5 L0,15 L0,11 L9.5,5.5 L9.5,-5.5 Z" fill="#4a2e19"/>
+<path d="M0,-15 L13,-7.5 L13,7.5 L0,15 L-13,7.5 L-13,-7.5 Z" fill="none" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="glow" fill="#fff2c0" stroke="#141414" stroke-width="1.4"><circle cx="0" cy="-13" r="2.6"/><circle cx="-11.3" cy="6.5" r="2.3"/><circle cx="11.3" cy="6.5" r="2.3"/></g>
+<g class="detail" fill="#c8bd98"><circle cx="-11.3" cy="-6.5" r="1"/><circle cx="11.3" cy="-6.5" r="1"/><circle cx="0" cy="13" r="1"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

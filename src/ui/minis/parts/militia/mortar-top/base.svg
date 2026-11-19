@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -40 120 84" data-part="militia.mortar.top.base">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pipe Mortar from above: base plate, bipod feet, the charge crate and the field telephone</title>
+<path d="M-6,-10 L-16,-24 M6,-10 L16,-24" stroke="#25282c" stroke-width="5" stroke-linecap="round"/>
+<path d="M-6,-10 L-16,-24 M6,-10 L16,-24" stroke="#4a5158" stroke-width="2.4" stroke-linecap="round"/>
+<rect x="-14" y="16" width="28" height="18" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="24" y="4" width="30" height="34" rx="1.5" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M45,4 L54,4 L54,38 L45,38 Z" fill="#4a2e19"/>
+<g class="tag"><rect x="25" y="5" width="28" height="6" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/></g>
+<path d="M24,16 H54 M24,27 H54" stroke="#141414" stroke-width="1.4"/>
+<path d="M37,13 L39,18 L44,18 L40,21 L42,26 L37,23 L32,26 L34,21 L30,18 L35,18 Z" fill="#e3d8b6"/>
+<rect x="-54" y="6" width="22" height="18" rx="2" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M-52,10 Q-43,4 -34,10" fill="none" stroke="#25282c" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M-43,24 Q-40,34 -26,32 Q-18,30 -14,26" fill="none" stroke="#2b2019" stroke-width="1.6"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

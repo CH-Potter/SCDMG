@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="76 66 120 36" data-part="militia.biplane.side.gear">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Biplane landing gear: a V strut to the axle and a tail skid</title>
+<path d="M82,70 L90,98 L96,71" fill="none" stroke="#25282c" stroke-width="4.4" stroke-linejoin="round"/>
+<path d="M82,70 L90,98 L96,71" fill="none" stroke="#4a5158" stroke-width="2" stroke-linejoin="round"/>
+<path d="M184,58 L192,70" stroke="#25282c" stroke-width="4"/>
+<path d="M184,58 L192,70" stroke="#6e4528" stroke-width="1.6"/>
+<g id="anchors"><circle id="pivot" cx="90" cy="98" r="1"/></g>
+</svg>

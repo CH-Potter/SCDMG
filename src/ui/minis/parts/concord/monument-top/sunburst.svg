@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-43 -11 86 22" data-part="concord.monument.top.sunburst">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The sunburst seen from above: an upright disc of gold rays, edge-on</title>
+<path d="M0,-8.8 L1.8,-1.5 L20,-7.6 L4.9,-1.1 L34.6,-4.4 L6.8,-0.4 L40,0 L6.8,0.4 L34.6,4.4 L4.9,1.1 L20,7.6 L1.8,1.5 L0,8.8 L-1.8,1.5 L-20,7.6 L-4.9,1.1 L-34.6,4.4 L-6.8,0.4 L-40,0 L-6.8,-0.4 L-34.6,-4.4 L-4.9,-1.1 L-20,-7.6 L-1.8,-1.5 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-16,-3 L16,-3 L16,3 L-16,3 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

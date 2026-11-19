@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="24 36 168 40" data-part="militia.rustler.side.fuselage" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sky Rustler: the crop duster's fuselage, engine cowling and spinner (nose to the left)</title>
+<path d="M50,44 L120,42 L188,50 L190,58 L120,70 L50,73 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M51,63 L120,61 L189,56 L190,58 L120,70 L50,73 Z" fill="#6c5a37"/>
+<path d="M88,44 Q101,37 114,42.6 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M78,43 L80,71 M140,46 L141,66" stroke="#141414" stroke-width="1.4"/>
+<path d="M36,47 Q30,58 36,69 L53,73 L53,43 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M33,62 Q34,66 36,69 L53,73 L53,63 Z" fill="#353b41"/>
+<path d="M44,45 L44,71" stroke="#141414" stroke-width="1.4"/>
+<path d="M36,52 L25,58 L36,64 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="54" y="65" width="12" height="4" rx="1" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<g class="detail">
+<path d="M150,54 h4 v9 h-4 Z M157,54 h4 v9 h-4 Z" fill="#e3d8b6" opacity="0.85"/>
+<circle cx="60" cy="47" r="1" fill="#c8bd98"/><circle cx="70" cy="47" r="1" fill="#c8bd98"/><circle cx="130" cy="46" r="1" fill="#c8bd98"/><circle cx="160" cy="49" r="1" fill="#c8bd98"/>
+<path d="M58,56 l5,-1 l-2,3 Z M170,53 l4,0 l-2,2 Z" fill="#b9bfc4"/>
+<path d="M58,70 L120,66 L186,57" stroke="#44432f" stroke-width="1" opacity="0.7"/>
+</g>
+<g id="anchors"><circle id="pivot" cx="100" cy="60" r="1"/><circle id="exhaust1" cx="66" cy="67" r="1"/></g>
+</svg>

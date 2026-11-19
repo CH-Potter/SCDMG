@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -5 14 10" data-part="swarm.bug.plate">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pheromone plate: the bug's one team tag, a flat hex scute</title>
+<g class="tag">
+<path d="M-5.6,0 L-2.8,-3.6 L2.8,-3.6 L5.6,0 L2.8,3.6 L-2.8,3.6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-4.2,1.2 L4.2,1.2 L2.4,3 L-2.4,3 Z" fill="#b000b0"/>
+</g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

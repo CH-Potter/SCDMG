@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="196 18 52 52" data-part="militia.bomber.side.tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber tail: tall square fin with the squadron band (team tag), tailplane and skid</title>
+<path d="M232,64 L240,74" stroke="#25282c" stroke-width="4"/>
+<path d="M206,53 L216,24 L238,22 L241,59 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M233,22.4 L238,22 L241,59 L236,58 Z" fill="#6c5a37"/>
+<path d="M230,23 L233,58" stroke="#141414" stroke-width="1.4"/>
+<g class="tag"><path d="M213,32 L238.6,30.6 L239.2,38 L210.4,39.6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/></g>
+<path d="M216,43 h3 v8 h-3 Z M221,43 h3 v8 h-3 Z" fill="#e3d8b6"/>
+<path d="M200,60 L246,57 L246,63 L202,66 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="224" cy="56" r="1"/></g>
+</svg>

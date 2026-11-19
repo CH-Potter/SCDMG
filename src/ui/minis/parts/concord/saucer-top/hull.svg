@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-96 -96 192 192" data-part="concord.saucer.top.hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Saucer hull from above: a pearl disc with cut-gem panels and gold seams</title>
+<circle cx="0" cy="0" r="90" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M63.6,-63.6 A90,90 0 0 1 -63.6,63.6 Q50,40 63.6,-63.6 Z" fill="#6c5a37"/>
+<circle cx="0" cy="0" r="58" fill="none" stroke="#6e4528" stroke-width="2.4"/>
+<path d="M0,-58 L0,-82 M41,-41 L58,-58 M58,0 L82,0 M41,41 L58,58 M0,58 L0,82 M-41,41 L-58,58 M-58,0 L-82,0 M-41,-41 L-58,-58" stroke="#141414" stroke-width="1.4"/>
+<path class="glow" d="M-54,-46 Q-30,-70 0,-74" fill="none" stroke="#e3d8b6" stroke-width="3"/>
+<g class="glow" fill="#fff2c0" stroke="#141414" stroke-width="1.4"><circle cx="0" cy="-70" r="3.4"/><circle cx="49.5" cy="-49.5" r="3"/><circle cx="70" cy="0" r="3"/><circle cx="49.5" cy="49.5" r="3"/><circle cx="0" cy="70" r="3"/><circle cx="-49.5" cy="49.5" r="3"/><circle cx="-70" cy="0" r="3"/><circle cx="-49.5" cy="-49.5" r="3"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

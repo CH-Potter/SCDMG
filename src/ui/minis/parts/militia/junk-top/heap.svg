@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-130 -50 260 100" data-part="militia.junk.top.heap" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Junk Barricade from above: bedstead, ore cart and boiler plate in a line, barbed wire along the front, the rag flag (team tag)</title>
+<rect x="-124" y="-30" width="64" height="58" rx="3" fill="none" stroke="#25282c" stroke-width="6"/>
+<rect x="-124" y="-30" width="64" height="58" rx="3" fill="none" stroke="#4a5158" stroke-width="3"/>
+<path d="M-114,-28 V26 M-102,-28 V26 M-90,-28 V26 M-78,-28 V26 M-122,-10 H-62 M-122,8 H-62" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-124" cy="-30" r="4" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-60" cy="-30" r="4" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<path d="M56,-34 L122,-26 L118,34 L52,26 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M104,-28 L122,-26 L118,34 L100,32 Z" fill="#353b41"/>
+<path d="M62,-14 L72,-13 L66,10 L58,9 Z M82,-11 L92,-10 L86,14 L78,13 Z" fill="#e3d8b6" opacity="0.85"/>
+<rect x="-50" y="-30" width="96" height="60" rx="3" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<rect x="-44" y="-24" width="84" height="48" rx="2" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M-40,-8 Q-30,-22 -18,-10 Q-6,-24 6,-8 Q18,-20 30,-6 Q40,4 30,16 Q18,24 6,14 Q-6,24 -18,14 Q-30,22 -40,10 Q-46,0 -40,-8 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-126,40 Q-110,30 -94,40 Q-78,50 -62,40 Q-46,30 -30,40 Q-14,50 2,40 Q18,30 34,40 Q50,50 66,40 Q82,30 98,40 Q114,50 126,40" fill="none" stroke="#141414" stroke-width="1.4"/>
+<rect x="30" y="16" width="4" height="4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g class="tag"><path d="M34,18 L52,22 L48,28 L54,34 L34,30 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/></g>
+<g class="detail"><path d="M-110,32 l4,4 M-106,32 l-4,4 M-40,36 l4,4 M-36,36 l-4,4 M30,34 l4,4 M34,34 l-4,4 M100,38 l4,4 M104,38 l-4,4" stroke="#b9bfc4" stroke-width="1"/><circle cx="62" cy="-28" r="1.2" fill="#c8bd98"/><circle cx="114" cy="-22" r="1.2" fill="#c8bd98"/><circle cx="110" cy="28" r="1.2" fill="#c8bd98"/><path d="M-20,-4 l3,-2 l2,3 Z M12,4 l3,-2 l2,3 Z" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

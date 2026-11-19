@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 12 12" data-part="militia.medic.top.band">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Medic's cog-and-plus band on the near shoulder, from above</title>
+<circle cx="0" cy="0" r="4.4" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<path d="M0,-2.4 V2.4 M-2.4,0 H2.4" stroke="#4a2e19" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

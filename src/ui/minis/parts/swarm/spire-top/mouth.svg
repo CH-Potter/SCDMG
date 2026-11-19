@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -48 96 96" data-part="swarm.spire.top.mouth" data-recoil="0">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Brood Spire mouth from above: an ivory lip round a glowing throat, four hooks curling outwards</title>
+<g fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round">
+<path d="M-14,-14 Q-30,-24 -40,-40 Q-44,-46 -36,-44 Q-28,-30 -10,-20 Z"/><path d="M14,-14 Q24,-30 40,-40 Q46,-44 44,-36 Q30,-28 20,-10 Z"/>
+<path d="M14,14 Q30,24 40,40 Q44,46 36,44 Q28,30 10,20 Z"/><path d="M-14,14 Q-24,30 -40,40 Q-46,44 -44,36 Q-30,28 -20,10 Z"/>
+</g>
+<circle cx="0" cy="0" r="20" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M16,-10 A20,20 0 0 1 -10,17 Q12,10 16,-10 Z" fill="#4a2e19"/>
+<circle cx="0" cy="0" r="12" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="0" cy="0" r="7" fill="#fff2c0"/>
+<circle class="glow" cx="0" cy="0" r="3.4" fill="#f2b84b"/>
+<path d="M-14,-8 Q-10,-15 -2,-17" fill="none" stroke="#e3d8b6" stroke-width="2" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/><circle id="exhaust1" cx="-4" cy="-3" r="1"/><circle id="exhaust2" cx="4" cy="3" r="1"/></g>
+</svg>

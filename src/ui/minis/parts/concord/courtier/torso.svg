@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 52 32 68" data-part="concord.courtier.side.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pearl cuirass: broad faceted chest, wasp waist, gold belt and pointed tassets</title>
+<path d="M56,54 L64,54 L65,64 L55,64 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M52,92 L68,92 L69,108 L51,108 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M60,99 L70,99 L66,115 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50,99 L61,99 L55,118 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M49,63 L71,61 L74,73 L66,94 L55,95 L47,77 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M60.5,62 L71,61 L74,73 L66,94 L60.5,94.6 Z" fill="#6c5a37"/>
+<path d="M60.5,62 L60.5,94.6" stroke="#141414" stroke-width="1.4"/>
+<path d="M49.4,69 L60.5,80 L72.6,67.6" fill="none" stroke="#6e4528" stroke-width="2.2" stroke-linejoin="round"/>
+<path class="glow" d="M57.6,76.6 L60.5,73.4 L63.4,76.6 L60.5,79.8 Z" fill="#f2b84b"/>
+<path d="M53,92 L68,92 L69,99.4 L52,99.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M61,92 L68,92 L69,99.4 L61,99.4 Z" fill="#4a2e19"/>
+<g class="detail"><circle cx="55.4" cy="95.8" r="1" fill="#c8bd98"/><circle cx="65" cy="95.8" r="1" fill="#c8bd98"/><path d="M50,66 L54,64.5" stroke="#e3d8b6" stroke-width="1"/><path d="M51.6,104 L55,114" stroke="#e3d8b6" stroke-width="1"/></g>
+<g id="anchors">
+<circle id="pivot" cx="60" cy="104" r="1"/><circle id="neck" cx="60" cy="57" r="1"/>
+<circle id="shoulderF" cx="50" cy="68" r="1"/><circle id="shoulderB" cx="70" cy="68" r="1"/>
+<circle id="back" cx="72" cy="70" r="1"/>
+</g>
+</svg>

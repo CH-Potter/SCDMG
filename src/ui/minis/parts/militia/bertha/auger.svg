@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="206 54 92 60" data-part="militia.bertha.side.auger">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Big Bertha: the grain auger, swung up and back off the hull, spout down</title>
+<path d="M210,112 L214,98 L234,98 L236,112 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M222.6,99.8 L279.6,59.8 L285.4,68 L228.4,108 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M225.5,103.9 L282.5,63.9 L285.4,68 L228.4,108 Z" fill="#6c5a37"/>
+<path d="M276,58 L292,60 L292,80 L284,80 L284,68 L278,67 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M240,88 L245,95 M252,80 L257,87 M264,71 L269,78" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="216" cy="104" r="1.1" fill="#c8bd98"/><circle cx="230" cy="104" r="1.1" fill="#c8bd98"/><path d="M288,64 v12" stroke="#b9bfc4" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="224" cy="104" r="1"/></g>
+</svg>

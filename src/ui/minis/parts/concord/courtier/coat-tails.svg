@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="53 90 38 82" data-part="concord.courtier.side.coat-tails">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Long navy coat tails split into two points, gold hem</title>
+<path d="M57,94 L72,94 L86,160 L78,169 L72,150 L66,166 L60,140 Z" fill="#44432f" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,94 L72,94 L86,160 L80,166 Z" fill="#5d5b45"/>
+<path d="M60,140 L66,166 L72,150 L78,169 L86,160" fill="none" stroke="#6e4528" stroke-width="2.6" stroke-linejoin="round"/>
+<path d="M72,150 L68,112" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="64" cy="100" r="1"/></g>
+</svg>

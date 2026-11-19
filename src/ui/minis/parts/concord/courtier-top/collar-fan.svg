@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-23 -4 46 28" data-part="concord.courtier.top.collar-fan">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Fan collar from above: a half-sunburst of blades behind the head, team gem at its heart</title>
+<g stroke="#141414" stroke-width="2" stroke-linejoin="round">
+<path d="M5,1.6 L15.5,2.1 L20.5,5.4 L14.6,6.3 L4.8,2.4 Z" fill="#4a2e19"/>
+<path d="M4.2,3.7 L13.5,8.8 L16.5,13.9 L10.8,12.2 L3.7,4.4 Z" fill="#6c5a37"/>
+<path d="M2.6,5.3 L8.7,13.9 L9.2,19.9 L4.8,15.8 L1.8,5.7 Z" fill="#6e4528"/>
+<path d="M0.4,6 L2.2,16.4 L0,22 L-2.2,16.4 L-0.4,6 Z" fill="#9a8458"/>
+<path d="M-1.8,5.7 L-4.8,15.8 L-9.2,19.9 L-8.7,13.9 L-2.6,5.3 Z" fill="#6e4528"/>
+<path d="M-3.7,4.4 L-10.8,12.2 L-16.5,13.9 L-13.5,8.8 L-4.2,3.7 Z" fill="#9a8458"/>
+<path d="M-4.8,2.4 L-14.6,6.3 L-20.5,5.4 L-15.5,2.1 L-5,1.6 Z" fill="#6e4528"/>
+</g>
+<path d="M-7,1 Q0,10 7,1" fill="none" stroke="#6e4528" stroke-width="3.4"/>
+<path class="tag" d="M0,4 L3,7.4 L0,10.8 L-3,7.4 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="1" r="1"/></g>
+</svg>

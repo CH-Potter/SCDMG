@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 104 80 28" data-part="concord.monument.side.pylon-ring">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hex emitter ring floating round the pylon, crystal lights at its corners</title>
+<path d="M136,118 L118,127.4 L82,127.4 L64,118 L82,108.6 L118,108.6 Z M127,118 L113.5,111 L86.5,111 L73,118 L86.5,125 L113.5,125 Z" fill="#6e4528" fill-rule="evenodd" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M118,127.4 L82,127.4 L86.5,125 L113.5,125 Z M136,118 L118,127.4 L113.5,125 L127,118 Z" fill="#4a2e19"/>
+<g class="glow" fill="#fff2c0" stroke="#141414" stroke-width="1.4"><circle cx="68" cy="118" r="2.6"/><circle cx="132" cy="118" r="2.6"/><circle cx="100" cy="126.2" r="2.6"/><circle cx="84" cy="124" r="2"/><circle cx="116" cy="124" r="2"/></g>
+<g id="anchors"><circle id="pivot" cx="100" cy="118" r="1"/></g>
+</svg>

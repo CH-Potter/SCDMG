@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -12 24 22" data-part="militia.biplane.top.pilot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pilot from above: coat shoulders, leather helm, goggle strap</title>
+<ellipse cx="0" cy="3" rx="9" ry="5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="-1" r="6" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M4,-5 A6,6 0 0 1 -1,5 Q4,2 4,-5 Z" fill="#4a2e19"/>
+<path d="M-6,-3 Q0,-6 6,-3" fill="none" stroke="#2b2019" stroke-width="2.4"/>
+<circle class="glow" cx="-2.4" cy="-4.6" r="1.4" fill="#f2b84b"/>
+<circle class="glow" cx="2.4" cy="-4.6" r="1.4" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-62 -8 124 172" data-part="swarm.mother.top.plates" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Broodmother abdomen plates from above: a violet keel and three scutes across the egg sac, rear hooks</title>
+<path d="M-10,150 Q-14,158 -8,162 Q-6,156 -2,152 Z M10,150 Q14,158 8,162 Q6,156 2,152 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-18,0 Q0,-6 18,0 Q24,70 14,152 Q0,158 -14,152 Q-24,70 -18,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M18,0 Q24,70 14,152 Q6,155 0,156 Q12,80 8,2 Z" fill="#6c5a37"/>
+<path d="M-56,26 Q0,6 56,26 Q60,38 56,46 Q0,28 -56,46 Q-60,38 -56,26 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-62,62 Q0,42 62,62 Q64,74 62,82 Q0,64 -62,82 Q-64,74 -62,62 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-52,100 Q0,84 52,100 Q54,110 50,118 Q0,104 -50,118 Q-54,110 -52,100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g class="shade" fill="#6c5a37"><path d="M56,40 Q0,24 -56,40 Q-58,44 -56,46 Q0,28 56,46 Z"/><path d="M62,76 Q0,58 -62,76 Q-63,80 -62,82 Q0,64 62,82 Z"/><path d="M52,112 Q0,98 -52,112 Q-52,116 -50,118 Q0,104 50,118 Z"/></g>
+<path d="M-10,10 Q-14,50 -12,90" fill="none" stroke="#e3d8b6" stroke-width="3" stroke-linecap="round"/>
+<path d="M-44,26 Q-30,20 -18,18 M-48,62 Q-34,56 -22,54" fill="none" stroke="#e3d8b6" stroke-width="1.8" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="46 52 32 20" data-part="concord.courtier.side.gorget">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Gold gorget ring, team gem at the throat</title>
+<path d="M49,64 Q62,54 75,62 L74,67 Q62,61 51,69 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M64,58.6 Q70,59 75,62 L74,67 Q69,63.6 64,63 Z" fill="#4a2e19"/>
+<path class="tag" d="M50,61.6 L53.4,57.4 L56.8,61.6 L53.4,66 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="62" cy="62" r="1"/></g>
+</svg>

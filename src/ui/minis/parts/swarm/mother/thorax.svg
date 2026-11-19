@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -146 82 70" data-part="swarm.mother.side.thorax">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Broodmother thorax: a humped chitin collar with two back hooks and an ivory underplate</title>
+<path d="M-14,-134 Q-8,-144 -2,-140 Q-4,-134 -8,-128 Z M6,-132 Q14,-142 20,-136 Q16,-130 10,-126 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-44,-106 Q-42,-132 -14,-136 Q16,-138 26,-112 Q28,-88 4,-82 Q-30,-80 -44,-106 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M26,-112 Q28,-88 4,-82 Q-24,-80 -38,-92 Q-6,-92 12,-100 Q24,-106 26,-112 Z" fill="#6c5a37"/>
+<path d="M-38,-92 Q-8,-80 22,-94" fill="none" stroke="#6e4528" stroke-width="5" stroke-linecap="round"/>
+<path d="M-24,-88 Q-22,-96 -22,-104 M-6,-86 Q-4,-96 -4,-106 M10,-90 Q12,-98 12,-106" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M-32,-120 Q-24,-132 -10,-134" fill="none" stroke="#e3d8b6" stroke-width="3" stroke-linecap="round"/>
+<g class="detail"><circle cx="0" cy="-122" r="1.2" fill="#b9bfc4"/><path d="M-30,-108 l4,-3" stroke="#b9bfc4" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="-8" cy="-108" r="1"/></g>
+</svg>

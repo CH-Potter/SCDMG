@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-124 -52 248 50" data-part="militia.bomber.top.wings" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber from above: the long, wide-chord upper wing with square tips</title>
+<path d="M-120,-46 L120,-46 L122,-10 L-122,-10 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-121.6,-17 L121.6,-17 L122,-10 L-122,-10 Z" fill="#44432f"/>
+<path d="M-80,-46 V-10 M80,-46 V-10 M-28,-46 V-10 M28,-46 V-10" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><path d="M-104,-45 V-11 M-54,-45 V-11 M54,-45 V-11 M104,-45 V-11" stroke="#44432f" stroke-width="1"/><path d="M-112,-40 h6 v10 h-6 Z M106,-40 h6 v10 h-6 Z" fill="#e3d8b6" opacity="0.8"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-28" r="1"/></g>
+</svg>

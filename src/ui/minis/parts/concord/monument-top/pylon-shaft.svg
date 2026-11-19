@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-19 -19 38 38" data-part="concord.monument.top.pylon-shaft">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The obelisk seen from straight above: a four-point cut crystal</title>
+<path d="M0,-17 L4.2,-4.2 L17,0 L4.2,4.2 L0,17 L-4.2,4.2 L-17,0 L-4.2,-4.2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M0,0 L17,0 L4.2,4.2 L0,17 Z" fill="#6c5a37"/>
+<path class="glow" d="M0,-9 L2,-2 L9,0 L2,2 L0,9 L-2,2 L-9,0 L-2,-2 Z" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

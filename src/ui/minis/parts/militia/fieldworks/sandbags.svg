@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 156 172 46" data-part="militia.fieldworks.side.sandbags" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A sandbag wall, two courses high (ground at y 200, centre at x 100)</title>
+<rect x="32" y="161" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<rect x="59" y="160" width="28" height="22" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<rect x="86" y="159" width="28" height="23" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<rect x="113" y="160" width="28" height="22" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<rect x="140" y="161" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M36,176 Q46,180 58,174 L59,176 Q59,182 52,182 L40,182 Q33,182 33,178 Z M63,176 Q73,180 85,173 L86,176 Q86,182 79,182 L67,182 Q60,182 60,178 Z M90,176 Q100,180 112,172 L113,176 Q113,182 106,182 L94,182 Q87,182 87,178 Z M117,176 Q127,180 139,173 L140,176 Q140,182 133,182 L121,182 Q114,182 114,178 Z M144,176 Q154,180 166,174 L167,176 Q167,182 160,182 L148,182 Q141,182 141,178 Z" fill="#6c5a37"/>
+<rect x="18" y="179" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="45" y="179" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="72" y="179" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="99" y="179" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="126" y="179" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="153" y="179" width="28" height="21" rx="7" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M21,194 Q32,198 45,191 L45,193 Q45,200 38,200 L26,200 Q19,200 19,196 Z M48,194 Q59,198 72,191 L72,193 Q72,200 65,200 L53,200 Q46,200 46,196 Z M75,194 Q86,198 99,191 L99,193 Q99,200 92,200 L80,200 Q73,200 73,196 Z M102,194 Q113,198 126,191 L126,193 Q126,200 119,200 L107,200 Q100,200 100,196 Z M129,194 Q140,198 153,191 L153,193 Q153,200 146,200 L134,200 Q127,200 127,196 Z M156,194 Q167,198 180,191 L180,193 Q180,200 173,200 L161,200 Q154,200 154,196 Z" fill="#6c5a37"/>
+<g class="detail"><path d="M24,184 l3,4 M51,184 l3,4 M78,184 l3,4 M105,184 l3,4 M132,184 l3,4 M159,184 l3,4 M38,165 l3,4 M65,164 l3,4 M92,163 l3,4 M119,164 l3,4 M146,165 l3,4" stroke="#6e4528" stroke-width="1"/><path d="M20,198 H180" stroke="#44432f" stroke-width="1" opacity="0.6"/></g>
+<g id="anchors"><circle id="pivot" cx="100" cy="200" r="1"/></g>
+</svg>

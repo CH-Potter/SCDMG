@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-70 -64 140 132" data-part="swarm.borer.top.mound">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Deep Borer mound from above: a ring of heaved-up crust round a dark hole, crumbs scattered</title>
+<path d="M0,-60 Q40,-58 60,-34 Q72,0 58,34 Q38,62 0,64 Q-40,62 -60,34 Q-72,0 -60,-34 Q-40,-58 0,-60 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64,-14 Q70,30 40,52 Q14,66 -24,58 Q20,50 42,30 Q60,10 64,-14 Z" fill="#44432f"/>
+<path d="M0,-30 Q28,-28 30,0 Q28,28 0,30 Q-28,28 -30,0 Q-28,-28 0,-30 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-48,-30 L-36,-38 L-30,-28 L-42,-22 Z M38,-40 L50,-38 L50,-26 L38,-28 Z M44,22 L56,24 L52,36 L42,32 Z M-46,30 L-34,26 L-32,38 L-44,40 Z M-8,-50 L4,-52 L6,-42 L-6,-42 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-50,-38 Q-34,-52 -12,-56" fill="none" stroke="#c8bd98" stroke-width="2.4" stroke-linecap="round"/>
+<g class="detail"><circle cx="-56" cy="6" r="1.4" fill="#c8bd98"/><circle cx="56" cy="-4" r="1.4" fill="#c8bd98"/><circle cx="10" cy="48" r="1.2" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

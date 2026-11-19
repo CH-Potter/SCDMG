@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-54 -222 108 46" data-part="swarm.spire.side.crown">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Brood Spire crown: four ivory hooks curling out from the chimney's lip</title>
+<g fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round">
+<path d="M-22,-184 Q-40,-188 -48,-206 Q-50,-218 -42,-216 Q-40,-200 -20,-192 Z"/>
+<path d="M22,-184 Q40,-188 48,-206 Q50,-218 42,-216 Q40,-200 20,-192 Z"/>
+<path d="M-10,-188 Q-18,-200 -16,-214 Q-12,-220 -8,-214 Q-12,-202 -4,-190 Z"/>
+<path d="M10,-188 Q18,-200 16,-214 Q12,-220 8,-214 Q12,-202 4,-190 Z"/>
+</g>
+<g class="shade" fill="#4a2e19"><path d="M24,-186 Q40,-190 46,-204 Q48,-212 44,-214 Q42,-198 22,-190 Z"/><path d="M12,-189 Q16,-200 15,-212 Q12,-202 6,-190 Z"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-190" r="1"/></g>
+</svg>

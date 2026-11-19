@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -16 12 22" data-part="militia.medic.top.injector">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Raised injector from above: gauntlet, glowing vial, needle</title>
+<path d="M0,-9 V-14.4" stroke="#141414" stroke-width="2" stroke-linecap="round"/>
+<rect x="-2.6" y="-10" width="5.2" height="9" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect class="glow" x="-1.2" y="-8.6" width="2.4" height="6" fill="#f2b84b"/>
+<circle cx="0" cy="1" r="3.6" fill="#353b41" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

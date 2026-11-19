@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-52 -46 104 92" data-part="concord.strider.top.pod">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The throne pod from above: a pearl hexagon, gold rim, glowing crystal core</title>
+<path d="M48,0 L24,41.6 L-24,41.6 L-48,0 L-24,-41.6 L24,-41.6 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M42,0 L21,36.4 L-21,36.4 L-42,0 L-21,-36.4 L21,-36.4 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="shade" d="M42,0 L21,36.4 L-21,36.4 L0,0 Z" fill="#6c5a37"/>
+<path d="M18,0 L9,15.6 L-9,15.6 L-18,0 L-9,-15.6 L9,-15.6 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M18,0 L9,15.6 L-9,15.6 L0,0 Z" fill="#f2b84b"/>
+<path d="M-42,0 L-18,0 M42,0 L18,0 M-21,-36.4 L-9,-15.6 M21,-36.4 L9,-15.6 M-21,36.4 L-9,15.6 M21,36.4 L9,15.6" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

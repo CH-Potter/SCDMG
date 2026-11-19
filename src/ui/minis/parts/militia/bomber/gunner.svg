@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="182 22 44 26" data-part="militia.bomber.side.gunner">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Haymaker Bomber: the tail gunner in the rear cockpit, his pintle gun aimed up and back</title>
+<path d="M199,38 L221,27" stroke="#25282c" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M200,40 L196,46" stroke="#141414" stroke-width="2"/>
+<path d="M186,46 Q186,39 193,38 Q200,39 200,46 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M188,38 Q188,30 194,29.5 Q200,30 200,38 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M188,35.5 L200,34.5" stroke="#25282c" stroke-width="2.4"/>
+<circle class="glow" cx="189" cy="33" r="1.6" fill="#fff2c0"/>
+<rect x="198" y="34" width="8" height="6" rx="1" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="192" cy="46" r="1"/></g>
+</svg>

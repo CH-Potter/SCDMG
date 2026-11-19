@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -12 60 24" data-part="swarm.geyser.pool">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Acid pool: a lime crater surface, bubbling (any view; pivot at its centre)</title>
+<ellipse cx="0" cy="0" rx="25" ry="7" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M24,-1 Q22,6 0,7 Q-14,7 -20,4 Q4,4 24,-1 Z" fill="#f2b84b"/>
+<g class="glow" fill="#f2b84b" stroke="#141414" stroke-width="1.4"><circle cx="-10" cy="-1" r="2.4"/><circle cx="6" cy="1" r="1.8"/><circle cx="14" cy="-2" r="1.4"/></g>
+<path d="M-18,-3 Q-10,-5 -2,-5" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

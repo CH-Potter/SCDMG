@@ -18,10 +18,13 @@ export { RigMini, type MiniDrive } from "./mini";
 export { MINI_STYLE_LABEL, miniStyle, nextMiniStyle, setMiniStyle, type MiniStyle } from "./settings";
 export { rigsFor } from "./registry";
 
-/** A new-engine miniature for this unit in the current style, or null to keep the Classic one. */
-export function createRigMini(profileId: string, team: number, baseRadius: number, style: MiniStyle = miniStyle()): RigMini | null {
+/**
+ * A new-engine miniature for this unit in the current style, or null to keep the Classic one.
+ * `model`: the model's index in its unit (squads vary their looks by it).
+ */
+export function createRigMini(profileId: string, team: number, baseRadius: number, style: MiniStyle = miniStyle(), model = 0): RigMini | null {
   if (style === "classic") return null;
-  const rigs = rigsFor(profileId);
+  const rigs = rigsFor(profileId, model);
   if (!rigs) return null;
   return new RigMini(rigs, style === "overhead" ? "top" : "side", team, baseRadius);
 }

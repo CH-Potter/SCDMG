@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="230 30 40 70" data-part="militia.bertha.side.pennant">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Big Bertha: the radio mast and the crew's pennant (the team tag)</title>
+<rect x="234.5" y="35" width="3" height="63" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g class="tag">
+<path d="M237,37 L267,45 L237,54 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M237,46 L253,49 L237,54 Z" fill="#b000b0"/>
+</g>
+<circle cx="236" cy="34" r="2.6" fill="#c8bd98" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="236" cy="98" r="1"/></g>
+</svg>

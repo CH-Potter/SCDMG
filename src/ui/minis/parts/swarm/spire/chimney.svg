@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -196 160 200" data-part="swarm.spire.side.chimney" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Brood Spire: a tapered chimney of chewed resin and spit, two chitin collars, warm to the touch</title>
+<path d="M-74,0 Q-72,-22 -54,-38 Q-44,-90 -34,-150 Q-30,-176 -24,-186 L24,-186 Q30,-176 34,-150 Q44,-90 54,-38 Q72,-22 74,0 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M74,0 L8,0 Q30,-20 34,-50 Q30,-110 26,-170 Q30,-176 34,-150 Q44,-90 54,-38 Q72,-22 74,0 Z" fill="#44432f"/>
+<path d="M-56,-36 Q0,-26 56,-36 L52,-56 Q0,-46 -52,-56 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M56,-36 Q20,-30 -10,-31 L-6,-38 Q24,-38 54,-46 Z" fill="#6c5a37"/>
+<path d="M-42,-118 Q0,-110 42,-118 L39,-134 Q0,-126 -39,-134 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M42,-118 Q16,-113 -8,-113 L-6,-119 Q18,-120 40,-126 Z" fill="#6c5a37"/>
+<path d="M-40,-48 Q-24,-46 -10,-46 M-30,-128 Q-18,-126 -6,-126" fill="none" stroke="#e3d8b6" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M-44,-80 Q-40,-100 -34,-108 M-32,-150 Q-30,-166 -26,-174" fill="none" stroke="#c8bd98" stroke-width="2" stroke-linecap="round"/>
+<path d="M-60,-10 L-48,-16 L-44,-8 Z M40,-12 L52,-16 L56,-8 Z M-12,-8 L-2,-12 L2,-6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-24" cy="-70" r="1.4" fill="#c8bd98"/><circle cx="28" cy="-96" r="1.4" fill="#c8bd98"/><circle cx="-18" cy="-160" r="1.2" fill="#c8bd98"/><path d="M-30,-20 q6,-6 12,0 M14,-150 q4,-4 8,0" fill="none" stroke="#44432f" stroke-width="1" stroke-linecap="round"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-90" r="1"/></g>
+</svg>

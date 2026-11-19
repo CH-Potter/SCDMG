@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11 56 22 64" data-part="concord.saucer.top.fin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tail fin from above: a gold blade off the back of the hull with the team stripe</title>
+<path d="M-5,60 L5,60 L4,108 L0,116 L-4,108 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-4,70 L4,70 L3.4,104 L-3.4,104 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="80" r="1"/></g>
+</svg>

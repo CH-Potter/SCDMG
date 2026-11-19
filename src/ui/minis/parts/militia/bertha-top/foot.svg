@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -28 28 50" data-part="militia.walker.top.foot">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Walker foot from above: a long cleated plate, toe up (forward), ankle drum on top</title>
+<path d="M-10,-24 L10,-24 L12,14 L8,18 L-8,18 L-12,14 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M5,-23 L10,-23 L12,14 L8,18 L4,18 Z" fill="#353b41"/>
+<path d="M-9,-23 L9,-23 L8,-12 L-8,-12 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="0" cy="0" r="7" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="0" r="2.6" fill="#25282c"/>
+<g class="detail"><path d="M-8,10 h16 M-8,14 h16" stroke="#353b41" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

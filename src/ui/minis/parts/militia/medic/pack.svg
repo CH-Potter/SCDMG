@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 -2 48 116" data-part="militia.medic.side.pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tall taped field pack: blanket roll on top, splint case on the back, cog-and-plus panel, hop-pack nozzles</title>
+<path d="M71,104 L77,103 L78,111 L72,112 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M83,102 L89,101.4 L90,109 L84,110 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="94" y="22" width="11" height="58" rx="5.5" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M100.4,23 Q104,24 104,28 V74 Q104,78 100.4,79 Z" fill="#4a2e19"/>
+<path d="M94.4,34 H104.6 M94.4,66 H104.6" stroke="#e3d8b6" stroke-width="3"/>
+<path d="M65,16 L95,11 L98,101 L69,105 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M87,12.4 L95,11 L98,101 L90.4,102.2 Z" fill="#44432f"/>
+<path d="M66.4,42 L95.6,37.6 L96,44.8 L66.8,49 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M68,56 L96.4,52.4 L97.2,70 L69,73.4 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="82.8" cy="62.8" r="6" fill="none" stroke="#4a2e19" stroke-width="2.4" stroke-dasharray="1.8 1.4"/>
+<circle cx="82.8" cy="62.8" r="3.8" fill="#e3d8b6" stroke="#4a2e19" stroke-width="1.2"/>
+<path d="M82.8,60.2 V65.4 M80.2,62.8 H85.4" stroke="#4a2e19" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M69.4,85 L97.6,81.4 L97.9,88.4 L69.8,92 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M63,16 L95,8.6 L97,20 L66,25 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M89,10 L95,8.6 L97,20 L91,21.2 Z" fill="#6c5a37"/>
+<rect x="64" y="0" width="31" height="11" rx="5.5" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path d="M71,0.4 V10.6 M87,0.4 V10.6" stroke="#2b2019" stroke-width="2"/>
+<g class="detail"><circle cx="68" cy="19.6" r="1" fill="#c8bd98"/><circle cx="92.4" cy="14" r="1" fill="#c8bd98"/><path d="M71,96 l2.6,-0.6 l-0.6,2.4 Z M93,30 l2,-0.4 l-0.4,2 Z" fill="#b9bfc4"/><path d="M70,32 h20" stroke="#44432f" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/><circle id="exhaust1" cx="75" cy="111" r="1"/><circle id="exhaust2" cx="87" cy="109" r="1"/></g>
+</svg>

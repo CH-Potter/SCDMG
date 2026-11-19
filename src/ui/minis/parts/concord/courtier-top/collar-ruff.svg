@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-15 -1 30 18" data-part="concord.courtier.top.collar-ruff">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Small fan ruff from above, team gem at its heart</title>
+<g stroke="#141414" stroke-width="2" stroke-linejoin="round">
+<path d="M3.8,2.3 L10,3.7 L12.7,6.9 L8.5,6.9 L3.4,3.1 Z" fill="#4a2e19"/>
+<path d="M2.5,4.1 L7,8.6 L7.5,12.8 L4,10.6 L1.8,4.6 Z" fill="#6e4528"/>
+<path d="M0.4,5 L1.8,11.2 L0,15 L-1.8,11.2 L-0.4,5 Z" fill="#9a8458"/>
+<path d="M-1.8,4.6 L-4,10.6 L-7.5,12.8 L-7,8.6 L-2.5,4.1 Z" fill="#6e4528"/>
+<path d="M-3.4,3.1 L-8.5,6.9 L-12.7,6.9 L-10,3.7 L-3.8,2.3 Z" fill="#9a8458"/>
+</g>
+<path class="tag" d="M0,3.6 L2.6,6.4 L0,9.2 L-2.6,6.4 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="1" r="1"/></g>
+</svg>

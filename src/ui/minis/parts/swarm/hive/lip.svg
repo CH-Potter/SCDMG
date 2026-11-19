@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-92 -22 184 26" data-part="swarm.hive.side.lip" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Tunnel Mouth, front: the near lip of the hole, still crumbling at the edges</title>
+<path d="M-88,0 Q-88,-10 -62,-8 Q-30,-2 0,-2 Q30,-2 62,-8 Q88,-10 88,0 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M88,0 L0,0 Q40,-1 62,-5 Q84,-6 88,0 Z" fill="#44432f"/>
+<path d="M-56,-8 L-50,-16 L-42,-10 L-48,-4 Z M18,-4 L24,-12 L32,-8 L26,-2 Z M54,-8 L60,-14 L66,-8 Z M-14,-2 L-8,-8 L-2,-3 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-74,-8 Q-60,-10 -46,-6" fill="none" stroke="#c8bd98" stroke-width="2" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-4" r="1"/></g>
+</svg>

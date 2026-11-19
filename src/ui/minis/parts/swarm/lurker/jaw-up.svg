@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-54 -22 60 32" data-part="swarm.lurker.jaw-up" data-recoil="0">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Trapjaw, upper blade: a long hooked mandible with a row of ivory teeth (hinge at 0,0, tip at -x)</title>
+<path d="M-12,-2.6 L-10,3 L-7,-1.4 L-4,4.4 L-1,0 M-24,-6 L-22,-0.6 L-19,-5 L-17,0.6 L-14,-3.6 M-36,-9.6 L-34,-4 L-31,-8.6 L-29,-3 L-26,-7.4" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M3,-6 Q-20,-15 -42,-19 Q-52,-19 -52,-8 Q-50,-1 -46,1 Q-47,-6 -42,-10 Q-20,-6 3,6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M3,6 Q-20,-6 -42,-10 Q-47,-6 -46,1 Q-49,-1 -50,-4 Q-46,-12 -40,-13 Q-18,-9 3,1 Z" fill="#6c5a37"/>
+<path d="M-8,-11 Q-22,-16 -38,-17" fill="none" stroke="#e3d8b6" stroke-width="2" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-48" cy="-2" r="1"/></g>
+</svg>

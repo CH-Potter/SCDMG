@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="32 92 60 101" data-part="concord.warden.side.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warden's bell robe: navy pleats, a pearl tabard down the front, gold hem; no feet show</title>
+<path d="M52,96 L71,96 L89,188 L35,188 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64,96 L71,96 L89,188 L72,188 Z" fill="#44432f"/>
+<path d="M53,98 L60,98 L56,186 L41,186 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M57,98 L60,98 L56,186 L51,186 Z" fill="#6c5a37"/>
+<path d="M66,104 L74,186 M71,110 L82,186" stroke="#141414" stroke-width="1.4"/>
+<path d="M35,188 L89,188 L88,182 L36.4,182 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M47,150 L50.6,145 L54.2,150 L50.6,155 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M49.4,150 L50.6,148.4 L51.8,150 L50.6,151.6 Z" fill="#f2b84b"/>
+<g class="detail"><path d="M45.6,120 L56.6,120 M44,160 L55.4,160" stroke="#6e4528" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="100" r="1"/></g>
+</svg>

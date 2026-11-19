@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -16 140 30" data-part="militia.marksman.side.varmint-rifle" data-recoil="5">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Scoped varmint rifle, longer than its owner (muzzle at the left), folded bipod, tally on the stock</title>
+<path d="M37,2 L58,4 L58,7 L37,5 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="0" y="-1.9" width="72" height="3.8" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="-4" y="-3.4" width="9" height="6.8" rx="1" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M50,-3.2 L92,-3.8 L92,4.6 L54,3.8 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M54,1.6 L92,2.2 L92,4.6 L54,3.8 Z" fill="#4a2e19"/>
+<path d="M88,-5.2 L108,-5.2 L109,5.4 L88,5.4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M82,-5 V-8 M98,-5 V-8" stroke="#141414" stroke-width="2.4"/>
+<rect x="76" y="-12.6" width="28" height="5.6" rx="1.4" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<path d="M70,-14 L77,-12.8 L77,-6.8 L70,-5.6 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M71.2,-12.4 L71.2,-7.2" stroke="#f2b84b" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M106,-4 L130,-7.4 L131.4,9 L118,7.2 L106,5.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M108,2.4 L131,5 L131.4,9 L118,7.2 L108,5.4 Z" fill="#4a2e19"/>
+<path d="M98,5.4 Q100,11 104.6,10.4 L105,5.4" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M114,-2 v4 M116.4,-2.3 v4 M118.8,-2.6 v4 M121.2,-2.9 v4 M112,-0.4 l11.6,-1.4" stroke="#e3d8b6" stroke-width="0.9"/><circle cx="91" cy="-2.6" r="1" fill="#c8bd98"/><circle cx="104" cy="-2.6" r="1" fill="#c8bd98"/><path d="M8,-1 h22 M36,-1 h10" stroke="#b9bfc4" stroke-width="0.9"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="62" cy="2" r="1"/><circle id="g2" cx="101" cy="5" r="1"/><circle id="muzzle" cx="-5" cy="0" r="1"/></g>
+</svg>

@@ -3,8 +3,8 @@
 // poses can be snapshot-tested. Limbs are two-bone IK chains solved from the shoulder/hip to the
 // weapon grip/foot target, so any weapon fits any frame: the arms follow its grips.
 
-import { readPart } from "./svg";
-import type { BoneRef, Channels, LimbDef, Mat, Pt, RigDef } from "./types";
+import { readPart, type PartInfo } from "./svg";
+import type { BoneRef, Channels, LimbDef, Mat, PartUse, Pt, RigDef } from "./types";
 
 export const IDENT: Mat = [1, 0, 0, 1, 0, 0];
 const DEG = Math.PI / 180;
@@ -26,7 +26,11 @@ export const rotAbout = (rad: number, p: Pt): Mat => (rad === 0 ? IDENT : mul(tr
 export const apply = (m: Mat, p: Pt): Pt => ({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5] });
 export const angle = (a: Pt, b: Pt): number => Math.atan2(b.y - a.y, b.x - a.x);
 const len = (a: Pt, b: Pt): number => Math.hypot(b.x - a.x, b.y - a.y);
-export const placeMat = (p: { x: number; y: number; rot: number } | undefined): Mat => (p ? mul(tr(p.x, p.y), rot(p.rot * DEG)) : IDENT);
+export const placeMat = (p: { x: number; y: number; rot: number; scale?: number } | undefined): Mat => {
+  if (!p) return IDENT;
+  const m = mul(tr(p.x, p.y), rot(p.rot * DEG));
+  return p.scale && p.scale !== 1 ? mul(m, scl(p.scale, p.scale)) : m;
+};
 
 export const ZERO: Readonly<Channels> = {
   rootX: 0,
@@ -51,6 +55,9 @@ export const ZERO: Readonly<Channels> = {
   drain: 0,
   fade: 0,
   muzzle: 0,
+  pulse: 0,
+  spin: 0,
+  flap: 0,
 };
 
 export interface IkResult {
@@ -111,7 +118,57 @@ export interface Pose {
   figure: Mat;
 }
 
+/** What posing needs from a rig that never changes: looked up once per rig, not every frame. */
+interface RigStatics {
+  wpn: PartUse | undefined;
+  wInfo: PartInfo | null;
+  place: Mat;
+  carry: { x: number; y: number; rot: number };
+  back: Pt;
+  /** Part placement matrices, and for animated parts their pivot (part coords). */
+  partPlace: Mat[];
+  partPivot: (Pt | null)[];
+  /** Where the muzzle sits when there's no weapon: the top centre of the figure (frame coords). */
+  top: Pt;
+  /** Each limb's drawable and bone names, made once (no string building per frame). */
+  limbKeys: { upper: string; lower: string; mid: string; end: string }[];
+}
+
+const staticCache = new WeakMap<RigDef, RigStatics>();
+function statics(rig: RigDef): RigStatics {
+  let s = staticCache.get(rig);
+  if (s) return s;
+  const wpn = rig.weapon ? rig.parts.find((p) => p.id === rig.weapon) : undefined;
+  const wInfo = wpn ? readPart(wpn.src) : null;
+  const carry = wpn?.place ?? { x: 0, y: 0, rot: 0 };
+  s = {
+    wpn,
+    wInfo,
+    place: placeMat(wpn?.place),
+    carry,
+    back: { x: Math.cos(carry.rot * DEG), y: Math.sin(carry.rot * DEG) },
+    partPlace: rig.parts.map((p) => placeMat(p.place)),
+    partPivot: rig.parts.map((p) => (p.anim ? (readPart(p.src).anchors.pivot ?? { x: 0, y: 0 }) : null)),
+    top: rig.view === "side" ? { x: rig.origin.x, y: rig.origin.y - rig.height * 0.8 } : { x: rig.origin.x, y: rig.origin.y - rig.height * 0.3 },
+    limbKeys: rig.limbs.map((l) => ({ upper: `${l.id}.upper`, lower: `${l.id}.lower`, mid: `${l.id}.mid`, end: `${l.id}.end` })),
+  };
+  staticCache.set(rig, s);
+  return s;
+}
+
+/** Ground one walk cycle covers (u): the rig's own, or twice the stance sweep of its first leg. */
+export function strideOf(rig: RigDef): number {
+  if (rig.stride) return rig.stride;
+  const keys = rig.gait;
+  if (!keys?.length) return 60;
+  const leg = Object.keys(keys[0]!)[0]!;
+  const vals = keys.map((k) => (rig.view === "side" ? k[leg]?.x : k[leg]?.y) ?? 0);
+  return Math.max(8, (Math.max(...vals) - Math.min(...vals)) * 2);
+}
+
 const smooth = (t: number) => t * t * (3 - 2 * t);
+/** A bone that carries rest point `restP` to `p`, turned by `a - restA`. */
+const seg = (p: Pt, a: number, restP: Pt, restA: number): Mat => mul(tr(p.x, p.y), mul(rot(a - restA), tr(-restP.x, -restP.y)));
 
 /** Foot target of a leg for gait position `g` (wraps), blended with the stand pose by `w`. */
 function footTarget(rig: RigDef, limb: LimbDef, g: number, w: number): Pt {
@@ -120,26 +177,41 @@ function footTarget(rig: RigDef, limb: LimbDef, g: number, w: number): Pt {
   const n = keys.length;
   const gg = ((g % n) + n) % n;
   const i = Math.floor(gg);
-  const t = smooth(gg - i);
   const a = keys[i]![limb.id] ?? limb.end;
   const b = keys[(i + 1) % n]![limb.id] ?? limb.end;
+  // a planted foot slides back at a steady rate (the body's walking speed); a swinging one eases
+  const planted = rig.view === "top" || (a.y >= limb.end.y - 0.5 && b.y >= limb.end.y - 0.5);
+  const t = planted ? gg - i : smooth(gg - i);
   const p = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
   const k = Math.min(1, w);
   return { x: limb.end.x + (p.x - limb.end.x) * k, y: limb.end.y + (p.y - limb.end.y) * k };
 }
 
-/** Pose a rig. All angles in channels are degrees, clockwise. */
-export function poseRig(rig: RigDef, c: Channels): Pose {
+/** A part's own motion (PartAnim) about its pivot, in part coords. */
+function animMat(p: PartUse, pivot: Pt, c: Channels): Mat {
+  const a = p.anim!;
+  const pulse = c.pulse;
+  let m: Mat = IDENT;
+  const sx = 1 + (a.pulse ?? 0) * pulse;
+  const sy = sx * (1 - (a.flap ?? 0) * c.flap);
+  if (sx !== 1 || sy !== 1) m = mul(tr(pivot.x, pivot.y), mul(scl(sx, sy), tr(-pivot.x, -pivot.y)));
+  if (a.spin) m = mul(rotAbout(c.spin * a.spin * DEG, pivot), m);
+  if (a.float) m = mul(tr(0, pulse * a.float), m);
+  return m;
+}
+
+/** Pose a rig. All angles in channels are degrees, clockwise. Pass `out` to reuse its maps. */
+export function poseRig(rig: RigDef, c: Channels, out?: Pose): Pose {
+  const st = statics(rig);
   const o = rig.origin;
   const pelvis = tr(c.pelvisX, c.pelvisY);
   const torso = mul(pelvis, rotAbout(c.torsoRot * DEG, rig.pivots.torso));
   const head = mul(torso, rotAbout(c.headRot * DEG, rig.pivots.head));
-  const wpn = rig.parts.find((p) => p.id === rig.weapon);
-  const wInfo = wpn ? readPart(wpn.src) : null;
-  const place = placeMat(wpn?.place);
-  const carry = wpn?.place ?? { x: 0, y: 0, rot: 0 };
+  const wInfo = st.wInfo;
+  const place = st.place;
+  const carry = st.carry;
   // recoil pushes the weapon back along its barrel (part +x runs from the muzzle to the stock)
-  const back = { x: Math.cos(carry.rot * DEG), y: Math.sin(carry.rot * DEG) };
+  const back = st.back;
   const kick = c.kick * (wInfo?.recoil ?? 0);
   // the gun bone moves the weapon; `gun` (bone · placement) maps the weapon's own coords
   const gunBone = mul(torso, mul(tr(c.gunX + back.x * kick, c.gunY + back.y * kick), rotAbout(c.gunRot * DEG, carry)));
@@ -152,9 +224,11 @@ export function poseRig(rig: RigDef, c: Channels): Pose {
     mul(rot(c.rootRot * DEG), mul(scl(1 + c.rootSX, 1 + c.rootSY), tr(-o.x, -o.y))),
   );
 
-  const mats = new Map<string, Mat>();
-  const limbs = new Map<string, PosedLimb>();
-  for (const l of rig.limbs) {
+  const mats = out?.mats ?? new Map<string, Mat>();
+  const limbs = out?.limbs ?? new Map<string, PosedLimb>();
+  for (let li = 0; li < rig.limbs.length; li++) {
+    const l = rig.limbs[li]!;
+    const key = st.limbKeys[li]!;
     const rest = limbRest(l);
     const from = bones[l.from.bone]!;
     const root = apply(from, l.from.at);
@@ -163,33 +237,49 @@ export function poseRig(rig: RigDef, c: Channels): Pose {
     else if (l.kind === "leg") {
       // Flyers' legs hang from the hips; walkers' feet go to the gait targets on the ground.
       target = c.lift > 0.5 ? apply(pelvis, { x: l.end.x - 3, y: l.end.y - 4 }) : footTarget(rig, l, c.gait, c.gaitW);
-    } else target = apply(from, l.end);
+    } else target = apply(l.to ? bones[l.to]! : from, l.end);
     const ik = solveIk(root, target, rest.l1, rest.l2, rest.bend);
     const a1 = angle(root, ik.joint);
     const a2 = angle(ik.joint, ik.end);
     limbs.set(l.id, { root, joint: ik.joint, end: ik.end, a1, a2 });
-    mats.set(`${l.id}.upper`, mul(figure, mul(tr(root.x, root.y), rot(a1))));
-    mats.set(`${l.id}.lower`, mul(figure, mul(tr(ik.joint.x, ik.joint.y), rot(a2))));
-    const seg = (p: Pt, a: number, restP: Pt, restA: number): Mat => mul(tr(p.x, p.y), mul(rot(a - restA), tr(-restP.x, -restP.y)));
-    bones[`${l.id}.upper`] = seg(root, a1, l.from.at, rest.a1);
-    bones[`${l.id}.lower`] = seg(ik.joint, a2, l.joint, rest.a2);
-    bones[`${l.id}.mid`] = seg(ik.joint, (a1 - rest.a1 + a2 - rest.a2) / 2, l.joint, 0);
+    mats.set(key.upper, mul(figure, mul(tr(root.x, root.y), rot(a1))));
+    mats.set(key.lower, mul(figure, mul(tr(ik.joint.x, ik.joint.y), rot(a2))));
+    bones[key.upper] = seg(root, a1, l.from.at, rest.a1);
+    bones[key.lower] = seg(ik.joint, a2, l.joint, rest.a2);
+    bones[key.mid] = seg(ik.joint, (a1 - rest.a1 + a2 - rest.a2) / 2, l.joint, 0);
     // feet stay flat on the ground and only tip when lifted; hands don't turn
-    const lifted = l.kind === "leg" ? Math.max(0, Math.min(1, (l.end.y - ik.end.y) / 6)) : 0;
-    bones[`${l.id}.end`] = seg(ik.end, l.kind === "leg" ? (a2 - rest.a2) * 0.6 * lifted : 0, l.end, 0);
+    const lifted = l.kind === "leg" && rig.view === "side" ? Math.max(0, Math.min(1, (l.end.y - ik.end.y) / 6)) : 0;
+    bones[key.end] = seg(ik.end, l.kind === "leg" ? (a2 - rest.a2) * 0.6 * lifted : 0, l.end, 0);
   }
 
-  for (const p of rig.parts) {
+  for (let i = 0; i < rig.parts.length; i++) {
+    const p = rig.parts[i]!;
     const b = bones[p.bone as BoneRef] ?? IDENT;
-    mats.set(p.id, mul(figure, mul(b, placeMat(p.place))));
+    const pv = st.partPivot[i];
+    const local = pv ? mul(st.partPlace[i]!, animMat(p, pv, c)) : st.partPlace[i]!;
+    mats.set(p.id, mul(figure, mul(b, local)));
   }
 
-  const muzzleLocal = wInfo?.anchors.muzzle ?? { x: 0, y: 0 };
-  const gunFig = mul(figure, gun);
-  const muzzle = apply(gunFig, muzzleLocal);
-  const ahead = apply(gunFig, { x: muzzleLocal.x - 10, y: muzzleLocal.y });
-  const L = Math.hypot(ahead.x - muzzle.x, ahead.y - muzzle.y) || 1;
-  return { mats, limbs, muzzle, muzzleDir: { x: (ahead.x - muzzle.x) / L, y: (ahead.y - muzzle.y) / L }, figure };
+  let muzzle: Pt;
+  let muzzleDir: Pt;
+  if (wInfo) {
+    const muzzleLocal = wInfo.anchors.muzzle ?? { x: 0, y: 0 };
+    const gunFig = mul(figure, gun);
+    muzzle = apply(gunFig, muzzleLocal);
+    const ahead = apply(gunFig, { x: muzzleLocal.x - 10, y: muzzleLocal.y });
+    const L = Math.hypot(ahead.x - muzzle.x, ahead.y - muzzle.y) || 1;
+    muzzleDir = { x: (ahead.x - muzzle.x) / L, y: (ahead.y - muzzle.y) / L };
+  } else {
+    muzzle = apply(figure, st.top);
+    muzzleDir = rig.view === "side" ? { x: -1, y: 0 } : { x: 0, y: -1 };
+  }
+  if (out) {
+    out.muzzle = muzzle;
+    out.muzzleDir = muzzleDir;
+    out.figure = figure;
+    return out;
+  }
+  return { mats, limbs, muzzle, muzzleDir, figure };
 }
 
 /** Draw order: parts and limb segments sorted by z (ties: manifest order). */

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-19 -9 22 18" data-part="swarm.skitter.side.head" data-recoil="0">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Skitterling head: a blunt chitin wedge with snipping mandibles (neck at 0,0)</title>
+<path d="M-15,4 Q-17,6 -16.4,8 Q-12,8 -10,4.4 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M2,-2 Q1,-7 -6,-7.4 Q-13,-7 -14.6,-1 Q-15,4 -10,5.4 Q-3,6.6 1.6,3 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M1.6,1 Q-3,5.4 -10,4.6 Q-13,4 -14,1.6 Q-8,3 -3,2 Q0,1 1.6,-1 Z" fill="#6c5a37"/>
+<path d="M-15.6,2.4 Q-18.4,4.4 -17.6,7.4 Q-14,7.4 -12,3.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-9,-5.6 Q-5,-7 -1,-5.4" fill="none" stroke="#e3d8b6" stroke-width="1.4" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="-17" cy="5" r="1"/></g>
+</svg>
