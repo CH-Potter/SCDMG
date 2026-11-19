@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -2 28 28" data-part="forge.regiment.top.medic-pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Medic's pack from above: the white band, the stretcher roll and the lamp</title>
+<rect x="-12" y="16" width="24" height="7" rx="3.5" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<rect x="-10" y="3" width="20" height="16" rx="2" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-10,10 H10" stroke="#6e4528" stroke-width="4"/>
+<circle class="glow" cx="0" cy="4" r="4" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

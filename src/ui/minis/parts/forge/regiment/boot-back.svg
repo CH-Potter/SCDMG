@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="49 163 35 28" data-part="forge.regiment.side.boot-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far boot: a big hobnailed ammo boot caked in mud</title>
+<path d="M61,166 L78,166 L79,185 L52,185 Q51,178 58,176 Z" fill="#25282c" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M51.6,180.4 Q57,176.6 63,179.6 Q69,176.4 74,179.4 Q77,177.6 79,179 L79,185 L52,185 Z" fill="#44432f"/>
+<path d="M50,185 L81,185 L81,189 L50,189 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M63,170 H77" stroke="#5d5b45" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="170" r="1"/></g>
+</svg>

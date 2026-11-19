@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 1 28 30" data-part="forge.regiment.top.pack-crates">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Loader's frame from above: two ammunition crates</title>
+<rect x="-11" y="4" width="22" height="12" rx="1.4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="-10" y="15" width="20" height="13" rx="1.4" fill="#6c5a37" stroke="#141414" stroke-width="2.4"/>
+<path d="M-4,4.6 V15.4 M4,4.6 V15.4 M-4,15.6 V27.4 M4,15.6 V27.4" stroke="#6e4528" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

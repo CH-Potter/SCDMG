@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-36 -82 72 146" data-part="forge.regiment.top.barge" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sky Barge from above: the cab and windscreen forward, the open cargo bed full of troopers' helmets, team-painted bed rails</title>
+<path d="M-24,-60 Q-24,-76 -10,-76 L10,-76 Q24,-76 24,-60 L24,-44 L-24,-44 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-20,-60 Q-20,-70 -10,-70 L10,-70 Q20,-70 20,-60 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="-30" y="-46" width="60" height="104" rx="4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M20,-45.4 H26 Q29.4,-45.4 29.4,-42 V54 Q29.4,57.4 26,57.4 H20 Z" fill="#6c5a37"/>
+<rect x="-22" y="-38" width="44" height="88" rx="2" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-30,-30 L-22,-30 L-22,50 L-30,50 Z M22,-30 L30,-30 L30,50 L22,50 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-10" cy="-22" r="7.4" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="-10" cy="-22" r="4.2" fill="#9a8458" stroke="#141414" stroke-width="1.4"/>
+<circle cx="10" cy="-20" r="7.4" fill="#6c5a37" stroke="#141414" stroke-width="2"/>
+<circle cx="10" cy="-20" r="4.2" fill="#6c5a37" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-10" cy="2" r="7.4" fill="#6c5a37" stroke="#141414" stroke-width="2"/>
+<circle cx="-10" cy="2" r="4.2" fill="#6c5a37" stroke="#141414" stroke-width="1.4"/>
+<circle cx="10" cy="4" r="7.4" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="10" cy="4" r="4.2" fill="#9a8458" stroke="#141414" stroke-width="1.4"/>
+<circle cx="-8" cy="26" r="7.4" fill="#9a8458" stroke="#141414" stroke-width="2"/>
+<circle cx="-8" cy="26" r="4.2" fill="#9a8458" stroke="#141414" stroke-width="1.4"/>
+<path d="M-22,40 Q-12,36 0,40 Q12,36 22,40" fill="none" stroke="#44432f" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

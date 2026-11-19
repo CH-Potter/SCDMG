@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-7 -9 79 18" data-part="forge.regiment.side.tank-cannon" data-recoil="8">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Battle cannon: a long barrel with a fume extractor and a muzzle brake (muzzle left)</title>
+<rect x="0" y="-3.2" width="64" height="6.4" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<ellipse cx="32" cy="0" rx="9" ry="5" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<rect x="-5" y="-5.4" width="11" height="10.8" rx="1.4" fill="#25282c" stroke="#141414" stroke-width="2.4"/>
+<rect x="62" y="-6.6" width="9" height="13.2" rx="1.4" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path class="detail" d="M12,-1.6 H26" stroke="#b9bfc4" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="66" cy="0" r="1"/><circle id="muzzle" cx="-5" cy="0" r="1"/></g>
+</svg>

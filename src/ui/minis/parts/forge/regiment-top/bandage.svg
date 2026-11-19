@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 12 12" data-part="forge.regiment.top.bandage">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>A gloved hand with a bandage roll, from above</title>
+<circle cx="0" cy="1" r="3.4" fill="#5d5b45" stroke="#141414" stroke-width="1.4"/>
+<ellipse cx="0" cy="-2" rx="3.6" ry="2.6" fill="#e3d8b6" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

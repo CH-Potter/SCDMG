@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -16 60 46" data-part="forge.regiment.top.torso-scout">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sniper scout from above: the ghillie cape, a shaggy mound of leaf tufts, team rags tied at both shoulders</title>
+<path d="M-18,-8 Q0,-14 18,-8 Q24,0 22,12 Q16,22 0,22 Q-16,22 -22,12 Q-24,0 -18,-8 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-10 Q22,-4 22,12 Q16,22 4,22 Q20,8 12,-10 Z" fill="#4a2e19"/>
+<path d="M-16.6,-3 Q-21.4,-7.2 -27.4,-5 Q-22.6,-0.8 -16.6,-3 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-17.8,6.1 Q-24.1,5 -28.2,9.9 Q-21.9,11 -17.8,6.1 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-13.3,13.2 Q-18.8,16.4 -18.8,22.8 Q-13.2,19.6 -13.3,13.2 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M16.6,-3 Q22.6,-0.8 27.4,-5 Q21.4,-7.2 16.6,-3 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M17.8,6.1 Q21.9,11 28.2,9.9 Q24.1,5 17.8,6.1 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M13.2,13.2 Q13.2,19.6 18.8,22.8 Q18.8,16.4 13.2,13.2 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-0,16.5 Q-3.2,22 0,27.5 Q3.2,22 -0,16.5 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-13.9,3.8 Q-11.3,8.3 -6.1,8.2 Q-8.7,3.7 -13.9,3.8 Z" fill="#9a8458"/>
+<path d="M13.4,5.1 Q8.3,6 6.6,10.9 Q11.7,10 13.4,5.1 Z" fill="#9a8458"/>
+<path d="M-0.8,7.6 Q-2.6,12.5 0.8,16.4 Q2.6,11.5 -0.8,7.6 Z" fill="#4a2e19"/>
+<path class="tag" d="M-21,-4 L-14,-6 L-13,6 L-20,7 Z M21,-4 L14,-6 L13,6 L20,7 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

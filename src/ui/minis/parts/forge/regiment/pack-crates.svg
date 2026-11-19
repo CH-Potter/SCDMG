@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 18 44 92" data-part="forge.regiment.side.pack-crates">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Loader's carrying frame stacked with two ammunition crates</title>
+<path d="M66,30 L68,106 M86,30 L88,106" stroke="#2b2019" stroke-width="3.6"/>
+<path d="M63,64 L91,66 L92,100 L66,102 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M84,65.6 L91,66 L92,100 L85,100.6 Z" fill="#6c5a37"/>
+<path d="M64,76 L91,78 M65,90 L91.6,91" stroke="#6e4528" stroke-width="3"/>
+<path d="M65,36 L89,37 L90,64 L66,64 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M83,36.8 L89,37 L90,64 L84,64 Z" fill="#6c5a37"/>
+<path d="M66,46 L89.6,47 M66,56 L90,57" stroke="#6e4528" stroke-width="3"/>
+<rect x="72" y="30" width="10" height="5" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<rect x="72" y="60" width="10" height="5" rx="1.4" fill="#4a5158" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/></g>
+</svg>

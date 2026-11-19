@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-46 -96 34 60" data-part="forge.regiment.side.flag">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Mortar Pit's marker flag: a team pennant on a stick</title>
+<rect x="-40" y="-92" width="3" height="56" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-37,-90 L-14,-82 L-37,-73 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M-37,-79 L-23,-79.6 L-37,-73 Z" fill="#b000b0"/>
+<g id="anchors"><circle id="pivot" cx="-38.5" cy="-40" r="1"/></g>
+</svg>

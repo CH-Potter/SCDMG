@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -18 36 36" data-part="forge.regiment.top.hood-scout">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Ghillie hood from above: a leafy cowl</title>
+<circle cx="0" cy="-1" r="11.4" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M7,-10 A11.4,11.4 0 0 1 -4,9.6 Q8,4 7,-10 Z" fill="#4a2e19"/>
+<path d="M-6,-11 Q0,-14 6,-11 L4,-8 Q0,-10 -4,-8 Z" fill="#44432f"/>
+<path d="M-8.6,-5.1 Q-10.3,-10 -15.4,-10.9 Q-13.7,-6 -8.6,-5.1 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-8.5,2 Q-13,-0.6 -17.5,2 Q-13,4.6 -8.5,2 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-5.1,6.6 Q-10,8.3 -10.9,13.4 Q-6,11.7 -5.1,6.6 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M8.6,-5.1 Q13.7,-6 15.4,-10.9 Q10.3,-10 8.6,-5.1 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M8.5,2 Q13,4.6 17.5,2 Q13,-0.6 8.5,2 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M5.1,6.6 Q6,11.7 10.9,13.4 Q10,8.3 5.1,6.6 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-0,7.5 Q-2.6,12 0,16.5 Q2.6,12 -0,7.5 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

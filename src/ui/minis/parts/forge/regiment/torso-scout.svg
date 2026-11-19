@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 46 66 96" data-part="forge.regiment.side.torso-scout">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sniper scout: a shaggy ghillie cape of leaf tufts over the greatcoat skirts, team scarf at the throat</title>
+<path d="M62,102 L80,99 L85,134 L66,138 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M65,131 Q72,128 76,131 Q81,128 84.6,131 L85,134 L66,138 Z" fill="#44432f"/>
+<path d="M43,103 L62,105 L61,140 L37,137 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M55,104.4 L62,105 L61,140 L54,139.2 Z" fill="#6c5a37"/>
+<path d="M37.6,132.6 Q42,129.6 46,132.4 Q51,129 55,132.6 Q58,130.6 61.2,133 L61,140 L37,137 Z" fill="#44432f"/>
+<path d="M43,64 Q50,54 62,54 Q78,55 85,66 L88,96 L84,99 L86,108 L80,105 L78,114 L72,107 L66,115 L62,107 L56,114 L52,106 L46,111 L45,103 L40,105 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M76,58 Q83,62 85,66 L88,96 L84,99 L86,108 L80,105 L78,110 Q82,84 76,58 Z" fill="#4a2e19"/>
+<path d="M50.1,68.2 Q45.2,62.6 37.9,63.8 Q42.8,69.4 50.1,68.2 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M46.5,84 Q40,80.4 33.5,84 Q40,87.6 46.5,84 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M48.4,98.9 Q41.4,96.5 35.6,101.1 Q42.6,103.5 48.4,98.9 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M80.4,73.2 Q87.8,73.1 91.6,66.8 Q84.2,66.9 80.4,73.2 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M82.5,88 Q89,91.6 95.5,88 Q89,84.4 82.5,88 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M60,62.5 Q63.6,56 60,49.5 Q56.4,56 60,62.5 Z" fill="#4a2e19" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M69.8,62.1 Q75.4,57.2 74.2,49.9 Q68.6,54.8 69.8,62.1 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M54.2,63 Q52.8,55.7 45.8,53 Q47.2,60.3 54.2,63 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M49.2,71.2 Q49.4,77.5 54.8,80.8 Q54.6,74.5 49.2,71.2 Z" fill="#4a2e19"/>
+<path d="M58.8,68.1 Q63,72.8 69.2,71.9 Q65,67.2 58.8,68.1 Z" fill="#9a8458"/>
+<path d="M71.9,82.8 Q67.2,87 68.1,93.2 Q72.8,89 71.9,82.8 Z" fill="#4a2e19"/>
+<path d="M61.2,92.1 Q55,91.2 50.8,95.9 Q57,96.8 61.2,92.1 Z" fill="#9a8458"/>
+<path d="M75,72.6 Q73,78.5 77,83.4 Q79,77.5 75,72.6 Z" fill="#9a8458"/>
+<path d="M57.2,99.2 Q60.5,104.6 66.8,104.8 Q63.5,99.4 57.2,99.2 Z" fill="#4a2e19"/>
+<path class="tag" d="M46,60.6 Q60,57 74,60 L74.4,67 Q60,63.6 45.6,67.6 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M45,66 L52,66.4 L50.4,80 L44.4,78 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>
