@@ -351,6 +351,8 @@ export class RigMini {
       if (p.id !== "death" && p.t >= clips[p.id].dur) this.playing.splice(i, 1);
     }
     if (view === "side" && flying) c.lift += d.lift * rig.unitsPerInch * w.flying;
+    // idle and bob both beat the wings of a hovering flyer: one full beat at most
+    if (c.flap > 1) c.flap = 1;
 
     // ---- facing ----
     if (view === "side") {

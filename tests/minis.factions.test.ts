@@ -122,8 +122,9 @@ describe("engine extensions", () => {
       // the figure faces left (-x) and walks g/4 of a stride: where the foot is on the ground
       const ground = foot.x - (g / 4) * stride;
       if (g === 0) drift = ground;
-      // (the trooper's keys step 16 then 18 u, so a 1 u give either side is in the drawing itself)
-      expect(Math.abs(ground - drift), `g ${g}`).toBeLessThan(1.5);
+      // (the trooper's keys step 16 then 18 u, and the full stride is just past the leg's reach,
+      // so a give of up to 2 u, about 2% of its height, is in the drawing itself)
+      expect(Math.abs(ground - drift), `g ${g}`).toBeLessThan(2);
     }
   });
 

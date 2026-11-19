@@ -343,13 +343,14 @@ function readoutText(): string {
 
 // ---------- panel ----------
 
-function btn(text: string, on: () => void, pressed?: () => boolean, title?: string): HTMLButtonElement {
+function btn(text: string, on: () => void, pressed?: () => boolean, title?: string, rebuild = true): HTMLButtonElement {
   const b = document.createElement("button");
   b.textContent = text;
   if (title) b.title = title;
   b.onclick = () => {
     on();
-    render();
+    // one-shot clips play on the models already there (a rebuild would make new ones)
+    if (rebuild) render();
   };
   if (pressed) b.setAttribute("aria-pressed", String(pressed()));
   return b;
@@ -455,7 +456,7 @@ function render(rebuild = true): void {
     "Clips",
     btn("Idle", () => (S.walking = false), () => !S.walking),
     btn("Step (walk)", () => (S.walking = !S.walking), () => S.walking),
-    ...(["recoil", "flinch", "death"] as ClipId[]).map((id) => btn(id[0]!.toUpperCase() + id.slice(1), () => playAll(id))),
+    ...(["recoil", "flinch", "death"] as ClipId[]).map((id) => btn(id[0]!.toUpperCase() + id.slice(1), () => playAll(id), undefined, undefined, false)),
     btn("Flyer bob", () => (S.flying = !S.flying), () => S.flying),
   );
   section(
