@@ -248,6 +248,71 @@ function wasps(v: LookVariant): Look {
   return { side: s, top: t };
 }
 
+// ---------- Dr. Graft and Big Mama ----------
+
+function mama(): Look {
+  const id = "forge.munch.mama";
+  const paw = side("claw-paw");
+  const sl = legs(
+    "side",
+    [
+      { id: "nF", hip: { x: -84, y: -78 }, knee: { x: -98, y: -42 }, foot: { x: -100, y: -2 }, near: true, a: true },
+      { id: "nR", hip: { x: 80, y: -80 }, knee: { x: 102, y: -44 }, foot: { x: 92, y: -2 }, near: true, a: false },
+      { id: "fF", hip: { x: -64, y: -84 }, knee: { x: -78, y: -48 }, foot: { x: -76, y: -2 }, near: false, a: false },
+      { id: "fR", hip: { x: 98, y: -86 }, knee: { x: 118, y: -50 }, foot: { x: 112, y: -2 }, near: false, a: true },
+    ],
+    { width: [26, 21], step: 14, lift: 10, z: [8, 1], slot: "suit", farSlot: "suitShade" },
+  );
+  const paws = sl.limbs.map((l) => ({ id: `${l.id}-paw`, src: paw, bone: `${l.id}.end` as PartUse["bone"], place: placeAt(paw, "pivot", { x: l.end.x + 4, y: 0 }, 0, 1.25), z: l.upper.z + 0.5 }));
+  const tx = side("transmitter");
+  const s = munchRig({
+    id,
+    name: "Dr. Graft and Big Mama",
+    view: "side",
+    k: 1.6,
+    limbInk: 2.4,
+    pivots: { torso: { x: 0, y: -110 }, head: { x: -112, y: -104 } },
+    parts: [
+      ...paws,
+      { id: "body", src: side("mama-body"), bone: "torso", z: 5 },
+      { id: "saddle", src: side("mama-saddle"), bone: "torso", z: 6 },
+      { id: "graft", src: side("graft"), bone: "torso", z: 7 },
+      at("transmitter", tx, "torso", 12, -276, 7.5, { anim: { pulse: 0.05 } }),
+      { id: "head", src: side("mama-head"), bone: "gun", place: { x: -114, y: -100, rot: 0 }, z: 9 },
+    ],
+    limbs: sl.limbs,
+    gait: sl.gait,
+    weapon: "head",
+  });
+  const tl = legs(
+    "top",
+    bothSides([
+      { id: "lF", hip: { x: -46, y: -62 }, knee: { x: -76, y: -70 }, foot: { x: -84, y: -92 }, a: true },
+      { id: "lR", hip: { x: -48, y: 66 }, knee: { x: -78, y: 78 }, foot: { x: -84, y: 100 }, a: false },
+    ]),
+    { width: [24, 20], step: 12, lift: 0, z: [1, 1], slot: "suit" },
+  );
+  const t = munchRig({
+    id,
+    name: "Dr. Graft and Big Mama",
+    view: "top",
+    k: 1.6,
+    limbInk: 2.4,
+    pivots: { torso: { x: 0, y: 0 }, head: { x: 0, y: -104 } },
+    parts: [
+      { id: "body", src: top("mama-body"), bone: "torso", z: 5 },
+      { id: "graft", src: top("graft"), bone: "torso", z: 7, anim: { pulse: 0.02 } },
+      { id: "head", src: top("mama-head"), bone: "gun", place: { x: 0, y: -100, rot: 0 }, z: 6 },
+    ],
+    limbs: tl.limbs,
+    gait: tl.gait,
+    weapon: "head",
+    shadow: { x: 10, y: 14, r: 110 },
+  });
+  // from above, the badger is drawn a touch smaller so she sits on her 1.4" base
+  return { side: s, top: scaleRig(t, 0.88) };
+}
+
 export default defineTemplateArt({
   key: "munch",
   colourway: (_f, spec) => munchColourway(spec.primary, "beetle"),
@@ -255,5 +320,6 @@ export default defineTemplateArt({
     nibblers: (ctx) => squad(ctx, "beetle", beetle),
     spitter: (ctx) => squad(ctx, "spider", spider),
     buzz: (ctx) => squad(ctx, "wasp", wasps),
+    mama: (ctx) => one(ctx, "badger", mama),
   },
 });
