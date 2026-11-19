@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="38 146 22 26" data-part="forge.bulwark.side.shin-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near greave: a broad shin plate</title>
+<path d="M41,149 L57,149 L55,169 L43,169 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M52,149.8 L56,149.8 L54.2,168.2 L50.6,168.2 Z" fill="#6c5a37"/>
+<g id="anchors"><circle id="pivot" cx="49" cy="152" r="1"/></g>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 -64 34 30" data-part="kit.beast.side.tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit beast tail with a tufted tip</title>
+<path d="M30,-50 Q44,-52 50,-58 Q56,-60 57,-54 Q52,-46 40,-42 Q34,-41 30,-44 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M50,-58 Q56,-63 58,-56 Q57,-50 52,-50 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="32" cy="-47" r="1"/></g>
+</svg>

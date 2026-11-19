@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 2 28 28" data-part="forge.bulwark.top.pack">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Reliquary pack from above: the peaked lid and its two candles</title>
+<rect x="-11" y="4" width="22" height="20" rx="2" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-11,14 L11,14" stroke="#141414" stroke-width="1.4"/>
+<path d="M-11,4 L0,14 L11,4 M-11,24 L0,14 L11,24" fill="none" stroke="#6e4528" stroke-width="2"/>
+<circle class="glow" cx="-5" cy="9" r="2" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="5" cy="19" r="2" fill="#f2b84b" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/></g>
+</svg>

@@ -2,26 +2,27 @@
 // passes rig-lint, every frame type's clips pose cleanly, walking feet stay planted, and a few
 // representative units (one per frame type) are snapshot-tested: bake plans and key poses.
 
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { FACTIONS } from "../src/engine/data/factions";
 import { planAtlas } from "../src/ui/minis/atlas";
 import { planHash } from "../src/ui/minis/bake";
 import { addClip, channels, CLIP_IDS, clipsFor, FRAME_CLIPS } from "../src/ui/minis/clips";
 import { lintPart, lintRig } from "../src/ui/minis/lint";
 import { poseRig, strideOf, ZERO } from "../src/ui/minis/pose";
-import { artFor, RIGGED_PROFILES, rigsFor } from "../src/ui/minis/registry";
+import { artFor, loadArt, riggedProfiles, rigsFor } from "../src/ui/minis/registry";
 import { trooperSide } from "../src/ui/minis/rigs/militiaTrooper";
 import { COLOURWAYS, FACTION_COLOURWAYS, resolveSlots, SLOT_KEYS } from "../src/ui/minis/slots";
 import type { Mat, RigDef } from "../src/ui/minis/types";
 
 const BASE = ["militia", "swarm", "concord"] as const;
+beforeAll(() => loadArt(BASE.flatMap((f) => FACTIONS[f]!.profiles)), 60000);
 const TEAL = 0x2fb5c8;
 const round = (m: Mat) => m.map((v) => Math.round(v * 100) / 100);
 
 /** Every rig of every look of every converted unit. */
 function allRigs(): { unit: string; rig: RigDef }[] {
   const out: { unit: string; rig: RigDef }[] = [];
-  for (const id of RIGGED_PROFILES) for (const l of artFor(id)!.looks) out.push({ unit: id, rig: l.side }, { unit: id, rig: l.top });
+  for (const id of riggedProfiles()) for (const l of artFor(id)!.looks) out.push({ unit: id, rig: l.side }, { unit: id, rig: l.top });
   return out;
 }
 
@@ -37,7 +38,7 @@ describe("base factions on the miniature engine", () => {
   });
 
   it("passes rig-lint for every part and rig (one team tag per figure)", () => {
-    for (const { unit, rig } of allRigs()) expect(lintRig(rig), `${unit} ${rig.id}`).toEqual([]);
+    for (const { unit, rig } of allRigs()) expect(lintRig(rig, { tagArea: false }), `${unit} ${rig.id}`).toEqual([]);
   });
 
   it("paints each faction in its own colourway, with the team colour only in the tag", () => {

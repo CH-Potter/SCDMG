@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="58 52 32 36" data-part="forge.bulwark.side.pad-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far shoulder slab, in shadow</title>
+<path d="M62,60 L84,57 Q88,58 88,62 L87,80 L64,83 Q61,82 61,79 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M63,77 L86,74" fill="none" stroke="#4a2e19" stroke-width="2.4"/>
+<g id="anchors"><circle id="pivot" cx="75" cy="72" r="1"/></g>
+</svg>

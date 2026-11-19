@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 46 40 76" data-part="forge.bulwark.side.jets">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Breacher bell-thrusters: two bronze bells hung mouth down, burning</title>
+<path d="M64,58 L86,60 L88,98 L68,100 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M88,62 Q92,62 92,72 L95,96 L81,97 L84,72 Q84,62 88,62 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M78,54 Q84,54 84,66 L88,98 L68,99 L72,66 Q72,54 78,54 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M80,55 Q84,56 84,66 L88,98 L82,98.4 Z" fill="#4a2e19"/>
+<path d="M66,98 L90,97 L91,102 L65,103 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M68,103 L88,102 L84,112 L72,112 Z" fill="#f2b84b"/>
+<circle cx="78" cy="52" r="3" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/><circle id="exhaust1" cx="78" cy="110" r="1"/><circle id="exhaust2" cx="88" cy="99" r="1"/></g>
+</svg>

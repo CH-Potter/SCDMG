@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 18 52 26" data-part="kit.humanoid.side.gear-hat">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit headgear: a wide-brimmed hat with a trim band</title>
+<path d="M49,38 Q47,21 60,20 Q72,21 71,37 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M64,21 Q72,24 71,37 L66,37.4 Q67,27 64,21 Z" fill="#4a2e19"/>
+<path d="M49,33 L71,31.6 L71,36 L49,37.6 Z" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M36,40.4 Q44,35 60,35.6 Q78,35 84,39 Q74,42.6 60,42 Q46,42.6 36,40.4 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M62,41.6 Q74,41.6 82,39.6 Q74,43 62,42.4 Z" fill="#4a2e19"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="38" r="1"/></g>
+</svg>

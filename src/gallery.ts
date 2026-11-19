@@ -11,6 +11,7 @@ import type { Faction, UnitProfile } from "./engine/types";
 import { figureDataUrl, figureSpec, paintSheet } from "./ui/art/figures";
 import { PLAYER_COLORS } from "./ui/art/palette";
 import { rigPortraitUrl } from "./ui/art/rigPortrait";
+import { loadAllArt } from "./ui/minis/registry";
 
 const q = new URLSearchParams(location.search);
 const which = q.get("faction") ?? "all";
@@ -93,7 +94,7 @@ function rigImg(url: string, w: number, h: number, ppi: number): HTMLImageElemen
 
 /** A new miniature's row: both teams large, both facings, idle and step, and a squad at board scale. */
 function rigRow(p: UnitProfile, view: "side" | "top"): HTMLElement | null {
-  const blue = rigPortraitUrl(p.id, { view, team: PLAYER_COLORS[0], base: true });
+  const blue = rigPortraitUrl(p, { view, team: PLAYER_COLORS[0], base: true });
   if (!blue) return null;
   const row = document.createElement("div");
   row.className = "row";
@@ -112,10 +113,10 @@ function rigRow(p: UnitProfile, view: "side" | "top"): HTMLElement | null {
     return wrap;
   };
   row.append(cell(rigImg(blue.url, blue.w, blue.h, ppi)));
-  const red = rigPortraitUrl(p.id, { view, team: PLAYER_COLORS[1], base: true, face: "left" })!;
+  const red = rigPortraitUrl(p, { view, team: PLAYER_COLORS[1], base: true, face: "left" })!;
   row.append(cell(rigImg(red.url, red.w, red.h, ppi)));
-  const idle = rigPortraitUrl(p.id, { view, clip: "idle", t: 1200 })!;
-  const step = rigPortraitUrl(p.id, { view, clip: "step", t: 70 })!;
+  const idle = rigPortraitUrl(p, { view, clip: "idle", t: 1200 })!;
+  const step = rigPortraitUrl(p, { view, clip: "step", t: 70 })!;
   const half = ppi / 2.2;
   const fr = cell(rigImg(idle.url, idle.w, idle.h, half), rigImg(step.url, step.w, step.h, half));
   fr.title = "idle | step";
@@ -123,7 +124,7 @@ function rigRow(p: UnitProfile, view: "side" | "top"): HTMLElement | null {
   const board = cell();
   board.classList.add("board");
   for (let i = 0; i < Math.min(6, p.models); i++) {
-    const m = rigPortraitUrl(p.id, { view, team: PLAYER_COLORS[0], base: true, model: i, face: i % 2 ? "left" : "right", ppi: BOARD_PPI })!;
+    const m = rigPortraitUrl(p, { view, team: PLAYER_COLORS[0], base: true, model: i, face: i % 2 ? "left" : "right", ppi: BOARD_PPI })!;
     board.append(rigImg(m.url, m.w, m.h, BOARD_PPI));
   }
   row.append(board);
@@ -164,6 +165,8 @@ function unitRow(p: UnitProfile, f: Faction): HTMLElement {
   return row;
 }
 
+// the new miniatures load lazily (one chunk per faction, template and the kits)
+await loadAllArt();
 const templates = TEMPLATES.filter((t) => which === "templates" || which === t.key).map((t) => t.faction);
 for (const f of [...Object.values(FACTIONS), ...templates]) {
   if (which !== "all" && which !== f.id && !templates.includes(f)) continue;

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -28 44 56" data-part="kit.humanoid.side.shield">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit off-hand: a heater shield with the team colour on its field</title>
+<path d="M-18,-24 L18,-24 L18,2 Q16,18 0,26 Q-16,18 -18,2 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-12,-18 L12,-18 L12,1 Q11,12 0,19 Q-11,12 -12,1 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M0,-18 L12,-18 L12,1 Q11,12 0,19 Z" fill="#b000b0"/>
+<path d="M-5,-8 L5,-8 L5,2 L0,8 L-5,2 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="-15" cy="-21" r="1" fill="#b9bfc4"/><circle cx="15" cy="-21" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

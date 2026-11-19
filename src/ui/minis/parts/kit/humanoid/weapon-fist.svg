@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -8 20 16" data-part="kit.humanoid.side.weapon-fist" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit weapon: a bare armoured fist (knuckles left)</title>
+<rect x="0" y="-6" width="12" height="12" rx="4" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<path d="M0.6,-2 H5 M0.6,2 H5" stroke="#141414" stroke-width="1.4"/>
+<path class="shade" d="M7,-5.4 h1 q3,0 3,3 v5 q0,3 -3,3 h-1 Z" fill="#353b41"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="7" cy="0" r="1"/><circle id="muzzle" cx="-2" cy="0" r="1"/></g>
+</svg>

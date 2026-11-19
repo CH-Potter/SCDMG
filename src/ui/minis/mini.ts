@@ -10,10 +10,10 @@
 import { ColorMatrixFilter, Container, Graphics, Matrix, Sprite, Texture } from "pixi.js";
 import { tierFor, type AtlasEntry } from "./atlas";
 import { releaseSkin, retainSkin, skinNow, skinReady, type Skin } from "./bake";
-import { addClip, channels, clipsFor, hunkerPose, resetChannels, statusPose } from "./clips";
+import { addClip, channels, clipsFor, hunkerPose, resetChannels, sampleChannel, statusPose } from "./clips";
 import { hexToNum } from "./color";
 import { Footprint } from "./footprint";
-import { drawOrder, poseRig, strideOf, type Pose } from "./pose";
+import { drawOrder, poseRig, strideOf, type PartChannels, type PhaseSampler, type Pose } from "./pose";
 import type { UnitRigs } from "./registry";
 import { readPart } from "./svg";
 import type { Channel, Channels, Clip, ClipId, Mat, Pt, RigDef, RigView, Status, Tier } from "./types";
@@ -56,6 +56,11 @@ interface Playing {
   t: number;
 }
 
+const PART_CHANNELS = ["pulse", "spin", "flap"] as const;
+
+/** A model's place in its squad, as a phase (0..1): the golden ratio spreads any squad size evenly. */
+export const modelPhase = (model: number): number => (model * 0.6180339887) % 1;
+
 type Weights = { hurt: number; engaged: number; shaken: number; hunkered: number; flying: number };
 type PoseList = [Channel, number][];
 
@@ -84,9 +89,15 @@ export class RigMini {
   private w: Weights = { hurt: 0, engaged: 0, shaken: 0, hunkered: 0, flying: 0 };
   private hunkered = false;
   private playing: Playing[] = [];
-  private time = Math.random() * 2400;
+  private time: number;
+  /** This model's offset (0..1) into its loops: squad mates don't breathe or step in lockstep. */
+  private phase: number;
   /** Walk cycle position in cycles (advanced by distance walked). */
   private walkPhase = 0;
+  /** The loop clips playing this frame and their times, for parts with their own phase offset. */
+  private loops: [Clip, number][] = [];
+  private hasPhased: boolean;
+  private phaseOut: PartChannels = { pulse: 0, spin: 0, flap: 0 };
   private wasWalking = false;
   private lastX = NaN;
   private lastY = NaN;
@@ -113,15 +124,23 @@ export class RigMini {
   private muzzleColour: number;
   private puffColour: number;
 
+  /**
+   * `phase`: the model's offset into its idle, walk and part loops (0..1; see `modelPhase`). Left
+   * out, a random one, so lone models on the table don't breathe together either.
+   */
   constructor(
     private rigs: UnitRigs,
     view: RigView,
     private team: number,
     private baseR: number,
+    phase?: number,
   ) {
     this.view = view;
     this.rig = view === "side" ? rigs.side : rigs.top;
     const rig = this.rig;
+    this.phase = phase ?? Math.random();
+    this.time = this.phase * clipsFor(rig).idle.dur;
+    this.hasPhased = rig.parts.some((p) => !!p.anim?.phase);
     const upi = rig.unitsPerInch;
     this.clips = clipsFor(rig);
     this.stride = strideOf(rig);
@@ -314,7 +333,8 @@ export class RigMini {
     const reduced = !!d.reduced;
     const clips = this.clips;
     this.time += dt;
-    if (d.walking && !this.wasWalking) this.walkPhase = 0;
+    // squad mates start their walk on different feet
+    if (d.walking && !this.wasWalking) this.walkPhase = this.phase;
     this.wasWalking = d.walking;
     if (d.walking) {
       // planted feet: one walk cycle per stride of ground actually covered (time only if it isn't moving)
@@ -325,10 +345,13 @@ export class RigMini {
     this.lastY = d.y;
     const c = resetChannels(this.c);
     const view = this.view;
+    const loops = this.loops;
+    loops.length = 0;
     if (!reduced && !this.dead) {
-      if (d.walking) addClip(c, clips.step, this.walkPhase * clips.step.dur);
-      else addClip(c, clips.idle, this.time);
-      if (flying) addClip(c, clips.bob, this.time);
+      if (d.walking) loops.push([clips.step, this.walkPhase * clips.step.dur]);
+      else loops.push([clips.idle, this.time]);
+      if (flying) loops.push([clips.bob, this.time]);
+      for (const [clip, t] of loops) addClip(c, clip, t);
     }
     // held status poses, eased in and out
     const st = this.status;
@@ -410,8 +433,22 @@ export class RigMini {
     this.figure.visible = true;
   }
 
+  /** Pulse, spin and flap for a part with its own phase: the loops' share of them, shifted in time. */
+  private phased: PhaseSampler = (ph: number): PartChannels => {
+    const c = this.c;
+    const o = this.phaseOut;
+    o.pulse = c.pulse;
+    o.spin = c.spin;
+    o.flap = c.flap;
+    for (const [clip, t] of this.loops)
+      for (const ch of PART_CHANNELS) o[ch] += sampleChannel(clip, ch, t + ph * clip.dur) - sampleChannel(clip, ch, t);
+    if (o.flap > 1) o.flap = 1;
+    if (o.flap < 0) o.flap = 0;
+    return o;
+  };
+
   private place(c: Channels): void {
-    const pose = (this.lastPose = poseRig(this.rig, c, this.lastPose ?? undefined));
+    const pose = (this.lastPose = poseRig(this.rig, c, this.lastPose ?? undefined, this.hasPhased ? this.phased : undefined));
     this.muzzleDir = pose.muzzleDir;
     const plan = this.skin!.plan;
     const inv = 1 / plan.k;

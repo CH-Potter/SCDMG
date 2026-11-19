@@ -10,6 +10,7 @@ import { factionSlots, supportSlots, UNIT_CLASSES, type Slots } from "../engine/
 import { applyComputedCosts } from "../engine/pricing";
 import type { AbilityId, Faction, ImpactDef, Keyword, ListEntry, StructureDef, SupportAbilityDef, SupportDef, SupportEffect, UnitProfile, UpgradeDef, Weapon, WeaponBonus, WeaponTrait, EvadeCondition } from "../engine/types";
 import { fitStarterLists, fixStructures, newProfile } from "../forge/model";
+import { RIG_TAG_RE, type Tagged } from "./minis/binding";
 import { loadJson, newId, saveJson, slug } from "./files";
 
 const KEY = "scdmg.customFactions.v1";
@@ -314,6 +315,8 @@ export function cleanFaction(raw: unknown, notes: string[] = []): Faction {
     if (isObj(p.impact)) out.impact = { dice: num(p.impact.dice), hit: num(p.impact.hit), damage: num(p.impact.damage), ap: num(p.impact.ap) };
     const art = cleanArt(p.art, notes, where);
     if (art) out.art = art;
+    // the template a unit's miniature art comes from ("bulwark/brothers", ui/minis/binding.ts): cosmetic, kept by copies
+    if (typeof p.rigTag === "string" && RIG_TAG_RE.test(p.rigTag)) (out as UnitProfile & Tagged).rigTag = p.rigTag;
     return out;
   };
   const effect = (e: unknown, where: string): SupportEffect => {

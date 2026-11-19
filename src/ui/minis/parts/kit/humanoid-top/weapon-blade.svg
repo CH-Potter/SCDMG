@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -7 48 14" data-part="kit.humanoid.top.weapon-blade" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit weapon from above: the broad blade (tip left)</title>
+<path d="M0,0 L6,-3.6 L30,-3.6 L30,3.6 L6,3.6 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="shade" d="M6,0.4 L30,0.4 L30,3.6 L6,3.6 L0,0 Z" fill="#4a5158"/>
+<rect x="29" y="-6" width="4" height="12" rx="1" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<rect x="33" y="-2" width="10" height="4" rx="1" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="35" cy="0" r="1"/><circle id="g2" cx="41" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g>
+</svg>

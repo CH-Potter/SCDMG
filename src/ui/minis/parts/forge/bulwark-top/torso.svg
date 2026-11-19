@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-28 -14 56 30" data-part="forge.bulwark.top.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bulwark from above: square shoulder slabs, vault chest, the team stole over both shoulders</title>
+<rect x="-15" y="-9" width="30" height="20" rx="5" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="-26" y="-10" width="15" height="21" rx="3" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<rect x="11" y="-10" width="15" height="21" rx="3" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M17,-9.4 H23 Q25.4,-9.4 25.4,-7 V8 Q25.4,10.4 23,10.4 H17 Z" fill="#6c5a37"/>
+<path d="M-24.6,6.6 H-12.4 M12.4,6.6 H24.6" stroke="#6e4528" stroke-width="2.4"/>
+<path class="tag" d="M-11,-9 L-6,-9 L-6,13 L-11,13 Z M6,-9 L11,-9 L11,13 L6,13 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="-22" cy="-6" r="0.9" fill="#c8bd98"/><circle cx="22" cy="-6" r="0.9" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

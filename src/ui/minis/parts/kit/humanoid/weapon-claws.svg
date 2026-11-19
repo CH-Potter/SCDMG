@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -10 32 20" data-part="kit.humanoid.side.weapon-claws" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit weapon: a fist of three hooked claws (tips left)</title>
+<path d="M14,-6 Q2,-10 -3,-6 Q4,-6 12,-2 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M14,-1 Q2,-3 -5,1 Q4,0 12,3 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M14,4 Q4,4 -2,9 Q5,6 12,8 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="10" y="-7" width="14" height="14" rx="4" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M17,-6.4 h3 q3,0 3,3 v7 q0,3 -3,3 h-3 Z" fill="#353b41"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="16" cy="0" r="1"/><circle id="g2" cx="20" cy="0" r="1"/><circle id="muzzle" cx="-4" cy="0" r="1"/></g>
+</svg>

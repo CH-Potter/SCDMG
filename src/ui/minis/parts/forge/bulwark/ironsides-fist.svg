@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -18 52 38" data-part="forge.bulwark.side.ironsides-fist">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Crusher fist: a squared gauntlet of vault plate (the pivot is the wrist)</title>
+<path d="M-26,-12 L4,-14 L8,-6 L8,12 L-26,14 Q-29,0 -26,-12 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M-26,6 L8,4 L8,12 L-26,14 Z" fill="#6c5a37"/>
+<path d="M-26,-4 L-12,-5 M-26,4 L-12,3" fill="none" stroke="#141414" stroke-width="1.4"/>
+<rect x="6" y="-10" width="12" height="20" rx="3" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-27,-12 L-27,14" stroke="#6e4528" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="12" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-44 -100 88 102" data-part="kit.structure.side.coin">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Standee: an upright coin token on a peg (the unit's uploaded picture fills its face)</title>
+<path d="M-16,0 L-12,-10 L12,-10 L16,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="-4" y="-18" width="8" height="10" fill="#353b41" stroke="#141414" stroke-width="2"/>
+<circle cx="0" cy="-56" r="40" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="-56" r="34" fill="#6c5a37" stroke="#141414" stroke-width="2"/>
+<path class="tag" d="M-30,-26 L30,-26 L34,-14 L-34,-14 Z" fill="#ff00ff" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-56" r="1"/></g>
+</svg>

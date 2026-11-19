@@ -61,6 +61,14 @@ export function addClip(out: Channels, clip: Clip, t: number, w = 1): void {
   }
 }
 
+/** One channel of a clip at time `t` (ms; loops wrap), or 0 if the clip doesn't drive it. */
+export function sampleChannel(clip: Clip, ch: Channel, t: number): number {
+  const keys = clip.tracks[ch];
+  if (!keys) return 0;
+  const tt = clip.loop ? ((t % clip.dur) + clip.dur) % clip.dur : Math.min(t, clip.dur);
+  return sampleTrack(keys, tt);
+}
+
 const loopK = (period: number, pts: [number, number][], e: Ease = "inOut"): Key[] => pts.map(([t, v]) => [t * period, v, e]);
 /** A smooth -1..1 breath over `period` ms (the `pulse` channel). */
 const breath = (period: number, amp = 1): Key[] => loopK(period, [[0, 0], [0.25, amp], [0.5, 0], [0.75, -amp], [1, 0]]);

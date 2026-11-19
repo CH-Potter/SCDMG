@@ -2,14 +2,17 @@
 // and title cards show the new miniatures (Ink Rig), the Munch only survives as a Forge template, and
 // the miniature stills (src/ui/art/rigPortrait.ts) are framed and inked the way the DOM needs them.
 
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { BUILT_IN_FACTION_IDS, PROFILES } from "../src/engine/data/factions";
 import { LORE_FACTION_IDS } from "../src/engine/data/lore";
 import { emblemFor, factionEmblemSvg } from "../src/ui/art/emblems";
 import { hasRigPortrait, rigPortrait, rigPortraitFit, rigPortraitUrl } from "../src/ui/art/rigPortrait";
 import { factionIntro, GAME_INTRO } from "../src/ui/intro/scripts";
 import type { IntroDef, Kit } from "../src/ui/intro/stage";
-import { RIGGED_PROFILES } from "../src/ui/minis/registry";
+import { loadArt, riggedProfiles } from "../src/ui/minis/registry";
+
+// the base factions' art loads lazily (one chunk each): load it before drawing
+beforeAll(() => loadArt(BUILT_IN_FACTION_IDS.flatMap((f) => Object.values(PROFILES).filter((p) => p.faction === f))), 60000);
 
 /** A stand-in DOM element: enough for the storyboards to build against. */
 function fakeEl(): HTMLElement {
@@ -101,7 +104,7 @@ describe("faction art: intros and title cards use the new miniatures", () => {
       const { minis } = record(def);
       expect(minis.length).toBeGreaterThan(5);
       for (const id of minis) {
-        expect(RIGGED_PROFILES, id).toContain(id);
+        expect(riggedProfiles(), id).toContain(id);
         expect(hasRigPortrait(id), id).toBe(true);
       }
       expect(minis.some((id) => id.startsWith("munch"))).toBe(false);
@@ -111,7 +114,7 @@ describe("faction art: intros and title cards use the new miniatures", () => {
 
 describe("miniature stills (rig portraits)", () => {
   it("draws every rigged unit in both views, inked by dilating the figure's alpha", () => {
-    for (const id of RIGGED_PROFILES) {
+    for (const id of riggedProfiles()) {
       for (const view of ["side", "top"] as const) {
         const p = rigPortrait(id, { view, base: true });
         expect(p, `${id} ${view}`).not.toBeNull();

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-38 -62 76 124" data-part="forge.bulwark.top.gunship" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Hammerhawk from above: the strongbox hull, cockpit slit forward, team stole down its back</title>
+<rect x="-30" y="-56" width="60" height="112" rx="14" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M16,-55 H18 Q29,-55 29,-44 V44 Q29,55 18,55 H10 Q24,0 16,-55 Z" fill="#6c5a37"/>
+<path d="M-18,-50 L18,-50 L16,-42 L-16,-42 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-14,-48 L14,-48 L13,-44.4 L-13,-44.4 Z" fill="#fff2c0"/>
+<path d="M-30,-10 H30" stroke="#6e4528" stroke-width="4"/>
+<path class="tag" d="M-6,0 L6,0 L6,52 L-6,52 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { planAtlas, tierFor, TIER_ORDER } from "../src/ui/minis/atlas";
 import { addClip, CLIPS, CLIP_IDS, channels, sampleTrack, statusPose } from "../src/ui/minis/clips";
 import { hexToOklch, parseHex, shadeOf } from "../src/ui/minis/color";
 import { lintPart, lintRig } from "../src/ui/minis/lint";
 import { apply, limbRest, poseRig, solveIk, ZERO } from "../src/ui/minis/pose";
-import { rigsFor, RIGGED_PROFILES } from "../src/ui/minis/registry";
+import { loadArt, riggedProfiles, rigsFor } from "../src/ui/minis/registry";
 import { trooperSide, trooperTop } from "../src/ui/minis/rigs/militiaTrooper";
 import { loadMiniStyle, saveMiniStyle } from "../src/ui/minis/settings";
 import { COLOURWAYS, resolveSlots, SLOT_KEYS } from "../src/ui/minis/slots";
@@ -13,6 +13,8 @@ import type { Channels, Mat, RigDef } from "../src/ui/minis/types";
 
 const RIGS: RigDef[] = [trooperSide("rifle"), trooperSide("scatter"), trooperTop("rifle"), trooperTop("scatter")];
 const TEAL = 0x2fb5c8;
+// the art chunks load lazily (a dynamic import each): generous time for a busy machine
+beforeAll(() => loadArt(["mil-grunts"]), 60000);
 const round = (m: Mat) => m.map((v) => Math.round(v * 100) / 100);
 
 describe("rig-lint", () => {
@@ -227,7 +229,7 @@ describe("baker plan and zoom tiers", () => {
 
 describe("registry and the Miniatures setting", () => {
   it("binds the Militia line squad by profile id, in both views", () => {
-    expect(RIGGED_PROFILES).toContain("mil-grunts");
+    expect(riggedProfiles()).toContain("mil-grunts");
     expect(rigsFor("mil-grunts")?.side.view).toBe("side");
     expect(rigsFor("mil-grunts")?.top.view).toBe("top");
     expect(rigsFor("no-such-unit")).toBeNull();

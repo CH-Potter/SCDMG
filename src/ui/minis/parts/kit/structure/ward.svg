@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -70 60 72" data-part="kit.structure.side.ward">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit summoned ward: a standing stone with a glowing sigil, team band at its foot</title>
+<path d="M-24,0 L-22,-6 L22,-6 L24,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-16,-6 L-18,-46 Q-12,-66 2,-66 Q16,-62 16,-44 L16,-6 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,-64 Q16,-60 16,-44 L16,-6 L8,-6 Z" fill="#6c5a37"/>
+<path class="glow" d="M-4,-50 L0,-56 L4,-50 L0,-36 Z M-8,-44 L8,-44" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M-17.4,-22 L16,-22 L16,-12 L-17,-12 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-30" r="1"/></g>
+</svg>

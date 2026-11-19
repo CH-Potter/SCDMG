@@ -29,7 +29,9 @@ import { PLAYER_COLORS } from "../ui/art/palette";
 import { clampCrop, type CropState, decodeUpload, defaultCrop, encodeCrop, renderCrop, type UploadSource } from "../ui/art/upload";
 import { MINI_BACKS, MINI_BODIES, MINI_HEADGEAR, MINI_HEADS, MINI_WEAPONS } from "../engine/data/unitArt";
 import type { MiniatureRecipe } from "../engine/types";
-import { artSectionHtml, hydrateMinis, miniImg, NEUTRAL_BASE, recipeFromProfile, rosterHtml, swapHtml, unitCardHtml } from "./art";
+import type { Tagged } from "../ui/minis/binding";
+import { loadAllArt } from "../ui/minis/registry";
+import { artSectionHtml, hydrateMinis, kitArtLoaded, kitTokenUrl, miniImg, NEUTRAL_BASE, recipeFromProfile, rosterHtml, swapHtml, unitCardHtml } from "./art";
 import { startFromTemplate, TEMPLATE_GROUPS, templateByKey, TEMPLATES, type TemplateGroup } from "./templates";
 import { esc, KEYWORD_TEXT, TRAIT_TEXT, weaponLine, EVADE_TEXT } from "../ui/describe";
 import { downloadJson, pickJsonFile, slug } from "../ui/files";
@@ -78,6 +80,8 @@ const KIND_NAMES: Record<ProfileKind, string> = { unit: "Unit", structure: "Stru
 const TIMING_NAMES: Record<SupportAbilityDef["timing"], string> = { any: "Any phase", movement: "Movement", assault: "Assault", combat: "Combat" };
 const FORBIDDEN_KEYS = new Set(["__proto__", "prototype", "constructor"]);
 
+/** The player rebuilt a unit's miniature: its template art (ui/minis/binding.ts) gives way to the generic kit, drawn from their parts. */
+const dropRigTag = (p: UnitProfile): void => void delete (p as UnitProfile & Tagged).rigTag;
 const hex = (n: number) => `#${(Number.isFinite(n) ? Math.max(0, Math.min(0xffffff, Math.round(n))) : 0).toString(16).padStart(6, "0")}`;
 /** A number for an input's value attribute ("" for NaN or missing). */
 const nv = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? String(v) : "");
@@ -86,7 +90,8 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 /** A small token in the faction's colour and look: the game's own miniature art, on a neutral base. */
 export function tokenSvg(color: number, look: Faction["look"], size = 40): string {
   const n = Math.max(8, Math.min(256, Math.round(Number(size) || 40)));
-  const url = tokenDataUrl(color, look, n);
+  // the generic kit's figure for the look, in the faction colour (Classic until the kits load)
+  const url = kitTokenUrl(color, look, n * 2) ?? tokenDataUrl(color, look, n);
   return `<svg class="ff-token" width="${n}" height="${n}" viewBox="0 0 40 40" aria-hidden="true"><image href="${url}" x="0" y="0" width="40" height="40"/></svg>`;
 }
 
@@ -122,6 +127,15 @@ class FactionForge {
     host.classList.add("show", "ff-open");
     window.addEventListener("keydown", this.onKey);
     this.renderLibrary();
+    // the codex pictures are the new miniatures: load the kits' and templates' art (lazy chunks),
+    // then redraw the library's tokens (the Classic figures stand in until then)
+    if (!kitArtLoaded())
+      void loadAllArt().then(
+        () => {
+          if (this.host.classList.contains("ff-open") && !this.f) this.renderLibrary();
+        },
+        () => undefined,
+      );
   }
 
   // ---------- state helpers ----------
@@ -1158,9 +1172,14 @@ class FactionForge {
       case "artMode":
         if (!p) return;
         this.crop = null;
-        if (d.mode === "auto") delete p.art;
-        else if (d.mode === "parts") {
-          if (p.art?.kind !== "parts") p.art = { kind: "parts", recipe: recipeFromProfile(p, f) };
+        if (d.mode === "auto") {
+          if (p.art) dropRigTag(p);
+          delete p.art;
+        } else if (d.mode === "parts") {
+          if (p.art?.kind !== "parts") {
+            dropRigTag(p);
+            p.art = { kind: "parts", recipe: recipeFromProfile(p, f) };
+          }
         } else if (d.mode === "image") {
           if (p.art?.kind !== "image") {
             this.root.querySelector<HTMLInputElement>(".ff-hiddenfile")?.click();
@@ -1174,14 +1193,17 @@ class FactionForge {
         const allowed: Record<string, readonly string[]> = { body: MINI_BODIES, head: MINI_HEADS, headgear: MINI_HEADGEAR, weapon: MINI_WEAPONS, back: MINI_BACKS };
         if (!allowed[part]?.includes(d.value!)) return;
         (p.art.recipe as unknown as Record<string, unknown>)[part] = d.value;
+        dropRigTag(p);
         break;
       }
       case "artRandom":
         if (!p || p.art?.kind !== "parts") return;
+        dropRigTag(p);
         p.art.recipe = { ...randomRecipe(Math.random, { body: p.art.recipe.body, ...(p.art.recipe.primary !== undefined ? { primary: p.art.recipe.primary } : {}) }), scale: p.art.recipe.scale };
         break;
       case "artRemove":
         if (!p) return;
+        dropRigTag(p);
         delete p.art;
         this.uploads.delete(p.id);
         break;
@@ -1200,6 +1222,7 @@ class FactionForge {
         if (!c || !target) return;
         try {
           target.art = { kind: "image", dataUrl: encodeCrop(c.src, c.state) };
+          dropRigTag(target);
         } catch (err) {
           return this.toast((err as Error).message, true);
         }

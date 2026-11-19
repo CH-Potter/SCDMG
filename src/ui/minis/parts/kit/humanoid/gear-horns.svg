@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 4 46 34" data-part="kit.humanoid.side.gear-horns">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit headgear: two great curled horns</title>
+<path d="M63,32 Q66,18 77,7 Q78,20 69,34 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M54,32 Q47,22 37,14 Q36,9 41,8 Q53,13 60,30 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M41,8 Q53,13 60,30 L57,31 Q51,17 41,8 Z" fill="#c8bd98"/>
+<path class="detail" d="M45,16 l3,-3 M49,20 l3,-3 M52,24 l3,-2.4" fill="none" stroke="#c8bd98" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="32" r="1"/></g>
+</svg>

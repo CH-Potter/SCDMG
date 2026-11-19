@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 28 36 18" data-part="kit.humanoid.side.gear-goggles">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit headgear: brass goggles pushed up on a strap</title>
+<path d="M47,34 Q60,30 74,33 L74,38 Q60,35 47,39 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="55.6" cy="35" r="4.6" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<circle cx="48.6" cy="36.4" r="5.4" fill="#6e4528" stroke="#141414" stroke-width="2.4"/>
+<circle class="glow" cx="48.2" cy="36.4" r="3.2" fill="#fff2c0"/>
+<path class="glow" d="M46.6,35 Q48,33.8 49.6,34.4" fill="none" stroke="#f2b84b" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="36" r="1"/></g>
+</svg>

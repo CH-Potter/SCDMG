@@ -6,15 +6,19 @@
 //   2. draw every part and limb capsule as the bake plan does, with its posed matrix,
 //   3. add the Hard Ink outer contour by dilating the finished figure's alpha (an SVG filter),
 //      never drawn per part.
-// The result is one SVG (data URL), cached. Units without new-engine art return null, so callers
-// fall back to the Classic figure painter (custom factions, forge copies).
+// The result is one SVG (data URL), cached. Every unit has new-engine art (base factions, Forge
+// templates and the generic kits), but it loads lazily: null means "not loaded yet" (or an unknown
+// id), and callers show the Classic figure meanwhile (see `loadArt` / `artPending` in ui/minis).
+// A unit is named by profile id (registered factions) or passed as a profile (the Forge's units),
+// with `faction` giving the colour and look of an unregistered faction.
 
 import { factionOf, PROFILES } from "../../engine/data/factions";
 import type { UnitProfile } from "../../engine/types";
 import { capsule, TIERS, tierFor } from "../minis/atlas";
 import { addClip, channels, clipsFor } from "../minis/clips";
 import { poseRig, drawOrder } from "../minis/pose";
-import { rigsFor } from "../minis/registry";
+import type { FactionLook } from "../minis/kits/spec";
+import { artKey, rigsFor } from "../minis/registry";
 import { keyMap, resolveSlots } from "../minis/slots";
 import { r3, readPart, renderBody } from "../minis/svg";
 import type { ClipId, Mat, RigDef, Tier } from "../minis/types";
@@ -42,7 +46,13 @@ export interface PortraitOptions {
    * the outline weight, as the board does. Default: close up (sheet tier).
    */
   ppi?: number;
+  /** The unit's faction colour and look, for a faction that isn't registered (the Forge's). */
+  faction?: FactionLook;
 }
+
+/** A unit: a registered profile id, or the profile itself. */
+export type PortraitUnit = string | UnitProfile;
+const profileOfUnit = (u: PortraitUnit): UnitProfile | undefined => (typeof u === "string" ? PROFILES[u] : u);
 
 export interface Portrait {
   svg: string;
@@ -71,22 +81,22 @@ const grow = (b: Box, x: number, y: number): void => {
 
 const matStr = (m: Mat): string => `matrix(${m.map(r3).join(" ")})`;
 
-/** Whether a unit has new-engine art (so a portrait exists). */
-export function hasRigPortrait(profileId: string): boolean {
-  return !!rigsFor(profileId);
+/** Whether a unit's new-engine art is loaded (so a portrait exists). */
+export function hasRigPortrait(unit: PortraitUnit, faction?: FactionLook): boolean {
+  return !!rigsFor(unit, 0, faction);
 }
 
 /** Flyers stand on a clear stem when shown on their base. */
 const isFlyer = (p: UnitProfile | undefined): boolean => !!p?.keywords.includes("flying");
 
-/** A still of the unit's miniature, or null if it has no new-engine art. */
-export function rigPortrait(profileId: string, o: PortraitOptions = {}): Portrait | null {
-  const rigs = rigsFor(profileId, o.model ?? 0);
+/** A still of the unit's miniature, or null if its art isn't loaded (or the id is unknown). */
+export function rigPortrait(unit: PortraitUnit, o: PortraitOptions = {}): Portrait | null {
+  const rigs = rigsFor(unit, o.model ?? 0, o.faction);
   if (!rigs) return null;
   const view = o.view ?? "side";
   const rig: RigDef = view === "top" ? rigs.top : rigs.side;
-  const profile = PROFILES[profileId];
-  let team = o.team;
+  const profile = profileOfUnit(unit);
+  let team = o.team ?? o.faction?.color;
   if (team === undefined) {
     try {
       team = profile ? factionOf(profile.faction).color : NEUTRAL_TEAM;
@@ -130,6 +140,12 @@ export function rigPortrait(profileId: string, o: PortraitOptions = {}): Portrai
       if (!part) continue;
       const info = readPart(part.src);
       body = renderBody(info, tier, keys);
+      // an uploaded picture (a standee's face), clipped to its circle
+      if (part.image) {
+        const im = part.image;
+        const cid = `pic${groups.length}`;
+        body += `<clipPath id="${cid}"><circle cx="${r3(im.cx)}" cy="${r3(im.cy)}" r="${r3(im.r)}"/></clipPath><image href="${im.href}" x="${r3(im.cx - im.r)}" y="${r3(im.cy - im.r)}" width="${r3(im.r * 2)}" height="${r3(im.r * 2)}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${cid})"/>`;
+      }
       b = info.box;
     }
     for (const [x, y] of [
@@ -195,12 +211,14 @@ export type PortraitUrl = Portrait & { url: string };
 const urlCache = new Map<string, PortraitUrl>();
 
 /** `rigPortrait` as a cached data URL (plus its framing), or null if the unit has no new-engine art. */
-export function rigPortraitUrl(profileId: string, o: PortraitOptions = {}): PortraitUrl | null {
-  const upi = rigsFor(profileId)?.side.unitsPerInch ?? 105;
-  const key = `${profileId}|${o.view ?? "side"}|${o.face ?? "right"}|${o.team ?? "f"}|${o.base ? 1 : 0}|${o.model ?? 0}|${o.clip ?? "idle"}|${o.t ?? 0}|${o.ppi ? tierFor(o.ppi / upi) : "sheet"}`;
+export function rigPortraitUrl(unit: PortraitUnit, o: PortraitOptions = {}): PortraitUrl | null {
+  const rigs = rigsFor(unit, 0, o.faction);
+  if (!rigs) return null;
+  const upi = rigs.side.unitsPerInch;
+  const key = `${artKey(unit, o.faction)}|${typeof unit === "string" ? unit : unit.id}|${o.faction?.color ?? "f"}|${o.view ?? "side"}|${o.face ?? "right"}|${o.team ?? "f"}|${o.base ? 1 : 0}|${o.model ?? 0}|${o.clip ?? "idle"}|${o.t ?? 0}|${o.ppi ? tierFor(o.ppi / upi) : "sheet"}`;
   const hit = urlCache.get(key);
   if (hit) return hit;
-  const p = rigPortrait(profileId, o);
+  const p = rigPortrait(unit, o);
   if (!p) return null;
   const out = { ...p, url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(p.svg)}` };
   if (urlCache.size > 400) urlCache.clear();
@@ -212,9 +230,9 @@ export function rigPortraitUrl(profileId: string, o: PortraitOptions = {}): Port
  * A portrait to show inside a `px` × `px` box (object-fit: contain): picks the detail tier and the
  * outline weight for the size it will actually be drawn at.
  */
-export function rigPortraitFit(profileId: string, px: number, o: Omit<PortraitOptions, "ppi"> = {}): PortraitUrl | null {
-  const first = rigPortraitUrl(profileId, o);
+export function rigPortraitFit(unit: PortraitUnit, px: number, o: Omit<PortraitOptions, "ppi"> = {}): PortraitUrl | null {
+  const first = rigPortraitUrl(unit, o);
   if (!first) return null;
   const ppi = px / Math.max(first.w, first.h);
-  return rigPortraitUrl(profileId, { ...o, ppi });
+  return rigPortraitUrl(unit, { ...o, ppi });
 }

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -90 80 74" data-part="kit.structure.side.pod">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit structure body: a ribbed organic pod with a glowing maw and a team-coloured crest</title>
+<path d="M-34,-18 Q-38,-60 -12,-80 Q0,-86 12,-80 Q38,-60 34,-18 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-80 Q38,-60 34,-18 L18,-18 Q30,-50 12,-80 Z" fill="#6c5a37"/>
+<path d="M-22,-20 Q-26,-56 -8,-74 M8,-74 Q26,-56 22,-20" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path class="tag" d="M-10,-81 Q0,-88 10,-81 L8,-66 Q0,-70 -8,-66 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-14,-48 Q0,-60 14,-48 Q0,-36 -14,-48 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-9,-48 Q0,-55 9,-48 Q0,-42 -9,-48 Z" fill="#fff2c0"/>
+<g class="detail"><circle cx="-24" cy="-36" r="2" fill="#e3d8b6"/><circle cx="22" cy="-30" r="1.6" fill="#e3d8b6"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-50" r="1"/><circle id="mount" cx="0" cy="-74" r="1"/></g>
+</svg>

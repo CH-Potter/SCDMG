@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="26 52 36 40" data-part="forge.bulwark.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Near shoulder slab: a squared vault plate with a gold edge</title>
+<path d="M30,62 L55,58 Q59,59 59,64 L58,84 L33,88 Q29,87 29,83 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M30,80 L58,77 L58,84 L33,88 Q29,87 29,83 Z" fill="#6c5a37"/>
+<path d="M31.6,82 L57.4,78.4" fill="none" stroke="#6e4528" stroke-width="2.6"/>
+<path d="M33,64 L55,61" fill="none" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="34" cy="68" r="1.1" fill="#c8bd98"/><circle cx="54" cy="65" r="1.1" fill="#c8bd98"/><circle cx="35" cy="77" r="1.1" fill="#c8bd98"/><circle cx="54" cy="74" r="1.1" fill="#c8bd98"/></g>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

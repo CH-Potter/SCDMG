@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -32 44 62" data-part="kit.beast.top.body">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit beast from above: a broad back, spine ridge and team saddle-cloth</title>
+<path d="M0,-28 Q16,-26 18,-8 Q19,14 10,24 Q0,28 -10,24 Q-19,14 -18,-8 Q-16,-26 0,-28 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M12,-22 Q18,-14 18,-8 Q19,14 10,24 Q4,26 2,26 Q16,10 12,-22 Z" fill="#6c5a37"/>
+<path class="tag" d="M-12,-8 Q0,-11 12,-8 L12,8 Q0,11 -12,8 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M0,-24 V-10 M0,10 V22" fill="none" stroke="#5d5b45" stroke-width="3"/>
+<path d="M-12,8 Q0,11 12,8" fill="none" stroke="#6e4528" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

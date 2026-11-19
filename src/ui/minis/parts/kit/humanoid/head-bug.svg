@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 22 40 40" data-part="kit.humanoid.side.head-bug">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit head: a chitin bug head, a great compound eye and mandibles</title>
+<path d="M55,48 L65,48 L65,60 L55,60 Z" fill="#44432f" stroke="#141414" stroke-width="2"/>
+<path d="M49,52 Q44,44 46,35 Q51,26 62,26.6 Q72,29 72,41 Q71,51 63,56 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,28.8 Q72,32 72,41 Q71,51 63,56 L61,55 Q69,44 66,28.8 Z" fill="#6c5a37"/>
+<ellipse cx="53" cy="37.6" rx="6.4" ry="7.2" fill="#fff2c0" stroke="#141414" stroke-width="2" class="glow"/>
+<path class="glow" d="M49,35 Q53,31 57,35" fill="none" stroke="#f2b84b" stroke-width="1.6"/>
+<path class="detail" d="M49,39 h8 M50,42 h6" stroke="#f2b84b" stroke-width="1"/>
+<path d="M48,49 Q40,48 38,54 Q42,52 47,54 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M52,52 Q46,55 46,60 Q49,57 54,56 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="34 14 42 48" data-part="kit.humanoid.side.head-beast">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit head: a beast's snout, tusks and a tall ear</title>
+<path d="M64,31 L69,16 L74,33 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M66,30 L69,21 L71.4,31 Z" fill="#5d5b45"/>
+<path d="M51,55 Q47,42 52,32 Q60,26 69,30 Q75,37 73,47 Q69,57 59,59 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,32 Q75,38 73,47 Q69,57 63,58.4 Q71,47 68,32 Z" fill="#6c5a37"/>
+<path d="M44,47 L54,49 L54,55 Q47,57 43,52 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M45,48 L46.6,44.6 L48.4,48.6 Z M50,49 L51.4,45.6 L53,49.4 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M54,34 L41,36 Q36,39 37,44 L54,48 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<ellipse cx="38.6" cy="38.6" rx="2.6" ry="2" fill="#141414"/>
+<path d="M53,33 L58,31.6" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+<circle class="glow" cx="55.4" cy="36.4" r="2.4" fill="#fff2c0"/>
+<circle cx="55" cy="36.4" r="1.1" fill="#141414"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

@@ -187,8 +187,13 @@ function footTarget(rig: RigDef, limb: LimbDef, g: number, w: number): Pt {
   return { x: limb.end.x + (p.x - limb.end.x) * k, y: limb.end.y + (p.y - limb.end.y) * k };
 }
 
+/** The part-motion channels (pulse, spin, flap) at a phase offset: see `PartAnim.phase`. */
+export type PartChannels = Pick<Channels, "pulse" | "spin" | "flap">;
+/** Part-motion channels for a phase offset (0..1 of the loops). The mini supplies it; tests may omit it. */
+export type PhaseSampler = (phase: number) => PartChannels;
+
 /** A part's own motion (PartAnim) about its pivot, in part coords. */
-function animMat(p: PartUse, pivot: Pt, c: Channels): Mat {
+function animMat(p: PartUse, pivot: Pt, c: PartChannels): Mat {
   const a = p.anim!;
   const pulse = c.pulse;
   let m: Mat = IDENT;
@@ -200,8 +205,11 @@ function animMat(p: PartUse, pivot: Pt, c: Channels): Mat {
   return m;
 }
 
-/** Pose a rig. All angles in channels are degrees, clockwise. Pass `out` to reuse its maps. */
-export function poseRig(rig: RigDef, c: Channels, out?: Pose): Pose {
+/**
+ * Pose a rig. All angles in channels are degrees, clockwise. Pass `out` to reuse its maps, and
+ * `phased` to give parts with a `PartAnim.phase` their own offset pulse, spin and flap.
+ */
+export function poseRig(rig: RigDef, c: Channels, out?: Pose, phased?: PhaseSampler): Pose {
   const st = statics(rig);
   const o = rig.origin;
   const pelvis = tr(c.pelvisX, c.pelvisY);
@@ -256,7 +264,8 @@ export function poseRig(rig: RigDef, c: Channels, out?: Pose): Pose {
     const p = rig.parts[i]!;
     const b = bones[p.bone as BoneRef] ?? IDENT;
     const pv = st.partPivot[i];
-    const local = pv ? mul(st.partPlace[i]!, animMat(p, pv, c)) : st.partPlace[i]!;
+    const ph = p.anim?.phase;
+    const local = pv ? mul(st.partPlace[i]!, animMat(p, pv, ph && phased ? phased(ph) : c)) : st.partPlace[i]!;
     mats.set(p.id, mul(figure, mul(b, local)));
   }
 
