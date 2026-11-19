@@ -9,11 +9,20 @@ It runs in the browser or as a portable Windows app. This is an original game: t
 
 Free and open source under the [GNU GPL v3 or later](LICENSE).
 
-![A Skirmish battle on Dustbowl Crossing: Rivet Grunts shoot Dr. Graft and Big Mama, with the dice tray showing 3 hits](docs/images/battle.webp)
+![An Assault battle: the Dustline Militia (Big Bertha, Rivet Grunts, a Sky Rustler and a Haymaker Bomber) against the Lumen Concord, drawn in the Ink Rig miniature style, with the dice tray showing the Grand Strider's Prism Cannon hitting the Bomber for 2 damage](docs/images/battle.png)
 
 **[▶ Play in your browser](https://ch-potter.github.io/SCDMG/)** · **[Download for Windows](https://github.com/CH-Potter/SCDMG/releases/latest)** · [Run it from source](#run-from-source) · [Rules](docs/rules.md) · [Lore](docs/lore.md)
 
 ## What's in it
+
+### New in v0.11: new miniatures, a new army, and tricks to master
+
+- **New miniatures.** Every unit of the three armies is redrawn on a new miniature engine, with walk cycles, recoil and wing beats. Pick the side-on **Ink Rig** style or the top-down **Overhead** style with the **Minis** button; Classic is still there.
+- **The Skitterswarm** replaces the Munch as the third army, and the **Dustline Militia** is now a drafted, armoured frontier army.
+- **Army slots:** units are Base, Support, Elite, Flyer or Static, inferred from their stats, and your faction and support cards decide how many of each your list can take (a house rule, on by default).
+- **Barrage markers:** mortars and other lobbed guns mark a spot in the movement phase, and it's shelled at the end of the assault phase, friend or foe. Move out, or don't charge in.
+- **Hide and seek:** Hidden units can only be picked out from close range until they attack; Swarm units can **burrow** and burst back up; detectors with **Keen Eyes** find both.
+- **Evade, rethought:** only small, agile units dodge, and they can dodge in a melee and against shells fired out of sight.
 
 ### New in v0.10: house rules, so you play it your way
 
@@ -38,7 +47,7 @@ One click puts everything back to the standard rules. Every rule is explained in
 - **The Skitterswarm:** a tide of bugs from under the valley, every one of them answering to the Broodmother. Cheap bodies, acid that softens whatever it hits for the rest of the swarm, broods that keep regrowing while she lives, and tunnels to burst up where you least want them.
 - **Lumen Concord:** smug alien invaders with saucers, ray guns and shields. Few elite models with precision shooting, and blinks, gates and portals to be in the right place.
 
-The Munch, Dr. Graft's grafted critter army, fought for the valley until v0.12. They live on whole as a Faction Forge template.
+The Munch, Dr. Graft's grafted critter army, fought for the valley until v0.11. They live on whole as a Faction Forge template.
 
 Each faction's design pillars are in [docs/factions.md](docs/factions.md).
 
