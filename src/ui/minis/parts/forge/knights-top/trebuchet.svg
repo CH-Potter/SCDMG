@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -60 112 120" data-part="forge.knights.top.trebuchet" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Royal Trebuchet from above: the timber base frame on its wheels, the A-frame, the royal banner with the team</title>
+<rect x="-46" y="-40" width="12" height="84" rx="2" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<rect x="34" y="-40" width="12" height="84" rx="2" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<rect x="-40" y="-30" width="80" height="10" rx="1" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<rect x="-40" y="22" width="80" height="10" rx="1" fill="#5d5b45" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M34,-40 H46 V44 H34 Z" fill="#44432f"/>
+<rect x="-54" y="-44" width="8" height="16" rx="2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<rect x="46" y="-44" width="8" height="16" rx="2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<rect x="-54" y="30" width="8" height="16" rx="2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<rect x="46" y="30" width="8" height="16" rx="2" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<path d="M-36,-6 L36,-6 L36,6 L-36,6 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="40" y="44" width="5" height="5" rx="1" fill="#2b2019" stroke="#141414" stroke-width="1.4"/>
+<path d="M44,46 L56,48 L50,54 L56,58 L42,58 Z" fill="#9a8458" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-32,18 L32,18 L32,34 L-32,34 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

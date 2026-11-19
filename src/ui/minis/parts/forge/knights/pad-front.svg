@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 54 34 34" data-part="forge.knights.side.pad-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Steel pauldron, near: three lames and a gold edge</title>
+<path d="M31,64 Q44,56 58,62 L58,78 Q45,84 32,80 Q29,72 31,64 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M31.4,74 Q45,79 58,73 L58,78 Q45,84 32,80 Z" fill="#353b41"/>
+<path d="M31,70 Q45,74 58,68 M31.4,76 Q45,80 58,74" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M32,79.6 Q45,83.4 57.6,77.6" fill="none" stroke="#6e4528" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="47" cy="70" r="1"/></g>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 162 32 24" data-part="forge.knights.side.shoe-front">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Plain leather shoe</title>
+<path d="M42,166 L56,166 L57,183 L33,183 Q30,182 31,178 Q36,176 42,174 Z" fill="#2b2019" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="48" cy="170" r="1"/></g>
+</svg>

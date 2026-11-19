@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 -66 26 38" data-part="forge.knights.side.horse-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warhorse tail: a long dark switch</title>
+<path d="M30,-56 Q42,-62 48,-52 Q52,-40 46,-30 Q44,-40 38,-44 Q34,-48 30,-48 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="32" cy="-52" r="1"/></g>
+</svg>

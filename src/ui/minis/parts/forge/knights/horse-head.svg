@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 -18 58 82" data-part="forge.knights.side.horse-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Warhorse head: a long bay head held high on an arched neck, dark mane, steel chanfron and a small blue plume</title>
+<path d="M50,62 Q40,34 46,8 L60,6 Q70,40 68,62 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M56,8 L60,6 Q70,40 68,62 L63,62 Q64,34 56,8 Z" fill="#4a2e19"/>
+<path d="M60,6 Q72,30 70,62 L75,60 Q78,30 62,2 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M58,10 Q52,0 42,2 L26,12 Q20,18 25,23 L40,24 Q54,22 58,10 Z" fill="#c8bd98" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M25,23 L40,24 Q52,22 55,16 Q42,19 25,23 Z" fill="#4a2e19"/>
+<path d="M54,-2 L48,2 L44,10 L30,16 L32,8 L44,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M52,2 L58,-10 L60,2 Z" fill="#c8bd98" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M48,0 Q44,-12 52,-15 Q50,-8 54,-2 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<ellipse cx="25" cy="17" rx="1.8" ry="1.4" fill="#141414"/>
+<circle cx="49" cy="8" r="1.6" fill="#141414"/>
+<path d="M42,16 L60,28 M28,20 L42,16" fill="none" stroke="#2b2019" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

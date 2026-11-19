@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-21 -28 42 56" data-part="forge.knights.side.shield">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Heater shield: gold rim, the team field, the rising sun in gold</title>
+<path d="M-18,-25 L18,-25 L18,0 Q16,17 0,27 Q-16,17 -18,0 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-13.4,-20.4 L13.4,-20.4 L13.4,0 Q11.6,12.6 0,20.6 Q-11.6,12.6 -13.4,0 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M0,-20.4 L13.4,-20.4 L13.4,0 Q11.6,12.6 0,20.6 Z" fill="#b000b0"/>
+<path d="M-6,0 Q-6,-6 0,-6 Q6,-6 6,0 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M0,-7.6 V-10.4 M-4.800000000000001,-4.800000000000001 l-2.2,-2.2 M4.800000000000001,-4.800000000000001 l2.2,-2.2 M-7.6,-1.4 h-3 M7.6,-1.4 h3" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M-8,1.4 H8" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

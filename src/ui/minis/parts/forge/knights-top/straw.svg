@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -18 36 36" data-part="forge.knights.top.straw">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Straw hat from above: a wide floppy round brim</title>
+<path d="M0,-17 Q12,-16 16,-6 Q18,6 10,13 Q0,17 -10,13 Q-17,6 -16,-6 Q-12,-16 0,-17 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="0" cy="-2" r="8.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path class="shade" d="M5,-8.6 A8.4,8.4 0 0 1 -2,6.2 Q8,2 5,-8.6 Z" fill="#4a2e19"/>
+<g class="detail"><path d="M-12,-10 l3,2 M12,-10 l-3,2 M-13,8 l3,-2 M12,9 l-3,-2" fill="none" stroke="#4a2e19" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>

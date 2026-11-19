@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 54 44 84" data-part="forge.knights.side.torso">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Man-at-arms torso: steel breastplate under a blue tabard with the gold rising sun, steel gorget and faulds</title>
+<path d="M64,103 L79,101 L81,121 L67,123 Z" fill="#353b41" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M46,68 Q60,62 76,67 L78,101 Q61,105 46,101 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M48,66 L71,64 L72,101 L74,133 L65,135 L60,125 L51,135 L44,131 L46,101 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M65,64.4 L71,64 L72,101 L74,133 L66,134.6 Q68,100 65,64.4 Z" fill="#6c5a37"/>
+<path d="M45,129 L51,133 L60,123 L65,133 L73,131" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M53,86 Q53,80 59,80 Q65,80 65,86 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M59,78.4 V75.6 M54.2,81.2 l-2.2,-2.2 M63.8,81.2 l2.2,-2.2 M51.4,84.6 h-3 M66.6,84.6 h3" fill="none" stroke="#6e4528" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M51,87.4 H67" fill="none" stroke="#6e4528" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M45,98.4 L78,95.4 L78,102.4 L45,105.4 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="56" y="97.6" width="6" height="7" rx="1" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M49,59.6 L71,57.6 L73,67 L50,69 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g class="detail"><circle cx="75" cy="72" r="1" fill="#b9bfc4"/><circle cx="75" cy="92" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

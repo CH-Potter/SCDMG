@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -11 80 22" data-part="forge.knights.side.sword" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Arming sword: a straight bright blade, gold cross and pommel (tip left)</title>
+<path d="M0,0 L8,-3.4 L52,-3.4 L52,3.4 L8,3.4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,0.4 L52,0.4 L52,3.4 L8,3.4 L0,0 Z" fill="#4a5158"/>
+<path d="M10,0 H48" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="52" y="-9.4" width="5" height="18.8" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect x="57" y="-2.6" width="12" height="5.2" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle cx="71.4" cy="0" r="3.4" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="62" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g>
+</svg>

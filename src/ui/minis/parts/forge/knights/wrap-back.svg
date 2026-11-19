@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 142 20 30" data-part="forge.knights.side.wrap-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far leg wraps</title>
+<path d="M65.6,146 L75.6,146 L74.6,169 L66.6,169 Z" fill="#4a2e19" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="70" cy="152" r="1"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -70 88 76" data-part="forge.knights.side.griffin-wing">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Griffin wing: great golden feathered wing, cream flight feathers (beats from the root)</title>
+<path d="M0,0 Q8,-46 42,-64 Q70,-70 80,-60 Q68,-54 76,-44 Q62,-42 68,-30 Q54,-30 58,-18 Q44,-20 46,-8 Q30,-10 24,2 Q10,6 0,0 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M24,2 Q30,-10 46,-8 Q44,-20 58,-18 Q54,-30 68,-30 Q62,-42 76,-44 L72,-40 Q60,-36 62,-26 Q50,-24 50,-14 Q38,-12 36,-4 Q28,-4 24,2 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M4,-4 Q16,-44 46,-60" fill="none" stroke="#4a2e19" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14,-6 Q30,-28 56,-44 M22,-4 Q36,-18 58,-26" fill="none" stroke="#141414" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>
