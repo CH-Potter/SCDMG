@@ -1,6 +1,7 @@
 // The Militia drop-ship (Rust Bucket Drop-Ship, "Bumpy Landing"): an airdrop that lands anywhere
 // on the table, from round 2, away from enemies and the enemy's home objective.
 
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { aiCommand } from "../src/engine/ai";
 import { factionOf, supportOf } from "../src/engine/data/factions";
@@ -34,8 +35,8 @@ function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {})
   s.initiative = 0;
   s.activePlayer = 0;
   s.orderChoice = null;
-  s.players[0].cp = 8;
-  s.players[1].cp = 8;
+  bankCp(s, 0, 8);
+  bankCp(s, 1, 8);
   s.round = 2;
   s.phase = "movement";
   return s;

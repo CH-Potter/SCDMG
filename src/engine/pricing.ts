@@ -646,7 +646,11 @@ export function priceSupport(
   const values = (s.abilities ?? []).map((a) => supportAbilityValue(a, summonLookup));
   const sorted = [...values].sort((a, b) => b - a);
   const abil = sorted.reduce((sum, v, i) => sum + (i === 0 ? v : F.extraAbility * v), 0);
-  const cp = F.cpPerRound * Math.max(0, num(s.cp));
+  // Card-bound CP: a card's CP up to its dearest ability is what burning it pays for that ability (its
+  // value is in the abilities); only the first CP and any CP beyond that are spare CP worth Fizz.
+  const dearest = Math.max(0, ...(s.abilities ?? []).map((a) => num(a.cp)));
+  const spare = Math.max(0, num(s.cp)) <= 0 ? 0 : 1 + Math.max(0, num(s.cp) - Math.max(1, dearest));
+  const cp = F.cpPerRound * spare;
   const slotCount = UNIT_CLASSES.reduce((n, c) => n + Math.max(0, num(supportSlots(s)[c])), 0);
   const slots = F.slot * (slotCount - 1);
   const raw = F.base + cp + abil + slots;

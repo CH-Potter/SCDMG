@@ -2,6 +2,7 @@
 // Militia drop-ship (anywhere, far from trouble), Skitterswarm Surface Breach (bursting up near the swarm,
 // or a Tunnel Mouth for the round), Concord portal (beside its own crystals, close to the fight, arriving overcharged).
 
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { defaultSupportsFor, supportOf } from "../src/engine/data/factions";
 import { aiSupportCommand } from "../src/engine/ai";
@@ -32,7 +33,7 @@ function portalGame(): GameState {
     supports: [["con-portal"], []],
   });
   Object.assign(s, { initiative: 0, activePlayer: 0, orderChoice: null, round: 2, phase: "movement" });
-  s.players[0].cp = 8;
+  bankCp(s, 0, 8);
   return s;
 }
 
@@ -113,7 +114,7 @@ describe("Surface Breach (the Skitterswarm's Undertunnels)", () => {
       supports: [["swarm-tunnels"], []],
     });
     Object.assign(s, { initiative: 0, activePlayer: 0, orderChoice: null, round, phase: "movement" });
-    s.players[0].cp = 8;
+    bankCp(s, 0, 8);
     s.players[0].resources = 20;
     return s;
   }

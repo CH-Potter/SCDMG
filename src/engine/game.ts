@@ -9,7 +9,8 @@
 
 import { ABILITIES } from "./data/abilities";
 import { defaultListFor, defaultSupportsFor } from "./data/factions";
-import { CP_CAP, MERCY_LEAD } from "./constants";
+import { MERCY_LEAD } from "./constants";
+import { grantCp, spendCp } from "./cp";
 import { consumeReaction } from "./reactions";
 import { canStillRecruit, defaultOpenCap, setupOpenRoster, syncOpenRoster, type ArmyRule } from "./openRoster";
 import { deployZones, freshStatus, initialSupports, isStructure, playSupport, refreshSupports, regrowModels, summon } from "./supports";
@@ -203,7 +204,7 @@ export function createGame(setup: GameSetup): GameState {
     if (!b) return;
     const pl = state.players[p as PlayerId];
     pl.resources += bonusAmount(b.resources);
-    pl.cp = Math.min(CP_CAP, pl.cp + bonusAmount(b.cp));
+    grantCp(state, p as PlayerId, bonusAmount(b.cp));
   });
   if (open) setupOpenRoster(state, setup.openCap === null ? undefined : (setup.openCap ?? defaultOpenCap(map.mode)));
   return state;
@@ -281,7 +282,8 @@ export function applyCommand(prev: GameState, cmd: Command): CommandResult {
     if (!rulesOf(s).morale) return fail("Morale is switched off in this game");
     if (!t.status.shaken) return fail("That unit isn't shaken");
     if (s.players[cmd.player].cp < RALLY_CP) return fail(`Rallying costs ${RALLY_CP} CP`);
-    s.players[cmd.player].cp -= RALLY_CP;
+    const paid = spendCp(s, cmd.player, RALLY_CP, events, { pay: cmd.pay });
+    if (paid) return fail(paid);
     t.status.shaken = false;
     events.push({ type: "rallied", uid: t.uid, how: "cp" });
     return { ok: true, state: s, events };
@@ -403,7 +405,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
       if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
       if (cmd.reroll) {
-        const e = payReroll(s, unit, plan);
+        const e = payReroll(s, unit, plan, events, cmd.pay);
         if (e) return e;
       }
       if (consumeReaction(s, target.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
@@ -441,7 +443,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (typeof plan === "string") return plan;
       unit.status.revealed = true;
       if (cmd.reroll) {
-        const e = payReroll(s, unit, plan);
+        const e = payReroll(s, unit, plan, events, cmd.pay);
         if (e) return e;
       }
       unit.status.fought = true;
@@ -449,7 +451,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       break;
     }
     case "ability": {
-      const e = useAbility(s, unit, cmd.ability, cmd.target, cmd.point, events);
+      const e = useAbility(s, unit, cmd.ability, cmd.target, cmd.point, events, cmd.pay);
       if (e) return e;
       break;
     }
@@ -462,11 +464,12 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
 }
 
 /** Command re-roll house rule: check it's allowed, pay its CP and mark the plan. Returns an error, or null. */
-function payReroll(s: GameState, unit: Unit, plan: AttackPlan): string | null {
+function payReroll(s: GameState, unit: Unit, plan: AttackPlan, events: GameEvent[], pay?: string[]): string | null {
   if (!rulesOf(s).reroll) return "Command re-rolls aren't in play in this game";
   if (plan.indirect) return "Lobbed shells can't be re-rolled";
   if (s.players[unit.owner].cp < REROLL_CP) return `A re-roll costs ${REROLL_CP} CP`;
-  s.players[unit.owner].cp -= REROLL_CP;
+  const paid = spendCp(s, unit.owner, REROLL_CP, events, { pay });
+  if (paid) return paid;
   plan.reroll = true;
   return null;
 }
@@ -788,6 +791,7 @@ function useAbility(
   targetUid: string | undefined,
   point: Vec | undefined,
   events: GameEvent[],
+  pay?: string[],
 ): string | null {
   const def = ABILITIES[id];
   if (!hasAbility(unit, id) || def.kind !== "active") return "This unit doesn't have that ability";
@@ -1060,8 +1064,7 @@ function useAbility(
   }
   unit.abilityUses[id] = used + 1;
   unit.status.abilityUsed = true;
-  s.players[unit.owner].cp -= cpCost;
-  return null;
+  return spendCp(s, unit.owner, cpCost, events, { pay });
 }
 
 // ---------- reactions ----------

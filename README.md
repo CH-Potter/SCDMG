@@ -55,7 +55,7 @@ Each faction's design pillars are in [docs/factions.md](docs/factions.md).
 
 ![Aim lines from a squad of Rivet Grunts to the Blink Dancers: one line is clear at 16.1 inches of 22, the rest are blocked by a raised platform](docs/images/aim-line.webp)
 
-Select a unit and hover a target to see what would happen before you commit: aim lines from every model, the range, what blocks sight or gives cover, and the odds. Then roll. The dice tray can let you **throw your own dice**, roll them automatically, roll quickly or skip them. Undo takes back your last command, and the seeded dice roll the same if you redo it.
+Select a unit and hover a target to see what would happen before you commit: aim lines from every model, the range, what blocks sight or gives cover, and the odds. Then roll. The dice tray can let you **throw your own dice**, roll them automatically, roll quickly or skip them. The dice are properly random, and Undo takes back your last command without re-rolling them: redo it and they land the same.
 
 <p align="center"><img src="docs/images/battle.gif" alt="A short battle moment: Rivet Grunts shoot the Blink Dancers, the dice tumble in the tray and the damage lands" width="720"></p>
 
@@ -144,7 +144,7 @@ The full rules are in [docs/rules.md](docs/rules.md), and in the game under **‚ù
 
 | Path               | What it is                                                                                       |
 | ------------------ | ------------------------------------------------------------------------------------------------ |
-| `src/engine/`      | Pure, deterministic rules engine: no DOM, seeded RNG, `applyCommand(state, cmd)` reducer         |
+| `src/engine/`      | Pure, deterministic rules engine: no DOM, seeded RNG (live games reseed it from crypto after every action), `applyCommand(state, cmd)` reducer |
 | `src/engine/data/` | Factions, units, upgrades, abilities, maps and missions (data only; tune here)                   |
 | `src/engine/ai.ts` | Greedy one-activation AI: simulates candidates, scores on expected damage, objectives and threat |
 | `src/ui/`          | PixiJS board renderer, DOM HUD and the controller that connects them                             |

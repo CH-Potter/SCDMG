@@ -75,6 +75,7 @@ describe("elevation", () => {
   it("jump jets hop straight up without a ramp", () => {
     const s = game();
     const jumpers = place(s, uidOf(s, 0, "mil-grunts", 1), { x: 18, y: 23 });
+    jumpers.upgrades = ["jets"]; // the starter squads no longer carry Jump Jets
     const route = planRoute(s, jumpers, { x: 18, y: 23 }, 0, { x: 16, y: 19 });
     expect(typeof route).toBe("object");
     if (typeof route === "object") expect(route.via).toBeUndefined();

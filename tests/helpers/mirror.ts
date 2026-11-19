@@ -33,6 +33,10 @@ export function mirrorState(s: GameState): GameState {
     f.home = m(f.home);
     f.pos = m(f.pos);
   }
+  for (const b of t.barrages ?? []) {
+    b.owner = flip(b.owner);
+    b.pos = m(b.pos);
+  }
   const ms = t.missionState;
   if (ms?.economy) ms.economy = [ms.economy[1], ms.economy[0]];
   if (ms?.culled) ms.culled = [ms.culled[1], ms.culled[0]];

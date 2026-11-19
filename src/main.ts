@@ -1,4 +1,5 @@
 import { missionFitsMap, MISSIONS } from "./engine/data/missions";
+import { freshSeed } from "./ui/entropy";
 import { registerCustomFactions } from "./engine/data/factions";
 import { openMapBuilder } from "./editor/index";
 import { openFactionForge } from "./forge/index";
@@ -81,7 +82,7 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
     factions: choice.factions,
     lists,
     supports,
-    seed: Date.now(),
+    seed: freshSeed(),
     orderChoice: true,
     map: choice.map,
     mapId: choice.map.id,

@@ -1,3 +1,4 @@
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { barrageGun, expectedBarrage, markerCatches, shellEvade, shellSeen } from "../src/engine/combat";
 import { BARRAGE_RADIUS, WIDE_BARRAGE_RADIUS } from "../src/engine/constants";
@@ -35,7 +36,7 @@ function table(rules: Partial<HouseRules> = {}, swarm: ListEntry[] = []) {
   const grunts = place(s.units.find((u) => u.profileId === "mil-grunts")!, { x: 15, y: 20 });
   s.phase = "movement";
   s.activePlayer = 0;
-  s.players[0].cp = 3;
+  bankCp(s, 0, 3);
   return { s, bombard, bugs, grunts };
 }
 

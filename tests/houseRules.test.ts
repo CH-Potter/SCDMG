@@ -1,3 +1,4 @@
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { playAiTurn } from "../src/engine/ai";
 import { breachFor, evadeVsShot, expectedBreach, expectedDamage, nerveTest, planMelee, planShooting, resolveAttack, scatterShell, strayTarget } from "../src/engine/combat";
@@ -395,7 +396,7 @@ describe("house rules: command re-roll and whole-army turns", () => {
     expect(applyCommand(off.s, { type: "shoot", uid: off.grunts.uid, target: off.guard.uid, weapon: w, reroll: true }).ok).toBe(false);
     for (const seed of [1, 2, 3, 4]) {
       const { s, grunts, guard } = battle({ reroll: true }, seed);
-      s.players[0].cp = 2;
+      bankCp(s, 0, 2);
       const r = applyCommand(s, { type: "shoot", uid: grunts.uid, target: guard.uid, weapon: w, reroll: true });
       expect(r.ok).toBe(true);
       if (!r.ok) continue;

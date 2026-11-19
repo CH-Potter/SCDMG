@@ -19,6 +19,7 @@ import { allRules, MISSIONS, rulesFor } from "./data/missions";
 import { cargoDestination, crownObjectives, crownPayout, loadsLeft, markedUnit, targetObjective } from "./scoring";
 import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, isFearless, nerveOf, planImpact, planMelee, planShooting, reportMisses, shakeChance, shellOdds, shellSpotted, weaponBonus, type AttackPlan } from "./combat";
 import { REROLL_CP, ROLLED_CHARGE_MAX, rulesOf } from "./houseRules";
+import { cardBound, paymentOptions, type OwnCard } from "./cp";
 import { HIDDEN_RANGE } from "./constants";
 import { applyCommand, BALE_OUT, chargeBonus, chargeNeed, closeRanksPreview, CROP_DUST, cropDustCaught, overwatchPlan, planDemoCharge, RALLY_CP, returnFirePlan, tableKey, twoDiceAtLeast } from "./game";
 import { planUnitMove } from "./formation";
@@ -1459,7 +1460,7 @@ export function aiSupportCommand(s: GameState): Command | null {
   for (const card of pl.supports) {
     for (const a of abilityOfCard(card.id)) {
       if (canPlaySupport(s, me, card.id, a.id)) continue;
-      reserve = Math.max(a.exhaust ? cardReserve(s, me, card.id, a.id) : 0, cpReserve(s, me, a.id, a.cp));
+      reserve = Math.max(a.exhaust ? cardReserve(s, me, card.id, a.id) : 0, cpReserve(s, me, a.id, a.cp, { id: card.id, exhausts: !!a.exhaust }));
       const cpLeft = pl.cp - a.cp;
       const base = { type: "support" as const, player: me, support: card.id, ability: a.id };
       const e = a.effect;
@@ -1913,7 +1914,9 @@ function laterBuffValue(s: GameState, me: PlayerId, e: SupportEffect): number {
  * later this round (Feeding Frenzy after an Undermine) gives that buff up. Its rough value, as in
  * `cardReserve`.
  */
-function cpReserve(s: GameState, me: PlayerId, abilityId: string, cost: number): number {
+function cpReserve(s: GameState, me: PlayerId, abilityId: string, cost: number, own?: OwnCard): number {
+  // Card-bound CP: the price is the abilities on the cards it burns (see aiPayment).
+  if (cardBound(s)) return aiPayment(s, me, cost, own, abilityId)?.loss ?? 0;
   const pl = s.players[me];
   let v = 0;
   for (const card of pl.supports) {
@@ -1921,6 +1924,46 @@ function cpReserve(s: GameState, me: PlayerId, abilityId: string, cost: number):
     for (const b of abilityOfCard(card.id)) if (b.id !== abilityId && pl.cp >= b.cp && pl.cp - cost < b.cp) v = Math.max(v, laterBuffValue(s, me, b.effect));
   }
   return v;
+}
+
+/** Card-bound CP: what burning this card gives up, the best of its other abilities still to come this round. */
+function burnLoss(s: GameState, me: PlayerId, cardId: string, exceptAbility?: string): number {
+  let v = 0;
+  for (const b of abilityOfCard(cardId)) if (b.id !== exceptAbility) v = Math.max(v, laterBuffValue(s, me, b.effect) + 0.4);
+  return v;
+}
+
+/**
+ * Card-bound CP: the cards to burn for `cost`, giving up the least. A card whose ability is being played
+ * and exhausts anyway is free to pay with; CP lost to overpaying counts a little (it's gone for the round).
+ */
+function aiPayment(s: GameState, me: PlayerId, cost: number, own?: OwnCard, abilityId?: string): { cards: string[]; loss: number } | null {
+  if (!cardBound(s) || cost <= 0) return null;
+  let best: { cards: string[]; loss: number } | null = null;
+  for (const p of paymentOptions(s.players[me], cost)) {
+    let loss = p.wasted * 0.3;
+    for (const id of p.cards) if (!(own?.exhausts && id === own.id)) loss += burnLoss(s, me, id, id === own?.id ? abilityId : undefined);
+    if (!best || loss < best.loss - 1e-9) best = { cards: p.cards, loss };
+  }
+  return best;
+}
+
+/** Attach the AI's choice of cards to burn to a command that costs CP (card-bound CP only). */
+function withPayment(s: GameState, cmd: Command): Command {
+  if (!cardBound(s)) return cmd;
+  let cost = 0;
+  let own: OwnCard | undefined;
+  let abilityId: string | undefined;
+  if (cmd.type === "support") {
+    const a = abilityOf(cmd.support, cmd.ability);
+    cost = a?.cp ?? 0;
+    own = { id: cmd.support, exhausts: !!a?.exhaust };
+    abilityId = cmd.ability;
+  } else if (cmd.type === "ability") cost = ABILITIES[cmd.ability].cp ?? 0;
+  else if (cmd.type === "rally") cost = RALLY_CP;
+  else if ((cmd.type === "shoot" || cmd.type === "fight") && cmd.reroll) cost = REROLL_CP;
+  const pick = aiPayment(s, s.activePlayer, cost, own, abilityId);
+  return pick ? ({ ...cmd, pay: pick.cards } as Command) : cmd;
 }
 
 function abilityOfCard(id: string) {
@@ -1939,7 +1982,7 @@ export function aiCommand(s: GameState): Command {
   // Order choice: moving second lets us react to the opponent, which tests show is the stronger seat.
   if (s.orderChoice) return { type: "chooseOrder", player: s.orderChoice.player, goFirst: false };
   const support = aiSupportCommand(s);
-  if (support) return support;
+  if (support) return withPayment(s, support);
   const candidates = candidatesFor(s, me);
   const base = baseEval(s, me);
   const baseFollow = new Map<string, number>();
@@ -1974,7 +2017,7 @@ export function aiCommand(s: GameState): Command {
     const score = own !== undefined ? raw + Math.max(0, own) : raw;
     if (!best || score > best.score + TIE || (score >= best.score - TIE && tieKey(s, me, c.cmd) < tieKey(s, me, best.cmd))) best = { cmd: c.cmd, score };
   }
-  if (best) return withReroll(s, best.cmd);
+  if (best) return withPayment(s, withReroll(s, best.cmd));
   return { type: "pass", player: me };
 }
 

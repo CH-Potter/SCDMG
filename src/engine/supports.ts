@@ -12,6 +12,7 @@ import { lineOfSight, platformAt } from "./terrain";
 import type { Command, GameEvent, GameState, PlayerId, SupportAbilityDef, SupportEffect, Unit, UnitStatus, Vec } from "./types";
 
 import { CP_CAP } from "./constants";
+import { cardBound, spendCp, syncCardCp } from "./cp";
 import { rulesOf } from "./houseRules";
 export { CP_CAP };
 const BURROW_EXIT_RANGE = 3;
@@ -500,8 +501,12 @@ export function playSupport(s: GameState, cmd: Extract<Command, { type: "support
       text = `${card.name}: ${ability.name} is armed.`;
       break;
   }
-  pl.cp -= ability.cp;
+  // Its CP: card-bound, the card can pay for itself (free when it exhausts anyway).
+  const paid = spendCp(s, cmd.player, ability.cp, events, { pay: cmd.pay, own: { id: cmd.support, exhausts: !!ability.exhaust } });
+  if (paid) return paid;
   if (ability.exhaust) pl.supports = pl.supports.map((c) => (c.id === cmd.support ? { ...c, exhausted: true } : c));
+  // An exhausted card's CP is gone for the round too.
+  if (cardBound(s)) syncCardCp(pl);
   if (text) events.push({ type: "support", player: cmd.player, support: cmd.support, ability: cmd.ability, text });
   return null;
 }
@@ -533,12 +538,13 @@ function blast(
 
 /** End of round: gain CP, refresh cards, drop unused reactions, remove temporary structures. */
 export function refreshSupports(s: GameState, events: GameEvent[]): void {
-  const refresh = (pl: GameState["players"][number]): GameState["players"][number] => ({
-    ...pl,
-    cp: Math.min(CP_CAP, pl.cp + cpPerRound(pl.supports)),
-    supports: pl.supports.map((c) => ({ ...c, exhausted: false })),
-    armed: [],
-  });
+  // Card-bound CP doesn't bank: the refreshed cards are the CP. The classic pool adds their CP to the bank.
+  const bound = cardBound(s);
+  const refresh = (pl: GameState["players"][number]): GameState["players"][number] => {
+    const next = { ...pl, cp: Math.min(CP_CAP, pl.cp + cpPerRound(pl.supports)), supports: pl.supports.map((c) => ({ ...c, exhausted: false })), armed: [] };
+    if (bound) syncCardCp(next);
+    return next;
+  };
   s.players = [refresh(s.players[0]), refresh(s.players[1])];
   for (const u of s.units) {
     if (u.onBoard && u.expiresRound !== undefined && u.expiresRound <= s.round) {

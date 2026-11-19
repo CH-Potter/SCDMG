@@ -203,7 +203,8 @@ export function template(s: TemplateSpec): FactionTemplate {
     name: x.name,
     faction: fid,
     fizz: 0,
-    cp: x.cp,
+    // Card-bound CP: a card gives at least its dearest ability's CP, so burning it can always pay for it.
+    cp: Math.max(x.cp, ...x.abilities.map((a) => a.cp)),
     blurb: x.blurb,
     slots: { ...(x.slots ?? {}) },
     abilities: x.abilities.map((a) => {

@@ -1,3 +1,4 @@
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { applyCommand, createGame, mercyLead } from "../src/engine/game";
 import { MISSIONS } from "../src/engine/data/missions";
@@ -76,7 +77,7 @@ describe("forward-deploy limits", () => {
     const s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["munch", "militia"], seed: 2 });
     s.initiative = 0;
     s.activePlayer = 0;
-    s.players[0].cp = 8;
+    bankCp(s, 0, 8);
     const m = unitById(s, uidOf(s, 0, "munch-mama"))!;
     m.upgrades = ["tunnel"]; // Tunnel Claws (not in every starter list)
     place(s, m.uid, { x: 17, y: 32 });
