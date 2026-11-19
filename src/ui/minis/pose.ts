@@ -130,6 +130,8 @@ interface RigStatics {
   partPivot: (Pt | null)[];
   /** Where the muzzle sits when there's no weapon: the top centre of the figure (frame coords). */
   top: Pt;
+  /** Each limb's drawable and bone names, made once (no string building per frame). */
+  limbKeys: { upper: string; lower: string; mid: string; end: string }[];
 }
 
 const staticCache = new WeakMap<RigDef, RigStatics>();
@@ -148,6 +150,7 @@ function statics(rig: RigDef): RigStatics {
     partPlace: rig.parts.map((p) => placeMat(p.place)),
     partPivot: rig.parts.map((p) => (p.anim ? (readPart(p.src).anchors.pivot ?? { x: 0, y: 0 }) : null)),
     top: rig.view === "side" ? { x: rig.origin.x, y: rig.origin.y - rig.height * 0.8 } : { x: rig.origin.x, y: rig.origin.y - rig.height * 0.3 },
+    limbKeys: rig.limbs.map((l) => ({ upper: `${l.id}.upper`, lower: `${l.id}.lower`, mid: `${l.id}.mid`, end: `${l.id}.end` })),
   };
   staticCache.set(rig, s);
   return s;
@@ -164,6 +167,8 @@ export function strideOf(rig: RigDef): number {
 }
 
 const smooth = (t: number) => t * t * (3 - 2 * t);
+/** A bone that carries rest point `restP` to `p`, turned by `a - restA`. */
+const seg = (p: Pt, a: number, restP: Pt, restA: number): Mat => mul(tr(p.x, p.y), mul(rot(a - restA), tr(-restP.x, -restP.y)));
 
 /** Foot target of a leg for gait position `g` (wraps), blended with the stand pose by `w`. */
 function footTarget(rig: RigDef, limb: LimbDef, g: number, w: number): Pt {
@@ -221,7 +226,9 @@ export function poseRig(rig: RigDef, c: Channels, out?: Pose): Pose {
 
   const mats = out?.mats ?? new Map<string, Mat>();
   const limbs = out?.limbs ?? new Map<string, PosedLimb>();
-  for (const l of rig.limbs) {
+  for (let li = 0; li < rig.limbs.length; li++) {
+    const l = rig.limbs[li]!;
+    const key = st.limbKeys[li]!;
     const rest = limbRest(l);
     const from = bones[l.from.bone]!;
     const root = apply(from, l.from.at);
@@ -235,15 +242,14 @@ export function poseRig(rig: RigDef, c: Channels, out?: Pose): Pose {
     const a1 = angle(root, ik.joint);
     const a2 = angle(ik.joint, ik.end);
     limbs.set(l.id, { root, joint: ik.joint, end: ik.end, a1, a2 });
-    mats.set(`${l.id}.upper`, mul(figure, mul(tr(root.x, root.y), rot(a1))));
-    mats.set(`${l.id}.lower`, mul(figure, mul(tr(ik.joint.x, ik.joint.y), rot(a2))));
-    const seg = (p: Pt, a: number, restP: Pt, restA: number): Mat => mul(tr(p.x, p.y), mul(rot(a - restA), tr(-restP.x, -restP.y)));
-    bones[`${l.id}.upper`] = seg(root, a1, l.from.at, rest.a1);
-    bones[`${l.id}.lower`] = seg(ik.joint, a2, l.joint, rest.a2);
-    bones[`${l.id}.mid`] = seg(ik.joint, (a1 - rest.a1 + a2 - rest.a2) / 2, l.joint, 0);
+    mats.set(key.upper, mul(figure, mul(tr(root.x, root.y), rot(a1))));
+    mats.set(key.lower, mul(figure, mul(tr(ik.joint.x, ik.joint.y), rot(a2))));
+    bones[key.upper] = seg(root, a1, l.from.at, rest.a1);
+    bones[key.lower] = seg(ik.joint, a2, l.joint, rest.a2);
+    bones[key.mid] = seg(ik.joint, (a1 - rest.a1 + a2 - rest.a2) / 2, l.joint, 0);
     // feet stay flat on the ground and only tip when lifted; hands don't turn
     const lifted = l.kind === "leg" && rig.view === "side" ? Math.max(0, Math.min(1, (l.end.y - ik.end.y) / 6)) : 0;
-    bones[`${l.id}.end`] = seg(ik.end, l.kind === "leg" ? (a2 - rest.a2) * 0.6 * lifted : 0, l.end, 0);
+    bones[key.end] = seg(ik.end, l.kind === "leg" ? (a2 - rest.a2) * 0.6 * lifted : 0, l.end, 0);
   }
 
   for (let i = 0; i < rig.parts.length; i++) {
