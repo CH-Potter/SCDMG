@@ -308,6 +308,12 @@ button.lore-side {
   display: block;
 }
 
+/* the new miniatures aren't square: fit them, feet down */
+img.lore-mini.rig {
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+
 .lore-badge {
   display: grid;
   place-items: center;
