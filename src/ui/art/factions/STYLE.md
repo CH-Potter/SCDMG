@@ -2,6 +2,8 @@
 
 All three built-in factions share one house style, so they look like pieces from the same game, while each faction's shape language, palette and materials make its identity obvious at a glance. Every faction art pass follows this page.
 
+> **Scope.** This page is the bible for the **Classic** painters in this folder (the Classic miniature setting, and the Faction Forge's built miniatures, including the Munch template). The default look is now the miniature engine's **Hard Ink** style (`src/ui/minis/`, Ink Rig and Overhead). Faction art outside the board follows Hard Ink too: see "Faction art outside the board" at the end of this page.
+
 ## The look
 
 Polished top-down "colony sim" miniatures: the chunky, highly readable, flat-shaded style of games like RimWorld and Prison Architect, finished to a premium, stylish standard. Our characters, vehicles and props are original; take the readability and charm of that style, never their actual designs.
@@ -36,3 +38,15 @@ With the dev server running (`npm run dev`, port 5173):
   `npx electron scripts/gallery-shot.cjs <id> <out.png> 1300 "ground=7a6a4e"`
   Then look at the PNG. Grounds: dirt `7a6a4e`, sand `b89a6a`, grass `5d7a45`, concrete `8a8a86`.
 - Each row shows the unit large in both team colours, its idle and step frames, and a squad at roughly board scale. Judge the board-scale squad hardest: that's what players see.
+- The gallery shows the new miniatures by default; add `&style=classic` for these painters (`&style=overhead` for the top view).
+
+## Faction art outside the board
+
+Intros, campaign story scenes, lore pages, emblems and faction-coloured panels follow the miniatures' Hard Ink style: a bold silhouette, a heavy ink edge, flat colour with one shadow tone, and two or three accents at most.
+
+- **Figures are never redrawn by hand.** Any miniature in the DOM comes from `src/ui/art/rigPortrait.ts`: the miniature engine's own rig, posed by its own `poseRig`, parts painted by its own renderer, and the outer contour made by dilating the figure's alpha. Only units without new-engine art (custom units) fall back to these Classic painters.
+- **Palettes** come from the miniatures' colourways (`src/ui/minis/slots.ts`), with the faction colour as the accent:
+  - Dustline Militia: khaki plate and olive work-suit (Dust), gunmetal, leather; orange accent. A drafted army: rivets, stencils, rank chevrons, call-up notices, section numbers.
+  - The Skitterswarm: brood-violet chitin, deep violet, ivory underplate; acid-lime accent and glow. Carapaces, mandibles, eggs, acid, tunnels.
+  - Lumen Concord: pearl armour, deep navy, deco gold; lavender crystal light. Medallions, sunbursts, fan crests, portals.
+- **Emblems** (`src/ui/art/emblems.ts`): one silhouette per faction (riveted plate, carapace, medallion) that still reads at 20 px. The Munch's look survives only in the custom-faction emblem icons and the Forge template.
