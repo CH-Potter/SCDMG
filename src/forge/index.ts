@@ -30,7 +30,8 @@ import { clampCrop, type CropState, decodeUpload, defaultCrop, encodeCrop, rende
 import { MINI_BACKS, MINI_BODIES, MINI_HEADGEAR, MINI_HEADS, MINI_WEAPONS } from "../engine/data/unitArt";
 import type { MiniatureRecipe } from "../engine/types";
 import type { Tagged } from "../ui/minis/binding";
-import { artSectionHtml, hydrateMinis, miniImg, NEUTRAL_BASE, recipeFromProfile, rosterHtml, swapHtml, unitCardHtml } from "./art";
+import { loadAllArt } from "../ui/minis/registry";
+import { artSectionHtml, hydrateMinis, kitArtLoaded, kitTokenUrl, miniImg, NEUTRAL_BASE, recipeFromProfile, rosterHtml, swapHtml, unitCardHtml } from "./art";
 import { startFromTemplate, TEMPLATE_GROUPS, templateByKey, TEMPLATES, type TemplateGroup } from "./templates";
 import { esc, KEYWORD_TEXT, TRAIT_TEXT, weaponLine, EVADE_TEXT } from "../ui/describe";
 import { downloadJson, pickJsonFile, slug } from "../ui/files";
@@ -89,7 +90,8 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 /** A small token in the faction's colour and look: the game's own miniature art, on a neutral base. */
 export function tokenSvg(color: number, look: Faction["look"], size = 40): string {
   const n = Math.max(8, Math.min(256, Math.round(Number(size) || 40)));
-  const url = tokenDataUrl(color, look, n);
+  // the generic kit's figure for the look, in the faction colour (Classic until the kits load)
+  const url = kitTokenUrl(color, look, n * 2) ?? tokenDataUrl(color, look, n);
   return `<svg class="ff-token" width="${n}" height="${n}" viewBox="0 0 40 40" aria-hidden="true"><image href="${url}" x="0" y="0" width="40" height="40"/></svg>`;
 }
 
@@ -125,6 +127,15 @@ class FactionForge {
     host.classList.add("show", "ff-open");
     window.addEventListener("keydown", this.onKey);
     this.renderLibrary();
+    // the codex pictures are the new miniatures: load the kits' and templates' art (lazy chunks),
+    // then redraw the library's tokens (the Classic figures stand in until then)
+    if (!kitArtLoaded())
+      void loadAllArt().then(
+        () => {
+          if (this.host.classList.contains("ff-open") && !this.f) this.renderLibrary();
+        },
+        () => undefined,
+      );
   }
 
   // ---------- state helpers ----------

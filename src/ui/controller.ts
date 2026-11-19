@@ -1,3 +1,5 @@
+import { reseed } from "./entropy";
+import { cardBound, defaultPayment, paymentOptions, type OwnCard, type Payment } from "../engine/cp";
 import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
 // Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
 
@@ -185,7 +187,8 @@ export class Controller {
     setup: GameSetup,
     private hooks: ControllerHooks = {},
   ) {
-    this.state = createGame(setup);
+    // Live games roll properly random dice: a fresh seed now and after every action (see entropy.ts).
+    this.state = reseed(createGame(setup));
     // Dev server only: a console handle (window.__scdmg) for poking at the game while testing the UI.
     if (import.meta.env.DEV) (window as unknown as { __scdmg?: unknown }).__scdmg = this;
     this.tooltip = document.createElement("div");
@@ -836,10 +839,10 @@ export class Controller {
 
   // ---------- commands ----------
 
-  private issue(cmd: Command): boolean {
+  private issue(cmd: Command, paying = false): boolean {
     // A board tap: the first one only previews a legal order; a second tap on the same spot or unit
     // carries out what was previewed.
-    if (this.touchTap && !commandProblem(this.state, cmd)) {
+    if (!paying && this.touchTap && !commandProblem(this.state, cmd)) {
       const pending = this.pendingTap;
       if (!pending || !sameOrder(pending, cmd, this.tapSlop())) {
         this.pendingTap = cmd;
@@ -854,11 +857,22 @@ export class Controller {
       this.reject(why);
       return false;
     }
+    // Card-bound CP: when there's a real choice of cards to burn, ask which.
+    const choice = this.paymentChoice(this.state, cmd);
+    if (choice) {
+      const gen = this.generation;
+      void this.askPayment(choice.cost, choice.options).then((pay) => {
+        if (pay && gen === this.generation) this.issue({ ...cmd, pay } as Command, true);
+        else this.refresh();
+      });
+      return false;
+    }
     const r = applyCommand(this.state, cmd);
     if (!r.ok) {
       this.reject(r.error);
       return false;
     }
+    reseed(r.state);
     const before = this.state;
     this.declareCommand(before, r.state, cmd);
     this.history.push(before);
@@ -900,8 +914,16 @@ export class Controller {
     if (commandProblem(before, again)) return false;
     const yes = await this.askReroll(misses, before.players[HUMAN].cp);
     if (!yes || gen !== this.generation) return false;
+    const choice = this.paymentChoice(before, again);
+    if (choice) {
+      const pay = await this.askPayment(choice.cost, choice.options);
+      if (!pay || gen !== this.generation) return false;
+      (again as { pay?: string[] }).pay = pay;
+    }
+    // The same seed as the first try: the same dice, with the misses rolled again.
     const r = applyCommand(before, again);
     if (!r.ok) return false;
+    reseed(r.state);
     this.log(`↻ You spend ${REROLL_CP} CP to re-roll ${misses} miss${misses === 1 ? "" : "es"}.`, HUMAN);
     this.state = before;
     this.declareCommand(before, r.state, again);
@@ -911,6 +933,82 @@ export class Controller {
       void this.runAi();
     });
     return true;
+  }
+
+  /**
+   * Card-bound CP: the CP a command of yours costs and the ways to pay it, when you have a real choice
+   * (more than one way, and not a card that pays for its own exhausting ability). Null otherwise.
+   */
+  private paymentChoice(s: GameState, cmd: Command): { cost: number; options: Payment[] } | null {
+    if (!cardBound(s) || ("pay" in cmd && cmd.pay)) return null;
+    let cost = 0;
+    let own: OwnCard | undefined;
+    if (cmd.type === "support") {
+      const a = abilityOf(cmd.support, cmd.ability);
+      cost = a?.cp ?? 0;
+      own = { id: cmd.support, exhausts: !!a?.exhaust };
+    } else if (cmd.type === "ability") cost = ABILITIES[cmd.ability].cp ?? 0;
+    else if (cmd.type === "rally") cost = RALLY_CP;
+    else if ((cmd.type === "shoot" || cmd.type === "fight") && cmd.reroll) cost = REROLL_CP;
+    if (cost <= 0) return null;
+    const options = paymentOptions(s.players[HUMAN], cost);
+    if (options.length <= 1) return null;
+    if (own?.exhausts && options.some((p) => p.cards.length === 1 && p.cards[0] === own.id)) return null;
+    const first = defaultPayment(s.players[HUMAN], cost, own);
+    return { cost, options: first ? [first, ...options.filter((p) => p.cards.join() !== first.cards.join())] : options };
+  }
+
+  /** "Pay N CP with which card?" Resolves the cards to burn, or null to cancel. */
+  private askPayment(cost: number, options: Payment[]): Promise<string[] | null> {
+    return new Promise((resolve) => {
+      const el = document.createElement("div");
+      el.className = "reroll-prompt pay-prompt";
+      el.setAttribute("role", "dialog");
+      const title = document.createElement("h3");
+      title.textContent = `Pay ${cost} CP: burn which card?`;
+      const sub = document.createElement("p");
+      sub.textContent = "A burnt card's abilities are off until the cards refresh at the end of the round, and CP over the cost is lost.";
+      const row = document.createElement("div");
+      row.className = "row";
+      this.rerollOpen = true;
+      this.refresh();
+      const done = (v: string[] | null) => {
+        this.rerollOpen = false;
+        el.remove();
+        window.removeEventListener("keydown", onKey, true);
+        resolve(v);
+      };
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          e.stopPropagation();
+          done(null);
+        }
+      };
+      for (const p of options) {
+        const b = document.createElement("button");
+        b.type = "button";
+        const names = p.cards.map((id) => supportOf(id).name);
+        const loses = p.cards.flatMap((id) => supportOf(id).abilities.map((a) => a.name));
+        b.textContent = `Burn ${names.join(" + ")}${p.wasted ? ` (${p.wasted} CP lost)` : ""}`;
+        b.title = `Loses until the end of the round: ${loses.join(", ")}`;
+        const small = document.createElement("small");
+        small.textContent = ` loses ${loses.join(", ")}`;
+        b.appendChild(small);
+        b.addEventListener("click", () => done(p.cards));
+        row.appendChild(b);
+      }
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "secondary";
+      cancel.textContent = "Cancel";
+      cancel.addEventListener("click", () => done(null));
+      row.appendChild(cancel);
+      el.append(title, sub, row);
+      window.addEventListener("keydown", onKey, true);
+      this.els.stage.appendChild(el);
+      (row.firstElementChild as HTMLButtonElement | null)?.focus({ preventScroll: true });
+    });
   }
 
   /** "Re-roll N misses for 1 CP?" Resolves true for re-roll, false to keep the dice. */
@@ -958,7 +1056,7 @@ export class Controller {
     });
   }
 
-  /** Take back your last command (and anything the AI did after it). Dice are seeded, so redoing it rolls the same. */
+  /** Take back your last command (and anything the AI did after it). The state keeps the seed it had, so redoing it rolls the same: no re-rolling by undo. */
   private undo(): void {
     if (!this.humanTurn() || !this.history.length) return;
     this.state = this.history.pop()!;
@@ -1169,6 +1267,7 @@ export class Controller {
           r = applyCommand(this.state, { type: "pass", player: AI });
           if (!r.ok) break;
         } else this.declareCommand(this.state, r.state, cmd);
+        reseed(r.state);
         this.refresh();
         await sleep(200);
         if (gen !== this.generation) return;
@@ -1439,6 +1538,7 @@ export class Controller {
     if (!el) return;
     const me = s.players[HUMAN];
     const ai = s.players[AI];
+    const bound = cardBound(s);
     const cards = me.supports
       .map((c) => {
         const def = supportOf(c.id);
@@ -1455,7 +1555,7 @@ export class Controller {
           })
           .join("");
         return `<div class="support-card ${c.exhausted ? "exhausted" : ""}">
-          <div class="support-head"><b>${esc(def.name)}</b> <small>+${def.cp} CP/round${c.exhausted ? " · exhausted" : ""}</small></div>
+          <div class="support-head"><b>${esc(def.name)}</b> <small>${bound ? `✦${def.cp} CP${c.exhausted ? " · burnt till the round ends" : ""}` : `+${def.cp} CP/round${c.exhausted ? " · exhausted" : ""}`}</small></div>
           <div class="support-abilities">${buttons}</div>
         </div>`;
       })
@@ -1467,7 +1567,7 @@ export class Controller {
       )
       .join("");
     const html = `
-      <h3 style="margin:0 0 4px">${factionEmblemSvg(s.factions[HUMAN], 22)} Supports <span class="chip cp">✦ ${me.cp}/${CP_CAP} CP</span> <small class="hint">+${cpPerRound(me.supports)}/round</small></h3>
+      <h3 style="margin:0 0 4px">${factionEmblemSvg(s.factions[HUMAN], 22)} Supports ${bound ? `<span class="chip cp" title="Your CP is the CP on your ready cards. Spending CP burns cards: their abilities are off until the end of the round.">✦ ${me.cp} CP</span> <small class="hint">on ready cards</small>` : `<span class="chip cp">✦ ${me.cp}/${CP_CAP} CP</span> <small class="hint">+${cpPerRound(me.supports)}/round</small>`}</h3>
       ${cards || `<p class="hint">No supports in this list.</p>`}
       ${armed ? `<div class="tags">Armed: ${armed}</div>` : ""}
       <p class="hint" style="margin:4px 0 0">AI: ✦ ${ai.cp} CP${ai.armed.length ? ` · ${ai.armed.length} reaction${ai.armed.length > 1 ? "s" : ""} armed` : ""}</p>`;

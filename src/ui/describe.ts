@@ -2,6 +2,7 @@
 
 import { BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT } from "../engine/constants";
 import { ABILITIES } from "../engine/data/abilities";
+import { SUPPORTS } from "../engine/data/factions";
 import { profileOf } from "../engine/profile";
 import { unitById } from "../engine/rules";
 import type { AttackReport, EvadeCondition, GameEvent, GameState, Keyword, Phase, Unit, Weapon, UnitProfile, WeaponTrait } from "../engine/types";
@@ -140,6 +141,11 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
       return `${esc(unitName(s, e.uid))}'s charge at ${esc(unitName(s, e.target))} falls apart (${esc(e.reason)}).`;
     case "hunkered":
       return `${esc(unitName(s, e.uid))} hunkers down.`;
+    case "cpPaid": {
+      const names = e.cards.map((id) => esc(SUPPORTS[id]?.name ?? id));
+      const how = [e.loose ? `${e.loose} loose CP` : "", names.length ? `burning ${names.join(" and ")}` : ""].filter(Boolean).join(" and ");
+      return `✦ ${who(e.player)} ${e.player === 0 ? "pay" : "pays"} ${e.amount} CP by ${how}${e.wasted ? ` (${e.wasted} CP lost for the round)` : ""}.`;
+    }
     case "burrowed":
       return e.under ? `🕳️ ${esc(unitName(s, e.uid))} burrows out of sight.` : `🕳️ ${esc(unitName(s, e.uid))} bursts back up out of the ground.`;
     case "barrageMarker":

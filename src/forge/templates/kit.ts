@@ -5,6 +5,7 @@
 import { applyComputedCosts } from "../../engine/pricing";
 import type { Tagged } from "../../ui/minis/binding";
 import { defaultEvade } from "../../engine/data/agility";
+import { defaultImpact } from "../../engine/data/impact";
 import type {
   AbilityId,
   EvadeDef,
@@ -191,8 +192,13 @@ export function template(s: TemplateSpec): FactionTemplate {
       const ev = defaultEvade(p);
       if (ev) p.evade = ev;
     }
-    if (u.impact) p.impact = { ...u.impact };
     if (u.structure) p.structure = { ...u.structure };
+    // Melee units hit on the charge: one without its own impact gets the basic one (see data/impact.ts).
+    if (u.impact) p.impact = { ...u.impact };
+    else {
+      const im = defaultImpact(p);
+      if (im) p.impact = im;
+    }
     return p;
   });
   const supports: SupportDef[] = s.supports.map((x) => ({
@@ -200,7 +206,8 @@ export function template(s: TemplateSpec): FactionTemplate {
     name: x.name,
     faction: fid,
     fizz: 0,
-    cp: x.cp,
+    // Card-bound CP: a card gives at least its dearest ability's CP, so burning it can always pay for it.
+    cp: Math.max(x.cp, ...x.abilities.map((a) => a.cp)),
     blurb: x.blurb,
     slots: { ...(x.slots ?? {}) },
     abilities: x.abilities.map((a) => {

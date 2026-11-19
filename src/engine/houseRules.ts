@@ -5,6 +5,8 @@
 import type { GameState } from "./types";
 
 export interface HouseRules {
+  /** CP lives on the support cards: spend it by exhausting cards (their abilities switch off until the round ends); it doesn't bank. On by default. */
+  cardCp: boolean;
   /** Army lists must fit their class slots (Base, Support, Elite, Flyer, Static; see data/unitClasses.ts). On by default. */
   classLimits: boolean;
   /** Nerve tests and Shaken (and Rally). Off by default. */
@@ -49,6 +51,7 @@ export type HouseRuleId = keyof HouseRules;
 
 /** The standard game: what a new game plays unless the players change it. */
 export const STANDARD_RULES: Readonly<HouseRules> = Object.freeze({
+  cardCp: true,
   classLimits: true,
   morale: false,
   evade: true,
@@ -76,6 +79,7 @@ export const STANDARD_RULES: Readonly<HouseRules> = Object.freeze({
  */
 export const CLASSIC_RULES: Readonly<HouseRules> = Object.freeze({
   ...STANDARD_RULES,
+  cardCp: false,
   classLimits: false,
   morale: true,
   rolledCharges: false,
@@ -95,6 +99,7 @@ export interface HouseRuleInfo {
 }
 
 export const HOUSE_RULES: readonly HouseRuleInfo[] = [
+  { id: "cardCp", name: "Card-bound CP", text: "Your CP is the CP on your ready support cards. To spend CP, exhaust cards worth at least that much: their abilities switch off until the cards refresh at the end of the round, and any CP over the cost is lost for the round. CP doesn't bank. Off: each round banks your cards' CP (up to 8), and spending takes from the bank." },
   { id: "classLimits", name: "Unit class limits", text: "Army lists fill class slots: Base, Support, Elite, Flyer and Static. Your faction and each support card add slots. Off: any mix within the mode's unit and cost limits." },
   { id: "rolledCharges", name: "Rolled charges", text: "Declare a charge at a unit within 12\", then roll 2d6\" for the distance. Too short, and the charge fails where it stands. Off: charge up to the unit's move." },
   { id: "closeRanks", name: "Close ranks", text: "When a unit fights, each of its models first moves up to 3\" into base contact (or behind a squad-mate who is). Off: models fight from where they stand." },

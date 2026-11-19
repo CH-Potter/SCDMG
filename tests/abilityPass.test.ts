@@ -1,6 +1,7 @@
 // The ability pass: every unit has at least two abilities (structures at least one) and every
 // support card at least two. Each new ability's effect, its legality errors, and that the AI uses it.
 
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { aiCommand, aiSupportCommand } from "../src/engine/ai";
 import { planShooting, saveNeeded, shellSpotted } from "../src/engine/combat";
@@ -38,8 +39,8 @@ function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {})
   s.initiative = 0;
   s.activePlayer = 0;
   s.orderChoice = null;
-  s.players[0].cp = 8;
-  s.players[1].cp = 8;
+  bankCp(s, 0, 8);
+  bankCp(s, 1, 8);
   return s;
 }
 
@@ -567,7 +568,7 @@ describe("Undermine (Tunnel Network)", () => {
   it("the AI doesn't spend the CP a swarm about to fight needs for Feeding Frenzy", () => {
     const setup = (cp: number) => {
       const s = at(game([L("munch-nibblers"), L("mil-grunts")], { factions: ["munch", "militia"], supports: [["munch-nest", "munch-tunnels"], []] }), "movement");
-      s.players[0].cp = cp;
+      bankCp(s, 0, cp);
       place(s, "p0-0", { x: 0.8, y: 26 });
       place(s, "p1-0", { x: 0.8, y: 19 });
       return s;
@@ -637,7 +638,7 @@ describe("Glaring Light (Star Lens)", () => {
     const grunts = place(s, "p1-0", { x: 0.8, y: 14 });
     grunts.status.hunkered = true;
     grunts.status.dugIn = 1;
-    s.players[0].cp = 2; // too little for the Sunbeam
+    bankCp(s, 0, 2); // too little for the Sunbeam
     const cmd = aiSupportCommand(s);
     expect(isSupport("glaring-light")(cmd)).toBe(true);
     const s2 = ok(applyCommand(s, cmd!));

@@ -1,4 +1,5 @@
 import { missionFitsMap, MISSIONS } from "./engine/data/missions";
+import { freshSeed } from "./ui/entropy";
 import { FACTIONS, registerCustomFactions } from "./engine/data/factions";
 import { openMapBuilder } from "./editor/index";
 import { openFactionForge } from "./forge/index";
@@ -82,7 +83,7 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
     factions: choice.factions,
     lists,
     supports,
-    seed: Date.now(),
+    seed: freshSeed(),
     orderChoice: true,
     map: choice.map,
     mapId: choice.map.id,
@@ -105,7 +106,12 @@ let starting = 0;
 // Custom factions from the Faction Forge join the built-ins.
 registerCustomFactions(listCustomFactions());
 
+// The miniatures' art loads in chunks (ui/minis/registry.ts): fetch the registered factions' in the
+// background, for the intros, lore and codex pictures (the battle loads its armies' itself).
+const artReady = loadArt(Object.values(FACTIONS).flatMap((f) => f.profiles)).catch((e) => console.warn("Couldn't load miniature art:", e));
+
 await renderer.init(els.stage);
 showMenu();
-// First launch: the game intro plays over the menu (skippable, and replayable from the menu).
-maybeGameIntro();
+// First launch: the game intro plays over the menu (skippable, and replayable from the menu), once
+// its miniatures are in (a moment; the Classic figures stand in if they never come).
+void Promise.race([artReady, new Promise((r) => setTimeout(r, 2500))]).then(() => maybeGameIntro());

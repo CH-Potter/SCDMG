@@ -4,6 +4,8 @@
 //   The Skitterswarm: primarily melee and swarm. Cheap bodies, acid, regrowth round the Broodmother, burrowing.
 //   Lumen Concord: few elite specialists. Shields, precision and tracking, teleporting about.
 
+import { bankCp } from "./helpers/cp";
+import { isMeleeBased } from "../src/engine/data/impact";
 import { describe, expect, it } from "vitest";
 import { saveNeeded, planShooting, strayTarget } from "../src/engine/combat";
 import { ABILITIES } from "../src/engine/data/abilities";
@@ -100,9 +102,9 @@ describe("faction pillars in the data", () => {
     };
     expect(nerve("swarm")).toBeLessThan(nerve("militia"));
     expect(nerve("militia")).toBeLessThan(nerve("concord"));
-    // Unlike the Munch they replaced, the swarm's line bugs don't hit on the charge: impact is for monsters and dives.
-    const swarmImpact = buyable("swarm").filter((p) => p.impact);
-    expect(swarmImpact.every((p) => p.keywords.includes("monster") || p.keywords.includes("flying"))).toBe(true);
+    // Every unit built for melee hits on the charge (data/impact.ts), in every faction.
+    const meleeUnits = (["militia", "swarm", "concord"] as const).flatMap((f) => buyable(f)).filter((p) => isMeleeBased(p));
+    expect(meleeUnits.filter((p) => !p.impact).map((p) => p.id)).toEqual([]);
     // Acid on the shooters, the bombard and the flyers; the Brood Bond on the Broodmother alone.
     const withAbility = (a: AbilityId) => buyable("swarm").filter((p) => abilitiesOf(p).includes(a)).map((p) => p.id);
     expect(withAbility("corrode").length).toBeGreaterThanOrEqual(4);
@@ -198,8 +200,8 @@ function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {})
   Object.assign(s, { initiative: 0, activePlayer: 0, orderChoice: null });
   // An open table: these tests are about the effects, not about finding a way round the scenery.
   Object.assign(s, { terrain: [], access: [] });
-  s.players[0].cp = 8;
-  s.players[1].cp = 8;
+  bankCp(s, 0, 8);
+  bankCp(s, 1, 8);
   return s;
 }
 

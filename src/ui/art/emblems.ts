@@ -45,86 +45,135 @@ function starPath(cx: number, cy: number, r0: number, r1: number, n: number, rot
   return d + "Z";
 }
 
-/** Dustline Militia: a riveted sheet-metal plate with a tractor cog and a wheat sheaf. */
+// The three built-in factions' emblems follow the Hard Ink direction of the miniatures: one bold
+// silhouette each (a riveted plate, a carapace, a medallion), the faction's own palette (the
+// miniatures' colourways), a heavy ink edge with a drop shadow, and two or three accents at most.
+
+/** Dustline Militia: a riveted khaki work-suit plate, a rifle crossed with a wheat ear, and two orange rank chevrons. The frontier, drafted. */
 function militia(color: number, id: string): string {
-  const c = css(color);
-  const dk = css(shade(color, -0.35));
-  return `${defs(id, "rgba(28,21,18,0.35)")}
-  <path d="M10 14 L32 5 L54 14 L54 38 C54 50 44 57 32 60 C20 57 10 50 10 38 Z" fill="${INK}" transform="translate(2 2)"/>
-  <path d="M10 14 L32 5 L54 14 L54 38 C54 50 44 57 32 60 C20 57 10 50 10 38 Z" fill="${c}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M32 60 C44 57 54 50 54 38 L54 14 L48 12 L48 38 C48 48 40 53 32 56 Z" fill="${dk}"/>
-  <path d="M32 60 C44 57 54 50 54 38 L54 14 L48 12 L48 38 C48 48 40 53 32 56 Z" fill="url(#ht${id})"/>
-  <path d="M14 16 L32 9" stroke="#fff3d6" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-  <rect x="15" y="44" width="9" height="8" rx="1" fill="#5c7389" stroke="${INK}" stroke-width="1.4" transform="rotate(-8 19 48)"/>
-  <rect x="16.5" y="45.5" width="6" height="5" rx="0.5" fill="none" stroke="#fff3d6" stroke-width="0.8" stroke-dasharray="1.2 1" transform="rotate(-8 19 48)"/>
-  <path d="${cogPath(32, 31, 10, 13.5, 9)}" fill="#4c5158" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>
-  <circle cx="32" cy="31" r="5" fill="${c}" stroke="${INK}" stroke-width="2"/>
-  <path d="M27 26 A 7 7 0 0 1 35 24" stroke="#c9ced2" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-  <path d="M32 50 L32 20 M32 24 l-4 -4 M32 24 l4 -4 M32 30 l-4 -4 M32 30 l4 -4 M32 36 l-4 -4 M32 36 l4 -4" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
-  <path d="M32 50 L32 20 M32 24 l-4 -4 M32 24 l4 -4 M32 30 l-4 -4 M32 30 l4 -4 M32 36 l-4 -4 M32 36 l4 -4" stroke="#e8c25a" stroke-width="2" stroke-linecap="round"/>
-  ${[[14, 17], [50, 17], [14, 37], [50, 37], [32, 55]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#c9c2b4" stroke="${INK}" stroke-width="1"/>`).join("")}`;
+  const acc = css(color);
+  const plate = "#a48d5e";
+  const plateDk = "#6f5d3b";
+  const plateLt = "#dccb9c";
+  const shape = "M15 5 L49 5 L58 14 L58 38 C58 50 46 57 32 62 C18 57 6 50 6 38 L6 14 Z";
+  const seam = "M16.5 10 L47.5 10 L53 15.5 L53 37.5 C53 47 43 52.5 32 56.5 C21 52.5 11 47 11 37.5 L11 15.5 Z";
+  const grains = [0, 1, 2, 3]
+    .map((i) => {
+      const t = 3 + i * 3.4;
+      const x = 20 + t * 0.707;
+      const y = 18 + t * 0.707;
+      return `<ellipse cx="${(x - 2.2).toFixed(2)}" cy="${(y + 1.1).toFixed(2)}" rx="2.6" ry="1.4" transform="rotate(-20 ${(x - 2.2).toFixed(2)} ${(y + 1.1).toFixed(2)})"/><ellipse cx="${(x + 1.1).toFixed(2)}" cy="${(y - 2.2).toFixed(2)}" rx="2.6" ry="1.4" transform="rotate(-70 ${(x + 1.1).toFixed(2)} ${(y - 2.2).toFixed(2)})"/>`;
+    })
+    .join("");
+  const rivets = [
+    [14.5, 12.5],
+    [49.5, 12.5],
+    [12.5, 33],
+    [51.5, 33],
+    [32, 59.2],
+  ]
+    .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.9" fill="#ddd3ba" stroke="${INK}" stroke-width="1.1"/>`)
+    .join("");
+  const chevron = (y: number) =>
+    `<path d="M21 ${y + 6} L32 ${y} L43 ${y + 6}" fill="none" stroke="${INK}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M21 ${y + 6} L32 ${y} L43 ${y + 6}" fill="none" stroke="${acc}" stroke-width="3.8" stroke-linejoin="round" stroke-linecap="round"/>`;
+  return `${defs(id, "rgba(28,21,18,0.4)")}
+  <clipPath id="c${id}"><path d="${shape}"/></clipPath>
+  <path d="${shape}" fill="${INK}" transform="translate(2 2)"/>
+  <path d="${shape}" fill="${plate}"/>
+  <g clip-path="url(#c${id})"><rect x="33" y="0" width="31" height="64" fill="${plateDk}" opacity="0.5"/><rect x="33" y="0" width="31" height="64" fill="url(#ht${id})"/></g>
+  <path d="${seam}" fill="none" stroke="${plateDk}" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="${shape}" fill="none" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M16 8.2 L47.5 8.2" stroke="${plateLt}" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M46 42 L20 16" stroke="${INK}" stroke-width="4.4" stroke-linecap="round"/>
+  <path d="M46 42 L20 16" stroke="#e8c25a" stroke-width="2.2" stroke-linecap="round"/>
+  <g fill="#e8c25a" stroke="${INK}" stroke-width="1">${grains}</g>
+  <path d="M18.5 42.5 L45.5 15.5" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>
+  <path d="M18.5 42.5 L28 33" stroke="#7a4a2a" stroke-width="4.4" stroke-linecap="round"/>
+  <path d="M28 33 L45.5 15.5" stroke="#4a5158" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M30.5 30.5 L35 26" stroke="#4a5158" stroke-width="4.6" stroke-linecap="butt"/>
+  ${chevron(41)}${chevron(48)}
+  ${rivets}`;
 }
 
-/**
- * The Skitterswarm: a bug's head seen front-on (hooked mandibles, two glowing compound eyes, feelers)
- * on a segmented chitin plate, over a clutch of three glowing eggs.
- */
+/** The Skitterswarm: a violet carapace with a bug's head front-on: slanted acid eyes, hooked ivory mandibles and a drip of acid. */
 function swarm(color: number, id: string): string {
   const acid = css(color);
-  const glow = css(mix(color, 0xf4ffc0, 0.45));
-  const shell = "#3b2a33";
-  const shellLt = "#5a4250";
-  const plate = "M32 4 C46 6 56 14 57 28 C58 44 48 56 32 61 C16 56 6 44 7 28 C8 14 18 6 32 4 Z";
-  const egg = (x: number, y: number, r: number) =>
-    `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 1.25}" fill="${glow}" stroke="${INK}" stroke-width="1.6"/><ellipse cx="${x - r * 0.3}" cy="${y - r * 0.45}" rx="${r * 0.3}" ry="${r * 0.4}" fill="#ffffff" opacity="0.75"/>`;
-  return `${defs(id, "rgba(28,21,18,0.45)")}
-  <path d="${plate}" fill="${INK}" transform="translate(2 2)"/>
-  <path d="${plate}" fill="${shell}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M12 22 C24 17 40 17 52 22 M9 36 C22 31 42 31 55 36" stroke="${shellLt}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <path d="M32 61 C48 56 58 44 57 28 C56 14 46 6 32 4 L32 61 Z" fill="url(#ht${id})"/>
-  <path d="M14 14 C20 9 26 7 31 7" stroke="#8a7080" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>
-  ${egg(23, 50, 4.2)}${egg(41, 50, 4.2)}${egg(32, 53.5, 4.8)}
-  <path d="M27 17 C24 11 20 9 15 9 M37 17 C40 11 44 9 49 9" stroke="${INK}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
-  <path d="M27 17 C24 11 20 9 15 9 M37 17 C40 11 44 9 49 9" stroke="${acid}" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-  <path d="M20 26 C20 18 26 15 32 15 C38 15 44 18 44 26 C44 33 39 38 32 38 C25 38 20 33 20 26 Z" fill="#5a4250" stroke="${INK}" stroke-width="2.4"/>
-  <path d="M23 21 C26 17.5 30 17 33 17.2" stroke="#8a7080" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-  <ellipse cx="25.5" cy="26" rx="4.4" ry="5.2" fill="${glow}" stroke="${INK}" stroke-width="1.8" transform="rotate(-18 25.5 26)"/>
-  <ellipse cx="38.5" cy="26" rx="4.4" ry="5.2" fill="${glow}" stroke="${INK}" stroke-width="1.8" transform="rotate(18 38.5 26)"/>
-  <path d="M23 24 L28 24 M22.6 27 L28.4 27 M36 24 L41 24 M35.6 27 L41.4 27" stroke="${css(shade(color, -0.35))}" stroke-width="0.8"/>
-  <circle cx="24.4" cy="23.6" r="1" fill="#ffffff"/><circle cx="37.4" cy="23.6" r="1" fill="#ffffff"/>
-  <path d="M26 35 C21 38 20 43 24 46 C25 42 28 40 31 39.5 Z" fill="#e8dcc4" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M38 35 C43 38 44 43 40 46 C39 42 36 40 33 39.5 Z" fill="#e8dcc4" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M24.5 38.5 l1.6 1.4 M39.5 38.5 l-1.6 1.4" stroke="${INK}" stroke-width="1"/>
-  <circle cx="32" cy="41.5" r="1.4" fill="${acid}" stroke="${INK}" stroke-width="0.8"/>`;
+  const glow = css(mix(color, 0xf0ffb0, 0.4));
+  const chitin = "#5e3478";
+  const deep = "#2b1838";
+  const ridge = "#7d4f9c";
+  const ivory = "#d6cba8";
+  const shape = "M32 3 C45 4 56 12 58 25 C60 39 50 53 32 62 C14 53 4 39 6 25 C8 12 19 4 32 3 Z";
+  return `${defs(id, "rgba(20,10,28,0.5)")}
+  <clipPath id="c${id}"><path d="${shape}"/></clipPath>
+  <path d="${shape}" fill="${INK}" transform="translate(2 2)"/>
+  <path d="${shape}" fill="${chitin}"/>
+  <g clip-path="url(#c${id})"><rect x="32" y="0" width="32" height="64" fill="${deep}" opacity="0.45"/><rect x="32" y="0" width="32" height="64" fill="url(#ht${id})"/></g>
+  <path d="M9 21 C21 15 43 15 55 21 M7 36 C21 30 43 30 57 36 M32 4 L32 15" stroke="${deep}" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M10 19.5 C21 14 31 13 31 13 M8 34.5 C18 29.5 28 28.6 31 28.6" stroke="${ridge}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <path d="${shape}" fill="none" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M15 11.5 C20 7.5 26 5.8 31 5.8" stroke="#a681c4" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M27 22 C23 15 18 11 12 9 M37 22 C41 15 46 11 52 9" stroke="${INK}" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  <path d="M27 22 C23 15 18 11 12 9 M37 22 C41 15 46 11 52 9" stroke="${acid}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M19 22 L45 22 L50.5 31 L43 41 L21 41 L13.5 31 Z" fill="#3a2150" stroke="${INK}" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M21 24.6 L33 24" stroke="${ridge}" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M17.5 28.5 L28.8 31.6 L27.2 36 L19.8 33.6 Z" fill="${glow}" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M46.5 28.5 L35.2 31.6 L36.8 36 L44.2 33.6 Z" fill="${glow}" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+  <circle cx="21.5" cy="30.4" r="0.9" fill="#ffffff"/><circle cx="42.5" cy="30.4" r="0.9" fill="#ffffff"/>
+  <path d="M23.5 40 C17 43 15.5 50.5 21 55 C21.5 49.5 25 46.4 30.5 45.2 Z" fill="${ivory}" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M40.5 40 C47 43 48.5 50.5 43 55 C42.5 49.5 39 46.4 33.5 45.2 Z" fill="${ivory}" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M21.5 44.5 l2.2 1.2 M42.5 44.5 l-2.2 1.2" stroke="${INK}" stroke-width="1.1" stroke-linecap="round"/>
+  <path d="M32 45 C34.4 49.4 34.8 52 32 54 C29.2 52 29.6 49.4 32 45 Z" fill="${acid}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>
+  <circle cx="32" cy="57.6" r="1.4" fill="${acid}" stroke="${INK}" stroke-width="0.9"/>`;
 }
 
-/** Lumen Concord: a smug alien in a fishbowl helmet, gold collar and little crown, on a radiant medallion. */
+/** Lumen Concord: a pearl mask with smug, half-lidded crystal eyes under a gold fan crest, on a navy deco sunburst medallion. */
 function concord(color: number, id: string): string {
-  const rays = Array.from({ length: 12 }, (_, i) => {
-    const a = (i / 12) * Math.PI * 2;
-    return `M${(32 + Math.cos(a) * 18).toFixed(1)} ${(34 + Math.sin(a) * 18).toFixed(1)} L${(32 + Math.cos(a) * 25).toFixed(1)} ${(34 + Math.sin(a) * 25).toFixed(1)}`;
+  const glow = css(mix(color, 0xffffff, 0.45));
+  const gold = "#d2b05a";
+  const navy = "#232848";
+  const pearl = "#eeeaf4";
+  const pearlDk = "#b9b1cf";
+  const rays = Array.from({ length: 16 }, (_, i) => {
+    const a = (i / 16) * Math.PI * 2;
+    const r1 = i % 2 ? 19 : 21.5;
+    return `M${(32 + Math.cos(a) * 12).toFixed(1)} ${(35 + Math.sin(a) * 12).toFixed(1)} L${(32 + Math.cos(a) * r1).toFixed(1)} ${(35 + Math.sin(a) * r1).toFixed(1)}`;
   }).join(" ");
-  const skin = "#9fe3c4";
-  const lid = "#74c4a2";
-  return `${defs(id, "rgba(44,47,88,0.4)")}
-  <circle cx="34" cy="36" r="26" fill="${INK}"/>
-  <circle cx="32" cy="34" r="26" fill="#2c2f58" stroke="${INK}" stroke-width="3"/>
-  <circle cx="32" cy="34" r="22.5" fill="none" stroke="#dcb55a" stroke-width="2.2"/>
-  <path d="${rays}" stroke="${css(shade(color, 0.5))}" stroke-width="2.2" stroke-linecap="round" opacity="0.9"/>
-  <circle cx="32" cy="33" r="15.5" fill="${css(mix(color, 0xffffff, 0.6))}" opacity="0.28"/>
-  <path d="M23.5 34 C23.5 25 27 20.5 32 20.5 C37 20.5 40.5 25 40.5 34 C40.5 40 37 44 32 45 C27 44 23.5 40 23.5 34 Z" fill="${skin}" stroke="${INK}" stroke-width="2"/>
-  <path d="M36 23 C38.5 25 39.5 29 39.3 33" stroke="${lid}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  <ellipse cx="28" cy="34" rx="3.4" ry="2.5" fill="${INK}" transform="rotate(12 28 34)"/>
-  <ellipse cx="36" cy="34" rx="3.4" ry="2.5" fill="${INK}" transform="rotate(-12 36 34)"/>
-  <path d="M24.6 33.2 C25.5 31 30 31.2 31.4 33.6 Z M39.4 33.2 C38.5 31 34 31.2 32.6 33.6 Z" fill="${lid}" stroke="${INK}" stroke-width="1"/>
-  <circle cx="29" cy="34.7" r="0.7" fill="#ffffff"/><circle cx="37" cy="34.7" r="0.7" fill="#ffffff"/>
-  <path d="M29.5 40.3 Q32.5 41.6 35 39.4" stroke="${INK}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-  <circle cx="32" cy="33" r="15.5" fill="none" stroke="${INK}" stroke-width="2.4"/>
-  <path d="M21 28 A12 12 0 0 1 28.5 19.4" stroke="#ffffff" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.85"/>
-  <circle cx="41.5" cy="25" r="1.2" fill="#ffffff" opacity="0.8"/>
-  <path d="M19.5 45 C24 50 40 50 44.5 45 L44.5 49 C40 54.5 24 54.5 19.5 49 Z" fill="#dcb55a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="32" cy="50.6" r="1.8" fill="${css(shade(color, 0.3))}" stroke="${INK}" stroke-width="0.9"/>
-  <path d="M25 13.5 L27.2 16.6 L29.6 11.4 L32 15.6 L34.4 11.4 L36.8 16.6 L39 13.5 L38 19 L26 19 Z" fill="#dcb55a" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>`;
+  const blades = [-2, -1, 0, 1, 2]
+    .map((k) => {
+      const a = ((-90 + k * 23) * Math.PI) / 180;
+      const n = a + Math.PI / 2;
+      const bx = 32 + Math.cos(a) * 4;
+      const by = 23 + Math.sin(a) * 4;
+      const tx = 32 + Math.cos(a) * (k === 0 ? 17 : 15);
+      const ty = 23 + Math.sin(a) * (k === 0 ? 17 : 15);
+      const p = (x: number, y: number) => `${x.toFixed(1)} ${y.toFixed(1)}`;
+      return `M${p(bx + Math.cos(n) * 3.6, by + Math.sin(n) * 3.6)} L${p(tx, ty)} L${p(bx - Math.cos(n) * 3.6, by - Math.sin(n) * 3.6)} Z`;
+    })
+    .join(" ");
+  const eye = (cx: number, dir: 1 | -1) => {
+    const x0 = cx - 3.2 * dir;
+    const x1 = cx + 3.2 * dir;
+    return `<path d="M${x0} 34.2 C${cx - 1.6 * dir} 32.4 ${cx + 1.6 * dir} 32.2 ${x1} 33.6 C${cx + 1.4 * dir} 35.8 ${cx - 1.6 * dir} 36 ${x0} 34.2 Z" fill="${glow}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M${x0 - 0.4 * dir} 34 C${cx - 1.6 * dir} 32 ${cx + 1.6 * dir} 31.8 ${x1 + 0.4 * dir} 33.4 L${x1} 34.4 C${cx + 1.4 * dir} 33.5 ${cx - 1.6 * dir} 33.6 ${x0} 34.6 Z" fill="${navy}"/>`;
+  };
+  return `${defs(id, "rgba(16,18,44,0.45)")}
+  <circle cx="34" cy="37" r="26" fill="${INK}"/>
+  <circle cx="32" cy="35" r="26" fill="${navy}" stroke="${INK}" stroke-width="3"/>
+  <path d="M32 9 A26 26 0 0 1 32 61 Z" fill="url(#ht${id})"/>
+  <circle cx="32" cy="35" r="22.8" fill="none" stroke="${gold}" stroke-width="2"/>
+  <path d="${rays}" stroke="${gold}" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="35" r="11.5" fill="${css(mix(color, 0x232848, 0.55))}" opacity="0.9"/>
+  <path d="${blades}" fill="${gold}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M32 21 C38.4 21 41.4 26.4 41.4 33 C41.4 41 37 47.4 32 50.6 C27 47.4 22.6 41 22.6 33 C22.6 26.4 25.6 21 32 21 Z" fill="${pearl}"/>
+  <path d="M32 21 C38.4 21 41.4 26.4 41.4 33 C41.4 41 37 47.4 32 50.6 Z" fill="${pearlDk}" opacity="0.6"/>
+  <path d="M32 21 C38.4 21 41.4 26.4 41.4 33 C41.4 41 37 47.4 32 50.6 C27 47.4 22.6 41 22.6 33 C22.6 26.4 25.6 21 32 21 Z" fill="none" stroke="${INK}" stroke-width="2.2"/>
+  <path d="M25.4 26 C26.4 24 28 23 29.6 22.6" stroke="#ffffff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  ${eye(27.6, 1)}${eye(36.4, -1)}
+  <path d="M32 24.2 L34 27 L32 29.8 L30 27 Z" fill="${glow}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>
+  <path d="M29.6 43.4 L34.4 43.4" stroke="${pearlDk}" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M21.5 49 C26 53.6 38 53.6 42.5 49 L42.5 52.6 C38 57.6 26 57.6 21.5 52.6 Z" fill="${gold}" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="32" cy="54" r="1.7" fill="${glow}" stroke="${INK}" stroke-width="0.9"/>`;
 }
 
 /** A procedural emblem for a custom faction: shape and pattern from its name hash, icon from its look. */

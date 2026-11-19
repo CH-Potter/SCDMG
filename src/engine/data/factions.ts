@@ -92,7 +92,7 @@ const militia: Faction = {
       name: "Motor Pool",
       faction: "militia",
       fizz: 3,
-      cp: 1,
+      cp: 2, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "The old tractor depot, now with a duty roster. Spare parts, spare plating, spare everything.",
       abilities: [
         {
@@ -119,7 +119,7 @@ const militia: Faction = {
       id: "mil-vane",
       name: "Smoke Detail",
       faction: "militia",
-      fizz: 3,
+      fizz: 2, // card-bound CP: its 2 CP is what its Dust Devil costs
       cp: 2,
       blurb: "Two old miners, a cart of smoke pots and the valley's dust. They read the wind like a map.",
       abilities: [
@@ -148,7 +148,7 @@ const militia: Faction = {
       name: "Forward Airstrip",
       faction: "militia",
       fizz: 3,
-      cp: 1,
+      cp: 3, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "A graded field, a windsock, a fuel bowser and a pilot who swears he has done this before.",
       abilities: [
         {
@@ -176,7 +176,7 @@ const militia: Faction = {
       name: "Rust Bucket Drop-Ship",
       faction: "militia",
       fizz: 4,
-      cp: 1,
+      cp: 2, // card-bound CP: 2 (balance: the Militia's Skirmish hand had 3 CP to everyone else's 4)
       blurb: "An ore hauler with troop benches bolted in. Forty years old, three engines out of four, and a landing light that is just a lantern on a hook.",
       abilities: [
         {
@@ -204,7 +204,7 @@ const militia: Faction = {
       name: "Ammo Wagon",
       faction: "militia",
       fizz: 2,
-      cp: 1,
+      cp: 2, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "Rivets, rifle rounds, sandbags, and a quartermaster who counts every one of them twice.",
       abilities: [
         { id: "rivet-crate", name: "Crate of Rivets", cp: 2, exhaust: true, timing: "assault", effect: { kind: "rangedBuff", dice: 1 }, text: "A friendly unit gets +1 ranged die per model this round." },
@@ -239,12 +239,15 @@ const militia: Faction = {
   // v0.12 barrage markers: Barrage Shells on Big Bertha now cost ⚙1 (pricing.ts agrees), and the point it
   // frees gives one Squinter a Field Telephone. At ⚙2 the 7⚙ Bertha came on late and the Militia scored
   // ~43% against the swarm in Skirmish (~58% with a plain Bertha); this list: ~53%, and 48% against the Concord.
+  // v0.12 card-bound CP and impact for melee units: the swarm's and the Concord's chargers now hit the line
+  // hard, so Overwatch on a second Grunt squad (not Jump Jets) and on a Squinter (not the Field Telephone).
+  // 5-seed Skirmish: Concord 54.7% against the Militia (58% before), the Militia 50.3% against the swarm (44%).
   defaultList: [
     { profileId: "mil-grunts", upgrades: ["overwatch"] },
-    { profileId: "mil-grunts", upgrades: ["jets"] },
+    { profileId: "mil-grunts", upgrades: ["overwatch"] },
     { profileId: "mil-grunts", upgrades: ["extra"] },
     { profileId: "mil-bertha", upgrades: ["barrage"] },
-    { profileId: "mil-squinter", upgrades: ["holler"] },
+    { profileId: "mil-squinter", upgrades: ["porch"] },
     { profileId: "mil-squinter", upgrades: [] },
     { profileId: "mil-mortar", upgrades: [] },
     { profileId: "mil-medic", upgrades: [] },
@@ -565,7 +568,7 @@ const swarm: Faction = {
       name: "Egg Chamber",
       faction: "swarm",
       fizz: 3,
-      cp: 1,
+      cp: 2, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "Warm, damp, humming, and full to the ceiling. Nobody counts the eggs. Nobody could.",
       abilities: [
         {
@@ -593,7 +596,7 @@ const swarm: Faction = {
       name: "Undertunnels",
       faction: "swarm",
       fizz: 3,
-      cp: 1,
+      cp: 2, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "Miles of chewed tunnels under the fields. The Militia's surveyors call it subsidence. It is not subsidence.",
       abilities: [
         {
@@ -608,7 +611,7 @@ const swarm: Faction = {
         {
           id: "open-tunnel",
           name: "Open a Tunnel",
-          cp: 3,
+          cp: 2, // card-bound CP: 2 (was 3), so the Undertunnels give the swarm 2 CP, not 3
           exhaust: true,
           timing: "movement",
           // From round 2, like every other arrival card (v0.12 balance pass). In round 1 of Assault the
@@ -719,10 +722,11 @@ const swarm: Faction = {
       keywords: ["infantry", "light", "beast"],
       evade: { target: 5, against: ["pointBlank", "blast"] },
       nerve: 6,
-      // No impact dice (the Munch's trick): they win by numbers, by coming back, and by chewing on
-      // whatever the acid has already softened. AP1 since the v0.12 balance pass (pricing.ts: still ⚙3),
+      // They win by numbers, by coming back, and by chewing on whatever the acid has already softened;
+      // since v0.12 every melee unit hits on the charge (data/impact.ts). AP1 since the v0.12 balance pass,
       // so the bites tell against the Militia's armour 4.
       weapons: [melee("Snippers", 1, 4, { ap: 1, traits: ["rending"] })],
+      impact: { dice: 1, hit: 5, damage: 1, ap: 0 }, // a melee unit hits on the charge; tiny bugs on a 5+
       abilities: ["regrow", "rampage"],
       upgrades: [
         { id: "eggs", name: "More Eggs", cost: 1, addModels: 3, text: "+3 models." },
@@ -766,6 +770,7 @@ const swarm: Faction = {
       evade: { target: 6, against: ["pointBlank"] },
       nerve: 7,
       weapons: [melee("Crusher Mandibles", 2, 4, { ap: 1 })],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 }, // a melee unit: it hits on the charge
       abilities: ["corrode", "regen", "burrow"],
       upgrades: [{ id: "plates", name: "Thick Plates", cost: 1, addKeywords: ["armoured"], text: "Becomes armoured (ignores 1 AP from weapons not built to crack armour)." }],
       blurb: "Beetles with shells like upturned bathtubs and acid in their jaws. They walk into the guns, and the guns go first.",
@@ -788,6 +793,7 @@ const swarm: Faction = {
       evade: { target: 5, against: ["pointBlank"] }, // it springs clear
       nerve: 7,
       weapons: [melee("Trapjaw", 3, 3, { ap: 1 })],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 }, // a melee unit: it hits on the charge
       abilities: ["lurk", "tunnel", "burrow"],
       upgrades: [{ id: "drool", name: "Acid Drool", cost: 1, addAbilities: ["corrode"], text: "Gains Corrode." }],
       blurb: "That isn't a rock. That was never a rock. It has been waiting under there since last spring.",
@@ -806,6 +812,7 @@ const swarm: Faction = {
       baseRadius: 1.4,
       keywords: ["beast", "monster", "heavy", "fearless"],
       weapons: [ranged("Larva Lob", 12, 2, 4, { traits: ["blast"] }), melee("Egg-Tooth Jaws", 3, 3, { damage: 2, ap: 1 })],
+      impact: { dice: 2, hit: 4, damage: 1, ap: 1 }, // a melee unit: it hits on the charge
       // The swarm's centre: Brood Bond refills every hurt brood within 6" each round, hurt or not.
       abilities: ["brood-bond", "brood-call", "hatch", "detector"],
       upgrades: [{ id: "sacs", name: "Acid Sacs", cost: 1, addAbilities: ["corrode"], text: "Gains Corrode." }],
@@ -1002,7 +1009,7 @@ const concord: Faction = {
       name: "Mirror Spire",
       faction: "concord",
       fizz: 3,
-      cp: 1,
+      cp: 3, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "A tower of polished smugness.",
       abilities: [
         { id: "refocus", name: "Refocus", cp: 1, exhaust: false, timing: "any", effect: { kind: "recharge" }, text: "A friendly unit's shields recharge to full." },
@@ -1041,8 +1048,8 @@ const concord: Faction = {
       id: "con-lens",
       name: "Star Lens",
       faction: "concord",
-      fizz: 3,
-      cp: 0,
+      fizz: 4, // card-bound CP: now a 3-CP card
+      cp: 3, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "Focuses sunlight. Also focuses disdain.",
       abilities: [
         {
@@ -1070,7 +1077,7 @@ const concord: Faction = {
       name: "Court of Disdain",
       faction: "concord",
       fizz: 2,
-      cp: 1,
+      cp: 2, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "A panel of alien critics, permanently unimpressed. They will tell your gunners exactly where the enemy's armour is cheap.",
       abilities: [
         {
@@ -1098,7 +1105,7 @@ const concord: Faction = {
       name: "Light Gate",
       faction: "concord",
       fizz: 4,
-      cp: 1,
+      cp: 3, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "A doorway of pure light for getting about the battlefield. Please wipe your feet.",
       abilities: [
         {
@@ -1129,7 +1136,7 @@ const concord: Faction = {
       name: "Grand Portal",
       faction: "concord",
       fizz: 3,
-      cp: 1,
+      cp: 2, // card-bound CP: at least its dearest ability, so burning it can always pay for it
       blurb: "Arriving fashionably late is an art. Arriving in a blaze of light, beside one's peers, is a privilege.",
       abilities: [
         {
@@ -1193,6 +1200,7 @@ const concord: Faction = {
       keywords: ["infantry", "armoured"],
       nerve: 8,
       weapons: [melee("Glow Blade", 2, 3, { ap: 1, traits: ["rending"] }), ranged("Light Flick", 12, 1, 3, { traits: ["pistol", "blast"] })],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 }, // a melee unit: it hits on the charge
       abilities: ["blink", "riposte"],
       upgrades: [{ id: "third", name: "Extra Guard", cost: 1, addModels: 1, text: "+1 model." }],
       blurb: "Duellists who refuse to sweat.",

@@ -25,6 +25,9 @@ import { MAPS } from "../../engine/data/maps";
 import { MISSIONS } from "../../engine/data/missions";
 import { factionEmblemSvg, wordmarkSvg } from "../art/emblems";
 import { figureDataUrl, figureSpec } from "../art/figures";
+import { rigPortraitFit } from "../art/rigPortrait";
+import { artPending, loadArt } from "../minis/registry";
+import type { UnitProfile } from "../../engine/types";
 import { esc } from "../describe";
 import { maybeFactionIntro, playIntro, type LoreTab } from "../loreLinks";
 import { drawMapPreview } from "../previews";
@@ -48,6 +51,7 @@ function miniImg(unitId: string, px: number, alt = ""): string {
 /** Paint miniature placeholders a few per frame, so the page opens at once. */
 function hydrate(root: HTMLElement): void {
   const imgs = [...root.querySelectorAll<HTMLImageElement>("img.lore-mini:not([src])")];
+  const waiting = new Set<UnitProfile>();
   const step = () => {
     if (!root.isConnected) return;
     const t0 = performance.now();
@@ -56,13 +60,27 @@ function hydrate(root: HTMLElement): void {
       const p = PROFILES[img.dataset.unit ?? ""];
       if (!p) continue;
       try {
-        const f = FACTIONS[p.faction]!;
-        img.src = figureDataUrl(figureSpec(p, f.look, f.color), NEUTRAL_BASE, Number(img.dataset.px) || 72);
+        const px = Number(img.dataset.px) || 72;
+        // the new miniature (Ink Rig) on a neutral base; Classic only for units without new art
+        const rig = rigPortraitFit(p.id, px, { team: NEUTRAL_BASE, base: true });
+        if (!rig && artPending(p)) {
+          // its art is still loading (a lazy chunk): leave it blank and come back for it
+          waiting.add(p);
+          continue;
+        }
+        if (rig) {
+          img.src = rig.url;
+          img.classList.add("rig");
+        } else {
+          const f = FACTIONS[p.faction]!;
+          img.src = figureDataUrl(figureSpec(p, f.look, f.color), NEUTRAL_BASE, px);
+        }
       } catch {
         /* leave it blank */
       }
     }
     if (imgs.length) requestAnimationFrame(step);
+    else if (waiting.size) void loadArt([...waiting]).then(() => hydrate(root), () => undefined);
   };
   requestAnimationFrame(step);
 }

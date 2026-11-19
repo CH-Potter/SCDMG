@@ -111,12 +111,29 @@ export function artPending(u: UnitProfile | string): boolean {
   return !!p && chunksOf(bindingFor(p)).some((k) => !loaded.has(k));
 }
 
+/** Whether the generic kits (every custom unit's fallback) and every template's art are loaded. */
+export const allArtLoaded = (): boolean => loaded.has("kit") && TEMPLATE_ART_KEYS.every((k) => loaded.has(`tpl:${k}`));
+
 /** Base-faction profile ids with art (once their chunks are loaded). */
 export function riggedProfiles(): string[] {
   return Object.keys(BASE).flatMap((f) => Object.keys((loaded.get(`base:${f}`) as Record<string, ArtBuilder> | undefined) ?? {}));
 }
 
 const cache = new Map<string, UnitArt>();
+
+/**
+ * A key for everything that shapes a unit's art (its binding, kit spec, faction colour and look):
+ * two units with the same key look the same. For caches of pictures made from the art.
+ */
+export function artKey(u: UnitProfile | string, faction?: FactionLook): string {
+  const p = profileOf(u);
+  if (!p) return `none|${String(u)}`;
+  const b = bindingFor(p);
+  if (b.kind === "base" && BASE[b.faction]) return `base|${b.id}`;
+  const f = faction ?? factionLookOf(p);
+  const s = kitSpec(p, f);
+  return `${b.kind === "template" ? `tpl:${b.template}/${b.unit}` : "kit"}|${specKey(s)}|${f.color}|${f.look}`;
+}
 
 /**
  * All of a unit's looks, or null while its art is loading (or for an unknown id). `faction`

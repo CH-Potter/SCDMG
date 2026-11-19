@@ -1,3 +1,4 @@
+import { bankCp } from "./helpers/cp";
 import { describe, expect, it } from "vitest";
 import { planShooting } from "../src/engine/combat";
 import { defaultSupportsFor, SUPPORTS } from "../src/engine/data/factions";
@@ -58,8 +59,18 @@ describe("off-board supports", () => {
     expect(again.ok).toBe(false);
   });
 
-  it("refreshes cards and adds CP at the end of the round", () => {
+  it("refreshes cards at the end of the round: card-bound, the ready cards are the CP (nothing banks)", () => {
     let s = game();
+    s = ok(applyCommand(s, { type: "support", player: 0, support: "mil-radio", ability: "supply-run" }));
+    expect(s.players[0].supports.find((c) => c.id === "mil-radio")!.exhausted).toBe(true);
+    while (s.round === 1) s = ok(applyCommand(s, { type: "pass", player: s.activePlayer }));
+    expect(s.players[0].supports.every((c) => !c.exhausted)).toBe(true);
+    expect(s.players[0].cp).toBe(s.players[0].supports.reduce((n, c) => n + SUPPORTS[c.id]!.cp, 0));
+  });
+
+  it("classic CP pool: refreshes cards and banks their CP at the end of the round", () => {
+    let s = game();
+    bankCp(s, 0, s.players[0].cp);
     s = ok(applyCommand(s, { type: "support", player: 0, support: "mil-radio", ability: "supply-run" }));
     const before = s.players[0].cp;
     while (s.round === 1) s = ok(applyCommand(s, { type: "pass", player: s.activePlayer }));
@@ -87,7 +98,7 @@ describe("off-board supports", () => {
     const grunts = place(s, uidOf(s, 1, "mil-grunts"), { x: 10, y: 14 });
     const rifle = profileOf(grunts).weapons[0]!;
     const before = planShooting(s, grunts, guard, rifle);
-    s.players[0].cp = 8; // don't depend on tuned CP numbers
+    bankCp(s, 0, 8); // don't depend on tuned CP numbers
     s = ok(applyCommand(s, { type: "support", player: 0, support: "con-spire", ability: "glimmer-ward", point: { x: 11, y: 28.5 } })); // clear of the guard, whatever its size
     const after = planShooting(s, unitById(s, grunts.uid)!, unitById(s, guard.uid)!, rifle);
     if (typeof before === "string" || typeof after === "string") throw new Error("expected a valid shot");
@@ -144,7 +155,7 @@ describe("structures", () => {
     s.initiative = 0;
     s.activePlayer = 0;
     s.players[0].resources = 50;
-    s.players[0].cp = 8; // don't depend on tuned CP numbers
+    bankCp(s, 0, 8); // don't depend on tuned CP numbers
     place(s, uidOf(s, 0, "munch-nibblers"), { x: 17, y: 26 });
     s = ok(applyCommand(s, { type: "support", player: 0, support: "munch-tunnels", ability: "dig-through", point: { x: 26, y: 18 } }));
     const hole = s.units.find((u) => u.profileId === "munch-hole" && u.onBoard)!;

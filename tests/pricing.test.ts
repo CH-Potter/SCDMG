@@ -218,7 +218,8 @@ describe("support pricing", () => {
   it("prices a card higher for more CP per round, cheaper abilities, stronger effects and more slots", () => {
     const base = priceSupport(card());
     const raw = (s: SupportDef) => priceSupport(s).raw;
-    expect(raw(card({ cp: 2 }))).toBeGreaterThan(raw(card()));
+    // Card-bound CP: only CP beyond what its dearest ability costs is spare CP worth Fizz.
+    expect(raw(card({ cp: 6 }))).toBeGreaterThan(raw(card()));
     expect(
       priceSupport(card({ abilities: [{ ...card().abilities[0]!, cp: 1 }] })).abilities[0],
     ).toBeGreaterThan(base.abilities[0]!);

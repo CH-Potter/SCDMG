@@ -498,8 +498,10 @@ export interface PlayerState {
   supplyCap: number;
   vp: number;
   passed: boolean;
-  /** Command points. */
+  /** Command points the player can spend right now (see cp.ts: card-bound, the ready cards' CP plus any loose CP). */
   cp: number;
+  /** Card-bound CP: CP from a head start, tied to no card (spent first, never refreshed). */
+  looseCp?: number;
   supports: { id: string; exhausted: boolean }[];
   /** Reactions armed this round. */
   armed: { support: string; ability: string; trigger: ReactionTrigger; expiresRound: number }[];
@@ -570,18 +572,18 @@ export type Command =
   | { type: "advance"; uid: string; leader: number; to: Vec }
   | { type: "charge"; uid: string; target: string }
   /** `reroll`: the Command re-roll house rule, spend 1 CP to re-roll the attack's misses. */
-  | { type: "shoot"; uid: string; target: string; weapon: number; reroll?: boolean }
-  | { type: "fight"; uid: string; target: string; weapon: number; reroll?: boolean }
+  | { type: "shoot"; uid: string; target: string; weapon: number; reroll?: boolean; pay?: string[] }
+  | { type: "fight"; uid: string; target: string; weapon: number; reroll?: boolean; pay?: string[] }
   | { type: "hunker"; uid: string }
   | { type: "hold"; uid: string }
-  | { type: "ability"; uid: string; ability: AbilityId; target?: string; point?: Vec }
+  | { type: "ability"; uid: string; ability: AbilityId; target?: string; point?: Vec; /** Card-bound CP: the cards to exhaust for its CP (else the default pick). */ pay?: string[] }
   | { type: "pass"; player: PlayerId }
   /** Free action every army has: spend 1 CP to steady a Shaken unit. */
-  | { type: "rally"; player: PlayerId; target: string }
+  | { type: "rally"; player: PlayerId; target: string; pay?: string[] }
   /** The roll-off winner (or trailing player) decides who goes first this round. */
   | { type: "chooseOrder"; player: PlayerId; goFirst: boolean }
   /** Free action: play a support ability (doesn't use an activation or pass the turn). */
-  | { type: "support"; player: PlayerId; support: string; ability: string; target?: string; point?: Vec };
+  | { type: "support"; player: PlayerId; support: string; ability: string; target?: string; point?: Vec; pay?: string[] };
 
 export interface AttackReport {
   uid: string;
@@ -624,6 +626,8 @@ export type GameEvent =
   /** A barrage marker was laid (after any scatter), or its shells came down at the end of the assault phase. */
   | { type: "barrageMarker"; uid: string; pos: Vec; radius: number; weapon: string; landed: boolean }
   | { type: "hunkered"; uid: string }
+  /** Card-bound CP: `amount` CP paid by exhausting `cards` (and `loose` CP); `wasted` CP over the cost is lost for the round. */
+  | { type: "cpPaid"; player: PlayerId; amount: number; cards: string[]; loose: number; wasted: number }
   /** Burrow: the unit went under the ground, or came back up. */
   | { type: "burrowed"; uid: string; under: boolean }
   | { type: "held"; uid: string }

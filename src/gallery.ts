@@ -1,13 +1,17 @@
 // Dev-only miniature gallery (http://localhost:5173/gallery.html): every built-in unit, large and at
 // board size, in both player colours, facing both ways, with its idle and step frames. Used to review
 // the faction art. Query: ?faction=militia|swarm|concord|all|templates|<template key>, &ground=<hex>,
-// &px=<large size>. "templates" shows the faction forge's trope templates (built from miniature parts).
+// &px=<large size>, &style=ink|overhead|classic. "templates" shows the faction forge's trope templates
+// (built from miniature parts). Ink Rig (the default) and Overhead show the new miniatures the way the
+// DOM pictures (intros, lore) draw them; Classic, and units without new art, use the Classic painters.
 
 import { FACTIONS } from "./engine/data/factions";
 import { TEMPLATES } from "./forge/templates";
 import type { Faction, UnitProfile } from "./engine/types";
 import { figureDataUrl, figureSpec, paintSheet } from "./ui/art/figures";
 import { PLAYER_COLORS } from "./ui/art/palette";
+import { rigPortraitUrl } from "./ui/art/rigPortrait";
+import { loadAllArt } from "./ui/minis/registry";
 
 const q = new URLSearchParams(location.search);
 const which = q.get("faction") ?? "all";
@@ -15,6 +19,7 @@ const ground = `#${(q.get("ground") ?? "7a6a4e").replace(/[^0-9a-f]/gi, "").slic
 const px = Math.min(400, Math.max(64, Number(q.get("px")) || 180));
 /** Board scale: the game draws about this many CSS pixels per inch at default zoom. */
 const BOARD_PPI = 26;
+const style = (["ink", "overhead", "classic"] as const).find((s) => s === q.get("style")) ?? "ink";
 
 const bar = document.getElementById("bar")!;
 const out = document.getElementById("out")!;
@@ -27,6 +32,15 @@ for (const id of ["all", ...Object.keys(FACTIONS), "templates"]) {
   a.href = `?${u}`;
   a.textContent = id === "all" ? "All" : id === "templates" ? "Forge templates" : FACTIONS[id as keyof typeof FACTIONS]!.name;
   if (id === which) a.setAttribute("aria-current", "true");
+  bar.append(a);
+}
+for (const st of ["ink", "overhead", "classic"] as const) {
+  const a = document.createElement("a");
+  const u = new URLSearchParams(q);
+  u.set("style", st);
+  a.href = `?${u}`;
+  a.textContent = st === "ink" ? "Ink Rig" : st === "overhead" ? "Overhead" : "Classic";
+  if (st === style) a.setAttribute("aria-current", "true");
   bar.append(a);
 }
 for (const [label, hex] of [["Dirt", "7a6a4e"], ["Sand", "b89a6a"], ["Grass", "5d7a45"], ["Concrete", "8a8a86"], ["Dark", "2b2620"]]) {
@@ -69,7 +83,59 @@ function frames(p: UnitProfile, f: Faction, ppi: number): HTMLElement {
   return wrap;
 }
 
+/** An image sized by its own framing, at `ppi` CSS pixels per inch of miniature. */
+function rigImg(url: string, w: number, h: number, ppi: number): HTMLImageElement {
+  const i = document.createElement("img");
+  i.src = url;
+  i.width = Math.round(w * ppi);
+  i.height = Math.round(h * ppi);
+  return i;
+}
+
+/** A new miniature's row: both teams large, both facings, idle and step, and a squad at board scale. */
+function rigRow(p: UnitProfile, view: "side" | "top"): HTMLElement | null {
+  const blue = rigPortraitUrl(p, { view, team: PLAYER_COLORS[0], base: true });
+  if (!blue) return null;
+  const row = document.createElement("div");
+  row.className = "row";
+  const name = document.createElement("div");
+  name.className = "name";
+  name.innerHTML = `<b></b><small></small><small></small>`;
+  name.children[0]!.textContent = p.name;
+  name.children[1]!.textContent = `${p.id} · ${view === "side" ? "Ink Rig" : "Overhead"} · r ${p.baseRadius}"`;
+  name.children[2]!.textContent = p.keywords.join(", ");
+  row.append(name);
+  const ppi = px / 1.6;
+  const cell = (...imgs: HTMLElement[]) => {
+    const wrap = document.createElement("div");
+    wrap.className = "ground";
+    wrap.append(...imgs);
+    return wrap;
+  };
+  row.append(cell(rigImg(blue.url, blue.w, blue.h, ppi)));
+  const red = rigPortraitUrl(p, { view, team: PLAYER_COLORS[1], base: true, face: "left" })!;
+  row.append(cell(rigImg(red.url, red.w, red.h, ppi)));
+  const idle = rigPortraitUrl(p, { view, clip: "idle", t: 1200 })!;
+  const step = rigPortraitUrl(p, { view, clip: "step", t: 70 })!;
+  const half = ppi / 2.2;
+  const fr = cell(rigImg(idle.url, idle.w, idle.h, half), rigImg(step.url, step.w, step.h, half));
+  fr.title = "idle | step";
+  row.append(fr);
+  const board = cell();
+  board.classList.add("board");
+  for (let i = 0; i < Math.min(6, p.models); i++) {
+    const m = rigPortraitUrl(p, { view, team: PLAYER_COLORS[0], base: true, model: i, face: i % 2 ? "left" : "right", ppi: BOARD_PPI })!;
+    board.append(rigImg(m.url, m.w, m.h, BOARD_PPI));
+  }
+  row.append(board);
+  return row;
+}
+
 function unitRow(p: UnitProfile, f: Faction): HTMLElement {
+  if (style !== "classic") {
+    const r = rigRow(p, style === "overhead" ? "top" : "side");
+    if (r) return r;
+  }
   const spec = figureSpec(p, f.look ?? "plain", f.color);
   const row = document.createElement("div");
   row.className = "row";
@@ -99,6 +165,8 @@ function unitRow(p: UnitProfile, f: Faction): HTMLElement {
   return row;
 }
 
+// the new miniatures load lazily (one chunk per faction, template and the kits)
+await loadAllArt();
 const templates = TEMPLATES.filter((t) => which === "templates" || which === t.key).map((t) => t.faction);
 for (const f of [...Object.values(FACTIONS), ...templates]) {
   if (which !== "all" && which !== f.id && !templates.includes(f)) continue;

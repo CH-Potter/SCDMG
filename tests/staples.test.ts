@@ -1,3 +1,4 @@
+import { bankCp } from "./helpers/cp";
 import { CLASSIC_RULES } from "../src/engine/houseRules";
 import { describe, expect, it } from "vitest";
 import { moraleCheck, planShooting, saveNeeded } from "../src/engine/combat";
@@ -96,7 +97,7 @@ describe("morale", () => {
     const o = s.objectives[1]!;
     g.models.filter((m) => m.alive).forEach((m) => (m.pos = { ...o.pos }));
     expect(presenceController(s, o)).toBeNull();
-    s.players[0].cp = RALLY_CP;
+    bankCp(s, 0, RALLY_CP);
     const r = applyCommand(s, { type: "rally", player: 0, target: g.uid });
     if (!r.ok) throw new Error(r.error);
     expect(unitById(r.state, g.uid)!.status.shaken).toBe(false);
@@ -167,7 +168,7 @@ describe("abilities are free actions", () => {
     let s = createGame({ map: CLASSIC_DUSTBOWL, factions: ["concord", "munch"], seed: 8 });
     s.initiative = 0;
     s.activePlayer = 0;
-    s.players[0].cp = 5;
+    bankCp(s, 0, 5);
     const guard = place(s, uidOf(s, 0, "con-guard"), { x: 10, y: 28 });
     let r = applyCommand(s, { type: "ability", uid: guard.uid, ability: "blink", point: { x: 10, y: 21 } });
     if (!r.ok) throw new Error(r.error);

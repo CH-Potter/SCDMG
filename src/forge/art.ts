@@ -11,6 +11,8 @@ import { archetypeSpec, type FigureSpec, figureDataUrl, figureDataUrlAsync, figu
 import { BACK_NAMES, BODY_NAMES, HEAD_NAMES, HEADGEAR_NAMES, WEAPON_NAMES } from "../ui/art/miniBuilder";
 import { css } from "../ui/art/palette";
 import { UPLOAD_ACCEPT } from "../ui/art/upload";
+import { rigPortraitFit } from "../ui/art/rigPortrait";
+import { allArtLoaded, artKey, artPending, loadArt } from "../ui/minis/registry";
 import { esc, evadeLine, KEYWORD_TEXT, weaponLine } from "../ui/describe";
 import { kindOf, type ProfileKind } from "./model";
 
@@ -50,18 +52,55 @@ function setSrc(img: HTMLImageElement, spec: FigureSpec, team: number | null, px
 
 export type ProfileLookup = (ref: string) => { f: Faction; p: UnitProfile } | null;
 
-/** Fill in every thumbnail and stage inside `scope`. Cheap when nothing changed (keys are compared). */
+/** Show a new-engine portrait in `img` (keyed, so an unchanged unit isn't redrawn). */
+function setRig(img: HTMLImageElement, key: string, url: string): void {
+  if (img.dataset.key === key) return;
+  img.dataset.key = key;
+  img.src = url;
+}
+
+/** The codex picture of a unit: its new-engine miniature (Ink Rig), on a base in `team`'s colour. */
+function rigPicture(p: UnitProfile, f: Faction, px: number, team: number): { url: string; key: string } | null {
+  const faction = { color: f.color, look: f.look };
+  const rig = rigPortraitFit(p, px, { team, base: true, faction });
+  return rig ? { url: rig.url, key: `rig|${artKey(p, faction)}|${team}|${px}` } : null;
+}
+
+let artWait: Promise<void> | null = null;
+
+/**
+ * Fill in every thumbnail and stage inside `scope`. Cheap when nothing changed (keys are compared).
+ * Units show their new-engine miniature (the game's look); the Classic figure stands in while that
+ * art loads (it's a lazy chunk), and the pictures are redrawn when it lands.
+ */
 export function hydrateMinis(scope: ParentNode, lookup: ProfileLookup, team: number): void {
+  const pending: UnitProfile[] = [];
   scope.querySelectorAll<HTMLImageElement>("img[data-mini]").forEach((img) => {
     const hit = lookup(img.dataset.mini ?? "");
     if (!hit) return;
-    setSrc(img, figureSpec(hit.p, hit.f.look, hit.f.color), NEUTRAL_BASE, Number(img.dataset.px) || 32, "all");
+    const px = Number(img.dataset.px) || 32;
+    const rig = rigPicture(hit.p, hit.f, px, NEUTRAL_BASE);
+    if (rig) return setRig(img, rig.key, rig.url);
+    if (artPending(hit.p)) pending.push(hit.p);
+    setSrc(img, figureSpec(hit.p, hit.f.look, hit.f.color), NEUTRAL_BASE, px, "all");
   });
   scope.querySelectorAll<HTMLElement>("[data-stage]").forEach((el) => {
     const hit = lookup(el.dataset.stage ?? "");
     if (!hit) return;
-    const spec = figureSpec(hit.p, hit.f.look, hit.f.color);
     const px = Number(el.dataset.px) || 200;
+    const baseImg = el.querySelector<HTMLImageElement>(".ff-stage-base")!;
+    const rig = rigPicture(hit.p, hit.f, px, team);
+    el.classList.toggle("rig", !!rig);
+    baseImg.hidden = !!rig;
+    if (rig) {
+      // the miniature stands on its own base in the portrait: hold it still, flyers hover
+      el.classList.toggle("fly", hit.p.keywords.includes("flying"));
+      el.classList.toggle("still", !hit.p.keywords.includes("flying"));
+      setRig(el.querySelector<HTMLImageElement>(".ff-stage-fig")!, rig.key, rig.url);
+      return;
+    }
+    if (artPending(hit.p)) pending.push(hit.p);
+    const spec = figureSpec(hit.p, hit.f.look, hit.f.color);
     const [amp, period] = IDLE_BREATH[spec.kind];
     el.style.setProperty("--amp", String(amp * 1.4));
     el.style.setProperty("--period", `${period}s`);
@@ -71,6 +110,50 @@ export function hydrateMinis(scope: ParentNode, lookup: ProfileLookup, team: num
     setSrc(el.querySelector<HTMLImageElement>(".ff-stage-base")!, spec, team, px, "base");
     setSrc(el.querySelector<HTMLImageElement>(".ff-stage-fig")!, spec, null, px, "figure");
   });
+  if (pending.length && !artWait)
+    artWait = loadArt(pending)
+      .then(() => {
+        if ((scope as Node).isConnected !== false) hydrateMinis(scope, lookup, team);
+      })
+      .catch(() => undefined)
+      .finally(() => (artWait = null));
+}
+
+/** Whether the kits and templates' art is in (the forge loads it when it opens). */
+export const kitArtLoaded = (): boolean => allArtLoaded();
+
+/** Sample units for the forge's faction tokens: the generic kit's figure for each token look. */
+const TOKEN_UNIT: Record<Faction["look"], { kw: UnitProfile["keywords"]; recipe: MiniatureRecipe }> = {
+  plain: { kw: ["infantry", "armoured"], recipe: { body: "trooper", head: "visor", headgear: "helmet", weapon: "rifle", back: "pack", secondary: 0xdcb55a, scale: 1 } },
+  cap: { kw: ["infantry"], recipe: { body: "trooper", head: "face", headgear: "helmet", weapon: "rifle", back: "pack", secondary: 0xe2b93a, scale: 1 } },
+  crystal: { kw: ["infantry"], recipe: { body: "trooper", head: "gem", headgear: "crown", weapon: "staff", back: "none", secondary: 0xd9ccff, scale: 1 } },
+  teeth: { kw: ["beast"], recipe: { body: "critter", head: "bug", headgear: "antennae", weapon: "claws", back: "none", secondary: 0xc8ef5a, scale: 1 } },
+};
+
+/** A faction token from the generic kit (the look's figure in the faction colour), or null until the kits load. */
+export function kitTokenUrl(color: number, look: Faction["look"], px: number): string | null {
+  const t = TOKEN_UNIT[look] ?? TOKEN_UNIT.plain;
+  const p: UnitProfile = {
+    id: `forge-token:${look}`,
+    name: "Token",
+    faction: "forge-token",
+    cost: 0,
+    supply: 0,
+    models: 1,
+    move: 6,
+    hp: 1,
+    shield: 0,
+    armor: 5,
+    baseRadius: look === "teeth" ? 0.45 : 0.55,
+    keywords: t.kw,
+    weapons: [],
+    abilities: [],
+    upgrades: [],
+    blurb: "",
+    art: { kind: "parts", recipe: t.recipe },
+  };
+  if (artPending(p)) return null;
+  return rigPortraitFit(p, px, { team: NEUTRAL_BASE, base: true, faction: { color, look } })?.url ?? null;
 }
 
 /** Replace `el`'s HTML, carrying over elements marked `data-persist` (so previews don't flicker or restart). */

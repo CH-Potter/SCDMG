@@ -1,6 +1,7 @@
 // New unit abilities (Reel In, Rocket Hop, Rampage, Spotter, Bubble Shield, Sugar Rush, Provoke,
 // Demo Charge, Lurk, Steadying Presence, Mending Spores) and the airdrop / rattle support effects.
 
+import { bankCp } from "./helpers/cp";
 import { CLASSIC_RULES } from "../src/engine/houseRules";
 import { describe, expect, it } from "vitest";
 import { aiCommand } from "../src/engine/ai";
@@ -32,8 +33,8 @@ function game(lists: [ListEntry[], ListEntry[]], extra: Partial<GameSetup> = {})
   s.initiative = 0;
   s.activePlayer = 0;
   s.orderChoice = null; // skip the opening go-first/go-second choice
-  s.players[0].cp = 8;
-  s.players[1].cp = 8;
+  bankCp(s, 0, 8);
+  bankCp(s, 1, 8);
   return s;
 }
 

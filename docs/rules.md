@@ -397,7 +397,8 @@ Every unit with a lobbed gun (the Pipe Mortar, the Bile Bombard, the Forge morta
 - **Difficult terrain:** area cover (scrub, craters, rubble, tarps) costs double movement for ground models. Pathfinding weighs going round against going through. Flyers and jumpers ignore it.
 - **Obscured:** other units' models standing in the line of fire, at the target's level, give the target cover. Shooting down from higher ground still ignores cover.
 - **Measuring tape and line-of-sight checker:** press **M**, then click a model or spot and point anywhere. You get the distance, the edge-to-edge distance between models, and whether sight is clear. It works even during the AI's turn.
-- **Undo:** press **Ctrl+Z** to take back your last action, and anything the AI did after it. The dice are seeded, so doing the same thing again rolls the same.
+- **Undo:** press **Ctrl+Z** to take back your last action, and anything the AI did after it. Undo can't re-roll bad dice: it goes back to the dice the game had already set, so doing the same thing again rolls the same.
+- **Random dice:** every roll in a game against the AI is properly random: after each action the game draws a fresh seed from your browser's cryptographic random source, so the next roll can't be known in advance. Only tests and the balance simulator use fixed seeds, so their games can be replayed.
 
 ## House rules
 
@@ -407,6 +408,7 @@ Pick these in the main menu (step 5, *House rules*). They're saved in your brows
 
 | Rule | Off means |
 | --- | --- |
+| Card-bound CP | The classic CP pool: each round banks your cards' CP (up to 8), and spending takes from the bank instead of burning cards. |
 | Unit class limits | Lists can be any mix of units within the mode's cost, unit and copy limits. |
 | Rolled charges | A charge reaches up to the unit's move and always arrives. |
 | Close ranks | Models fight from where they stand. |
@@ -428,7 +430,7 @@ Pick these in the main menu (step 5, *House rules*). They're saved in your brows
 
 - **Breach dice:** keyword bonuses become breach dice. Against a target with the matching keyword, the weapon gets no bonus dice, damage or AP. Instead, roll one breach die with the attack: a **d3** for a bonus worth 1 (one die, damage or AP), or a **d6** for a bigger one (the Chain Popper with its Flak Kit, against flyers). Only the best matching bonus counts. After evades, that many of the hits (never more than there are) skip the save and go straight to damage; the rest save as normal. Armoured targets still ignore 1 AP from weapons without an anti-armour bonus. Lobbed shells don't breach.
 - **Overwatch:** when a unit is charged, before the charge moves, it shoots the charger with its best ranged weapon, hitting only on 6s. It can't if it's already in a melee, and lobbed weapons can't fire overwatch. It fires each time it's charged.
-- **Command re-roll:** after one of your attacks, you may spend 1 CP to re-roll all its misses, once. The dice are seeded, so the first roll is the same and only the misses roll again. Lobbed shells can't be re-rolled. The AI re-rolls when about 1.5 or more hits would come back, keeping a CP for a Rally if it needs one.
+- **Command re-roll:** after one of your attacks, you may spend 1 CP to re-roll all its misses, once. The first roll stands and only the misses roll again. Lobbed shells can't be re-rolled. The AI re-rolls when about 1.5 or more hits would come back, keeping a CP for a Rally if it needs one.
 - **Whole-army turns:** in the movement, assault and combat phases, the player with the initiative activates all their units (or passes), then the other player does. In the combat phase each side still fights with its chargers first. It can't be on with random activation order.
 
 ## Structures
@@ -457,8 +459,14 @@ Structures have the `structure` keyword and Move 0: turrets, pylons, spore pods,
 ## Off-board supports, Fizz and CP
 
 - **Fizz ✦** is a second list currency, used to buy **supports**: off-board backing such as a command post, a motor pool or a light-choir. The Fizz budget is 6 in Skirmish and 10 in Assault.
-- Each support adds **command points (CP)** to your pool at the start of each round. The pool starts with one round's worth and is capped at 8.
-- **Support abilities** cost CP and are **free actions** on your turn, in their listed phase or any phase. Playing one doesn't use an activation or pass the turn.
+- **Command points (CP) live on the support cards** (the *Card-bound CP* core house rule). Each card shows its CP (✦), and your CP is the total on your **ready** cards.
+  - **Spending CP burns cards.** To pay for a unit ability, a support ability, a Rally or a re-roll, exhaust cards worth at least the cost. You choose which: the game asks when there's a real choice. A burnt card's abilities are off until the end of the round, and CP over the cost is lost for the round (paying 1 CP with a 2-CP card loses the other).
+  - **It doesn't bank.** At the end of the round every card refreshes, and that's your CP again. Supply still grows each round.
+  - A card always has at least as much CP as its dearest ability, so burning it can always pay for its own ability. Playing a card's ability that **exhausts** the card can pay with that card at no extra cost; that's what the game picks unless you choose otherwise.
+  - A campaign head start can add **loose CP**, tied to no card. It's spent first, doesn't refresh, and your total never goes over 8.
+  - So every CP is a choice: a unit's trick now, or that card's abilities later this round.
+  - With the rule off (the classic pool), each round adds your cards' CP to a bank (up to 8), and spending takes from it.
+- **Support abilities** are **free actions** on your turn, in their listed phase or any phase. Playing one doesn't use an activation or pass the turn.
 - Many abilities **exhaust** their card until the next round.
 - **Reactions** (Dust Devil, Hold Fast, Acid Blood) are **armed** on your turn and fire automatically the next time their trigger happens. If they don't fire, they expire at the end of the round.
 - **Airdrops** deploy a unit from your reserves straight onto the table, paying its resources and supply as normal. The unit counts as having moved and acted this phase, and enemy Overwatch and Lurk react to it like any other arrival. An airdrop can never land within 6" of the enemy's home objective, inside impassable terrain or off the table. It can land on a platform.
