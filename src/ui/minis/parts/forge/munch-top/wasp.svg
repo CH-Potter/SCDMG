@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-9 -17 18 38" data-part="forge.munch.top.wasp">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bomb Wasp from above: striped abdomen, dark thorax, the head with its implant lens (thorax at 0,0)</title>
+<path d="M0,3 Q7,5 7,12 Q6,19 0,20 Q-6,19 -7,12 Q-7,5 0,3 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-6.6,9 Q0,7.4 6.6,9 L6.8,12 Q0,10.6 -6.8,12 Z M-6,15.4 Q0,14 6,15.4 L5,17.6 Q0,16.6 -5,17.6 Z" fill="#5d5b45"/>
+<ellipse cx="0" cy="0" rx="5.4" ry="5" fill="#5d5b45" stroke="#141414" stroke-width="2.4"/>
+<circle cx="0" cy="-9" r="4.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path d="M-3,-12 Q-4,-16 -1,-16.4 M3,-12 Q4,-16 1,-16.4" fill="none" stroke="#b9bfc4" stroke-width="2" stroke-linecap="round"/>
+<circle class="glow" cx="0" cy="-9" r="2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

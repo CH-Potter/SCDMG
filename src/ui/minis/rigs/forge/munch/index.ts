@@ -1,0 +1,259 @@
+// The Munch (Forge template `munch`): Dr. Graft's grafted farmland critters, in Hard Ink. Natural
+// coats (each critter's own, tinted toward the faction colour), the lab's hardware bolted on: chrome
+// jaws, pistons and claws, glass vials of mutagen in the faction colour, staples and stitched seams,
+// and on every head the signal implant, a steel cap with a glowing lens. That cap and the mutagen
+// glow are the faction's thread; the team colour is the farmer's paint daub, a collar or a band.
+//
+// Not the Skitterswarm: fur and farm bugs with lab parts, round and lumpy, never violet chitin and
+// scythes. Built on this folder's frame helpers (frame.ts) and the kits' rig utilities.
+
+import { defineTemplateArt, placeAt, scaleRig, squadLooks, type ArtContext, type LookVariant, type UnitArt } from "../../../kits";
+import type { PartUse, RigDef } from "../../../types";
+import type { Colourway } from "../../../slots";
+import { munchColourway, type Coat } from "./colours";
+import { legs, bothSides, munchRig } from "./frame";
+
+const byName = (g: Record<string, string>): Record<string, string> => Object.fromEntries(Object.entries(g).map(([p, s]) => [p.slice(p.lastIndexOf("/") + 1, -4), s]));
+const SIDE = byName(import.meta.glob<string>("../../../parts/forge/munch/*.svg", { query: "?raw", import: "default", eager: true }));
+const TOP = byName(import.meta.glob<string>("../../../parts/forge/munch-top/*.svg", { query: "?raw", import: "default", eager: true }));
+const side = (n: string): string => SIDE[n] ?? fail(`munch/${n}`);
+const top = (n: string): string => TOP[n] ?? fail(`munch-top/${n}`);
+function fail(n: string): never {
+  throw new Error(`missing Munch part ${n}`);
+}
+
+type Look = { side: RigDef; top: RigDef };
+
+/** A part at a frame point, by its pivot (or another anchor), turned and scaled. */
+const at = (id: string, src: string, bone: PartUse["bone"], x: number, y: number, z: number, o: { rot?: number; scale?: number; anchor?: string; anim?: PartUse["anim"] } = {}): PartUse => ({
+  id,
+  src,
+  bone,
+  place: placeAt(src, o.anchor ?? "pivot", { x, y }, o.rot ?? 0, o.scale ?? 1),
+  z,
+  ...(o.anim ? { anim: o.anim } : {}),
+});
+
+function squad(ctx: ArtContext, coat: Coat, build: (v: LookVariant, cw: Colourway) => Look): UnitArt {
+  const { variants, pick } = squadLooks(ctx.spec.models);
+  const cw = munchColourway(ctx.spec.primary, coat);
+  return { colourway: cw, looks: variants.map((v) => build(v, cw)), ...(variants.length > 1 ? { pick } : {}) };
+}
+
+/** A lone model (a monster, a burrow): one look. */
+function one(ctx: ArtContext, coat: Coat, build: (cw: Colourway) => Look): UnitArt {
+  const cw = munchColourway(ctx.spec.primary, coat);
+  return { colourway: cw, looks: [build(cw)] };
+}
+
+const scale = (l: Look, k: number): Look => (k === 1 ? l : { side: scaleRig(l.side, k), top: scaleRig(l.top, k) });
+
+// ---------- Chrome-Jaw Beetles ----------
+
+function beetle(v: LookVariant): Look {
+  const id = `forge.munch.nibblers.${v.tag}`;
+  const k = v.leader ? 1.1 : 1;
+  const sl = legs(
+    "side",
+    [
+      { id: "nF", hip: { x: -8, y: -20 }, knee: { x: -26, y: -31 }, foot: { x: -37, y: 0 }, near: true, a: true },
+      { id: "nM", hip: { x: 5, y: -19 }, knee: { x: 12, y: -33 }, foot: { x: 6, y: 0 }, near: true, a: false },
+      { id: "nR", hip: { x: 18, y: -20 }, knee: { x: 36, y: -30 }, foot: { x: 45, y: 0 }, near: true, a: true },
+      { id: "fF", hip: { x: -1, y: -23 }, knee: { x: -19, y: -34 }, foot: { x: -28, y: 0 }, near: false, a: false },
+      { id: "fM", hip: { x: 12, y: -22 }, knee: { x: 19, y: -36 }, foot: { x: 15, y: 0 }, near: false, a: true },
+      { id: "fR", hip: { x: 25, y: -23 }, knee: { x: 43, y: -33 }, foot: { x: 52, y: 0 }, near: false, a: false },
+    ],
+    { width: [3, 2.4], step: 5, lift: 6, z: [8, 1] },
+  );
+  const back: PartUse[] = v.tag === "b" ? [at("plate", side("beetle-plate"), "torso", 12, -46, 6)] : [at("vial", side("vial"), "torso", 16, -50, 6, { rot: 14, scale: 0.85, anim: { pulse: 0.04 } })];
+  const head = side("beetle-head");
+  const s = munchRig({
+    id,
+    name: "Chrome-Jaw Beetle",
+    view: "side",
+    k: 0.55 * k,
+    pivots: { torso: { x: 8, y: -28 }, head: { x: -16, y: -24 } },
+    parts: [
+      { id: "shell", src: side("beetle-shell"), bone: "torso", z: 5 },
+      ...back,
+      { id: "head", src: head, bone: "gun", place: { x: -16, y: -24, rot: v.tag === "b" ? -6 : 0 }, z: 7 },
+      ...(v.leader ? [at("booster", side("booster"), "gun", -20, -38, 6.5, { rot: 14, scale: 0.9 })] : []),
+    ],
+    limbs: sl.limbs,
+    gait: sl.gait,
+    weapon: "head",
+  });
+  const tl = legs(
+    "top",
+    bothSides([
+      { id: "lF", hip: { x: -10, y: -10 }, knee: { x: -22, y: -18 }, foot: { x: -27, y: -32 }, a: true },
+      { id: "lM", hip: { x: -13, y: 4 }, knee: { x: -27, y: 2 }, foot: { x: -35, y: 8 }, a: false },
+      { id: "lR", hip: { x: -11, y: 18 }, knee: { x: -25, y: 24 }, foot: { x: -29, y: 38 }, a: true },
+    ]),
+    { width: [3, 2.4], step: 4, lift: 0, z: [1, 1] },
+  );
+  const t = munchRig({
+    id,
+    name: "Chrome-Jaw Beetle",
+    view: "top",
+    k: 0.55 * k,
+    pivots: { torso: { x: 0, y: 4 }, head: { x: 0, y: -24 } },
+    parts: [
+      { id: "shell", src: top("beetle-shell"), bone: "torso", z: 5 },
+      v.tag === "b" ? at("plate", top("plate"), "torso", 0, 22, 6, { rot: 4 }) : at("vial", side("vial"), "torso", 0, 22, 6, { scale: 0.95, anim: { pulse: 0.04 } }),
+      { id: "head", src: top("beetle-head"), bone: "gun", place: { x: 0, y: -24, rot: 0 }, z: 7 },
+      ...(v.leader ? [at("booster", top("booster"), "gun", 0, -30, 7.5)] : []),
+    ],
+    limbs: tl.limbs,
+    gait: tl.gait,
+    weapon: "head",
+    shadow: { x: 4, y: 6, r: 30 },
+  });
+  return scale({ side: s, top: t }, k);
+}
+
+// ---------- Web-Gunner Spiders ----------
+
+function spider(v: LookVariant, cw: Colourway): Look {
+  const id = `forge.munch.spitter.${v.tag}`;
+  const k = v.leader ? 1.08 : 1;
+  const sl = legs(
+    "side",
+    [
+      { id: "n1", hip: { x: -18, y: -26 }, knee: { x: -36, y: -48 }, foot: { x: -52, y: 0 }, near: true, a: true },
+      { id: "n2", hip: { x: -13, y: -24 }, knee: { x: -24, y: -52 }, foot: { x: -30, y: 0 }, near: true, a: false },
+      { id: "n3", hip: { x: -8, y: -24 }, knee: { x: 8, y: -50 }, foot: { x: 20, y: 0 }, near: true, a: true },
+      { id: "n4", hip: { x: -4, y: -26 }, knee: { x: 26, y: -46 }, foot: { x: 46, y: 0 }, near: true, a: false },
+      { id: "f1", hip: { x: -12, y: -29 }, knee: { x: -28, y: -52 }, foot: { x: -42, y: 0 }, near: false, a: false },
+      { id: "f2", hip: { x: -7, y: -27 }, knee: { x: -16, y: -56 }, foot: { x: -20, y: 0 }, near: false, a: true },
+      { id: "f3", hip: { x: -2, y: -27 }, knee: { x: 16, y: -54 }, foot: { x: 30, y: 0 }, near: false, a: false },
+      { id: "f4", hip: { x: 2, y: -29 }, knee: { x: 34, y: -50 }, foot: { x: 56, y: 0 }, near: false, a: true },
+    ],
+    { width: [3, 2.2], step: 6, lift: 7, z: [8, 1] },
+  );
+  const gun = side("web-cannon");
+  const s = munchRig({
+    id,
+    name: "Web-Gunner Spider",
+    view: "side",
+    k: 0.6 * k,
+    spits: true,
+    limbInk: 1.4,
+    pivots: { torso: { x: 8, y: -34 }, head: { x: -20, y: -31 } },
+    parts: [
+      { id: "body", src: side("spider-body"), bone: "torso", z: 5 },
+      { id: "head", src: side("spider-head"), bone: "head", place: { x: -21, y: -31, rot: 0 }, z: 9 },
+      { id: "cannon", src: gun, bone: "gun", place: placeAt(gun, "pivot", { x: 10, y: -64 }, v.aim * 0.6, 1.05), z: 6 },
+      ...(v.leader ? [at("booster", side("booster"), "head", -24, -44, 9.5, { rot: 10, scale: 0.8 })] : []),
+    ],
+    limbs: sl.limbs,
+    gait: sl.gait,
+    weapon: "cannon",
+    fx: { muzzle: cw.glow },
+  });
+  const tl = legs(
+    "top",
+    bothSides([
+      { id: "l1", hip: { x: -7, y: -14 }, knee: { x: -24, y: -26 }, foot: { x: -30, y: -44 }, a: true },
+      { id: "l2", hip: { x: -9, y: -9 }, knee: { x: -30, y: -14 }, foot: { x: -42, y: -20 }, a: false },
+      { id: "l3", hip: { x: -9, y: -4 }, knee: { x: -30, y: 4 }, foot: { x: -42, y: 14 }, a: true },
+      { id: "l4", hip: { x: -7, y: 0 }, knee: { x: -24, y: 16 }, foot: { x: -32, y: 36 }, a: false },
+    ]),
+    { width: [2.8, 2.2], step: 5, lift: 0, z: [1, 1] },
+  );
+  const t = munchRig({
+    id,
+    name: "Web-Gunner Spider",
+    view: "top",
+    k: 0.6 * k,
+    spits: true,
+    limbInk: 1.4,
+    pivots: { torso: { x: 0, y: 6 }, head: { x: 0, y: -18 } },
+    parts: [
+      { id: "body", src: top("spider-body"), bone: "torso", z: 5 },
+      { id: "head", src: top("spider-head"), bone: "head", place: { x: 0, y: -17, rot: 0 }, z: 6 },
+      { id: "cannon", src: gun, bone: "gun", place: placeAt(gun, "pivot", { x: 0, y: 8 }, 90 + v.aim * 0.3, 0.95), z: 7 },
+      ...(v.leader ? [at("booster", top("booster"), "head", 0, -14, 6.5)] : []),
+    ],
+    limbs: tl.limbs,
+    gait: tl.gait,
+    weapon: "cannon",
+    fx: { muzzle: cw.glow },
+    shadow: { x: 4, y: 6, r: 34 },
+  });
+  return scale({ side: s, top: t }, k);
+}
+
+// ---------- Bomb Wasps ----------
+
+/** A point turned `deg` about the origin. */
+const turn = (x: number, y: number, deg: number) => {
+  const c = Math.cos((deg * Math.PI) / 180);
+  const n = Math.sin((deg * Math.PI) / 180);
+  return { x: x * c - y * n, y: x * n + y * c };
+};
+
+function wasps(v: LookVariant): Look {
+  const id = `forge.munch.buzz.${v.tag}`;
+  // the bomb swings a little differently on each model; the two wasps sit on the ends of its lines
+  const swing = v.tag === "b" ? 9 : v.leader ? -4 : -10;
+  const bk = v.leader ? 1.15 : 1;
+  const hook = { x: 0, y: -84 };
+  const la = turn(-17 * bk, -15 * bk, swing);
+  const lb = turn(15 * bk, -23 * bk, swing);
+  const A = { x: hook.x + la.x, y: hook.y + la.y };
+  const B = { x: hook.x + lb.x, y: hook.y + lb.y };
+  const wasp = side("wasp");
+  const wings = side("wings");
+  const fly = (n: string, p: { x: number; y: number }, bone: PartUse["bone"], sc: number, z: number, phase: number): PartUse[] => [
+    { id: `wasp-${n}`, src: wasp, bone, place: { x: p.x, y: p.y, rot: -6, scale: sc }, z },
+    { id: `wings-${n}`, src: wings, bone, place: { x: p.x + 1 * sc, y: p.y - 4 * sc, rot: 0, scale: sc * 1.15 }, z: z + 0.5, anim: { flap: 0.55, phase } },
+  ];
+  const s = munchRig({
+    id,
+    name: "Bomb Wasps",
+    view: "side",
+    frame: "hover",
+    k: 0.5,
+    pivots: { torso: { x: 0, y: -84 }, head: { x: A.x, y: A.y } },
+    parts: [
+      ...fly("b", B, "torso", 1.0, 3, 0.3),
+      { id: "bomb", src: side("bomb"), bone: "gun", place: { x: hook.x, y: hook.y, rot: swing, scale: bk }, z: 6 },
+      ...fly("a", A, "head", 1.15, 8, 0),
+    ],
+    weapon: "bomb",
+    limbInk: 1.4,
+  });
+  const wt = top("wasp");
+  const wgt = top("wings");
+  const flyT = (n: string, x: number, y: number, rot: number, bone: PartUse["bone"], z: number, phase: number): PartUse[] => [
+    { id: `wasp-${n}`, src: wt, bone, place: { x, y, rot, scale: 1.1 }, z },
+    { id: `wings-${n}`, src: wgt, bone, place: { x, y, rot, scale: 1.15 }, z: z + 0.5, anim: { flap: 0.5, phase } },
+  ];
+  const t = munchRig({
+    id,
+    name: "Bomb Wasps",
+    view: "top",
+    frame: "hover",
+    k: 0.5,
+    pivots: { torso: { x: 0, y: 4 }, head: { x: -13, y: -8 } },
+    parts: [
+      { id: "bomb", src: top("bomb"), bone: "gun", place: { x: 0, y: 6, rot: swing, scale: bk }, z: 3 },
+      ...flyT("a", -13, -8 + (v.tag === "b" ? 4 : 0), -10, "head", 5, 0),
+      ...flyT("b", 14, -4 - (v.tag === "b" ? 4 : 0), 8, "torso", 6, 0.3),
+    ],
+    weapon: "bomb",
+    shadow: { x: 4, y: 6, r: 30 },
+  });
+  return { side: s, top: t };
+}
+
+export default defineTemplateArt({
+  key: "munch",
+  colourway: (_f, spec) => munchColourway(spec.primary, "beetle"),
+  units: {
+    nibblers: (ctx) => squad(ctx, "beetle", beetle),
+    spitter: (ctx) => squad(ctx, "spider", spider),
+    buzz: (ctx) => squad(ctx, "wasp", wasps),
+  },
+});
