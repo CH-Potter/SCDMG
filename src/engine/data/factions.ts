@@ -985,7 +985,10 @@ const concord: Faction = {
   // the swarm (sims: Concord ~58% vs Munch), while Gate Step helps a few elites reach the long board's objectives.
   // v0.11: the Court of Disdain rather than the Mirror Spire. Point Out Flaws and Withering Review (which
   // switches off Overwatch and Return Fire) took the Concord from ~45% to ~54% against the Militia.
-  assaultStarter: ["con-court", "con-portal", "con-gate"],
+  // v0.12 touch-up (evade in the scrum, agile-only evade): back to the Mirror Spire, which also spends
+  // the tenth Fizz. 5-seed sims: Concord 48.8% against the swarm (43.6% with the Court) and 48.6%
+  // against the Militia (49.3%). The Star Lens there took the Concord to ~42% against both.
+  assaultStarter: ["con-spire", "con-portal", "con-gate"],
   supports: [
     {
       id: "con-spire",
