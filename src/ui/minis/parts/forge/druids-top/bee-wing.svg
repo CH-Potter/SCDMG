@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -20 10 22" data-part="forge.druids.top.bee-wing">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Bee wing from above: a pale teardrop along -y</title>
+<path d="M-1,1 Q-4,-10 0,-18 Q5,-17 5,-10 Q4,-3 2,1 Z" fill="#c8bd98" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -34 40 62" data-part="forge.druids.top.wolf-body-alpha">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Pack leader from above: the moss mane over the shoulders</title>
+<path d="M0,-28 Q12,-26 13,-10 Q14,10 8,22 Q0,26 -8,22 Q-14,10 -13,-10 Q-12,-26 0,-28 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,-22 Q13,-14 13,-10 Q14,10 8,22 Q4,24 2,24 Q12,8 8,-22 Z" fill="#353b41"/>
+<path d="M-4,-16 L-2,-20 L0,-16 L2,-20 L4,-16 L3,14 L0,18 L-3,14 Z" fill="#353b41" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M-12,-18 Q0,-24 12,-18 L13,-8 L8,-11 L4,-6 L0,-11 L-4,-6 L-8,-11 L-13,-8 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="tag" d="M-12,-26 Q0,-31 12,-26 L12,-20 Q0,-24 -12,-20 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M-12,-21 L-18,-14 L-11,-14 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

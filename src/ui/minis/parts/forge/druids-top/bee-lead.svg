@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 -18 28 52" data-part="forge.druids.top.bee-lead" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>The lead bee from above: the team stripe on its abdomen</title>
+<path d="M-9.6,4.8 Q-10.8,24.0 0.0,28.8 Q10.8,24.0 9.6,4.8 Q0.0,-2.4 -9.6,4.8 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M-10.3,10.8 L10.3,10.8 L10.3,15.6 L-10.3,15.6 Z" fill="#2b2019"/>
+<path class="tag" d="M-10.3,16.8 L10.3,16.8 L7.9,25.2 L-7.9,25.2 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="0.0" cy="0.0" r="7.7" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle cx="0.0" cy="-10.8" r="6.0" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-3.1" cy="-13.2" r="1.9" fill="#fff2c0"/>
+<circle class="glow" cx="3.1" cy="-13.2" r="1.9" fill="#fff2c0"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="muzzle" cx="0" cy="-14" r="1"/></g>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="63 138 16 15" data-part="forge.druids.side.knee-back">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Far knee wrap, in shadow</title>
+<path d="M65,141 L77,140 L77,147 L71,151 L65,148 Z" fill="#44432f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="71" cy="145" r="1"/></g>
+</svg>

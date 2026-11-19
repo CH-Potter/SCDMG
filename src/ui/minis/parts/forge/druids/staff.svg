@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-18 -20 140 40" data-part="forge.druids.side.staff" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Archdruid's staff: a gnarled branch whose twisted crook cradles a glowing mistletoe orb (head left)</title>
+<path d="M10,-2.6 Q30,-5 50,-2 Q70,1 90,-2 Q106,-4 120,-2 L120,3 Q106,1 90,3 Q70,6 50,3 Q30,0 10,2.6 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M12,-2 Q4,-14 -10,-14 Q-16,-8 -12,-2 Q-8,-8 -2,-8 Q4,-6 6,0 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M12,2 Q6,14 -6,16 Q-12,14 -10,10 Q-4,10 2,6 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<circle class="glow" cx="-4" cy="0" r="7" fill="#fff2c0" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="-5" cy="-1" r="3.4" fill="#f2b84b"/>
+<path d="M-12,-12 Q-18,-18 -12,-20 Q-8,-16 -12,-12 Z M2,-12 Q6,-18 10,-14 Q6,-10 2,-12 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle cx="-7" cy="-14" r="1.6" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<circle cx="5" cy="-15" r="1.6" fill="#b9bfc4" stroke="#141414" stroke-width="1.4"/>
+<path d="M40,-3 L44,3 M76,-2 L80,4" fill="none" stroke="#4a2e19" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="50" cy="0" r="1"/><circle id="g2" cx="78" cy="0" r="1"/><circle id="muzzle" cx="-10" cy="0" r="1"/></g>
+</svg>

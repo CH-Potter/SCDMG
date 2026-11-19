@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 46 20" data-part="forge.druids.side.cudgel">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Knobbly cudgel in the off hand (gripped at its handle)</title>
+<rect x="12" y="-2.4" width="22" height="4.8" rx="2" fill="#4a2e19" stroke="#141414" stroke-width="2"/>
+<path d="M-6,-1 Q-6,-8 2,-8 Q10,-8 14,-4 L14,4 Q10,8 2,8 Q-6,7 -6,-1 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<circle cx="-2" cy="-6" r="2.2" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<circle cx="4" cy="7" r="2" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="28" cy="0" r="1"/></g>
+</svg>

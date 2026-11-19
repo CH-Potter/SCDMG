@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-22 -12 44 52" data-part="forge.druids.top.robe">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Archdruid from above: the bark-fur mantle, moss robe spreading behind, team stole down the back</title>
+<path d="M-15,0 Q-19,22 -12,36 L-6,33 L0,38 L6,33 L12,36 Q19,22 15,0 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,4 Q16,20 12,36 L8,34 Q12,18 8,4 Z" fill="#6c5a37"/>
+<path d="M-21,-2 Q-16,-11 0,-10 Q16,-11 21,-2 L22,8 L17,6 L14,12 L8,7 L2,13 L-4,7 L-10,12 L-14,6 L-20,9 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M14,-9 Q20,-6 21,-2 L22,8 L17,6 L16,9 Q20,0 14,-9 Z" fill="#4a2e19"/>
+<path class="tag" d="M-3.6,-8 L3.6,-8 L4.6,32 L-4.6,32 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

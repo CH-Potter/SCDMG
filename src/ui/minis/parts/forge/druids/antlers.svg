@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 -14 62 62" data-part="forge.druids.side.antlers">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Antler headdress: two branching lichen-white racks on a leafy bark band</title>
+<path d="M50,33 L46,14 L36,8 L46,9 L42,-4 L50,8 L54,-2 L54,12 L54,32 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M64,31 L67,10 L60,-2 L70,5 L74,-10 L76,6 L88,-2 L80,12 L72,18 L70,32 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,32 L72,18 L80,12 L76,16 L74,30 Z" fill="#c8bd98"/>
+<path d="M45,36 Q60,29.6 75,34" fill="none" stroke="#6e4528" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M47,36 Q44,30 49,29 Q51,34 47,36 Z M62,33 Q62,26 67,27 Q66,32 62,33 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="46" r="1"/></g>
+</svg>

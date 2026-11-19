@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 18 12 30" data-part="forge.druids.top.wolf-tail">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wolf tail from above: a bushy brush</title>
+<path d="M-3.4,20 Q-6,34 0,46 Q6,34 3.4,20 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-2.4,38 Q0,46 2.4,38 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="21" r="1"/></g>
+</svg>

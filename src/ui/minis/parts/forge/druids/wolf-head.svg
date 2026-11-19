@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="28 8 52 58" data-part="forge.druids.side.wolf-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Wolf head: long muzzle, tall ears, firefly-yellow eye, pale ruff</title>
+<path d="M54,62 Q48,46 52,32 L66,30 Q72,46 70,62 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M62,31 L66,30 Q72,46 70,62 L65,62 Q68,46 62,31 Z" fill="#353b41"/>
+<path d="M60,30 L66,12 L72,32 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M62,29 L66,18 L69,30 Z" fill="#5d5b45"/>
+<path d="M38,44 L54,44 L56,50 Q46,54 40,50 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M42,44 L43.4,48 L45,44 Z" fill="#e3d8b6" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path d="M66,36 Q60,26 50,28 L36,32 Q31,35 33,39 L36,42 L54,44 Q66,44 66,36 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M36,42 L54,44 Q62,44 64,40 Q50,40 36,42 Z" fill="#353b41"/>
+<ellipse cx="33.6" cy="34.2" rx="2.6" ry="2" fill="#141414"/>
+<path d="M48,30 L56,29 L55,33 Z" fill="#353b41" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<circle class="glow" cx="53" cy="34" r="2.4" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle cx="52.4" cy="34" r="1" fill="#141414"/>
+<path d="M66,44 L74,50 L68,54 L76,58 L68,60 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

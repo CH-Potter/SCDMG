@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="30 14 52 58" data-part="forge.druids.side.oak-head">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Oakheart's face in the bark: a heavy knotted brow, glowing eyes in deep hollows, a knot nose and a moss beard</title>
+<path d="M44,62 L45,28 Q60,16 77,28 L77,62 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M70,22.6 Q74,25 77,28 L77,62 L71,62 Q74,40 70,22.6 Z" fill="#4a2e19"/>
+<path d="M66,26 Q70,44 68,60" fill="none" stroke="#4a2e19" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<ellipse cx="50" cy="43" rx="4.6" ry="3.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<ellipse cx="62" cy="43" rx="3.6" ry="3" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle class="glow" cx="50" cy="43" r="2" fill="#fff2c0"/>
+<circle class="glow" cx="62" cy="43" r="1.6" fill="#fff2c0"/>
+<path d="M42,35 Q54,30 68,36 L66,40 Q56,35 44,40 Z" fill="#4a2e19" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M45,46 L36,50 L44,54 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M40,54 Q42,68 52,70 Q60,66 68,62 Q62,56 52,55 Q46,54 40,54 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M48,58 L50,66 M56,58 L57,64" fill="none" stroke="#6c5a37" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

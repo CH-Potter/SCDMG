@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -46 42 50" data-part="forge.druids.side.sprite-wing">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Sprite wing: a slender veined dragonfly wing (beats from the shoulder)</title>
+<path d="M0,0 Q6,-30 28,-42 Q38,-44 36,-34 Q26,-14 0,0 Z" fill="#fff2c0" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M2,-2 Q14,-24 32,-38 M8,-6 Q20,-14 30,-26" fill="none" stroke="#c8bd98" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

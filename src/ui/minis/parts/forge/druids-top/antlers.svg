@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-26 -18 52 28" data-part="forge.druids.top.antlers">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Antler headdress from above: two racks spreading out to the sides</title>
+<path d="M-6,-4 L-14,-8 L-20,-16 L-18,-8 L-24,-6 L-16,-4 L-20,2 L-12,-1 L-6,0 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M6,-4 L14,-8 L20,-16 L18,-8 L24,-6 L16,-4 L20,2 L12,-1 L6,0 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-7,-2 Q0,-10 7,-2" fill="none" stroke="#6e4528" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-2" r="1"/></g>
+</svg>
