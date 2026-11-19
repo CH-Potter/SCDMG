@@ -10,6 +10,7 @@ import type { SfxName } from "../../audio/mapping";
 import { factionOf, PROFILES } from "../../engine/data/factions";
 import { factionEmblemSvg } from "../art/emblems";
 import { figureDataUrl, figureSpec, miniFraming } from "../art/figures";
+import { rigPortraitUrl } from "../art/rigPortrait";
 import { esc } from "../describe";
 import { markIntroSeen, type IntroId } from "./prefs";
 import { IntroRunner, isSkipKey, sceneAt, sceneStarts, totalDuration, type EndReason } from "./runner";
@@ -110,13 +111,29 @@ const reducedMotion = (): boolean => {
   }
 };
 
-/** Paint a unit's miniature (cached by figures.ts). */
-function miniUrl(unitId: string, base: boolean): string | null {
+/** A unit's picture and how it's framed: size in inches, and where the feet are (fractions). */
+interface MiniPicture {
+  url: string;
+  w: number;
+  h: number;
+  feetX: number;
+  feetY: number;
+}
+
+/**
+ * Paint a unit's miniature: the new miniature (Ink Rig side view, the game's default look) when it
+ * has one, else the Classic painter (custom units). Both are cached by their painters.
+ */
+export function miniPicture(unitId: string, base: boolean, ppi?: number): MiniPicture | null {
+  const rig = rigPortraitUrl(unitId, { base, ppi });
+  if (rig) return rig;
   const p = PROFILES[unitId];
   if (!p) return null;
   try {
     const f = factionOf(p.faction);
-    return figureDataUrl(figureSpec(p, f.look, f.color), base ? f.color : null, MINI_PX);
+    const spec = figureSpec(p, f.look, f.color);
+    const fr = miniFraming(spec);
+    return { url: figureDataUrl(spec, base ? f.color : null, MINI_PX), w: fr.size, h: fr.size, feetX: 0.5, feetY: fr.feet };
   } catch {
     return null;
   }
@@ -126,7 +143,7 @@ function miniUrl(unitId: string, base: boolean): string | null {
 async function warmCast(cast: readonly string[], alive: () => boolean): Promise<void> {
   for (const id of cast) {
     if (!alive()) return;
-    miniUrl(id, false);
+    miniPicture(id, false);
     await new Promise((r) => setTimeout(r, 0));
   }
 }
@@ -156,33 +173,25 @@ class SceneKit implements Kit {
   }
 
   mini(unitId: string, o: MiniOpts): HTMLElement {
-    const p = PROFILES[unitId];
     const k = o.k ?? 16;
-    let size = 2;
-    let feet = 0.75;
-    if (p) {
-      try {
-        const f = factionOf(p.faction);
-        const fr = miniFraming(figureSpec(p, f.look, f.color));
-        size = fr.size;
-        feet = fr.feet;
-      } catch {
-        /* keep defaults */
-      }
-    }
-    const S = size * k;
+    // on-screen pixels per inch of miniature, for the detail tier and outline weight
+    const ppi = (k * (this.panel.clientHeight || 600)) / 100;
+    const pic = miniPicture(unitId, !!o.base, ppi) ?? { url: "", w: 2, h: 2, feetX: 0.5, feetY: 0.75 };
+    const W = pic.w * k;
+    const H = pic.h * k;
+    const feet = `50% ${(pic.feetY * 100).toFixed(1)}%`;
     const wrap = this.add(
       "ix-mini",
       "",
-      `width:${S.toFixed(2)}cqh;height:${S.toFixed(2)}cqh;left:calc(${o.x}% - ${(S / 2).toFixed(2)}cqh);top:calc(${o.y}% - ${(S * feet).toFixed(2)}cqh);z-index:${o.z ?? Math.round(o.y)}`,
+      `width:${W.toFixed(2)}cqh;height:${H.toFixed(2)}cqh;left:calc(${o.x}% - ${(W * pic.feetX).toFixed(2)}cqh);top:calc(${o.y}% - ${(H * pic.feetY).toFixed(2)}cqh);z-index:${o.z ?? Math.round(o.y)}`,
     );
-    const mover = this.add("ix-mover", "", "", wrap);
+    const mover = this.add("ix-mover", "", `transform-origin:${feet}`, wrap);
     const img = document.createElement("img");
     img.alt = "";
     img.draggable = false;
     img.decoding = "async";
-    const url = miniUrl(unitId, !!o.base);
-    if (url) img.src = url;
+    img.style.transformOrigin = feet;
+    if (pic.url) img.src = pic.url;
     if (o.flip) img.classList.add("ix-flip");
     if (o.bob) {
       img.classList.add("ix-bob");

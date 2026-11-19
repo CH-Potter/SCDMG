@@ -515,3 +515,32 @@ export function scoreCard(score: string): string {
     <rect x="6" y="6" width="108" height="100" rx="10" fill="#fffaf0" stroke="${INK}" stroke-width="7"/>
     <text x="60" y="80" text-anchor="middle" font-family="'Bowlby One','Arial Black',Impact,sans-serif" font-size="58" fill="#45307a">${score.replace(/[^0-9.½/]/g, "")}</text></svg>`;
 }
+
+/**
+ * The Muster's call-up notice, nailed to a post (SVG, 2:3): the draft as the valley sees it, a roll
+ * of families with every name ticked off. All its text is fixed, never user data.
+ */
+export function callUpNotice(): string {
+  const id = `n${++uid}`;
+  const font = `font-family="'Bowlby One','Arial Black',Impact,sans-serif"`;
+  const body = `font-family="'Barlow Semi Condensed','Arial Narrow',sans-serif" font-weight="700"`;
+  const rows = ["HAYBRIGHT", "TUMBLEWEED", "PICKETT", "OKAFOR", "DELGADO"]
+    .map((n, i) => {
+      const y = 196 + i * 25;
+      return `<text x="44" y="${y}" ${body} font-size="19" fill="#3b3024">${n}</text><path d="M196 ${y - 16} h18 v18 h-18 Z" fill="none" stroke="#3b3024" stroke-width="2.5"/><path d="M198 ${y - 7} l6 6 l12 -16" fill="none" stroke="#c0392b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    })
+    .join("");
+  return `<svg viewBox="0 0 240 360" aria-hidden="true"><defs>${halftone(`h${id}`, "rgba(110,80,40,0.18)", 8)}</defs>
+    <rect x="108" y="250" width="24" height="110" fill="#7a5232" stroke="${INK}" stroke-width="6"/>
+    <path d="M14 22 L226 14 L230 318 L10 326 Z" fill="${INK}" transform="translate(6 6)"/>
+    <path d="M14 22 L226 14 L230 318 L10 326 Z" fill="#f3e6c4" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M14 22 L226 14 L230 318 L10 326 Z" fill="url(#h${id})"/>
+    <path d="M22 30 L218 23 L219 80 L23 86 Z" fill="#6b5c3c"/>
+    <text x="120" y="68" text-anchor="middle" ${font} font-size="34" fill="#f3e6c4" letter-spacing="2">CALL-UP</text>
+    <text x="120" y="112" text-anchor="middle" ${body} font-size="21" fill="#3b3024">DUSTLINE MUSTER</text>
+    <text x="120" y="135" text-anchor="middle" ${body} font-size="15" fill="#3b3024" textLength="176" lengthAdjust="spacingAndGlyphs">EVERY FAMILY SENDS ITS HANDS</text>
+    <text x="120" y="155" text-anchor="middle" ${body} font-size="15" fill="#3b3024" textLength="184" lengthAdjust="spacingAndGlyphs">REPORT TO THE GRANGE HALL GREEN</text>
+    <path d="M36 168 H204" stroke="#3b3024" stroke-width="2.5"/>
+    ${rows}
+    <circle cx="120" cy="22" r="7" fill="#9aa0a6" stroke="${INK}" stroke-width="3"/></svg>`;
+}

@@ -25,6 +25,7 @@ import { MAPS } from "../../engine/data/maps";
 import { MISSIONS } from "../../engine/data/missions";
 import { factionEmblemSvg, wordmarkSvg } from "../art/emblems";
 import { figureDataUrl, figureSpec } from "../art/figures";
+import { rigPortraitFit } from "../art/rigPortrait";
 import { esc } from "../describe";
 import { maybeFactionIntro, playIntro, type LoreTab } from "../loreLinks";
 import { drawMapPreview } from "../previews";
@@ -56,8 +57,16 @@ function hydrate(root: HTMLElement): void {
       const p = PROFILES[img.dataset.unit ?? ""];
       if (!p) continue;
       try {
-        const f = FACTIONS[p.faction]!;
-        img.src = figureDataUrl(figureSpec(p, f.look, f.color), NEUTRAL_BASE, Number(img.dataset.px) || 72);
+        const px = Number(img.dataset.px) || 72;
+        // the new miniature (Ink Rig) on a neutral base; Classic only for units without new art
+        const rig = rigPortraitFit(p.id, px, { team: NEUTRAL_BASE, base: true });
+        if (rig) {
+          img.src = rig.url;
+          img.classList.add("rig");
+        } else {
+          const f = FACTIONS[p.faction]!;
+          img.src = figureDataUrl(figureSpec(p, f.look, f.color), NEUTRAL_BASE, px);
+        }
       } catch {
         /* leave it blank */
       }
