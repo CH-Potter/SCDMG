@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PvP spike</title>
+    <style>
+      body { font: 15px/1.4 system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+      code, #log { font-family: ui-monospace, monospace; }
+      #log { white-space: pre-wrap; background: #f4f4f4; padding: 8px; min-height: 200px; font-size: 12px; }
+      input { font: inherit; padding: 4px 6px; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; align-items: center; }
+    </style>
+  </head>
+  <body>
+    <h1>PvP transport spike</h1>
+    <p>
+      Throwaway test page, not part of the game. Open it in two tabs (serve the repo with <code>npx vite</code> and open
+      <code>/spikes/pvp/</code>). Create a game in one tab, paste the code into the other, then send messages. Traffic goes
+      through a public MQTT broker, end-to-end encrypted with a key derived from the code.
+    </p>
+    <div class="row">
+      <label>Broker <select id="broker"></select></label>
+    </div>
+    <div class="row">
+      <button id="create">Create game</button>
+      <span>or</span>
+      <input id="code" placeholder="XXXX-XXXX-XXXX-XXXX" size="22" />
+      <button id="join">Join</button>
+    </div>
+    <div class="row">
+      <input id="text" placeholder="message" size="40" disabled />
+      <button id="send" disabled>Send</button>
+      <button id="ping" disabled>Ping x10</button>
+    </div>
+    <div id="log"></div>
+    <script type="module">
+      import { BROKERS, MiniMqtt, SecureChannel, deriveRoom, newInviteCode } from "./pvp-core.mjs";
+
+      const $ = (id) => document.getElementById(id);
+      const log = (s) => ($("log").textContent += `${new Date().toLocaleTimeString()}  ${s}\n`);
+      for (const [name, url] of Object.entries(BROKERS)) $("broker").add(new Option(`${name} (${url})`, url));
+      let mqtt, ch, room;
+      const pings = new Map();
+
+      async function enter(code) {
+        room = await deriveRoom(code);
+        ch = new SecureChannel(room);
+        mqtt = new MiniMqtt($("broker").value);
+        log(`Connecting to ${$("broker").value} ...`);
+        await mqtt.connect();
+        await mqtt.subscribe(room.topic);
+        log(`In room ${room.topic} (derived from the code; the code itself is never sent). My session ${ch.sid}.`);
+        mqtt.onMessage = async (_topic, bytes) => {
+          const m = await ch.open(bytes);
+          if (m.drop) return m.drop === "own echo" || log(`dropped: ${m.drop}`);
+          const b = m.body;
+          if (b.ping !== undefined) return mqtt.publish(room.topic, await ch.seal({ pong: b.ping }));
+          if (b.pong !== undefined) {
+            const t = pings.get(b.pong);
+            if (t) log(`pong ${b.pong}: ${(performance.now() - t).toFixed(0)} ms round trip`);
+            return;
+          }
+          log(`peer ${m.sid.slice(0, 6)} #${m.seq}: ${JSON.stringify(b)}`);
+        };
+        mqtt.onClose = () => log("Disconnected.");
+        mqtt.publish(room.topic, await ch.seal({ hello: true }));
+        for (const id of ["text", "send", "ping"]) $(id).disabled = false;
+      }
+
+      $("create").onclick = () => {
+        const code = newInviteCode();
+        $("code").value = code;
+        log(`Invite code: ${code}  (share it yourself)`);
+        enter(code).catch((e) => log(`Error: ${e.message}`));
+      };
+      $("join").onclick = () => enter($("code").value).catch((e) => log(`Error: ${e.message}`));
+      $("send").onclick = async () => {
+        mqtt.publish(room.topic, await ch.seal({ text: $("text").value }));
+        $("text").value = "";
+      };
+      $("ping").onclick = async () => {
+        for (let i = 0; i < 10; i++) {
+          const id = `${ch.sid}-${Date.now()}-${i}`;
+          pings.set(id, performance.now());
+          mqtt.publish(room.topic, await ch.seal({ ping: id }));
+          await new Promise((r) => setTimeout(r, 300));
+        }
+      };
+    </script>
+  </body>
+</html>
