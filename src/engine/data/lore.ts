@@ -461,6 +461,7 @@ export const LORE_FACTIONS: Record<LoreFactionId, FactionLore> = {
       { id: "mil-airstrip", note: "A graded field behind Haybright Farm: home of the Haymaker Bomber, the crop-duster squadron, a windsock and Flight Sergeant Lew's confidence." },
       { id: "mil-dropship", note: "A boom-years ore hauler with troop benches bolted in, which Flight Sergeant Lew keeps flying on Fizz, prayer and rivets." },
       { id: "mil-wagon", note: "Rivets, rifle rounds and sandbags, signed out by a quartermaster who counts every one of them twice." },
+      { id: "mil-powder", note: "A sandbagged dugout of blasting powder and parachute flares. The sign says NO SMOKING in three hands, one of them the Marshal's." },
     ],
     intro: [
       "When trouble comes up the valley, the Marshal calls the Muster roll.",
@@ -507,6 +508,7 @@ export const LORE_FACTIONS: Record<LoreFactionId, FactionLore> = {
       { id: "swarm-tunnels", note: "Miles of tunnels under the fields, dug by Old Grinder. The Muster's surveyors call it subsidence. It is not subsidence." },
       { id: "swarm-pheromones", note: "A smell like old pennies and wet leaves that drifts up from the tunnels before an attack. Troopers who've smelled it once check their sleeves for the rest of their lives." },
       { id: "swarm-glands", note: "Sacs of acid the size of water tanks, buried under the brood chambers. They gurgle at night, and the wells near them taste of batteries." },
+      { id: "swarm-moult", note: "Pits full of shed skins, still twitching. A bug fresh out of its old shell is soft, slippery and very hard to catch, and the venom in the air goes straight to your arms." },
     ],
     intro: [
       "Under Badger Knob, the ground trembles.",
@@ -551,6 +553,7 @@ export const LORE_FACTIONS: Record<LoreFactionId, FactionLore> = {
       { id: "con-court", note: "Lady Prismwick's panel of critics. They score every battle, and point out where the enemy's armour is cheap." },
       { id: "con-gate", note: "Doorways of light for crossing the valley without touching the dirt, or whatever is in it." },
       { id: "con-portal", note: "The Concord's front door, opened wherever His Radiance's peers would like to make an entrance." },
+      { id: "con-forge", note: "An orbital workshop that prints armour out of light for the Concord, and publishes reviews of everyone else's, rivet by rivet." },
     ],
     intro: [
       "From orbit, the Dustline glows. The Star Lens noticed.",

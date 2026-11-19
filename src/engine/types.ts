@@ -84,6 +84,31 @@ export type AbilityId =
   // passive (added with the Skitterswarm)
   | "corrode" // attacks that deal damage leave the target's saves one worse this round
   | "brood-bond" // aura: end of round, friendly units within 6" regrow a lost model even if they were hurt
+  // active, CP (the CP ability pass): the Militia
+  | "stand-to" // movement: the first enemy to charge it this round is shot first, before the roll
+  | "hold-the-line" // movement, instead of moving: it stays put and counts double for objectives this round
+  | "smoke-shells" // movement: lob smoke; friends within 3" of it can't be shot from more than 12" away this round
+  | "steel-core" // assault: +1 AP on its shots this round
+  // the Skitterswarm
+  | "mad-scramble" // assault: roll three dice for its charge this round and keep the best two
+  | "eat-through" // assault: an enemy unit is corroded, or if it already was, its saves are two worse this round
+  | "brood-frenzy" // assault: friendly units within 6" of the Broodmother get +1 melee die per model this round
+  | "lay-eggs" // movement: lay an Egg Clutch within 3"
+  // the Lumen Concord
+  | "phase-shift" // movement: its models evade shots on a 4+ this round
+  | "triangulate" // assault: your shots at an enemy unit get precision +1 and tracking +1 this round
+  | "bow-out" // movement, even while engaged: teleport up to 6" (its move), leaving any melee cleanly
+  | "lend-shields" // movement: pour this unit's shields into a friendly unit within 6"
+  // disruption: burn the enemy's best ready support card for the round
+  | "snipe-runner" // Militia, assault, if it hasn't moved: shoot the dispatch runner
+  | "chew-wires" // Skitterswarm, movement, within 18" of an enemy: chew through the field telephone lines
+  | "cutting-remark" // Concord, assault, an enemy unit in sight within 24": a remark so cutting their staff walks out
+  // dice buffs and debuffs on support units (the same statuses as the support effects)
+  | "rivet-plates" // Militia, movement: a friendly unit within 3" saves one better this round
+  | "star-shell" // Militia, assault: an enemy unit in range of its lobbed gun can't evade this round
+  | "slime-coat" // Skitterswarm, movement: a friendly unit within 3" evades one better (or on a 6+) this round
+  | "numbing-sting" // Skitterswarm, assault: an enemy unit within 10" rolls one fewer die per model this round
+  | "exacting-standards" // Concord, movement: a friendly unit within 6" deals +1 damage per hit this round
   // structures
   | "burrow-exit" // your reserves may deploy within 3" of this structure
   | "ward-aura" // enemy ranged attacks on friendly units within 4" hit one worse
@@ -278,6 +303,19 @@ export type SupportEffect =
   | { kind: "silence"; range: number }
   /** A friendly unit gets +`amount` shield per model, even above its maximum, until the end of the round. */
   | { kind: "overshield"; amount: number }
+  // dice buffs and debuffs (unit abilities use the same statuses), until the end of the round
+  /** A friendly unit's saves are `save` better against every attack. */
+  | { kind: "armourBuff"; save: number }
+  /** An enemy unit within `range`" of your models: its saves are `save` worse against every attack. */
+  | { kind: "armourBreak"; save: number; range: number }
+  /** A friendly unit's evade rolls get +`amount`; a unit with no evade evades everything on `grant`+ instead. */
+  | { kind: "evadeBuff"; amount: number; grant: number }
+  /** An enemy unit within `range`" of your models: its evade rolls are `amount` worse. */
+  | { kind: "evadeDebuff"; amount: number; range: number }
+  /** A friendly unit's attacks deal +`amount` damage per hit. */
+  | { kind: "damageBuff"; amount: number }
+  /** An enemy unit within `range`" of your models rolls `dice` fewer dice per model on every attack (never below 1). */
+  | { kind: "weaken"; dice: number; range: number }
   // reactions: armed on your turn, fire automatically on the trigger, expire at the end of the round
   | { kind: "ward" }
   | { kind: "brace" }
@@ -401,6 +439,31 @@ export interface UnitStatus {
   revealed?: boolean;
   /** Burrow: under the ground until it surfaces (see rules.ts concealment). */
   burrowed?: boolean;
+  /** Stand To: the first enemy to declare a charge at it this round gets shot first. */
+  standingTo?: boolean;
+  /** Hold the Line: can't move, advance or charge this round, and counts double for objectives. */
+  holding?: boolean;
+  /** Steel-Core Rounds: extra AP on its shots until the end of the round. */
+  apBonus?: number;
+  /** Mad Scramble: rolls three dice for its charge this round and keeps the best two. */
+  scrambling?: boolean;
+  /** Eat Through: on top of Corrode, its saves are one worse again until the end of the round. */
+  melting?: boolean;
+  /** Phase Shift: its models evade shots on a 4+ (or one better) until the end of the round. */
+  phased?: boolean;
+  /** Triangulate: enemy shots at it get precision +1 and tracking +1 until the end of the round. */
+  triangulated?: boolean;
+  // ----- dice buffs and debuffs (unit abilities and support cards share these), until the end of the round -----
+  /** Armour: its saves against every attack are this much better (negative: worse). */
+  saveMod?: number;
+  /** Evade: a unit with no evade evades every attack on this roll (the better of this and its own). */
+  evadeGrant?: number;
+  /** Damage: each of its hits deals this much more damage (negative: less, never below 1). */
+  damageMod?: number;
+  /** Attack dice: each of its models rolls this many more dice on every attack (negative: fewer, never below 1). */
+  diceMod?: number;
+  /** Star Shell: lit up, it can't evade anything until the end of the round. */
+  noEvade?: boolean;
 }
 
 export interface Unit {
@@ -640,6 +703,8 @@ export type GameEvent =
   | { type: "gameOver"; winner: PlayerId | "draw"; reason: string }
   | { type: "support"; player: PlayerId; support: string; ability: string; text: string }
   | { type: "summoned"; uid: string }
+  /** A unit's disruption ability burned one of `player`'s support cards for the round. */
+  | { type: "cardBurned"; player: PlayerId; support: string }
   | { type: "morale"; uid: string; roll: [number, number]; nerve: number; shaken: boolean }
   | { type: "rallied"; uid: string; how: "cp" | "roll" }
   | { type: "rolloff"; rolls: [number, number][]; winner: PlayerId; reason: "start" | "tie" }

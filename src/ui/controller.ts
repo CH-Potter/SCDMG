@@ -42,7 +42,12 @@ import {
   overwatchPlan,
   planCharge,
   planCloseRanks,
-  twoDiceAtLeast,
+  chargeOdds,
+  LAY_EGGS,
+  smokeCaught,
+  SMOKE_SHELLS,
+  standsTo,
+  standToPlan,
   mercyLead,
   type GameSetup,
   RALLY_CP,
@@ -1713,10 +1718,12 @@ export class Controller {
         if (rolled) {
           const need = chargeNeed(s, sel, hit.unit);
           const bonus = chargeBonus(s, sel);
-          if (need !== null) notes.push(`🎲 needs ${need}+ on 2d6${bonus ? ` (${bonus > 0 ? "+" : ""}${bonus}" from buffs)` : ""}: ${Math.round(twoDiceAtLeast(need) * 100)}% to make it, else it stays put`);
+          if (need !== null) notes.push(`🎲 needs ${need}+ on ${sel.status.scrambling ? "the best 2 of 3d6" : "2d6"}${bonus ? ` (${bonus > 0 ? "+" : ""}${bonus}" from buffs)` : ""}: ${Math.round(chargeOdds(sel, need) * 100)}% to make it, else it stays put`);
         }
         const ow = rulesOf(s).overwatch ? overwatchPlan(s, hit.unit, sel) : null;
         if (ow) notes.push(`⚠ overwatch: they fire ${ow.weapon.name} first, hitting on 6s (≈${expectedDamage(s, hit.unit, sel, ow.plan, false).toFixed(1)} damage)`);
+        const st = standsTo(hit.unit) ? standToPlan(s, hit.unit, sel) : null;
+        if (st) notes.push(`⚠ standing to: they fire ${st.weapon.name} first (≈${expectedDamage(s, hit.unit, sel, st.plan, false).toFixed(1)} damage)`);
         return ok(
           `💥 Charge ${profileOf(hit.unit).name}${typeof plan === "string" || rolled ? "" : ` (${plan.leaderDistance.toFixed(1)}")`}. Chargers get +1 die per model in combat.${notes.length ? ` · ${notes.join(" · ")}` : ""}`,
           "target",
@@ -1733,7 +1740,7 @@ export class Controller {
       if (def.needs === "enemyUnit" || def.needs === "friendlyUnit") {
         const checks = actionTargets(s, sel.uid, { kind: "ability", id: mode.id });
         if (def.needs === "enemyUnit") {
-          view.moveRing = { center: leader.pos, radius: (def.range ?? 0) + r };
+          view.moveRing = { center: leader.pos, radius: (mode.id === "star-shell" ? (barrageGun(profileOf(sel))?.range ?? 0) : (def.range ?? 0)) + r };
           view.targets = checks.map((c) => ({ uid: c.uid, ok: !c.problem }));
         } else view.friendlyMarks = checks.filter((c) => !c.problem).map((c) => c.uid);
         if (hit) {
@@ -1757,9 +1764,9 @@ export class Controller {
       }
       // Spot-picking abilities: Barrage, Blink, Tunnel, Rocket Hop, and Recall's second click.
       const mover = mode.id === "recall" && this.abilityTarget ? unitById(s, this.abilityTarget) ?? sel : sel;
-      if (mode.id === "barrage") view.moveRing = { center: leader.pos, radius: barrageGun(profileOf(sel))?.range ?? 24 };
-      if (mode.id === "blink" || mode.id === "rocket-hop" || mode.id === "crop-dust") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
-      if (mode.id === "bale-out") view.moveRing = { center: leader.pos, radius: (def.range ?? 6) + r };
+      if (mode.id === "barrage" || mode.id === "smoke-shells") view.moveRing = { center: leader.pos, radius: barrageGun(profileOf(sel))?.range ?? 24 };
+      if (mode.id === "blink" || mode.id === "rocket-hop" || mode.id === "crop-dust" || mode.id === "bow-out") view.moveRing = { center: leader.pos, radius: def.range ?? 10 };
+      if (mode.id === "bale-out" || mode.id === "lay-eggs") view.moveRing = { center: leader.pos, radius: (def.range ?? 6) + r };
       if (mode.id === "recall") view.moveRing = { center: leader.pos, radius: 4 + r };
       if (!hp) return info(def.text);
       if (hit && mode.id !== "barrage") return bad(`${def.name}: pick open ground`);
@@ -1788,6 +1795,16 @@ export class Controller {
         view.ghosts = [{ pos: hp, radius: profileFor(BALE_OUT.profileId, []).baseRadius }];
         view.ghostOk = !why;
         return why ? bad(`${def.name}: ${why}`) : ok(`${def.name}: drop the hay bales here (they block paths and give cover this round)`, "target");
+      }
+      if (mode.id === "lay-eggs") {
+        view.ghosts = [{ pos: hp, radius: profileFor(LAY_EGGS.profileId, []).baseRadius }];
+        view.ghostOk = !why;
+        return why ? bad(`${def.name}: ${why}`) : ok(`${def.name} (${def.cp ?? 0} CP): lay an Egg Clutch here (it blocks the way and lurks this round)`, "target");
+      }
+      if (mode.id === "smoke-shells") {
+        view.blast = { center: hp, radius: SMOKE_SHELLS.radius };
+        const hid = smokeCaught(s, sel.owner, hp).map((u) => profileOf(u).name);
+        return why ? bad(`${def.name}: ${why}`) : ok(`${def.name} (${def.cp ?? 0} CP): smoke over ${hid.join(", ")}: only shots from within ${SMOKE_SHELLS.range}" find them this round`, "target");
       }
       if (mode.id === "crop-dust") {
         const caught = cropDustCaught(s, sel, leader.pos, hp);
