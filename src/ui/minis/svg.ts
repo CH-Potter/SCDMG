@@ -73,7 +73,8 @@ export function walk(n: XmlNode, fn: (n: XmlNode, classes: Set<string>) => void,
 
 const esc = (s: string) => s.replace(/&(?![a-z]+;|#\d+;)/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
-function write(n: XmlNode): string {
+/** Serialise a node (and its children) back to SVG text. */
+export function write(n: XmlNode): string {
   const attrs = Object.entries(n.attrs)
     .map(([k, v]) => ` ${k}="${esc(v)}"`)
     .join("");

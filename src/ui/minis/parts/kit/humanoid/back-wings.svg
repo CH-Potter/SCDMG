@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="66 4 64 86" data-part="kit.humanoid.side.back-wings">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit back: a ribbed membrane wing (beats from the shoulder blade)</title>
+<path d="M72,70 Q82,34 110,10 Q126,8 127,18 Q116,24 121,36 Q108,38 112,52 Q98,52 100,66 Q88,64 82,84 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M82,84 Q88,64 100,66 Q98,52 112,52 Q108,38 121,36 L118,40 Q107,46 106,56 Q95,58 93,70 Q86,72 82,84 Z" fill="#44432f"/>
+<path d="M73,68 Q86,36 110,11 M80,66 Q96,40 120,20 M86,66 Q100,48 120,36 M90,70 Q100,58 112,52" fill="none" stroke="#141414" stroke-width="2"/>
+<path d="M72,70 Q82,34 110,10" fill="none" stroke="#9a8458" stroke-width="3"/>
+<g id="anchors"><circle id="pivot" cx="74" cy="70" r="1"/></g>
+</svg>

@@ -57,6 +57,8 @@ export interface AtlasPlan {
   h: number;
   entries: AtlasEntry[];
   svg: string;
+  /** Raster pictures to draw over the colour half after the SVG (page pixels): see PartUse.image. */
+  images: { href: string; x: number; y: number; r: number }[];
 }
 
 /** A limb segment's capsule: length from the rest pose, and its SVG drawn along +x from 0. */
@@ -75,6 +77,16 @@ export function capsule(rig: RigDef, l: LimbDef, seg: "upper" | "lower", tier: T
   return { box: { x: -half, y: -half, w: L + 2 * half, h: 2 * half }, body };
 }
 
+/** A short key for a picture (FNV-1a and its length): enough to tell two uploads apart. */
+function imageKey(href: string): string {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < href.length; i++) {
+    h ^= href.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return `${(h >>> 0).toString(36)}.${href.length.toString(36)}`;
+}
+
 /** Plan one atlas page for a rig at a tier. `dpr` multiplies the bake resolution. */
 export function planAtlas(rig: RigDef, tier: Tier, colours: Record<SlotName, string>, dpr = 1): AtlasPlan {
   const spec = TIERS[tier];
@@ -82,7 +94,7 @@ export function planAtlas(rig: RigDef, tier: Tier, colours: Record<SlotName, str
   const sil = (spec.silPx * dpr * spec.bake) / spec.refS;
   const pad = Math.ceil(sil) + 2;
   const keys = keyMap(colours);
-  const items: { id: string; box: { x: number; y: number; w: number; h: number }; body: string }[] = [];
+  const items: { id: string; box: { x: number; y: number; w: number; h: number }; body: string; image?: { href: string; cx: number; cy: number; r: number } }[] = [];
   for (const d of drawOrder(rig)) {
     if (d.limb) {
       const c = capsule(rig, d.limb.def, d.limb.seg, tier, colours);
@@ -90,7 +102,7 @@ export function planAtlas(rig: RigDef, tier: Tier, colours: Record<SlotName, str
     } else {
       const p = rig.parts.find((x) => x.id === d.id)!;
       const info = readPart(p.src);
-      items.push({ id: d.id, box: info.box, body: renderBody(info, tier, keys) });
+      items.push({ id: d.id, box: info.box, body: renderBody(info, tier, keys), ...(p.image ? { image: p.image } : {}) });
     }
   }
   // Shelf packing, tallest first (ties by id), so the layout is stable.
@@ -119,6 +131,15 @@ export function planAtlas(rig: RigDef, tier: Tier, colours: Record<SlotName, str
     const e = entries.get(it.id)!;
     return `<g transform="translate(${r3(e.x - e.ox * k)},${r3(e.y - e.oy * k)}) scale(${r3(k)})">${it.body}</g>`;
   });
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${groups.join("")}</svg>`;
-  return { tier, k, sil, w, h, entries: sized.map((it) => entries.get(it.id)!), svg };
+  const images = sized
+    .filter((it) => it.image)
+    .map((it) => {
+      const e = entries.get(it.id)!;
+      const im = it.image!;
+      return { href: im.href, x: r3(e.x + (im.cx - e.ox) * k), y: r3(e.y + (im.cy - e.oy) * k), r: r3(im.r * k) };
+    });
+  // the pictures change the page, so they're named in it (a hash, for the disk cache's plan hash)
+  const named = images.map((im) => `<!--img ${imageKey(im.href)} ${im.x},${im.y},${im.r}-->`).join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${groups.join("")}${named}</svg>`;
+  return { tier, k, sil, w, h, entries: sized.map((it) => entries.get(it.id)!), svg, images };
 }

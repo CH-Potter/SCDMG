@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -22 96 26" data-part="kit.structure.side.plinth">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit structure plinth: a stepped stone footing</title>
+<path d="M-44,0 L-40,-12 L40,-12 L44,0 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-12 L40,-12 L44,0 L28,0 Z" fill="#353b41"/>
+<path d="M-34,-12 L-32,-19 L32,-19 L34,-12 Z" fill="#5d5b45" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-20,-12 L-21,0 M0,-12 V0 M20,-12 L21,0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-6" r="1"/></g>
+</svg>

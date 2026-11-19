@@ -202,6 +202,23 @@ async function rasterise(plan: AtlasPlan, page: HTMLCanvasElement, ctx: CanvasRe
   img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(plan.svg)}`;
   await img.decode();
   ctx.drawImage(img, 0, 0, plan.w, plan.h);
+  // raster pictures (a standee's face), each clipped to its circle; a picture that won't decode is skipped
+  for (const im of plan.images) {
+    try {
+      const pic = new Image();
+      pic.src = im.href;
+      await pic.decode();
+      const s = Math.max((im.r * 2) / pic.naturalWidth, (im.r * 2) / pic.naturalHeight);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(im.x, im.y, im.r, 0, Math.PI * 2);
+      ctx.clip();
+      ctx.drawImage(pic, im.x - (pic.naturalWidth * s) / 2, im.y - (pic.naturalHeight * s) / 2, pic.naturalWidth * s, pic.naturalHeight * s);
+      ctx.restore();
+    } catch {
+      // the coin's face stays plain
+    }
+  }
   // Silhouette: stamp the colour art round two rings (full and half radius), then fill it white.
   const sil = canvas(plan.w, plan.h);
   const s = sil.getContext("2d")!;

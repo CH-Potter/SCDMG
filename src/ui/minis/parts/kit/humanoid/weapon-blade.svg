@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -10 86 20" data-part="kit.humanoid.side.weapon-blade" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit weapon: a two-handed broad blade (tip left)</title>
+<path d="M0,0 L10,-5.4 L60,-5.4 L60,5.4 L10,5.4 Z" fill="#b9bfc4" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M10,0.6 L60,0.6 L60,5.4 L10,5.4 L0,0 Z" fill="#4a5158"/>
+<path d="M12,-0.2 L56,-0.2" stroke="#141414" stroke-width="1.4"/>
+<rect x="59" y="-9" width="6" height="18" rx="1.6" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<rect x="65" y="-2.8" width="13" height="5.6" rx="1.4" fill="#2b2019" stroke="#141414" stroke-width="2"/>
+<circle cx="79.4" cy="0" r="3.2" fill="#6e4528" stroke="#141414" stroke-width="2"/>
+<path class="detail" d="M68,-2.6 v5.2 M72,-2.6 v5.2" stroke="#4a2e19" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="67" cy="0" r="1"/><circle id="g2" cx="75" cy="0" r="1"/><circle id="muzzle" cx="0" cy="0" r="1"/></g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 55 40 77" data-part="kit.humanoid.side.torso-plain">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit torso without the team sash (the shield or banner carries the team colour)</title>
+<path d="M46,66 L74,64 L78,110 L46,112 Z" fill="#5d5b45" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M64,110 L78,108 L80,124 L67,126 Z" fill="#6c5a37" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path d="M46,110 L60,110 L59,130 L52,128 L46,129 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M55,110.6 L60,110.6 L59,129.4 L55,128.6 Z" fill="#4a2e19"/>
+<path d="M45,103 L78,99 L78,107 L45,111 Z" fill="#2b2019" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<rect x="51" y="102" width="8" height="9" rx="1.4" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<path d="M45,70 Q60,63 76,68 L77,95 Q61,101 46,97 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M68,66.6 Q73,67 76,68 L77,95 Q72,97 68.6,98 Z" fill="#6c5a37"/>
+<path d="M46,84 Q61,89 77,83" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path d="M53,67 Q56,66 59.4,65.8 L60.4,98.6 Q57,98.4 54,97.8 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><circle cx="49" cy="74" r="1.1" fill="#b9bfc4"/><circle cx="49.4" cy="91" r="1.1" fill="#b9bfc4"/><circle cx="71" cy="72" r="1.1" fill="#b9bfc4"/></g>
+<path d="M49,60 L71,58 L73,67 L50,69 Z" fill="#353b41" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="60" cy="110" r="1"/><circle id="neck" cx="59" cy="57" r="1"/></g>
+</svg>

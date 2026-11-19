@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -54 60 104" data-part="kit.machine.top.pod" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit hover pod from above: teardrop hull, canopy forward, keel and team stripe</title>
+<path d="M0,-50 Q24,-44 26,-6 Q26,30 12,44 L-12,44 Q-26,30 -26,-6 Q-24,-44 0,-50 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M14,-42 Q26,-30 26,-6 Q26,30 12,44 L6,44 Q22,20 14,-42 Z" fill="#6c5a37"/>
+<path d="M0,-44 Q12,-40 12,-24 Q0,-18 -12,-24 Q-12,-40 0,-44 Z" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path class="glow" d="M0,-41 Q8,-38 8,-27 Q0,-23 -8,-27 Q-8,-38 0,-41 Z" fill="#fff2c0"/>
+<path class="tag" d="M-22,0 L22,0 L22,10 L-22,10 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<path d="M-2,22 L2,22 L3,46 L-3,46 Z" fill="#6e4528" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

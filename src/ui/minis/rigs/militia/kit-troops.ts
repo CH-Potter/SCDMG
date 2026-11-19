@@ -117,11 +117,23 @@ export interface LegPose {
 
 const STAND_LEGS: LegPose = { body: ID, footF: STAND.footF, footB: STAND.footB };
 
+/** The leg plates a kit can swap (drawn, like the trooper's, in the standing frame). */
+export interface LegParts {
+  shinF?: string;
+  shinB?: string;
+  kneeF?: string;
+  kneeB?: string;
+  bootF?: string;
+  bootB?: string;
+  /** Leg capsule width (default 7.4). */
+  width?: number;
+}
+
 /** Two ink legs with knee, shin and boot plates re-seated to the pose, and the trooper's walk cycle. */
-export function trooperLegs(pose: LegPose = STAND_LEGS, ground = 170): { limbs: LimbDef[]; parts: PartUse[]; gait: Record<string, Pt>[] } {
+export function trooperLegs(pose: LegPose = STAND_LEGS, ground = 170, lp: LegParts = {}): { limbs: LimbDef[]; parts: PartUse[]; gait: Record<string, Pt>[] } {
   const legs: { id: "legF" | "legB"; hip: Pt; knee: Pt; foot: Pt; l: [number, number]; shin: string; knee_: string; boot: string; slot: "suit" | "suitShade"; z: number }[] = [
-    { id: "legB", hip: STAND.hipB, knee: STAND.kneeB, foot: STAND.footB, l: STAND.legB, shin: shinBack, knee_: kneeBack, boot: bootBack, slot: "suitShade", z: 1 },
-    { id: "legF", hip: STAND.hipF, knee: STAND.kneeF, foot: STAND.footF, l: STAND.legF, shin: shinFront, knee_: kneeFront, boot: bootFront, slot: "suit", z: 5 },
+    { id: "legB", hip: STAND.hipB, knee: STAND.kneeB, foot: STAND.footB, l: STAND.legB, shin: lp.shinB ?? shinBack, knee_: lp.kneeB ?? kneeBack, boot: lp.bootB ?? bootBack, slot: "suitShade", z: 1 },
+    { id: "legF", hip: STAND.hipF, knee: STAND.kneeF, foot: STAND.footF, l: STAND.legF, shin: lp.shinF ?? shinFront, knee_: lp.kneeF ?? kneeFront, boot: lp.bootF ?? bootFront, slot: "suit", z: 5 },
   ];
   const limbs: LimbDef[] = [];
   const parts: PartUse[] = [];
@@ -141,8 +153,8 @@ export function trooperLegs(pose: LegPose = STAND_LEGS, ground = 170): { limbs: 
       from: { bone: "pelvis", at: hip },
       joint: knee,
       end: foot,
-      upper: { width: 7.4, slot: L.slot, z: L.z },
-      lower: { width: 7.4, slot: L.slot, z: L.z + 0.1 },
+      upper: { width: lp.width ?? 7.4, slot: L.slot, z: L.z },
+      lower: { width: lp.width ?? 7.4, slot: L.slot, z: L.z + 0.1 },
     });
     const z = L.id === "legF" ? 6 : 2;
     parts.push(
@@ -240,6 +252,10 @@ export interface TrooperKitSide {
   ground?: string;
   /** Additional limbs and parts in final frame coords (a bike, the rider's own legs). */
   more?: { limbs?: LimbDef[]; parts?: PartUse[] };
+  /** Swap the leg plates (shins, knees, boots); default: the trooper's. */
+  legParts?: LegParts;
+  /** Swap the gripping hand (default: the trooper's gauntlet). */
+  hand?: string;
 }
 
 export function trooperKitSide(o: TrooperKitSide): RigDef {
@@ -266,7 +282,7 @@ export function trooperKitSide(o: TrooperKitSide): RigDef {
 
   const limbs: LimbDef[] = [];
   if (o.legs !== null) {
-    const legs = trooperLegs({ body, ...(o.legs ?? { footF: STAND.footF, footB: STAND.footB }) });
+    const legs = trooperLegs({ body, ...(o.legs ?? { footF: STAND.footF, footB: STAND.footB }) }, 170, o.legParts);
     limbs.push(...legs.limbs);
     parts.push(...legs.parts);
     o = { ...o, gait: o.gait ?? legs.gait };
@@ -279,7 +295,7 @@ export function trooperKitSide(o: TrooperKitSide): RigDef {
     if ("grip" in use) {
       const hand = anchorAt(o.weapon.src, o.weapon.place, use.grip);
       limbs.push(armLimb(id, shoulder, hand, l, 0, use.grip, undefined));
-      parts.push({ id: handId, src: gauntletSide, bone: `${id}.end`, place: { x: hand.x, y: hand.y, rot: 0 }, z });
+      parts.push({ id: handId, src: o.hand ?? gauntletSide, bone: `${id}.end`, place: { x: hand.x, y: hand.y, rot: 0 }, z });
     } else {
       limbs.push(armLimb(id, shoulder, use.at, l, use.elbow ?? 0, undefined, use.to));
       parts.push({ id: handId, src: use.hand, bone: `${id}.end`, place: placeAt(use.hand, "pivot", use.at, use.rot ?? 0), z });

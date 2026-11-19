@@ -33,7 +33,7 @@ import { DropShipFx, drawNoGo, type NoGoRing } from "./fx/dropship";
 export { INK, PLAYER_COLORS } from "./boardArt";
 import { drawAttackMark, drawExhausted, type AttackMarkView } from "./attackMark";
 import { TAP_SLOP_PX } from "./touch";
-import { createRigMini, type RigMini } from "./minis";
+import { artPending, createRigMini, loadArt, miniStyle, type RigMini } from "./minis";
 export type { BannerTone } from "./fx";
 
 const MARGIN = 1.2;
@@ -1131,7 +1131,10 @@ export class BoardRenderer {
     if (glass) mini.addChild(glass);
     // New-engine miniature (Miniatures setting): its footprint joins the flat base layer and its
     // figure replaces the sprite; the HUD, rings and effects around it stay as they are.
-    const rig = createRigMini(prof.id, PLAYER_COLORS[u.owner], prof.baseRadius, undefined, Math.max(0, u.models.indexOf(m)));
+    const style = miniStyle();
+    const rig = createRigMini(prof, PLAYER_COLORS[u.owner], style, Math.max(0, u.models.indexOf(m)));
+    // its art is still loading (a lazy chunk): rebuild the miniatures once it's in
+    if (!rig && style !== "classic" && artPending(prof)) this.awaitArt(prof);
     if (rig) {
       for (const c of [base, cast, figSprite, flash, stand]) if (c) c.visible = false;
       fig.addChild(rig.figure);
@@ -1751,7 +1754,29 @@ export class BoardRenderer {
     });
   }
 
-  /** Rebuild every miniature (after the Miniatures setting changes). */
+  private artWait: Promise<void> | null = null;
+  private artWanted = new Set<UnitProfile>();
+
+  /** Load a unit's art chunk, then rebuild the miniatures (one rebuild for a burst of units). */
+  private awaitArt(p: UnitProfile): void {
+    this.artWanted.add(p);
+    if (this.artWait) return;
+    this.artWait = Promise.resolve().then(async () => {
+      const want = [...this.artWanted];
+      this.artWanted.clear();
+      try {
+        await loadArt(want);
+      } catch (e) {
+        console.warn("Couldn't load miniature art:", e);
+        return;
+      } finally {
+        this.artWait = null;
+      }
+      this.refreshMinis();
+    });
+  }
+
+  /** Rebuild every miniature (after the Miniatures setting changes, or art finishes loading). */
   refreshMinis(): void {
     const s = this.lastState;
     for (const v of this.models.values()) {

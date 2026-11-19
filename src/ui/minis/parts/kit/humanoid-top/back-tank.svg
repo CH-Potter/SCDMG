@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-13 2 26 26" data-part="kit.humanoid.top.back-tank">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit back from above: the goo tank's round glass lid</title>
+<rect x="-10" y="4" width="20" height="12" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<circle class="glow" cx="0" cy="16" r="8.4" fill="#fff2c0" stroke="#141414" stroke-width="2.4"/>
+<circle class="glow" cx="0.6" cy="16.6" r="5" fill="#f2b84b"/>
+<path d="M-4,12 Q-2,10 1,10.4" fill="none" stroke="#e3d8b6" stroke-width="1.6" stroke-linecap="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="16" r="1"/></g>
+</svg>

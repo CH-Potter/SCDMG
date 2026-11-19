@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -118 60 102" data-part="kit.structure.side.pylon">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit structure body: a crystal pylon on a collar, team band round its waist</title>
+<path d="M-18,-18 L-12,-60 L0,-112 L12,-60 L18,-18 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M0,-112 L12,-60 L18,-18 L4,-18 Z" fill="#6c5a37"/>
+<path d="M0,-112 L-2,-60 L-18,-18 M-2,-60 L12,-60" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path class="glow" d="M-4,-92 L0,-104 L4,-92 L0,-74 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M-15,-44 L15,-44 L16.4,-34 L-16.4,-34 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4"/>
+<path d="M-24,-18 L-20,-26 L20,-26 L24,-18 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="-60" r="1"/><circle id="mount" cx="0" cy="-80" r="1"/></g>
+</svg>

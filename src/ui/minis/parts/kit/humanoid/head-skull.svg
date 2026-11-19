@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 22 36 40" data-part="kit.humanoid.side.head-skull">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit head: a grinning skull with ember eyes</title>
+<path d="M55,48 L65,48 L65,60 L55,60 Z" fill="#25282c" stroke="#141414" stroke-width="2"/>
+<path d="M48,47 Q44,31 59,26 Q73,26 73,41 Q73,48 68,50 L66,57 L52,57 L51,50 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,27.6 Q73,31 73,41 Q73,48 68,50 L66,57 L63,57 Q69,45 66,27.6 Z" fill="#c8bd98"/>
+<ellipse cx="53" cy="39.4" rx="4.4" ry="4.8" fill="#141414"/>
+<circle class="glow" cx="52.4" cy="39.6" r="1.7" fill="#f2b84b"/>
+<path d="M47.6,45 L45.4,48 L48.6,48.4 Z" fill="#141414"/>
+<path d="M51,50.6 L66,50 M54,50.4 L54.4,56.6 M57.4,50.3 L57.6,56.8 M60.8,50.2 L60.8,56.9 M64,50.1 L63.8,56.8" fill="none" stroke="#141414" stroke-width="1.4"/>
+<path class="detail" d="M64,32 l3,4 l-2,3" fill="none" stroke="#c8bd98" stroke-width="1"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="57" r="1"/></g>
+</svg>

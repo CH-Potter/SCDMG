@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -22 42 44" data-part="kit.humanoid.top.weapon-bow" data-recoil="2">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit weapon from above: the bow's curve, string drawn back, arrow forward (left)</title>
+<path d="M8,-19 L30,0 L8,19" fill="none" stroke="#e3d8b6" stroke-width="1.2"/>
+<path d="M10,-20 Q2,-10 4,0 Q2,10 10,20 Q7,10 9,0 Q7,-10 10,-20 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-2,0 H32" stroke="#141414" stroke-width="2"/>
+<path d="M-3,0 L3,-2.6 L3,2.6 Z" fill="#b9bfc4" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/><circle id="g1" cx="6" cy="0" r="1"/><circle id="g2" cx="30" cy="0" r="1"/><circle id="muzzle" cx="-3" cy="0" r="1"/></g>
+</svg>

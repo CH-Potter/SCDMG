@@ -3,6 +3,7 @@
 // at 0 here and computed by engine/pricing.ts (the forge recomputes them whenever a faction is opened).
 
 import { applyComputedCosts } from "../../engine/pricing";
+import type { Tagged } from "../../ui/minis/binding";
 import { defaultEvade } from "../../engine/data/agility";
 import type {
   AbilityId,
@@ -181,6 +182,8 @@ export function template(s: TemplateSpec): FactionTemplate {
       const [body, head, headgear, weapon, back, secondary, scale, primary] = u.art;
       p.art = { kind: "parts", recipe: { body, head, headgear, weapon, back, secondary, scale: scale ?? 1, ...(primary !== undefined ? { primary } : {}) } };
     }
+    // binds the unit to its template's new-engine art (ui/minis/binding.ts); copies keep it
+    (p as UnitProfile & Tagged).rigTag = `${s.key}/${u.id}`;
     if (u.nerve !== undefined) p.nerve = u.nerve;
     // Evade is for small, agile units: one without its own gets the basic one (see data/agility.ts).
     if (u.evade) p.evade = structuredClone(u.evade);

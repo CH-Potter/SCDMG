@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 20 20" data-part="kit.structure.top.beacon">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit beacon lamp from above</title>
+<circle class="glow" cx="0" cy="0" r="8" fill="#fff2c0" stroke="#141414" stroke-width="2.4"/>
+<circle class="glow" cx="-1" cy="-1" r="4" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

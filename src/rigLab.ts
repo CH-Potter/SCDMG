@@ -2,6 +2,7 @@
 // faction, pose it, play the six clips, flip team colours and colourways, step through the zoom
 // tiers, switch between the Ink Rig (A) and Overhead (D) views, line a whole faction up, run the
 // silhouette test (every unit nameable as a 32 px black shape), and measure 100+ models.
+// Forge templates (?faction=tpl:bulwark) and the generic kits' samples (?faction=kit) are here too.
 // URL: ?faction=swarm&unit=swarm-mother&view=top&scene=lineup&ppi=26
 
 import { Application, Container, Graphics, UPDATE_PRIORITY } from "pixi.js";
@@ -12,7 +13,10 @@ import { bakedSkins, bakeStats, clearDiskCache } from "./ui/minis/bake";
 import { CLIP_IDS } from "./ui/minis/clips";
 import { RigMini } from "./ui/minis/mini";
 import { drawOrder } from "./ui/minis/pose";
-import { artFor, rigsFor, type UnitRigs } from "./ui/minis/registry";
+import { TEMPLATES } from "./forge/templates";
+import type { FactionLook } from "./ui/minis/kits/spec";
+import { artFor, loadAllArt, rigsFor, TEMPLATE_ART_KEYS, type UnitRigs } from "./ui/minis/registry";
+import { kitSamples, type Sample } from "./rigLabSamples";
 import { COLOURWAYS, FACTION_COLOURWAYS } from "./ui/minis/slots";
 import type { ClipId, RigView, Status } from "./ui/minis/types";
 
@@ -24,26 +28,33 @@ const TEAMS: [string, number][] = [
 ];
 const DIRT = 0xcf9f62;
 const BASE_FACTIONS = ["militia", "swarm", "concord"] as const;
-type FactionKey = (typeof BASE_FACTIONS)[number];
+/** A collection of units: a base faction, a Forge template ("tpl:<key>") or the kit samples ("kit"). */
+type FactionKey = string;
+const COLLECTIONS: string[] = [...BASE_FACTIONS, "kit", ...TEMPLATES.map((t) => `tpl:${t.key}`)];
+let samples: Sample[] = [];
 
 type Scene = "one" | "squad" | "zooms" | "lineup" | "sil32" | "perf";
 const SCENES: Scene[] = ["one", "squad", "zooms", "lineup", "sil32", "perf"];
 const SCENE_LABEL: Record<Scene, string> = { one: "One model", squad: "Squad", zooms: "Three zooms", lineup: "Faction lineup", sil32: "32 px silhouettes", perf: "Perf" };
 
 /** A unit's buyable and summon-only profiles, in faction order. */
-const profilesOf = (f: FactionKey): UnitProfile[] => FACTIONS[f]?.profiles ?? [];
+const profilesOf = (f: FactionKey): UnitProfile[] =>
+  f === "kit" ? samples.map((x) => x.profile) : f.startsWith("tpl:") ? (TEMPLATES.find((t) => `tpl:${t.key}` === f)?.faction.profiles ?? []) : (FACTIONS[f]?.profiles ?? []);
+/** The kit samples' own faction colours (other units use their faction's). */
+const lookFor = (id: string): FactionLook | undefined => samples.find((x) => x.profile.id === id)?.faction;
+const collectionName = (f: FactionKey): string => (f === "kit" ? "Generic kit samples" : f.startsWith("tpl:") ? (TEMPLATES.find((t) => `tpl:${t.key}` === f)?.faction.name ?? f) : (FACTIONS[f]?.name ?? f));
 const flies = (p: UnitProfile) => p.keywords.includes("flying");
 /** The board renderer's flyer altitude (inches), so the lab shows flyers at their table height. */
 const flyLift = (r: number): number => 0.8 + r * 0.6;
 
 const q = new URLSearchParams(location.search);
-const qFaction = (BASE_FACTIONS as readonly string[]).includes(q.get("faction") ?? "") ? (q.get("faction") as FactionKey) : null;
+const qFaction = COLLECTIONS.includes(q.get("faction") ?? "") ? (q.get("faction") as FactionKey) : null;
 const qUnit = q.get("unit");
-const startFaction: FactionKey = qFaction ?? (BASE_FACTIONS.find((f) => profilesOf(f).some((p) => p.id === qUnit)) as FactionKey | undefined) ?? "militia";
+const startFaction: FactionKey = qFaction ?? (COLLECTIONS.find((f) => profilesOf(f).some((p) => p.id === qUnit)) as FactionKey | undefined) ?? "militia";
 
 const S = {
   faction: startFaction,
-  unit: qUnit && profilesOf(startFaction).some((p) => p.id === qUnit) ? qUnit : "mil-grunts",
+  unit: qUnit ?? "",
   look: Number(q.get("look")) || 0,
   view: (q.get("view") === "top" ? "top" : "side") as RigView,
   team: TEAMS[0]![1],
@@ -83,7 +94,7 @@ let placed: Placed[] = [];
 const world = new Container();
 let perf: { frames: number[]; work: number[]; t0: number; done: boolean; result: string } | null = null;
 
-const profile = (id = S.unit): UnitProfile | undefined => profilesOf(S.faction).find((p) => p.id === id) ?? BASE_FACTIONS.flatMap(profilesOf).find((p) => p.id === id);
+const profile = (id = S.unit): UnitProfile | undefined => profilesOf(S.faction).find((p) => p.id === id) ?? COLLECTIONS.flatMap(profilesOf).find((p) => p.id === id);
 
 function colourwayFor(rigs: UnitRigs): UnitRigs {
   if (!S.cw || !COLOURWAYS[S.cw]) return rigs;
@@ -92,7 +103,8 @@ function colourwayFor(rigs: UnitRigs): UnitRigs {
 }
 
 function rigsOf(id: string, model: number): UnitRigs | null {
-  const r = rigsFor(id, model);
+  const p = profile(id);
+  const r = p ? rigsFor(p, model, lookFor(id)) : null;
   return r ? colourwayFor(r) : null;
 }
 
@@ -142,7 +154,7 @@ function add(host: Container, ppi: number, x: number, y: number, view: RigView, 
   const p = profile(id);
   const rigs = rigsOf(id, look ?? i);
   if (!p || !rigs) return null;
-  const mini = new RigMini(rigs, view, team, p.baseRadius);
+  const mini = new RigMini(rigs, view, team, p.baseRadius, (i * 0.618) % 1);
   host.addChild(mini.footprint);
   const fig = new Container();
   fig.position.set(x, y);
@@ -161,7 +173,11 @@ function add(host: Container, ppi: number, x: number, y: number, view: RigView, 
 }
 
 /** Converted units of the current faction. */
-const rigged = (): UnitProfile[] => profilesOf(S.faction).filter((p) => !!artFor(p.id));
+const rigged = (): UnitProfile[] => profilesOf(S.faction).filter((p) => !!artFor(p, lookFor(p.id)));
+const artOf = (id: string) => {
+  const p = profile(id);
+  return p ? artFor(p, lookFor(id)) : null;
+};
 
 function build(): void {
   clear();
@@ -169,7 +185,7 @@ function build(): void {
   const W = app.screen.width;
   const H = app.screen.height;
   const p = profile();
-  const look = artFor(S.unit) ? S.look : 0;
+  const look = artOf(S.unit) ? S.look : 0;
   if (S.scene === "one") {
     const host = area(S.ppi, 0, 0, W, H);
     const pl = add(host, S.ppi, W / S.ppi / 2, (H / S.ppi) * 0.66, S.view, S.team, S.unit, 0, look);
@@ -380,29 +396,28 @@ function check(text: string, get: () => boolean, set: (v: boolean) => void): HTM
 
 function render(rebuild = true): void {
   const p = profile();
-  const art = artFor(S.unit);
+  const art = artOf(S.unit);
   panel.replaceChildren();
   const h1 = document.createElement("h1");
   h1.textContent = "Rig Lab";
   const sm = document.createElement("small");
   sm.textContent = `${p?.name ?? S.unit} (${S.unit}): ${art ? `${art.looks.length} look${art.looks.length > 1 ? "s" : ""}` : "no new art yet (Classic)"}. Dev page: not part of the game build.`;
   panel.append(h1, sm);
-  section(
-    "Faction",
-    ...BASE_FACTIONS.map((f) =>
-      btn(
-        FACTIONS[f]?.name ?? f,
-        () => {
-          S.faction = f;
-          S.unit = (rigged()[0] ?? profilesOf(f)[0]!).id;
-          S.cw = "";
-          S.look = 0;
-          S.hidden.clear();
-        },
-        () => S.faction === f,
-      ),
-    ),
-  );
+  const pickColl = (f: FactionKey) =>
+    btn(
+      f.startsWith("tpl:") ? `${collectionName(f)}${TEMPLATE_ART_KEYS.includes(f.slice(4)) ? " ★" : ""}` : collectionName(f),
+      () => {
+        S.faction = f;
+        S.unit = (rigged()[0] ?? profilesOf(f)[0]!).id;
+        S.cw = "";
+        S.look = 0;
+        S.hidden.clear();
+      },
+      () => S.faction === f,
+      f.startsWith("tpl:") ? `Forge template ${f.slice(4)}${TEMPLATE_ART_KEYS.includes(f.slice(4)) ? ": its own art (★)" : ": generic kit"}` : undefined,
+    );
+  section("Faction", ...BASE_FACTIONS.map(pickColl), pickColl("kit"));
+  section("Forge templates (★ own art)", ...COLLECTIONS.filter((f) => f.startsWith("tpl:")).map(pickColl));
   section(
     `Units (${rigged().length}/${profilesOf(S.faction).length} converted)`,
     ...profilesOf(S.faction).map((u) => {
@@ -417,7 +432,7 @@ function render(rebuild = true): void {
         () => S.unit === u.id,
         `${u.id}${u.structure?.summonOnly ? " (summon-only)" : ""}`,
       );
-      if (!artFor(u.id)) b.style.opacity = "0.45";
+      if (!artOf(u.id)) b.style.opacity = "0.45";
       return b;
     }),
   );
@@ -471,7 +486,7 @@ function render(rebuild = true): void {
   angle.oninput = () => (S.angle = Number(angle.value));
   section("Facing (degrees)", angle, check("auto-turn", () => S.autoTurn, (v) => (S.autoTurn = v)));
   section("Team colour", ...TEAMS.map(([n, c]) => btn(n, () => (S.team = c), () => S.team === c)));
-  const cws = FACTION_COLOURWAYS[S.faction] ?? [];
+  const cws = (BASE_FACTIONS as readonly string[]).includes(S.faction) ? (FACTION_COLOURWAYS[S.faction] ?? []) : [];
   const current = S.cw || art?.colourway.id || "";
   section("Colourway", ...cws.map((id) => btn(COLOURWAYS[id]!.name, () => (S.cw = id), () => current === id)));
   const rigs = rigsOf(S.unit, S.look);
@@ -538,6 +553,9 @@ async function main(): Promise<void> {
   });
   w = app.screen.width;
   h = app.screen.height;
+  samples = kitSamples();
+  await loadAllArt();
+  if (!profile()) S.unit = (profilesOf(S.faction)[0] ?? profilesOf("militia")[0]!).id;
   render();
   (window as unknown as { rigLab: unknown }).rigLab = { S, render, build, placed: () => placed, clips: CLIP_IDS };
 }

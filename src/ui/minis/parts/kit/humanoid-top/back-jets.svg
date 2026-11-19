@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-14 2 28 28" data-part="kit.humanoid.top.back-jets">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit back from above: twin thrusters, nozzles glowing</title>
+<rect x="-8" y="4" width="16" height="12" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2.4"/>
+<circle cx="-6" cy="19" r="5.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<circle cx="6" cy="19" r="5.6" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<circle cx="-6" cy="19" r="3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle cx="6" cy="19" r="3" fill="#25282c" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="-6" cy="19" r="1.6" fill="#f2b84b"/>
+<circle class="glow" cx="6" cy="19" r="1.6" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="4" r="1"/><circle id="exhaust1" cx="-6" cy="22" r="1"/><circle id="exhaust2" cx="6" cy="22" r="1"/></g>
+</svg>

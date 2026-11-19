@@ -1,5 +1,5 @@
 import { missionFitsMap, MISSIONS } from "./engine/data/missions";
-import { registerCustomFactions } from "./engine/data/factions";
+import { FACTIONS, registerCustomFactions } from "./engine/data/factions";
 import { openMapBuilder } from "./editor/index";
 import { openFactionForge } from "./forge/index";
 import { listCustomFactions } from "./ui/customFactions";
@@ -9,6 +9,7 @@ import { openListBuilder } from "./ui/listbuilder";
 import { maybeGameIntro } from "./ui/loreLinks";
 import { loadHouseRules, openMenu, type MenuChoice } from "./ui/menu";
 import "./ui/menu.css";
+import { loadArt, miniStyle } from "./ui/minis";
 import { BoardRenderer } from "./ui/renderer";
 import { audio } from "./audio"; // [audio]
 
@@ -77,7 +78,7 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
   const custom = choice.lists.every((l) => l.length > 0);
   const lists = custom ? choice.lists : undefined;
   const supports = custom ? choice.supports : undefined;
-  controller = new Controller(renderer, els, showMenu, {
+  const start = () => (controller = new Controller(renderer, els, showMenu, {
     factions: choice.factions,
     lists,
     supports,
@@ -89,8 +90,17 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
     armyRule: choice.armyRule,
     startBonus: choice.startBonus,
     rules: loadHouseRules(),
-  }, hooks);
+  }, hooks));
+  // New-engine miniatures load per army (lazy chunks): fetch both armies' art before the board shows.
+  if (miniStyle() === "classic") start();
+  else {
+    const mine = ++starting;
+    const go = () => void (mine === starting && start());
+    void loadArt(choice.factions.flatMap((f) => FACTIONS[f]?.profiles ?? [])).then(go, go);
+  }
 }
+/** Bumped by each start, so a slow art load never starts a battle the player has moved on from. */
+let starting = 0;
 
 // Custom factions from the Faction Forge join the built-ins.
 registerCustomFactions(listCustomFactions());

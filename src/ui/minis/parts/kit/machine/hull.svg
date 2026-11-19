@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-48 -164 96 96" data-part="kit.machine.side.hull" data-budget="large">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit walker hull: an armoured cockpit box, visor slit, vents and a team panel</title>
+<path d="M-36,-142 L22,-150 L40,-140 L42,-90 L-30,-82 L-42,-100 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M22,-150 L40,-140 L42,-90 L26,-88 Z" fill="#6c5a37"/>
+<path d="M-42,-100 L-30,-82 L42,-90 L41,-98 L-26,-92 Z" fill="#6c5a37" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M-38,-132 L-8,-136 L-6,-122 L-38,-118 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="glow" d="M-35,-129 L-11,-132 L-10,-126 L-35,-123 Z" fill="#fff2c0"/>
+<path class="tag" d="M2,-142 L18,-144 L19,-104 L3,-102 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M11,-143 L18,-144 L19,-104 L12,-103 Z" fill="#b000b0"/>
+<rect x="24" y="-158" width="10" height="14" rx="2" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M24,-126 L38,-128 M24,-118 L38,-120 M24,-110 L38,-112" stroke="#141414" stroke-width="1.4"/>
+<path d="M-30,-112 L-4,-115" fill="none" stroke="#6e4528" stroke-width="4"/>
+<g class="detail"><circle cx="-32" cy="-138" r="1.1" fill="#b9bfc4"/><circle cx="-34" cy="-106" r="1.1" fill="#b9bfc4"/><circle cx="34" cy="-96" r="1.1" fill="#b9bfc4"/><circle cx="-8" cy="-145" r="1.1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-110" r="1"/><circle id="exhaust1" cx="29" cy="-158" r="1"/></g>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -24 48 48" data-part="kit.structure.top.ward">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit ward from above: the stone's top, sigil glowing, team ring at its foot</title>
+<circle cx="0" cy="0" r="20" fill="#4a5158" stroke="#141414" stroke-width="2"/>
+<path d="M-14,-4 Q-12,-16 2,-16 Q16,-14 15,0 Q14,14 0,15 Q-14,12 -14,-4 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M8,-14 Q16,-10 15,0 Q14,14 0,15 Q12,4 8,-14 Z" fill="#6c5a37"/>
+<path class="tag" d="M-13,5 L14,5 L13,12 L-11,12 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M-3,-6 L0,-10 L3,-6 L0,4 Z" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<g id="anchors"><circle id="pivot" cx="0" cy="0" r="1"/></g>
+</svg>

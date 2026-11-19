@@ -68,7 +68,7 @@ import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec, Weapon
 import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine, impactLine, evadeLine, reportHits, noHarmVerdict, unitName, abilityStatusTags } from "./describe";
 import { ComicAlerts, type AlertTone } from "./alerts";
 import { DICE_SPEED_LABEL, DiceTray, type DiceRoll, type DiceSpeed } from "./dice";
-import { MINI_STYLE_LABEL, miniStyle, nextMiniStyle, setMiniStyle } from "./minis";
+import { loadArt, MINI_STYLE_LABEL, miniStyle, nextMiniStyle, setMiniStyle } from "./minis";
 import { BoardRenderer, drawPos, type RenderView } from "./renderer";
 import { audio } from "../audio"; // [audio]
 import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserveRowsHtml, reservesHeading } from "./recruit";
@@ -392,11 +392,19 @@ export class Controller {
     this.refresh();
   }
 
-  /** Miniatures: Classic, Ink Rig or Overhead (units without new-engine art stay Classic). */
+  /** Miniatures: Classic, Ink Rig or Overhead (every unit has new-engine art; it loads on first use). */
   private cycleMinis(): void {
-    setMiniStyle(nextMiniStyle(miniStyle()));
-    this.renderer.refreshMinis();
-    this.refresh();
+    const next = nextMiniStyle(miniStyle());
+    const gen = this.generation;
+    const apply = () => {
+      if (gen !== this.generation) return;
+      setMiniStyle(next);
+      this.renderer.refreshMinis();
+      this.refresh();
+    };
+    // load the armies' art first, so the switch is one step (no Classic figures in between)
+    if (next === "classic") apply();
+    else void loadArt(this.state.units.map((u) => profileOf(u))).then(apply, apply);
   }
 
   destroy(): void {
@@ -1829,7 +1837,7 @@ export class Controller {
       <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" aria-pressed="${this.mode.kind === "measure"}" title="${this.mode.kind === "measure" ? "Stop measuring (M or Esc)" : "Measure distances and check line of sight (M)"}">📏 Measure</button>
       <button class="secondary" id="btn-undo" ${this.humanTurn() && this.history.length ? "" : "disabled"} title="Take back your last action (Ctrl+Z)">↶ Undo</button>
       <button class="secondary" id="btn-dice" title="Dice: Throw (you throw your own dice), Auto, Quick or Off">🎲 Dice: ${DICE_SPEED_LABEL[this.tray.speed]}</button>
-      <button class="secondary" id="btn-minis" title="Miniatures: Classic, Ink Rig (side-on) or Overhead (from above). Units without new-engine art stay Classic.">♟ Minis: ${MINI_STYLE_LABEL[miniStyle()]}</button>
+      <button class="secondary" id="btn-minis" title="Miniatures: Classic, Ink Rig (side-on) or Overhead (from above). New art loads the first time it is shown.">♟ Minis: ${MINI_STYLE_LABEL[miniStyle()]}</button>
       <span id="audio-slot"></span>
       <button class="secondary" id="btn-rules">How to play</button>
       ${

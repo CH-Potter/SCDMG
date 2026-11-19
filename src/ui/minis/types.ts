@@ -44,6 +44,11 @@ export interface PartAnim {
   spin?: number;
   /** Squash across the part's y axis by flap * this (0..1): wings beating. */
   flap?: number;
+  /**
+   * Phase offset (0..1 of the loop) for this part's pulse, spin and flap, so repeated parts (two
+   * wings, a row of crystals, a pair of rotors) don't beat in lockstep. 0 or absent: in step.
+   */
+  phase?: number;
 }
 
 export interface PartUse {
@@ -57,6 +62,11 @@ export interface PartUse {
   /** Draw order (back to front). */
   z: number;
   anim?: PartAnim;
+  /**
+   * A raster picture the baker draws into this part, clipped to a circle (part coords): the
+   * standee's face for a unit with an uploaded picture. Only validated image data URLs go here.
+   */
+  image?: { href: string; cx: number; cy: number; r: number };
 }
 
 /** One segment of an ink limb: a capsule the engine draws (no artwork needed). */

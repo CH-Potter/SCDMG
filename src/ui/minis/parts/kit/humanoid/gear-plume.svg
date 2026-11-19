@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="40 6 52 42" data-part="kit.humanoid.side.gear-plume">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit headgear: a crested helm with a tall trim plume</title>
+<path d="M54,26 Q60,10 80,9 Q90,12 89,22 Q82,17 74,20 Q66,22 60,28 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M89,22 Q82,17 74,20 Q66,22 60,28 L58,26 Q68,17 80,15.6 Q86,16 89,22 Z" fill="#4a2e19"/>
+<path d="M45,42 Q44,24.6 59,23 Q74,24 74,40 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M67,25.4 Q74,28 74,40 L68.6,40.6 Q70,31 67,25.4 Z" fill="#6c5a37"/>
+<path d="M43,43 L75,39 L75.6,43 L43.6,47.4 Z" fill="#4a5158" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M44.6,40 L50,40 L49,47 L44,47.4 Z" fill="#9a8458" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M66,14 Q72,12 78,13 M64,18 Q72,15 84,15" fill="none" stroke="#4a2e19" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="59" cy="47" r="1"/></g>
+</svg>

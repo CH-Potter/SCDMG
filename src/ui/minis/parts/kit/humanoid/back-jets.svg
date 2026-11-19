@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 50 36 66" data-part="kit.humanoid.side.back-jets">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit back: a twin-thruster jump pack</title>
+<path d="M64,60 L80,62 L82,96 L68,98 Z" fill="#4a5158" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<rect x="76" y="54" width="10" height="44" rx="4" fill="#9a8458" stroke="#141414" stroke-width="2.4"/>
+<path class="shade" d="M82,56 Q86,57 86,60 L86,94 Q86,97 82,98 Z" fill="#6c5a37"/>
+<rect x="84" y="58" width="9" height="40" rx="4" fill="#6c5a37" stroke="#141414" stroke-width="2"/>
+<path d="M75,98 L87,98 L89,106 L73,106 Z" fill="#25282c" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M85,98 L93,98 L94,105 L84,105 Z" fill="#25282c" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="glow" d="M75,106 L87,106 L84,111 L78,111 Z" fill="#f2b84b"/>
+<path d="M76,64 h10 M76,88 h10" stroke="#141414" stroke-width="1.4"/>
+<g class="detail"><circle cx="70" cy="70" r="1" fill="#b9bfc4"/><circle cx="71" cy="90" r="1" fill="#b9bfc4"/></g>
+<g id="anchors"><circle id="pivot" cx="74" cy="62" r="1"/><circle id="exhaust1" cx="81" cy="110" r="1"/><circle id="exhaust2" cx="89" cy="105" r="1"/></g>
+</svg>

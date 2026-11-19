@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="42 14 34 28" data-part="kit.humanoid.side.gear-crown">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit headgear: a pointed crown set with glowing stones</title>
+<path d="M47,32 L48,19 L53,28 L57,16 L61,27.4 L66,18 L67,27 L72,21 L72,30 Z" fill="#6e4528" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path d="M46.6,30.6 L72.4,28.6 L72.6,35.4 L47,37.6 Z" fill="#6e4528" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M66,29.2 L72.4,28.6 L72.6,35.4 L66.4,36 Z" fill="#4a2e19"/>
+<circle class="glow" cx="53" cy="33.6" r="2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="60" cy="33" r="2" fill="#fff2c0" stroke="#141414" stroke-width="1.4"/>
+<circle class="glow" cx="57" cy="17.4" r="1.6" fill="#f2b84b"/>
+<g id="anchors"><circle id="pivot" cx="59" cy="34" r="1"/></g>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-42 -70 84 52" data-part="kit.beast.side.body">
+<!-- SPDX-License-Identifier: GPL-3.0-or-later. SCDMG miniature part: original art, (c) 2026 Craig Potter and SCDMG contributors. -->
+<title>Kit beast body: a hunched hide over a pale belly, team saddle-cloth on the back</title>
+<path d="M-34,-40 Q-38,-60 -18,-64 Q4,-68 24,-62 Q38,-56 37,-40 Q36,-28 24,-25 L-22,-24 Q-33,-27 -34,-40 Z" fill="#9a8458" stroke="#141414" stroke-width="2.4" stroke-linejoin="round"/>
+<path class="shade" d="M24,-62 Q38,-56 37,-40 Q36,-28 24,-25 L14,-25 Q30,-34 24,-62 Z" fill="#6c5a37"/>
+<path d="M-26,-30 Q0,-24 26,-30 Q20,-23 0,-22 Q-20,-23 -26,-30 Z" fill="#e3d8b6" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+<path class="tag" d="M-12,-64.6 Q2,-67 14,-64 L12,-46 Q1,-44 -10,-46 Z" fill="#ff00ff" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<path class="tag" d="M4,-65.6 Q10,-65 14,-64 L12,-46 Q8,-45.4 4,-45.4 Z" fill="#b000b0"/>
+<path d="M-12,-46 Q1,-43 12,-46" fill="none" stroke="#6e4528" stroke-width="3"/>
+<path d="M-24,-60 L-20,-66 L-16,-61 M-6,-66 L-2,-71 L2,-66 M18,-63 L22,-68 L25,-61" fill="#5d5b45" stroke="#141414" stroke-width="1.4" stroke-linejoin="round"/>
+<g class="detail"><path d="M-28,-44 q4,-2 8,0 M20,-42 q4,-2 8,0" fill="none" stroke="#6c5a37" stroke-width="1"/></g>
+<g id="anchors"><circle id="pivot" cx="0" cy="-40" r="1"/><circle id="neck" cx="-30" cy="-46" r="1"/><circle id="back" cx="2" cy="-64" r="1"/></g>
+</svg>
