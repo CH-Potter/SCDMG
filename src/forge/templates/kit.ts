@@ -4,6 +4,7 @@
 
 import { applyComputedCosts } from "../../engine/pricing";
 import { defaultEvade } from "../../engine/data/agility";
+import { defaultImpact } from "../../engine/data/impact";
 import type {
   AbilityId,
   EvadeDef,
@@ -188,8 +189,13 @@ export function template(s: TemplateSpec): FactionTemplate {
       const ev = defaultEvade(p);
       if (ev) p.evade = ev;
     }
-    if (u.impact) p.impact = { ...u.impact };
     if (u.structure) p.structure = { ...u.structure };
+    // Melee units hit on the charge: one without its own impact gets the basic one (see data/impact.ts).
+    if (u.impact) p.impact = { ...u.impact };
+    else {
+      const im = defaultImpact(p);
+      if (im) p.impact = im;
+    }
     return p;
   });
   const supports: SupportDef[] = s.supports.map((x) => ({

@@ -719,10 +719,11 @@ const swarm: Faction = {
       keywords: ["infantry", "light", "beast"],
       evade: { target: 5, against: ["pointBlank", "blast"] },
       nerve: 6,
-      // No impact dice (the Munch's trick): they win by numbers, by coming back, and by chewing on
-      // whatever the acid has already softened. AP1 since the v0.12 balance pass (pricing.ts: still ⚙3),
+      // They win by numbers, by coming back, and by chewing on whatever the acid has already softened;
+      // since v0.12 every melee unit hits on the charge (data/impact.ts). AP1 since the v0.12 balance pass,
       // so the bites tell against the Militia's armour 4.
       weapons: [melee("Snippers", 1, 4, { ap: 1, traits: ["rending"] })],
+      impact: { dice: 1, hit: 5, damage: 1, ap: 0 }, // a melee unit hits on the charge; tiny bugs on a 5+
       abilities: ["regrow", "rampage"],
       upgrades: [
         { id: "eggs", name: "More Eggs", cost: 1, addModels: 3, text: "+3 models." },
@@ -766,6 +767,7 @@ const swarm: Faction = {
       evade: { target: 6, against: ["pointBlank"] },
       nerve: 7,
       weapons: [melee("Crusher Mandibles", 2, 4, { ap: 1 })],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 }, // a melee unit: it hits on the charge
       abilities: ["corrode", "regen", "burrow"],
       upgrades: [{ id: "plates", name: "Thick Plates", cost: 1, addKeywords: ["armoured"], text: "Becomes armoured (ignores 1 AP from weapons not built to crack armour)." }],
       blurb: "Beetles with shells like upturned bathtubs and acid in their jaws. They walk into the guns, and the guns go first.",
@@ -788,6 +790,7 @@ const swarm: Faction = {
       evade: { target: 5, against: ["pointBlank"] }, // it springs clear
       nerve: 7,
       weapons: [melee("Trapjaw", 3, 3, { ap: 1 })],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 }, // a melee unit: it hits on the charge
       abilities: ["lurk", "tunnel", "burrow"],
       upgrades: [{ id: "drool", name: "Acid Drool", cost: 1, addAbilities: ["corrode"], text: "Gains Corrode." }],
       blurb: "That isn't a rock. That was never a rock. It has been waiting under there since last spring.",
@@ -806,6 +809,7 @@ const swarm: Faction = {
       baseRadius: 1.4,
       keywords: ["beast", "monster", "heavy", "fearless"],
       weapons: [ranged("Larva Lob", 12, 2, 4, { traits: ["blast"] }), melee("Egg-Tooth Jaws", 3, 3, { damage: 2, ap: 1 })],
+      impact: { dice: 2, hit: 4, damage: 1, ap: 1 }, // a melee unit: it hits on the charge
       // The swarm's centre: Brood Bond refills every hurt brood within 6" each round, hurt or not.
       abilities: ["brood-bond", "brood-call", "hatch", "detector"],
       upgrades: [{ id: "sacs", name: "Acid Sacs", cost: 1, addAbilities: ["corrode"], text: "Gains Corrode." }],
@@ -1193,6 +1197,7 @@ const concord: Faction = {
       keywords: ["infantry", "armoured"],
       nerve: 8,
       weapons: [melee("Glow Blade", 2, 3, { ap: 1, traits: ["rending"] }), ranged("Light Flick", 12, 1, 3, { traits: ["pistol", "blast"] })],
+      impact: { dice: 1, hit: 4, damage: 1, ap: 0 }, // a melee unit: it hits on the charge
       abilities: ["blink", "riposte"],
       upgrades: [{ id: "third", name: "Extra Guard", cost: 1, addModels: 1, text: "+1 model." }],
       blurb: "Duellists who refuse to sweat.",

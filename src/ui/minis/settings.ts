@@ -1,5 +1,5 @@
-// The "Miniatures" display setting: Classic (the current art, the default and fallback), Ink Rig
-// (Option A, side-on rigs) or Overhead (Option D, figures from straight above). Kept in localStorage
+// The "Miniatures" display setting: Ink Rig (the default; Option A, side-on rigs), Overhead (Option D,
+// figures from straight above) or Classic (the original art, and the fallback for units without rigs). Kept in localStorage
 // like the dice speed; storage may be blocked, so every access is guarded.
 
 export type MiniStyle = "classic" | "ink" | "overhead";
@@ -25,9 +25,9 @@ const defaultStorage = (): StorageLike | null => {
 export function loadMiniStyle(storage: StorageLike | null = defaultStorage()): MiniStyle {
   try {
     const v = storage?.getItem(KEY);
-    return v === "ink" || v === "overhead" || v === "classic" ? v : "classic";
+    return v === "ink" || v === "overhead" || v === "classic" ? v : "ink";
   } catch {
-    return "classic";
+    return "ink";
   }
 }
 

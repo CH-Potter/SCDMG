@@ -233,14 +233,14 @@ describe("registry and the Miniatures setting", () => {
     expect(rigsFor("no-such-unit")).toBeNull();
   });
 
-  it("defaults to Classic and persists the choice", () => {
+  it("defaults to Ink Rig and persists the choice", () => {
     const mem = new Map<string, string>();
     const store = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
-    expect(loadMiniStyle(store)).toBe("classic");
+    expect(loadMiniStyle(store)).toBe("ink");
     saveMiniStyle("overhead", store);
     expect(loadMiniStyle(store)).toBe("overhead");
     mem.set([...mem.keys()][0]!, "nonsense");
-    expect(loadMiniStyle(store)).toBe("classic");
-    expect(loadMiniStyle(null)).toBe("classic");
+    expect(loadMiniStyle(store)).toBe("ink");
+    expect(loadMiniStyle(null)).toBe("ink");
   });
 });

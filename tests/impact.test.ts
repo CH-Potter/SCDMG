@@ -46,7 +46,7 @@ describe("impact on charge", () => {
   });
 
   it("units without impact just charge", () => {
-    const events = chargeEvents("con-guard", "concord");
+    const events = chargeEvents("con-lancer", "concord"); // a gunner: its rifle outhits its melee, so no impact
     expect(events.some((e) => e.type === "attack" && e.report.kind === "impact")).toBe(false);
     expect(events.some((e) => e.type === "moved" && e.kind === "charge")).toBe(true);
   });
