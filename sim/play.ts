@@ -3,6 +3,7 @@
 
 import { readFileSync } from "node:fs";
 import { aiCommand } from "../src/engine/ai";
+import { fnv, hex8, stateFingerprint } from "../src/engine/fingerprint";
 import { defaultListFor } from "../src/engine/data/factions";
 import { applyCommand, createGame, type StartBonus } from "../src/engine/game";
 import { MISSIONS } from "../src/engine/data/missions";
@@ -80,18 +81,7 @@ export interface Restored {
 
 const MAX_CMDS = 3000;
 
-/** 32-bit FNV-1a, continued from `h`. */
-function fnv(str: string, h = 0x811c9dc5): number {
-  for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 0x01000193) >>> 0;
-  return h;
-}
-const hex = (h: number) => h.toString(16).padStart(8, "0");
-
-/** A fingerprint of the parts of a state that the game plays out on (not the static terrain). */
-function stateFingerprint(s: GameState): string {
-  const { units, players, objectives, flags, missionState, rng, round, phase, over, winner } = s;
-  return hex(fnv(JSON.stringify({ units, players, objectives, flags, missionState, rng, round, phase, over, winner })));
-}
+const hex = hex8;
 
 /** Each on-board model's alive/hp/shield, keyed by unit uid, to spot wounds coming back between commands. */
 function woundSnapshot(s: GameState): Map<string, { alive: boolean; hp: number; shield: number }[]> {
