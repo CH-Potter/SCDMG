@@ -635,8 +635,8 @@ export type Command =
   | { type: "advance"; uid: string; leader: number; to: Vec }
   | { type: "charge"; uid: string; target: string }
   /** `reroll`: the Command re-roll house rule, spend 1 CP to re-roll the attack's misses. */
-  | { type: "shoot"; uid: string; target: string; weapon: number; reroll?: boolean; pay?: string[] }
-  | { type: "fight"; uid: string; target: string; weapon: number; reroll?: boolean; pay?: string[] }
+  | { type: "shoot"; uid: string; target: string; weapon: number; reroll?: boolean; /** Online play: fresh shared randomness for the re-rolled misses. */ rerollSalt?: number; pay?: string[] }
+  | { type: "fight"; uid: string; target: string; weapon: number; reroll?: boolean; /** Online play: fresh shared randomness for the re-rolled misses. */ rerollSalt?: number; pay?: string[] }
   | { type: "hunker"; uid: string }
   | { type: "hold"; uid: string }
   | { type: "ability"; uid: string; ability: AbilityId; target?: string; point?: Vec; /** Card-bound CP: the cards to exhaust for its CP (else the default pick). */ pay?: string[] }

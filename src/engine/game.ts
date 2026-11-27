@@ -408,7 +408,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       const decoy = isEngaged(s, unit) ? undefined : provokedBy(s, unit, w, target);
       if (decoy) return `${profileOf(decoy).name} is provoking this unit: it must shoot that one`;
       if (cmd.reroll) {
-        const e = payReroll(s, unit, plan, events, cmd.pay);
+        const e = payReroll(s, unit, plan, events, cmd.pay, cmd.rerollSalt);
         if (e) return e;
       }
       if (consumeReaction(s, target.owner, "enemyShoots", events)) plan.hitOn = Math.min(6, plan.hitOn + 1);
@@ -446,7 +446,7 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
       if (typeof plan === "string") return plan;
       unit.status.revealed = true;
       if (cmd.reroll) {
-        const e = payReroll(s, unit, plan, events, cmd.pay);
+        const e = payReroll(s, unit, plan, events, cmd.pay, cmd.rerollSalt);
         if (e) return e;
       }
       unit.status.fought = true;
@@ -467,13 +467,14 @@ function perform(s: GameState, unit: Unit, cmd: Exclude<Command, { type: "pass" 
 }
 
 /** Command re-roll house rule: check it's allowed, pay its CP and mark the plan. Returns an error, or null. */
-function payReroll(s: GameState, unit: Unit, plan: AttackPlan, events: GameEvent[], pay?: string[]): string | null {
+function payReroll(s: GameState, unit: Unit, plan: AttackPlan, events: GameEvent[], pay?: string[], rerollSalt?: number): string | null {
   if (!rulesOf(s).reroll) return "Command re-rolls aren't in play in this game";
   if (plan.indirect) return "Lobbed shells can't be re-rolled";
   if (s.players[unit.owner].cp < REROLL_CP) return `A re-roll costs ${REROLL_CP} CP`;
   const paid = spendCp(s, unit.owner, REROLL_CP, events, { pay });
   if (paid) return paid;
   plan.reroll = true;
+  if (rerollSalt !== undefined) plan.rerollSalt = rerollSalt >>> 0;
   return null;
 }
 

@@ -14,8 +14,10 @@
 //      B → A  SALT   { n, b }                       B checked it's legal; B's randomness
 //      A → B  REVEAL { n, a, hash }                 A applied it with salt H(aₙ ‖ bₙ ‖ n)
 //      B → A  ACK    { n, hash }                    B applied it; hashes are compared both ways
-//    A shoot or fight that could be re-rolled (house rule) stays open until A sends FINAL with or
-//    without the re-roll; nobody moves on until then.
+//    A shoot or fight that could be re-rolled (house rule) stays open until A settles it: FINAL to
+//    keep it, or a second commit-reveal for the re-roll (REROLL with a new commitment, B's RSALT,
+//    A's RREVEAL), whose salt the engine stirs in just before the misses are re-rolled. So A can't
+//    know the re-rolled dice when deciding to pay for them. Nobody moves on until it is settled.
 // Every step is re-sent until it is answered (public brokers may drop a message), and answering is
 // idempotent.
 
@@ -64,7 +66,10 @@ type Msg =
   | { k: "cmd"; n: number; cmd: Command; c: string }
   | { k: "salt"; n: number; b: string }
   | { k: "reveal"; n: number; a: string; hash: string; open: boolean }
-  | { k: "final"; n: number; cmd: Command; hash: string }
+  | { k: "final"; n: number; hash: string }
+  | { k: "reroll"; n: number; cmd: Command; c: string }
+  | { k: "rsalt"; n: number; b: string }
+  | { k: "rreveal"; n: number; a: string; hash: string }
   | { k: "ack"; n: number; hash: string; final: boolean }
   | { k: "resign" };
 
@@ -133,12 +138,28 @@ interface LogEntry {
   state: GameState;
   hash: string;
   open: boolean;
+  /** Our re-roll secret, if we re-rolled this attack (to answer a repeated RSALT). */
+  ra?: string;
 }
 
 /** A command step in flight. */
 type Pending =
   | { role: "A"; n: number; cmd: Command; a: string; c: string; resolve: (r: Applied) => void; reject: (e: Error) => void }
-  | { role: "B"; n: number; cmd: Command; c: string; b: string };
+  | { role: "B"; n: number; cmd: Command; c: string; b: string }
+  | { role: "A2"; n: number; cmd: Command; a: string; c: string; resolve: (r: Applied) => void; reject: (e: Error) => void }
+  | { role: "B2"; n: number; cmd: Command; c: string; b: string };
+
+/** A hello we answered, waiting for the other side to prove it holds the session key. */
+interface Candidate {
+  channel: SecureChannel;
+  build: string;
+  timer: ReturnType<typeof setTimeout>;
+}
+
+/** At most this many unconfirmed hellos at once; more are ignored until one expires. */
+const MAX_CANDIDATES = 8;
+/** Hellos stamped further than this from our clock are ignored (old recordings replayed). */
+const HELLO_WINDOW_MS = 30 * 60 * 1000;
 
 export class PvpSession {
   readonly role: Role;
@@ -170,8 +191,7 @@ export class PvpSession {
   private nonce = randomHex(16);
   private keys: CryptoKeyPair | null = null;
   private epk = "";
-  private peerNonce: string | null = null;
-  private pairTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly candidates = new Map<string, Candidate>();
   // lobby and seed
   private setup: GameSetup | null = null;
   private seedA: string | null = null;
@@ -294,29 +314,32 @@ export class PvpSession {
 
   /**
    * Settle this player's open attack: keep it, or re-roll its misses (`reroll` is the re-roll
-   * command, with `reroll: true` and any card payment). Resolves once both sides have it.
+   * command, with `reroll: true` and any card payment). A re-roll takes a fresh commit-reveal, so
+   * its dice aren't known until it is paid for. Resolves once applied here.
    */
   async finalize(reroll?: Command): Promise<Applied> {
     const e = this.openCommand;
-    if (!e || e.seat !== this.seat) throw new Error("Nothing to settle");
-    let cmd = e.cmd;
-    let applied: { state: GameState; events: GameEvent[] } = { state: e.state, events: [] };
-    if (reroll) {
-      if (!sameAttack(e.cmd, reroll)) throw new Error("A re-roll must repeat the same attack");
-      const r = await this.applyWith(e.before, reroll, e.a, e.b, e.n);
-      if (!r.ok) throw new Error(r.error);
-      cmd = reroll;
-      applied = r;
+    if (!e || e.seat !== this.seat || this.pending) throw new Error("Nothing to settle");
+    if (!reroll) {
+      this.log[e.n] = { ...e, open: false };
+      const msg: Msg = { k: "final", n: e.n, hash: e.hash };
+      this.outbox = msg;
+      void this.send(msg);
+      const out: Applied = { n: e.n, seat: e.seat, cmd: e.cmd, before: e.before, state: e.state, events: [], revised: false, open: false };
+      this.applied.emit(out);
+      return out;
     }
-    const entry: LogEntry = { ...e, cmd, state: applied.state, hash: syncHash(applied.state), open: false };
-    this.log[e.n] = entry;
-    this.state = applied.state;
-    const msg: Msg = { k: "final", n: e.n, cmd, hash: entry.hash };
-    this.outbox = msg;
-    void this.send(msg);
-    const out: Applied = { n: e.n, seat: e.seat, cmd, before: e.before, state: entry.state, events: applied.events, revised: !!reroll, open: false };
-    this.applied.emit(out);
-    return out;
+    if (!sameAttack(e.cmd, reroll) || "rerollSalt" in reroll) throw new Error("A re-roll must repeat the same attack");
+    const problem = commandProblem(e.before, reroll);
+    if (problem) throw new Error(problem);
+    const a = randomHex(16);
+    const c = await sha256Hex(a);
+    return new Promise((resolve, reject) => {
+      this.pending = { role: "A2", n: e.n, cmd: reroll, a, c, resolve, reject };
+      const msg: Msg = { k: "reroll", n: e.n, cmd: reroll, c };
+      this.outbox = msg;
+      void this.send(msg);
+    });
   }
 
   /** Concede the game. */
@@ -331,10 +354,10 @@ export class PvpSession {
     this.closed = true;
     if (this.resendTimer) clearInterval(this.resendTimer);
     if (this.pingTimer) clearInterval(this.pingTimer);
-    if (this.pairTimer) clearTimeout(this.pairTimer);
+    this.dropCandidates();
     for (const u of this.unsubs) u();
     this.transport.close();
-    if (this.pending?.role === "A") this.pending.reject(new Error("The session closed"));
+    if (this.pending?.role === "A" || this.pending?.role === "A2") this.pending.reject(new Error("The session closed"));
     this.pending = null;
     this.ended.emit({ why: "closed" });
   }
@@ -361,7 +384,7 @@ export class PvpSession {
     if (this.closed) return;
     if (!this.isPaired) {
       await this.sendRaw(this.hello());
-      if (this.sessionChannel) await this.send({ k: "ready" });
+      for (const c of this.candidates.values()) this.transport.send(await c.channel.seal({ k: "ready" }));
       return;
     }
     if (this.outbox) await this.sendRaw(this.outbox);
@@ -387,63 +410,80 @@ export class PvpSession {
       const r = await this.sessionChannel.open<Msg>(bytes);
       if (r.ok) return this.onSession(r.msg.body);
       if (r.drop !== "failed authentication") return;
+    } else {
+      // Not paired yet: the first candidate to prove the session key wins.
+      for (const [nonce, c] of this.candidates) {
+        const r = await c.channel.open<Msg>(bytes);
+        if (!r.ok) continue;
+        if (r.msg.body?.k === "ready") this.confirm(nonce, c);
+        return;
+      }
     }
     const h = await this.codeChannel?.open<Hello>(bytes);
-    if (h?.ok) await this.onHello(h.msg.body);
+    if (h?.ok) await this.onHello(h.msg.body, h.msg.t);
   }
 
-  private async onHello(m: Hello): Promise<void> {
+  private async onHello(m: Hello, sentAt: number): Promise<void> {
     if (m?.k !== "hello" || this.isPaired) return;
     if (!isHex(m.nonce, 16) || !isHex(m.epk, 65) || (m.role !== "host" && m.role !== "guest")) return;
     if (m.role === this.role) return; // another tab with the same role, or our own echo
+    if (!(Math.abs(Date.now() - sentAt) <= HELLO_WINDOW_MS)) return; // a stale recording
     if (m.v !== PROTOCOL || m.build !== this.build) {
       this.problem.emit(`Your opponent is on a different version (${String(m.build)}). Both of you need the same release to play.`);
       return;
     }
-    if (this.peerNonce && this.peerNonce !== m.nonce) return; // busy confirming another hello
-    if (this.peerNonce === m.nonce) {
-      void this.send({ k: "ready" }); // a repeat: answer again
+    const known = this.candidates.get(m.nonce);
+    if (known) {
+      this.transport.send(await known.channel.seal({ k: "ready" })); // a repeat: answer again
       return;
     }
-    this.peerNonce = m.nonce;
-    const peerKey = await crypto.subtle.importKey("raw", fromHex(m.epk), { name: "ECDH", namedCurve: "P-256" }, false, []);
-    const shared = await crypto.subtle.deriveBits({ name: "ECDH", public: peerKey }, this.keys!.privateKey, 256);
-    const [hostNonce, guestNonce] = this.role === "host" ? [this.nonce, m.nonce] : [m.nonce, this.nonce];
-    const base = await crypto.subtle.importKey("raw", shared, "HKDF", false, ["deriveKey"]);
-    const key = await crypto.subtle.deriveKey(
-      { name: "HKDF", hash: "SHA-256", salt: fromHex(await sha256Hex(this.room!.id, hostNonce, guestNonce)), info: enc.encode("scdmg session v1") },
-      base,
-      { name: "AES-GCM", length: 256 },
-      false,
-      ["encrypt", "decrypt"],
-    );
-    this.sessionChannel = new SecureChannel({ id: `${this.room!.id}/${hostNonce}/${guestNonce}`, key });
-    // Confirm within the time limit, or forget this hello and listen for another.
-    this.pairTimer = setTimeout(() => {
-      if (this.isPaired) return;
-      this.peerNonce = null;
-      this.sessionChannel = null;
-    }, this.opts.pairTimeoutMs);
+    if (this.candidates.size >= MAX_CANDIDATES) return;
+    let channel: SecureChannel;
+    try {
+      const peerKey = await crypto.subtle.importKey("raw", fromHex(m.epk), { name: "ECDH", namedCurve: "P-256" }, false, []);
+      const shared = await crypto.subtle.deriveBits({ name: "ECDH", public: peerKey }, this.keys!.privateKey, 256);
+      const [hostNonce, guestNonce] = this.role === "host" ? [this.nonce, m.nonce] : [m.nonce, this.nonce];
+      const base = await crypto.subtle.importKey("raw", shared, "HKDF", false, ["deriveKey"]);
+      const key = await crypto.subtle.deriveKey(
+        { name: "HKDF", hash: "SHA-256", salt: fromHex(await sha256Hex(this.room!.id, hostNonce, guestNonce)), info: enc.encode("scdmg session v1") },
+        base,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["encrypt", "decrypt"],
+      );
+      channel = new SecureChannel({ id: `${this.room!.id}/${hostNonce}/${guestNonce}`, key });
+    } catch {
+      return; // not a usable public key
+    }
+    if (this.isPaired || this.candidates.has(m.nonce) || this.candidates.size >= MAX_CANDIDATES) return;
+    // Confirm within the time limit, or forget this hello.
+    const timer = setTimeout(() => this.candidates.delete(m.nonce), this.opts.pairTimeoutMs);
+    this.candidates.set(m.nonce, { channel, build: m.build, timer });
     await this.sendRaw(this.hello()); // make sure they have ours
-    await this.send({ k: "ready" });
-    this.peerBuild = m.build;
+    this.transport.send(await channel.seal({ k: "ready" }));
   }
 
-  private peerBuild = "";
+  /** The other side proved it holds this candidate's session key: it's our opponent. */
+  private confirm(nonce: string, c: Candidate): void {
+    if (this.isPaired || !this.candidates.has(nonce)) return;
+    this.sessionChannel = c.channel;
+    this.dropCandidates();
+    this.isPaired = true;
+    this.lastHeard = Date.now();
+    this.outbox = null;
+    void this.send({ k: "ready" });
+    this.setPeer("connected");
+    this.paired.emit({ peerBuild: c.build });
+  }
+
+  private dropCandidates(): void {
+    for (const c of this.candidates.values()) clearTimeout(c.timer);
+    this.candidates.clear();
+  }
 
   private async onSession(m: Msg): Promise<void> {
     if (!m || typeof m !== "object") return;
     this.lastHeard = Date.now();
-    if (!this.isPaired) {
-      if (m.k !== "ready") return;
-      this.isPaired = true;
-      if (this.pairTimer) clearTimeout(this.pairTimer);
-      this.outbox = null;
-      void this.send({ k: "ready" });
-      this.setPeer("connected");
-      this.paired.emit({ peerBuild: this.peerBuild });
-      return;
-    }
     this.setPeer("connected");
     switch (m.k) {
       case "ready":
@@ -467,6 +507,12 @@ export class PvpSession {
         return this.onReveal(m);
       case "final":
         return this.onFinal(m);
+      case "reroll":
+        return this.onReroll(m);
+      case "rsalt":
+        return this.onRsalt(m);
+      case "rreveal":
+        return this.onRreveal(m);
       case "ack":
         return this.onAck(m);
     }
@@ -476,6 +522,11 @@ export class PvpSession {
     if (this.role !== "guest" || this.state || !isHex(m.c, 32)) return;
     if (this.setup && this.seedCommit === m.c) {
       if (this.seedB) void this.send({ k: "accept", fp: setupFingerprint(this.setup), b: this.seedB }); // a repeat
+      return;
+    }
+    if (this.seedB) {
+      // We already accepted (and sent our half of the seed): a new setup now could be fishing for a better seed.
+      this.problem.emit("Your opponent changed the game after you accepted it.");
       return;
     }
     this.setup = m.setup;
@@ -601,31 +652,95 @@ export class PvpSession {
     this.applied.emit({ n: p.n, seat: (1 - this.seat) as PlayerId, cmd: p.cmd, before, state: r.state, events: r.events, revised: false, open });
   }
 
-  /** B: the opponent settled their open attack (re-rolled or kept it). */
-  private async onFinal(m: Extract<Msg, { k: "final" }>): Promise<void> {
+  /** B: the opponent kept their open attack as it was. */
+  private onFinal(m: Extract<Msg, { k: "final" }>): void {
     const e = this.log[m.n];
     if (!e || e.seat === this.seat) return;
     if (!e.open) {
       void this.send({ k: "ack", n: e.n, hash: e.hash, final: true }); // a repeat
       return;
     }
-    if (m.n !== this.log.length - 1) return;
-    let state = e.state;
-    let events: GameEvent[] = [];
-    const revised = !sameCommand(m.cmd, e.cmd);
-    if (revised) {
-      if (!sameAttack(e.cmd, m.cmd)) return this.problem.emit("Your opponent's re-roll didn't match their attack.");
-      const r = await this.applyWith(e.before, m.cmd, e.a, e.b, e.n);
-      if (!r.ok) return this.problem.emit(`Your opponent's re-roll failed here (${r.error}).`);
-      state = r.state;
-      events = r.events;
+    if (m.n !== this.log.length - 1 || this.pending) return;
+    this.log[e.n] = { ...e, open: false };
+    if (e.hash !== m.hash) this.desync.emit({ n: e.n, mine: e.hash, theirs: m.hash });
+    void this.send({ k: "ack", n: e.n, hash: e.hash, final: true });
+    this.applied.emit({ n: e.n, seat: e.seat, cmd: e.cmd, before: e.before, state: e.state, events: [], revised: false, open: false });
+  }
+
+  /** B: the opponent wants to re-roll their open attack. Check it, then send a fresh salt. */
+  private onReroll(m: Extract<Msg, { k: "reroll" }>): void {
+    const e = this.log[m.n];
+    if (!e || e.seat === this.seat || !isHex(m.c, 32)) return;
+    if (this.pending?.role === "B2" && this.pending.n === m.n) {
+      void this.send({ k: "rsalt", n: m.n, b: this.pending.b }); // a repeat
+      return;
     }
-    const hash = syncHash(state);
-    this.log[e.n] = { ...e, cmd: m.cmd, state, hash, open: false };
-    this.state = state;
+    if (!e.open) {
+      void this.send({ k: "ack", n: e.n, hash: e.hash, final: true }); // already settled
+      return;
+    }
+    if (m.n !== this.log.length - 1 || this.pending) return;
+    if (!sameAttack(e.cmd, m.cmd) || "rerollSalt" in m.cmd) return this.problem.emit("Your opponent's re-roll didn't match their attack.");
+    const problem = commandProblem(e.before, m.cmd);
+    if (problem) return this.problem.emit(`Your opponent's re-roll isn't allowed (${problem}).`);
+    const b = randomHex(16);
+    this.pending = { role: "B2", n: m.n, cmd: m.cmd, c: m.c, b };
+    const msg: Msg = { k: "rsalt", n: m.n, b };
+    this.outbox = msg;
+    void this.send(msg);
+  }
+
+  /** A: the opponent's re-roll salt; apply the re-roll and reveal. */
+  private async onRsalt(m: Extract<Msg, { k: "rsalt" }>): Promise<void> {
+    const p = this.pending;
+    if (!isHex(m.b, 16)) return;
+    if (!p || p.role !== "A2" || p.n !== m.n) {
+      const e = this.log[m.n];
+      if (e && e.seat === this.seat && !e.open && e.ra) void this.send({ k: "rreveal", n: e.n, a: e.ra, hash: e.hash });
+      return;
+    }
+    const e = this.log[p.n]!;
+    const cmd = { ...p.cmd, rerollSalt: await saltOf(p.a, m.b, p.n) } as Command;
+    const r = await this.applyWith(e.before, cmd, e.a, e.b, e.n);
+    if (!r.ok) {
+      this.pending = null;
+      p.reject(new Error(r.error));
+      return;
+    }
+    const hash = syncHash(r.state);
+    this.log[e.n] = { ...e, cmd, state: r.state, hash, open: false, ra: p.a };
+    this.state = r.state;
+    this.pending = null;
+    const msg: Msg = { k: "rreveal", n: e.n, a: p.a, hash };
+    this.outbox = msg;
+    void this.send(msg);
+    const out: Applied = { n: e.n, seat: e.seat, cmd, before: e.before, state: r.state, events: r.events, revised: true, open: false };
+    this.applied.emit(out);
+    p.resolve(out);
+  }
+
+  /** B: the re-roll's secret; check it, apply the re-roll, compare hashes and acknowledge. */
+  private async onRreveal(m: Extract<Msg, { k: "rreveal" }>): Promise<void> {
+    const p = this.pending;
+    if (!isHex(m.a, 16)) return;
+    if (!p || p.role !== "B2" || p.n !== m.n) {
+      const e = this.log[m.n];
+      if (e && !e.open) void this.send({ k: "ack", n: e.n, hash: e.hash, final: true });
+      return;
+    }
+    if ((await sha256Hex(m.a)) !== p.c) return this.problem.emit("The opponent's re-roll secret didn't match its promise.");
+    const e = this.log[p.n]!;
+    const cmd = { ...p.cmd, rerollSalt: await saltOf(m.a, p.b, p.n) } as Command;
+    const r = await this.applyWith(e.before, cmd, e.a, e.b, e.n);
+    if (!r.ok) return this.problem.emit(`Your opponent's re-roll failed here (${r.error}).`);
+    const hash = syncHash(r.state);
+    this.log[e.n] = { ...e, cmd, state: r.state, hash, open: false };
+    this.state = r.state;
+    this.pending = null;
+    this.outbox = null;
     if (hash !== m.hash) this.desync.emit({ n: e.n, mine: hash, theirs: m.hash });
     void this.send({ k: "ack", n: e.n, hash, final: true });
-    this.applied.emit({ n: e.n, seat: e.seat, cmd: m.cmd, before: e.before, state, events, revised, open: false });
+    this.applied.emit({ n: e.n, seat: e.seat, cmd, before: e.before, state: r.state, events: r.events, revised: true, open: false });
   }
 
   /** A: the opponent applied our command (or our FINAL); compare hashes and stop re-sending. */
@@ -653,8 +768,6 @@ export class PvpSession {
     return applyCommand(salted, structuredClone(cmd));
   }
 }
-
-const sameCommand = (x: Command, y: Command): boolean => JSON.stringify(x) === JSON.stringify(y);
 
 /** A re-roll repeats the same attack, with `reroll: true` (and maybe a payment). */
 function sameAttack(orig: Command, again: Command): boolean {

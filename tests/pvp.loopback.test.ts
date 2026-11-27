@@ -4,7 +4,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { aiCommand } from "../src/engine/ai";
 import { syncHash } from "../src/engine/fingerprint";
-import type { GameSetup } from "../src/engine/game";
+import { applyCommand, createGame, type GameSetup } from "../src/engine/game";
 import type { Command } from "../src/engine/types";
 import { SecureChannel, deriveRoom } from "../src/net/crypto";
 import { PvpSession, rerollMisses, seatToAct, type Role } from "../src/net/session";
@@ -242,5 +242,86 @@ describe("rerollMisses", () => {
   it("is 0 without the house rule", async () => {
     const { host } = await startGame();
     expect(rerollMisses(host.state!, { type: "shoot", uid: "x", target: "y", weapon: 0 }, [])).toBe(0);
+  });
+});
+
+describe("PvP security fixes", () => {
+  it("pairs the real players even with stale hellos from earlier sessions replayed into the room", async () => {
+    // Record the hellos of a few earlier, abandoned guests with the same code...
+    const hubOld = memoryHub();
+    const room = await deriveRoom(CODE);
+    const tape = hubOld.transport();
+    await tape.join(room.id);
+    const recorded: Uint8Array[] = [];
+    tape.onMessage((b) => recorded.push(b));
+    for (let i = 0; i < 10; i++) {
+      const ghost = session(hubOld, "guest");
+      await ghost.start();
+      ghost.close();
+    }
+    await tick(5);
+    expect(recorded.length).toBeGreaterThanOrEqual(10);
+    // ...and replay them all at a new host, just before and while the real guest says hello.
+    const hub = memoryHub();
+    const host = session(hub, "host");
+    await host.start();
+    const replayer = hub.transport();
+    await replayer.join(room.id);
+    for (const b of recorded) replayer.send(b);
+    const guest = session(hub, "guest");
+    await guest.start();
+    for (const b of recorded) replayer.send(b);
+    await until(() => host.isPaired && guest.isPaired, 3000, "pairing despite the replayed hellos");
+  });
+
+  it("refuses a setup changed after the guest accepted it (seed grinding)", async () => {
+    const hub = memoryHub();
+    const host = session(hub, "host");
+    const guest = session(hub, "guest");
+    const problems: string[] = [];
+    guest.problem.add((p) => problems.push(p));
+    let accepted = 0;
+    guest.setupOffered.add(() => void guest.acceptSetup().then(() => accepted++));
+    // A host that, having seen the guest's half of the seed, holds back its reveal and offers a new setup.
+    const h = host as unknown as { onAccept(m: unknown): Promise<void>; send(m: unknown): Promise<void>; outbox: unknown };
+    h.onAccept = async () => {};
+    await host.start();
+    await guest.start();
+    await until(() => host.isPaired && guest.isPaired);
+    await host.proposeSetup(SETUP);
+    await until(() => accepted > 0, 2000, "the guest to accept");
+    h.outbox = null;
+    await h.send({ k: "setup", setup: { ...SETUP, mapId: "scrapyard" }, c: "cd".repeat(32) });
+    await until(() => problems.length > 0, 2000, "the refusal");
+    expect(problems[0]).toMatch(/changed the game after you accepted/);
+    expect(accepted).toBe(1);
+    expect(guest.state).toBeNull();
+  });
+
+  it("gives re-rolled misses fresh dice: the same first dice, a salted re-roll", () => {
+    // Find an attack that could be re-rolled in an AI game.
+    let s = createGame({ ...SETUP, seed: 5, rules: { reroll: true } });
+    let found: { before: typeof s; cmd: Extract<Command, { type: "shoot" | "fight" }> } | null = null;
+    for (let i = 0; i < 800 && !s.over && !found; i++) {
+      const cmd = aiCommand(s)!;
+      const r = applyCommand(s, cmd);
+      if (!r.ok) break;
+      if ((cmd.type === "shoot" || cmd.type === "fight") && rerollMisses(s, cmd, r.events) > 0) found = { before: s, cmd };
+      s = r.state;
+    }
+    expect(found).not.toBeNull();
+    const { before, cmd } = found!;
+    const roll = (salt?: number) => {
+      const r = applyCommand(structuredClone(before), { ...cmd, reroll: true, ...(salt === undefined ? {} : { rerollSalt: salt }) });
+      if (!r.ok) throw new Error(r.error);
+      const a = r.events.find((e) => e.type === "attack");
+      if (a?.type !== "attack") throw new Error("no attack");
+      return a.report;
+    };
+    const plain = roll();
+    const salted = [1, 2, 3, 4, 5, 6].map((x) => roll(x * 0x9e3779b1));
+    for (const r of salted) expect(r.rerolledFrom).toEqual(plain.rerolledFrom); // the first dice are the same
+    // The re-rolled dice depend on the salt.
+    expect(new Set(salted.map((r) => r.hitRolls.join(","))).size).toBeGreaterThan(1);
   });
 });

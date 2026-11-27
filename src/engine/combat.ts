@@ -1,5 +1,6 @@
 // Attack resolution: per-model range/sight, keyword bonuses, wound allocation, saves, reactions.
 
+import { withSalt } from "./fingerprint";
 import { BARRAGE_RADIUS, BLAST_SQUAD, SHELL_BURST, SHELL_DRIFT, WIDE_BARRAGE_RADIUS } from "./constants";
 import { MISSIONS } from "./data/missions";
 import { dist } from "./geometry";
@@ -36,6 +37,12 @@ export interface AttackPlan {
   breach?: { die: 3 | 6; vs: string };
   /** Command re-roll house rule: re-roll the misses once (the CP is paid by the caller). */
   reroll?: boolean;
+  /**
+   * Online play: a shared random value stirred into the dice just before the misses are re-rolled,
+   * so the attacker couldn't know the re-rolled dice when deciding to pay for them. Absent: the
+   * re-roll carries on the same dice stream (local games, the simulator).
+   */
+  rerollSalt?: number;
 }
 
 export const hasTrait = (w: Weapon, t: NonNullable<Weapon["traits"]>[number]): boolean => !!w.traits?.includes(t);
@@ -464,6 +471,7 @@ export function resolveAttack(
   let rerolledFrom: number[] | undefined;
   if (plan.reroll) {
     rerolledFrom = hitRolls.filter((r) => r < plan.hitOn);
+    if (plan.rerollSalt !== undefined) withSalt(s, plan.rerollSalt);
     for (let i = 0; i < hitRolls.length; i++) if (hitRolls[i]! < plan.hitOn) hitRolls[i] = rollD6(s);
   }
   let hits = hitRolls.filter((r) => r >= plan.hitOn).length;

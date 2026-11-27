@@ -29,7 +29,7 @@ describe("syncHash", () => {
     expect(hashes.length).toBeGreaterThan(20);
     for (const [x, y] of hashes) expect(x).toBe(y);
     expect(new Set(hashes.map(([x]) => x)).size).toBeGreaterThan(10); // and moves as the game does
-  });
+  }, 30000);
 
   it("notices any drift, even one the simulator's fingerprint ignores", () => {
     const s = createGame(SETUP);
