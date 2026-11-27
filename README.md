@@ -108,6 +108,16 @@ The **faction forge** shows every built-in faction's codex, and lets you copy on
 
 Play the latest release at **[ch-potter.github.io/SCDMG](https://ch-potter.github.io/SCDMG/)**: nothing to install. It works on desktop browsers, tablets and phones (touch is supported). Your armies, maps, factions and campaign are saved in that browser only, so use the same browser to pick up where you left off.
 
+### Play a friend online
+
+In the browser version, press **🌐 Play a friend online** on the main menu.
+
+1. One of you **hosts**: pick the mode, mission, battlefield, house rules and your army, press **Create game**, and send the invite code (or the link) to your friend over WhatsApp, Discord or anything else.
+2. The other **joins**: paste the code (or open the link), look over the host's game, pick an army (custom factions from the faction forge are fine) and press **Ready**.
+3. You both see the full match summary, every house rule included, and press **Start**. Either of you can back out before then.
+
+Both of you need the same release of the game. No accounts, emails or names are involved. Moves and the game setup travel encrypted through two public relay servers (test.mosquitto.org and broker.emqx.io), which can't read them but can see connection details such as your IP address: see [SECURITY.md](SECURITY.md). Online play isn't in the Windows desktop build, which stays offline.
+
 ### Download (Windows)
 
 Grab `SCDMG-<version>-portable.exe` from the [latest release](https://github.com/CH-Potter/SCDMG/releases/latest) and run it. It needs no install and no Node.js, and it runs fully offline on any Windows 10/11 x64 PC.
