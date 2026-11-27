@@ -83,7 +83,7 @@ Linked Skirmish and Assault battles on a map of the valley, told from the side y
   </tr>
 </table>
 
-Comic-panel intro animations, drawn live with the game's own miniatures, introduce the valley and each faction, and short story scenes play through the campaign. The **📖 Lore** pages tell the story of the Dustline, its three sides and the places they fight over (also in [docs/lore.md](docs/lore.md)).
+Comic-panel intro animations, drawn live with the game's own miniatures, introduce the valley and each faction whenever you want to watch them (from the main menu or the lore pages; they never play by themselves), and short story scenes play through the campaign. The **📖 Lore** pages tell the story of the Dustline, its three sides and the places they fight over (also in [docs/lore.md](docs/lore.md)).
 
 ![The Lore of the Dustline pages in the game](docs/images/lore.webp)
 

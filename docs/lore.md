@@ -128,8 +128,8 @@ A suggested order for the war, each with a battlefield and mission from the game
 
 The intros are drawn live in the game's own style (the real miniatures, emblems and wordmark on inked comic panels); there are no video files. Each one can be skipped with a click, Esc, Space or the Skip button, and with *reduce motion* turned on in your system they show as a still comic page instead.
 
-- **The game intro** (about 19 seconds) plays once on first launch: the valley at dawn, the fizzing creek and the Wellspring below it, the Skitterswarm bursting up through the corn, Concord saucers beaming down at night, the Muster standing firm, and the three emblems facing off under the SCDMG wordmark. Replay it from **▶ Watch the intro** on the main menu or the lore pages.
-- **A faction intro** (about 16 seconds each) plays the first time you pick a built-in faction or open its lore page, and can be replayed from the faction's lore page:
+- **The game intro** (about 19 seconds) never plays by itself; watch it from **▶ Watch the intro** on the main menu or the lore pages: the valley at dawn, the fizzing creek and the Wellspring below it, the Skitterswarm bursting up through the corn, Concord saucers beaming down at night, the Muster standing firm, and the three emblems facing off under the SCDMG wordmark.
+- **A faction intro** (about 16 seconds each) plays from **▶ Play the intro** on the faction's lore page:
   - *Dustline Militia:* Marshal Haybright calling the Muster roll, squads in riveted armour falling in, Big Bertha striding out of the motor pool, the crop dusters overhead in formation, and the title card.
   - *The Skitterswarm:* the ground trembling under Badger Knob, the Brood Hollow's eggs glowing, Mother Mandible revealed, the swarm pouring out of the tunnels, and the title card.
   - *Lumen Concord:* the Star Lens noticing the glow, saucers beaming down, His Radiance stepping out of a Light Gate, the Court of Disdain scoring the locals, and the title card.

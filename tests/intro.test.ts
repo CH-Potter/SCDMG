@@ -1,7 +1,7 @@
 // The intro player's DOM-free parts: the "seen intro" preference, scene timing and skipping.
 
 import { describe, expect, it, vi } from "vitest";
-import { INTRO_SEEN_KEY, hasSeenIntro, loadSeen, markIntroSeen, shouldAutoPlay } from "../src/ui/intro/prefs";
+import { INTRO_SEEN_KEY, hasSeenIntro, loadSeen, markIntroSeen } from "../src/ui/intro/prefs";
 import { IntroRunner, isSkipKey, sceneAt, sceneStarts, totalDuration, type Timers } from "../src/ui/intro/runner";
 
 function memoryStorage(init: Record<string, string> = {}) {
@@ -26,10 +26,8 @@ describe("intro: seen preference", () => {
   it("remembers each intro separately", () => {
     const s = memoryStorage();
     expect(hasSeenIntro("game", s)).toBe(false);
-    expect(shouldAutoPlay("game", s)).toBe(true);
     expect(markIntroSeen("game", s)).toBe(true);
     expect(hasSeenIntro("game", s)).toBe(true);
-    expect(shouldAutoPlay("game", s)).toBe(false);
     expect(hasSeenIntro("swarm", s)).toBe(false);
     markIntroSeen("swarm", s);
     markIntroSeen("swarm", s);
@@ -45,12 +43,7 @@ describe("intro: seen preference", () => {
   it("never throws when storage is blocked, and never autoplays when it can't remember", () => {
     expect(hasSeenIntro("game", throwing)).toBe(false);
     expect(markIntroSeen("game", throwing)).toBe(false);
-    expect(shouldAutoPlay("game", throwing)).toBe(false);
-    expect(shouldAutoPlay("game", null)).toBe(false);
     expect(markIntroSeen("game", null)).toBe(false);
-    // Readable but not writable storage would replay the intro on every launch.
-    const readOnly = { getItem: () => null, setItem: throwing.setItem };
-    expect(shouldAutoPlay("game", readOnly)).toBe(false);
   });
 });
 

@@ -2,13 +2,13 @@
 // and their art are loaded on first use with dynamic import(), so they stay out of the main bundle.
 
 import { isBuiltInFaction } from "../engine/data/factions";
-import { shouldAutoPlay, type IntroId } from "./intro/prefs";
+import type { IntroId } from "./intro/prefs";
 
 export type LoreTab = "world" | "places" | "militia" | "swarm" | "concord";
 
 const builtIn = (id: string): id is "militia" | "swarm" | "concord" => isBuiltInFaction(id);
 
-/** Open the lore pages on a tab. Opening a faction's page plays its intro the first time. */
+/** Open the lore pages on a tab. Intros never play by themselves: each page has a button for its intro. */
 export function showLore(tab: LoreTab | string = "world", opts: { onClose?: () => void } = {}): void {
   const t: LoreTab = tab === "places" || tab === "world" || builtIn(tab) ? (tab as LoreTab) : "world";
   void import("./lore/loreView")
@@ -24,14 +24,4 @@ export function playIntro(id: IntroId | string, opts: { onClose?: () => void } =
       console.warn("Couldn't play the intro:", err);
       opts.onClose?.();
     });
-}
-
-/** The game intro, on first launch only. */
-export function maybeGameIntro(): void {
-  if (shouldAutoPlay("game")) playIntro("game");
-}
-
-/** A built-in faction's intro, the first time the player picks or views it. */
-export function maybeFactionIntro(factionId: string): void {
-  if (builtIn(factionId) && shouldAutoPlay(factionId)) playIntro(factionId);
 }

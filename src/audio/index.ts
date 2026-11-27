@@ -19,6 +19,9 @@ import { styleForLook, type Style } from "./composer";
 import { battleIntensity, cuesForEvents, decayHeat, rollsIn, type Cue, type SfxName, type UnitInfo } from "./mapping";
 import { MusicPlayer, type Mood } from "./music";
 import { busGains, loadAudioSettings, saveAudioSettings, type AudioSettings } from "./settings";
+
+/** The menu music plays at this share of the music volume, so it sits quietly in the background. */
+export const MENU_MUSIC_LEVEL = 0.5;
 import { Sfx } from "./sfx";
 import { Synth } from "./synth";
 import { mountAudioButton } from "./ui";
@@ -149,12 +152,13 @@ class AudioEngine {
     else if (!want && ctx.state === "running") ctx.suspend().catch(() => {});
   }
 
-  private applyGains(): void {
+  private applyGains(glide = 0.03): void {
     if (!this.ctx || !this.master || !this.musicBus || !this.sfxBus) return;
     const g = busGains(this.settings);
     const now = this.ctx.currentTime;
+    const moodLevel = this.wantMood === "menu" ? MENU_MUSIC_LEVEL : 1;
     this.master.gain.setTargetAtTime(g.master, now, 0.03);
-    this.musicBus.gain.setTargetAtTime(g.music * 0.9, now, 0.03);
+    this.musicBus.gain.setTargetAtTime(g.music * 0.9 * moodLevel, now, glide);
     this.sfxBus.gain.setTargetAtTime(g.sfx, now, 0.03);
   }
 
@@ -180,9 +184,11 @@ class AudioEngine {
   // ---------------------------------------------------------------- music
 
   setMood(mood: Mood, seed?: number): void {
+    const levelChanged = (this.wantMood === "menu") !== (mood === "menu");
     this.wantMood = mood;
     this.wantSeed = seed;
     this.music?.setMood(mood, this.styleFor(mood), seed);
+    if (levelChanged) this.applyGains(0.6); // ease between the quieter menu level and the battle level
   }
 
   private styleFor(mood: Mood): Style {

@@ -16,7 +16,7 @@ import { loadJson, saveJson } from "./files";
 import { findList, listProblems, listsFor } from "./lists";
 import { recruitableProfiles, type ArmyRule } from "../engine/openRoster";
 import { drawMapPreview, drawMissionPreview } from "./previews";
-import { maybeFactionIntro, playIntro, showLore } from "./loreLinks";
+import { playIntro, showLore } from "./loreLinks";
 import { audio } from "../audio"; // [audio]
 
 export interface MenuChoice {
@@ -339,8 +339,6 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
         render();
         // Keep keyboard focus on the chip that was picked (the page was just re-rendered).
         host.querySelector<HTMLElement>(`[data-faction-pick="${p}:${CSS.escape(fid)}"]`)?.focus({ preventScroll: true });
-        // The first time a built-in faction is picked, its intro plays.
-        maybeFactionIntro(fid);
       }),
     );
     host.querySelectorAll<HTMLSelectElement>("[data-list]").forEach((sel) =>

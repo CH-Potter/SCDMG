@@ -1,5 +1,5 @@
-// Which intros the player has already seen: the game intro plays once on first launch, and each
-// built-in faction's intro the first time that faction is picked or its lore is opened. Kept in
+// Which intros the player has already watched. The intros never play by themselves; this only records
+// which ones were opened from the menu or the lore pages. Kept in
 // localStorage behind try/catch (storage may be blocked); pure apart from the storage you pass in.
 
 export const INTRO_SEEN_KEY = "scdmg.intro.v1";
@@ -44,17 +44,4 @@ export function markIntroSeen(id: IntroId, storage: StorageLike | null = default
   } catch {
     return false;
   }
-}
-
-/** Should this intro play by itself now? Only the first time, and never when storage can't remember it (it would replay forever). */
-export function shouldAutoPlay(id: IntroId, storage: StorageLike | null = defaultStorage()): boolean {
-  if (!storage) return false;
-  try {
-    // Storage that can be read but not written would replay the intro on every launch: probe it by
-    // writing the current value back.
-    storage.setItem(INTRO_SEEN_KEY, storage.getItem(INTRO_SEEN_KEY) ?? "[]");
-  } catch {
-    return false;
-  }
-  return !hasSeenIntro(id, storage);
 }

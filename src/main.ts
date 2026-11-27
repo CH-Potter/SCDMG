@@ -7,7 +7,6 @@ import { listCustomFactions } from "./ui/customFactions";
 import { Controller, showRules, type ControllerHooks } from "./ui/controller";
 import type { CampaignReturn } from "./ui/campaign/index";
 import { openListBuilder } from "./ui/listbuilder";
-import { maybeGameIntro } from "./ui/loreLinks";
 import { loadHouseRules, openMenu, type MenuChoice } from "./ui/menu";
 import "./ui/menu.css";
 import { loadArt, miniStyle } from "./ui/minis";
@@ -108,10 +107,8 @@ registerCustomFactions(listCustomFactions());
 
 // The miniatures' art loads in chunks (ui/minis/registry.ts): fetch the registered factions' in the
 // background, for the intros, lore and codex pictures (the battle loads its armies' itself).
-const artReady = loadArt(Object.values(FACTIONS).flatMap((f) => f.profiles)).catch((e) => console.warn("Couldn't load miniature art:", e));
+void loadArt(Object.values(FACTIONS).flatMap((f) => f.profiles)).catch((e) => console.warn("Couldn't load miniature art:", e));
 
 await renderer.init(els.stage);
 showMenu();
-// First launch: the game intro plays over the menu (skippable, and replayable from the menu), once
-// its miniatures are in (a moment; the Classic figures stand in if they never come).
-void Promise.race([artReady, new Promise((r) => setTimeout(r, 2500))]).then(() => maybeGameIntro());
+// The intros never play by themselves (the menu's Intro button and each lore page play them).

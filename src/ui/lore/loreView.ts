@@ -29,7 +29,7 @@ import { rigPortraitFit } from "../art/rigPortrait";
 import { artPending, loadArt } from "../minis/registry";
 import type { UnitProfile } from "../../engine/types";
 import { esc } from "../describe";
-import { maybeFactionIntro, playIntro, type LoreTab } from "../loreLinks";
+import { playIntro, type LoreTab } from "../loreLinks";
 import { drawMapPreview } from "../previews";
 
 const TABS: { id: LoreTab; label: () => string }[] = [
@@ -291,8 +291,6 @@ export function openLore(tab: LoreTab = "world", opts: { onClose?: () => void } 
     page.scrollTop = 0;
     hydrate(page);
     drawPreviews(page);
-    // Viewing a faction for the first time plays its intro on top.
-    if (f) maybeFactionIntro(f.factionId);
     if (placeId) {
       requestAnimationFrame(() => {
         const el = page.querySelector<HTMLElement>(`#lore-place-${CSS.escape(placeId)}`);
