@@ -212,14 +212,18 @@ class AudioEngine {
     if (this.wantMood === "menu") this.setMood("menu");
   }
 
+  /** The local player's seat (1 for an online guest): their faction sets the style, their win the victory mood. */
+  private me: 0 | 1 = 0;
+
   /** Switch to the battle loop for a fresh game, in the player's faction style. */
-  startBattle(state: GameState, seed?: number): void {
+  startBattle(state: GameState, seed?: number, me: 0 | 1 = 0): void {
+    this.me = me;
     this.round = state.round;
     this.maxRounds = state.maxRounds;
     this.heat = 0;
-    this.battleStyle = this.styleOf(state.factions[0]);
-    this.aiStyle = this.styleOf(state.factions[1]);
-    this.aiTurn = state.activePlayer === 1;
+    this.battleStyle = this.styleOf(state.factions[me]);
+    this.aiStyle = this.styleOf(state.factions[me === 0 ? 1 : 0]);
+    this.aiTurn = state.activePlayer !== me;
     this.outcomes = [];
     this.setMood("battle", seed);
   }
@@ -236,13 +240,13 @@ class AudioEngine {
   onGameEvents(events: readonly GameEvent[], state: GameState): void {
     this.round = state.round;
     this.maxRounds = state.maxRounds;
-    this.aiTurn = !state.over && state.activePlayer === 1;
+    this.aiTurn = !state.over && state.activePlayer !== this.me;
     // Outcomes nobody claimed with takeOutcome() (no dice shown): play them now rather than lose them.
     for (const o of this.outcomes.splice(0)) this.release(o);
     let combat = 0;
     for (const e of events) {
       if (e.type === "attack") combat++;
-      if (e.type === "gameOver") this.setMood(e.winner === 1 ? "defeat" : "victory");
+      if (e.type === "gameOver") this.setMood(e.winner !== "draw" && e.winner !== this.me ? "defeat" : "victory");
     }
     if (combat) {
       this.intensity();
@@ -260,7 +264,7 @@ class AudioEngine {
       }
     };
     const t0 = this.ctx.currentTime + 0.02;
-    const cues = cuesForEvents(events, resolve, { reduced: reducedMotion(), me: 0 });
+    const cues = cuesForEvents(events, resolve, { reduced: reducedMotion(), me: this.me });
     for (const c of cues) if (c.group === undefined) this.play(c.sfx, t0 + c.delay, c.gain, c.count);
     // Hits, KOs and gulps wait for their dice to settle (they may need throwing first).
     for (let g = 0; g < rollsIn(events); g++) {

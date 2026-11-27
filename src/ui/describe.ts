@@ -5,6 +5,7 @@ import { ABILITIES } from "../engine/data/abilities";
 import { SUPPORTS } from "../engine/data/factions";
 import { profileOf } from "../engine/profile";
 import { unitById } from "../engine/rules";
+import { LOCAL_VS_AI, who as seatWho, whoMid, whoThe, type Seats } from "./seats";
 import type { AttackReport, EvadeCondition, GameEvent, GameState, Keyword, Phase, Unit, Weapon, UnitProfile, WeaponTrait } from "../engine/types";
 
 export const esc = (s: string): string =>
@@ -100,9 +101,9 @@ const diceHtml = (rolls: number[], need: (number | null)[] | number): string =>
     })
     .join(" ");
 
-const who = (p: number) => (p === 0 ? "You" : "AI");
-
-export function describeEvent(s: GameState, e: GameEvent): string | null {
+/** A log line for an event, worded for the player at `v` ("You" and "AI" or "Opponent"). */
+export function describeEvent(s: GameState, e: GameEvent, v: Seats = LOCAL_VS_AI): string | null {
+  const who = (p: number) => seatWho(v, p);
   switch (e.type) {
     case "attack": {
       const r = e.report;
@@ -125,7 +126,7 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
       // Open roster games: every arrival is a fresh recruit, paid for on the spot.
       const u = s.openRoster ? unitById(s, e.uid) : undefined;
       return u
-        ? `🛠 ${u.owner === 0 ? "You recruit" : "The AI recruits"} ${esc(unitName(s, e.uid))} (⚙${profileOf(u).cost} · ◆${profileOf(u).supply}).`
+        ? `🛠 ${u.owner === v.me ? "You recruit" : `${whoThe(v, u.owner)} recruits`} ${esc(unitName(s, e.uid))} (⚙${profileOf(u).cost} · ◆${profileOf(u).supply}).`
         : `${esc(unitName(s, e.uid))} arrives.`;
     }
     case "moved":
@@ -136,7 +137,7 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
         ? `🎲 ${esc(unitName(s, e.uid))} rolls ${e.roll[0]}+${e.roll[1]} for the charge: ${e.roll[0] + e.roll[1]}", enough (needed ${e.need}").`
         : `🎲 ${esc(unitName(s, e.uid))} rolls ${e.roll[0]}+${e.roll[1]} for the charge: ${e.roll[0] + e.roll[1]}", too short (needed ${e.need}"). It stays put.`;
     case "orderDraw":
-      return `🎲 Order draw: ${e.player === 0 ? "you go" : "the AI goes"} next (${e.left[e.player]} of ${e.left[0] + e.left[1]} activations left).`;
+      return `🎲 Order draw: ${e.player === v.me ? "you go" : `${whoMid(v, e.player)} goes`} next (${e.left[e.player]} of ${e.left[0] + e.left[1]} activations left).`;
     case "chargeFailed":
       return `${esc(unitName(s, e.uid))}'s charge at ${esc(unitName(s, e.target))} falls apart (${esc(e.reason)}).`;
     case "hunkered":
@@ -144,7 +145,7 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
     case "cpPaid": {
       const names = e.cards.map((id) => esc(SUPPORTS[id]?.name ?? id));
       const how = [e.loose ? `${e.loose} loose CP` : "", names.length ? `burning ${names.join(" and ")}` : ""].filter(Boolean).join(" and ");
-      return `✦ ${who(e.player)} ${e.player === 0 ? "pay" : "pays"} ${e.amount} CP by ${how}${e.wasted ? ` (${e.wasted} CP lost for the round)` : ""}.`;
+      return `✦ ${who(e.player)} ${e.player === v.me ? "pay" : "pays"} ${e.amount} CP by ${how}${e.wasted ? ` (${e.wasted} CP lost for the round)` : ""}.`;
     }
     case "burrowed":
       return e.under ? `🕳️ ${esc(unitName(s, e.uid))} burrows out of sight.` : `🕳️ ${esc(unitName(s, e.uid))} bursts back up out of the ground.`;
@@ -183,7 +184,7 @@ export function describeEvent(s: GameState, e: GameEvent): string | null {
     case "upkeep":
       return `${who(e.player)}: +${e.resources} ⚙${e.supply ? `, +${e.supply} ◆ supply cap` : ""}${e.cp ? `, +${e.cp} CP` : ""} for next round.`;
     case "gameOver":
-      return `<b>Game over: ${e.winner === "draw" ? "a draw" : e.winner === 0 ? "you win" : "the AI wins"}.</b> ${esc(e.reason)}.`;
+      return `<b>Game over: ${e.winner === "draw" ? "a draw" : e.winner === v.me ? "you win" : `${whoMid(v, e.winner)} wins`}.</b> ${esc(e.reason)}.`;
     default:
       return null;
   }

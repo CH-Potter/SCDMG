@@ -167,6 +167,8 @@ export class PvpSession {
   readonly desync = new Listeners<{ n: number; mine: string; theirs: string }>();
   readonly problem = new Listeners<string>();
   readonly ended = new Listeners<EndReason>();
+  /** The opponent confirmed one of our steps (n; -1 is the start): `myMove` or `canSettle` may have changed. */
+  readonly acked = new Listeners<number>();
 
   state: GameState | null = null;
   peerStatus: PeerStatus = "waiting";
@@ -772,6 +774,7 @@ export class PvpSession {
       this.peerAck.set(-1, `${m.hash}:true`);
       if (m.hash !== this.startHash) this.desync.emit({ n: -1, mine: this.startHash, theirs: m.hash });
       if (this.outbox?.k === "seed") this.outbox = null;
+      this.acked.emit(-1);
       return;
     }
     const e = this.log[m.n];
@@ -782,6 +785,7 @@ export class PvpSession {
     this.peerAck.set(m.n, `${m.hash}:${m.final}`);
     if (m.hash !== e.hash) this.desync.emit({ n: m.n, mine: e.hash, theirs: m.hash });
     if (this.outbox && "n" in this.outbox && this.outbox.n === m.n) this.outbox = null;
+    this.acked.emit(m.n);
   }
 
   private async applyWith(before: GameState, cmd: Command, a: string, b: string, n: number) {

@@ -300,6 +300,30 @@
   translate: -50% 0;
 }
 
+/* Online play: "Opponent disconnected — waiting…" and problems, across the top of the board. */
+.net-banner {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  top: 10px;
+  translate: -50% 0;
+  max-width: calc(100% - 24px);
+  background: var(--panel, #fffaf0);
+  color: var(--ink, #2b2140);
+  border: 3px solid var(--ink, #2b2140);
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 var(--ink, #2b2140);
+  padding: 6px 14px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+}
+
+.net-banner.error {
+  background: var(--bad, #c8372d);
+  color: white;
+}
+
 /* ---------- who goes first? ---------- */
 .order-choice,
 .reroll-prompt {

@@ -18,7 +18,7 @@ export interface DiceGroup {
   rolls: number[];
   /** Success threshold: one number for the group, one per die, or null for "just show it". */
   need?: number | (number | null)[] | null;
-  /** Whose dice these are: "p0" (you) are thrown by hand in throw mode. */
+  /** Whose dice these are (seat colour): the local player's side (`handSide`) is thrown by hand in throw mode. */
   side: "p0" | "p1" | "neutral";
   /** Text shown after the dice settle (e.g. "3 hits"). */
   result?: string;
@@ -98,6 +98,8 @@ export class DiceTray {
   private hideTimer: number | undefined;
   private cancelWait: (() => void) | null = null;
   speed: DiceSpeed = loadSpeed();
+  /** Whose dice are thrown by hand in throw mode: the local player's seat ("p1" for an online guest). */
+  handSide: "p0" | "p1" = "p0";
   /** Called when a group of dice starts tumbling (for sound effects). */
   onTumble?: (count: number, quick: boolean) => void;
 
@@ -194,7 +196,7 @@ export class DiceTray {
 
     // Hits first, then saves: each group is thrown (by you) or rolled (by the AI) in turn.
     for (const r of rows) {
-      if (this.speed === "throw" && r.group.side === "p0") await this.waitForThrow(r.row);
+      if (this.speed === "throw" && r.group.side === this.handSide) await this.waitForThrow(r.row);
       // The speed can be switched to "off" while we wait for a throw.
       if ((this.speed as DiceSpeed) === "off") return;
       this.onTumble?.(r.dice.length, quick);

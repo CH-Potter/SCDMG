@@ -1,8 +1,9 @@
-import { rerollProblem } from "../engine/reroll";
+import { rerollMisses, rerollProblem } from "../engine/reroll";
 import { reseed } from "./entropy";
 import { cardBound, defaultPayment, paymentOptions, type OwnCard, type Payment } from "../engine/cp";
 import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
-// Glue between the pure engine, the Pixi board and the DOM HUD. The human is player 0; the AI is player 1.
+// Glue between the pure engine, the Pixi board and the DOM HUD. You play `me` (seat 0 by default, the
+// guest's seat 1 online); the other seat is the AI, or an online opponent (see opponent.ts and seats.ts).
 
 import { aiCommand } from "../engine/ai";
 import { barrageGun, barrageMarkerFor, evadeTarget, expectedBarrage, expectedDamage, markerCatches, expectedStray, planMelee, planShooting, rangedCanHit, saveNeeded, shellAim, shellOdds, shellSpotted, type AttackPlan } from "../engine/combat";
@@ -72,7 +73,10 @@ import {
   isHidden,
 } from "../engine/rules";
 import { lineOfSight, platformAt, planRoute, shotLine } from "../engine/terrain";
-import type { AbilityId, Command, GameEvent, GameState, Model, Unit, Vec, Weapon } from "../engine/types";
+import type { AbilityId, Command, GameEvent, GameState, Model, PlayerId, Unit, Vec, Weapon } from "../engine/types";
+import type { Applied, EndReason, PeerStatus, PvpSession } from "../net/session";
+import { AiOpponent, NetOpponent, type OpponentDriver } from "./opponent";
+import { canAct, colourOf, seats, seatToAct, sideOf, statusLine, toneOf, who, whoMid, whoThe, type Seats, type TurnFlags } from "./seats";
 import { describeEvent, esc, KEYWORD_TEXT, PHASE_NAMES, weaponLine, impactLine, evadeLine, reportHits, noHarmVerdict, unitName, abilityStatusTags } from "./describe";
 import { ComicAlerts, type AlertTone } from "./alerts";
 import { DICE_SPEED_LABEL, DiceTray, type DiceRoll, type DiceSpeed } from "./dice";
@@ -81,9 +85,6 @@ import { BoardRenderer, drawPos, type RenderView } from "./renderer";
 import { audio } from "../audio"; // [audio]
 import { aiReserveText, deployChoices, deployMenuDetail, deployMenuTitle, reserveRowsHtml, reservesHeading } from "./recruit";
 import { CONFIRM_SLOP_PX, pxToInches, sameOrder } from "./touch";
-
-const HUMAN = 0;
-const AI = 1;
 
 /** How a battle ended, for a campaign: the winner (0 is you), the score, and whether you retreated. */
 export interface BattleResult {
@@ -99,6 +100,13 @@ export interface ControllerHooks {
     title: string;
     onResult: (r: BattleResult) => void;
   };
+  /** Your seat in a game against the AI (default 0, as always). An online game takes its seat from the session. */
+  seat?: PlayerId;
+  /**
+   * An online game (see `Controller.online`): your moves go through the session and your opponent's
+   * arrive from it. Never with `campaign`.
+   */
+  online?: { net: NetOpponent };
 }
 
 /** The disengage odds in words: a clean break, or exhausted for the assault phase. */
@@ -158,7 +166,23 @@ export class Controller {
   private touchTap = false;
   /** When the floating Pass button last appeared (a tap meant for the board mustn't land on it). */
   private passShownAt = 0;
-  private aiRunning = false;
+  /** The AI is playing its turn, or the opponent's moves are being shown. */
+  private opponentActing = false;
+  /** Your seat, the other seat, and how to word them. */
+  private readonly me: PlayerId;
+  private readonly them: PlayerId;
+  private readonly seats: Seats;
+  /** Who plays the other seat: the AI, or (online) a person through `net`. */
+  private readonly opponent: OpponentDriver;
+  private readonly net: NetOpponent | null;
+  /** Online: your move is on its way (or its re-roll choice is being settled). */
+  private sending = false;
+  /** Online: the game stopped (a resignation, or the session closed): what the status line says. */
+  private stopped: string | null = null;
+  /** Online: your opponent has gone quiet. */
+  private opponentSilent = false;
+  /** Online: the banner for a disconnected opponent or a problem. */
+  private netBanner: HTMLDivElement | null = null;
   /** States before each of your commands, for Undo. */
   private history: GameState[] = [];
   /** The command re-roll prompt is up (the AI waits for your answer). */
@@ -193,8 +217,15 @@ export class Controller {
     setup: GameSetup,
     private hooks: ControllerHooks = {},
   ) {
+    const online = hooks.online?.net ?? null;
+    this.me = online ? online.session.seat : (hooks.seat ?? 0);
+    this.them = this.me === 0 ? 1 : 0;
+    this.seats = seats(this.me, !!online);
+    this.net = online;
+    this.opponent = online ?? new AiOpponent(() => this.runAi());
     // Live games roll properly random dice: a fresh seed now and after every action (see entropy.ts).
-    this.state = reseed(createGame(setup));
+    // An online game's dice come from both players (net/session.ts), so it is never reseeded here.
+    this.state = online ? online.startState : reseed(createGame(setup));
     // Dev server only: a console handle (window.__scdmg) for poking at the game while testing the UI.
     if (import.meta.env.DEV) (window as unknown as { __scdmg?: unknown }).__scdmg = this;
     this.tooltip = document.createElement("div");
@@ -206,13 +237,14 @@ export class Controller {
     this.markEl.hidden = true;
     els.stage.appendChild(this.markEl);
     this.tray = new DiceTray(els.stage);
+    this.tray.handSide = sideOf(this.me);
     renderer.autoPhaseBanners = false;
     renderer.onViewChange = () => {
       this.closeDeployMenu();
       this.refresh();
     };
     this.tray.onTumble = (count, quick) => audio.dice(count, quick); // [audio]
-    audio.startBattle(this.state, setup.seed); // [audio]
+    audio.startBattle(this.state, setup.seed, this.me); // [audio]
     // Right-hand panel: what you're doing first (unit + actions), then supports, then the army.
     els.sidebar.innerHTML = `
       <section class="panel" id="card"></section>
@@ -245,7 +277,7 @@ export class Controller {
     this.passBtn.addEventListener("click", () => {
       // It pops up when your turn starts, often right where a finger was about to tap the board.
       if (performance.now() - this.passShownAt < 500) return;
-      this.issue({ type: "pass", player: HUMAN });
+      this.issue({ type: "pass", player: this.me });
     });
     els.stage.appendChild(this.passBtn);
     renderer.onPointerMove = (p) => {
@@ -262,18 +294,36 @@ export class Controller {
     const mission = MISSIONS[this.state.missionId]!;
     if (hooks.campaign) this.log(`⚔ <b>Campaign: ${esc(hooks.campaign.title)}.</b>`);
     this.log(
-      `<b>${esc(mission.name)} at ${esc(setup.map?.name ?? MAPS[this.state.mapId]?.name ?? "the battlefield")}.</b> ${esc(mission.blurb)} You (${esc(factionOf(setup.factions[0]).name)}, cyan) vs the AI (${esc(factionOf(setup.factions[1]).name)}, red). ${this.state.initiative === HUMAN ? "You have" : "The AI has"} the initiative.`,
+      `<b>${esc(mission.name)} at ${esc(setup.map?.name ?? MAPS[this.state.mapId]?.name ?? "the battlefield")}.</b> ${esc(mission.blurb)} You (${esc(factionOf(setup.factions[this.me]).name)}, ${colourOf(this.me)}) vs ${whoMid(this.seats, this.them)} (${esc(factionOf(setup.factions[this.them]).name)}, ${colourOf(this.them)}). ${this.state.initiative === this.me ? "You have" : `${whoThe(this.seats, this.them)} has`} the initiative.`,
     );
     if (mission.roles) {
       this.log(
-        `You play <b>${esc(mission.roles[0].name)}</b>: ${esc(mission.roles[0].blurb)} The AI plays <b>${esc(mission.roles[1].name)}</b>: ${esc(mission.roles[1].blurb)}`,
+        `You play <b>${esc(mission.roles[this.me].name)}</b>: ${esc(mission.roles[this.me].blurb)} ${whoThe(this.seats, this.them)} plays <b>${esc(mission.roles[this.them].name)}</b>: ${esc(mission.roles[this.them].blurb)}`,
       );
     }
     this.log(
       `Your army starts in reserve. Deploy units into your shaded zone from the <b>Army</b> panel.`,
     );
+    if (online) this.listenOnline(online);
     this.refresh();
     void this.start();
+  }
+
+  /**
+   * An online game from a started session (the lobby calls this). Make `net` (a NetOpponent over the
+   * session) as soon as the game starts, so no move is missed while the screen loads; the board
+   * starts from the session's state then. You play the session's seat against a person.
+   */
+  static online(
+    renderer: BoardRenderer,
+    els: { topbar: HTMLElement; sidebar: HTMLElement; stage: HTMLElement },
+    onLeave: () => void,
+    session: PvpSession,
+    setup: GameSetup,
+    net: NetOpponent = new NetOpponent(session),
+  ): Controller {
+    if (net.session !== session) throw new Error("That opponent belongs to another session");
+    return new Controller(renderer, els, onLeave, setup, { online: { net } });
   }
 
   /** Opening: show the initiative roll-off, then hand over to whoever won it. */
@@ -286,32 +336,32 @@ export class Controller {
       await this.tray.show({
         title: ties ? `Initiative roll-off (${ties} tie${ties > 1 ? "s" : ""} re-rolled)` : "Initiative roll-off",
         groups: [
-          { label: "You", rolls: [last[0]], side: "p0", need: null },
-          { label: "AI", rolls: [last[1]], side: "p1", need: null },
+          { label: who(this.seats, 0), rolls: [last[0]], side: "p0", need: null },
+          { label: who(this.seats, 1), rolls: [last[1]], side: "p1", need: null },
         ],
         verdict: this.state.orderChoice
-          ? this.state.orderChoice.player === HUMAN
+          ? this.state.orderChoice.player === this.me
             ? "You won: choose who goes first!"
-            : "The AI won the roll-off"
-          : this.state.initiative === HUMAN
+            : `${whoThe(this.seats, this.them)} won the roll-off`
+          : this.state.initiative === this.me
             ? "You go first!"
-            : "The AI goes first!",
+            : `${whoThe(this.seats, this.them)} goes first!`,
       });
       if (gen !== this.generation) return;
       // Only once the dice are down (in Throw mode, after you've thrown yours).
       this.log(
-        `🎲 Initiative roll-off: you ${last[0]}, AI ${last[1]}${ties ? ` (after ${ties} tie${ties > 1 ? "s" : ""})` : ""}. ${this.state.initiative === HUMAN ? `You won and ${this.state.orderChoice ? "choose who goes first" : "go first"}` : `The AI won and ${this.state.orderChoice ? "chooses who goes first" : "goes first"}`}.`,
+        `🎲 Initiative roll-off: you ${last[this.me]}, ${who(this.seats, this.them)} ${last[this.them]}${ties ? ` (after ${ties} tie${ties > 1 ? "s" : ""})` : ""}. ${this.state.initiative === this.me ? `You won and ${this.state.orderChoice ? "choose who goes first" : "go first"}` : `${whoThe(this.seats, this.them)} won and ${this.state.orderChoice ? "chooses who goes first" : "goes first"}`}.`,
       );
     }
     this.started = true;
     this.refresh();
-    void this.runAi();
+    this.opponent.wake();
   }
 
   /** Dice for the rolls in a batch of events (attacks, impacts, barrages, blasts, morale). */
   private diceFor(events: GameEvent[]): DiceRoll[] {
     const s = this.state;
-    const side = (uid: string): "p0" | "p1" => (unitById(s, uid)?.owner === HUMAN ? "p0" : "p1");
+    const side = (uid: string): "p0" | "p1" => sideOf(unitById(s, uid)?.owner ?? 1);
     const out: DiceRoll[] = [];
     for (const e of events) {
       if (e.type === "attack") {
@@ -374,10 +424,10 @@ export class Controller {
         out.push({
           title: "Tie on VP: initiative roll-off",
           groups: [
-            { label: "You", rolls: [last[0]], side: "p0", need: null },
-            { label: "AI", rolls: [last[1]], side: "p1", need: null },
+            { label: who(this.seats, 0), rolls: [last[0]], side: "p0", need: null },
+            { label: who(this.seats, 1), rolls: [last[1]], side: "p1", need: null },
           ],
-          verdict: e.winner === HUMAN ? "You choose the order!" : "The AI chooses the order",
+          verdict: e.winner === this.me ? "You choose the order!" : `${whoThe(this.seats, this.them)} chooses the order`,
         });
       } else if (e.type === "morale") {
         out.push({
@@ -425,14 +475,32 @@ export class Controller {
     this.alerts.destroy();
     this.logDrawer.remove();
     this.passBtn.remove();
+    this.netBanner?.remove();
+    this.opponent.dispose();
     this.closeDeployMenu();
     window.onkeydown = null;
   }
 
   // ---------- helpers ----------
 
+  /** Whether you can give an order now (see seats.ts). */
   private humanTurn(): boolean {
-    return this.started && !this.state.over && !this.aiRunning && !this.busy && this.state.activePlayer === HUMAN;
+    return canAct(this.state, this.seats, this.turnFlags());
+  }
+
+  private turnFlags(): TurnFlags {
+    const net = this.net;
+    return {
+      started: this.started,
+      busy: this.busy,
+      rerollOpen: this.rerollOpen,
+      opponentActing: this.opponentActing,
+      sending: this.sending,
+      myMove: net ? net.session.myMove : true,
+      opponentRerolling: net ? net.opponentRerolling : false,
+      opponentSilent: this.opponentSilent,
+      stopped: this.stopped,
+    };
   }
 
   private sel(): Unit | undefined {
@@ -686,7 +754,7 @@ export class Controller {
         // A spot nothing can deploy to says why instead of opening an empty menu.
         const why = deploySpotProblem(s, here, q, here.length);
         if (why) this.reject(why);
-        else this.openDeployMenu(q, deployChoices(s, HUMAN));
+        else this.openDeployMenu(q, deployChoices(s, this.me));
         return;
       }
     }
@@ -696,27 +764,27 @@ export class Controller {
       const need = supportTarget(a);
       const base = {
         type: "support" as const,
-        player: HUMAN as 0,
+        player: this.me,
         support: this.mode.support,
         ability: this.mode.ability,
       };
-      if (need === "friendlyUnit" && hit && hit.unit.owner === HUMAN) this.issue({ ...base, target: hit.unit.uid });
-      else if (need === "enemyUnit" && hit && hit.unit.owner !== HUMAN) this.issue({ ...base, target: hit.unit.uid });
+      if (need === "friendlyUnit" && hit && hit.unit.owner === this.me) this.issue({ ...base, target: hit.unit.uid });
+      else if (need === "enemyUnit" && hit && hit.unit.owner !== this.me) this.issue({ ...base, target: hit.unit.uid });
       else if (need === "point" && !hit) this.issue({ ...base, point: p });
       else if (need === "reservePoint" && !hit) {
         // A spot it can't land on says why straight away, instead of opening the unit menu.
-        const bad = (a.effect.kind === "airdrop" ? airdropSpotProblem(s, HUMAN, a.effect, p) : null) ?? this.dropProblem(base, p);
+        const bad = (a.effect.kind === "airdrop" ? airdropSpotProblem(s, this.me, a.effect, p) : null) ?? this.dropProblem(base, p);
         if (bad) this.reject(bad);
         else {
-          this.openDeployMenu(p, droppableReserves(s, HUMAN), {
+          this.openDeployMenu(p, droppableReserves(s, this.me), {
             title: `${a.name}: drop which unit?`,
             cmd: (u) => ({ ...base, target: u.uid, point: p }),
           });
         }
       } else if (need === "unitPoint") {
         // Two clicks: one of your units, then where it goes.
-        if (hit && hit.unit.owner === HUMAN && !this.mode.unit) {
-          const why = supportUnitProblem(s, HUMAN, base.support, base.ability, hit.unit);
+        if (hit && hit.unit.owner === this.me && !this.mode.unit) {
+          const why = supportUnitProblem(s, this.me, base.support, base.ability, hit.unit);
           if (why) this.reject(why);
           else {
             this.mode = { ...this.mode, unit: hit.unit.uid };
@@ -733,12 +801,12 @@ export class Controller {
     if (this.mode.kind === "ability" && sel) {
       const def = ABILITIES[this.mode.id];
       if (def.needs === "enemyUnit") {
-        if (hit && hit.unit.owner !== HUMAN)
+        if (hit && hit.unit.owner !== this.me)
           this.issue({ type: "ability", uid: sel.uid, ability: this.mode.id, target: hit.unit.uid });
         return;
       }
       if (def.needs === "friendlyUnit") {
-        if (hit && hit.unit.owner === HUMAN)
+        if (hit && hit.unit.owner === this.me)
           this.issue({
             type: "ability",
             uid: sel.uid,
@@ -748,7 +816,7 @@ export class Controller {
         return;
       }
       if (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget) {
-        if (hit && hit.unit.owner === HUMAN && hit.unit.uid !== sel.uid) {
+        if (hit && hit.unit.owner === this.me && hit.unit.uid !== sel.uid) {
           const why = abilityUnitProblem(s, sel, this.mode.id, hit.unit);
           if (why) this.reject(why);
           else {
@@ -769,11 +837,11 @@ export class Controller {
         return;
       }
     }
-    if (hit && hit.unit.owner === HUMAN) {
+    if (hit && hit.unit.owner === this.me) {
       if (sel && hit.unit.uid === sel.uid) {
         this.leader = hit.model.id;
         this.refresh();
-      } else if (eligibleUnits(s, HUMAN).includes(hit.unit)) {
+      } else if (eligibleUnits(s, this.me).includes(hit.unit)) {
         this.select(hit.unit, hit.model.id);
       } else {
         this.reject(actionProblem(s, hit.unit.uid, { kind: "hold" }) ?? "That unit can't act right now");
@@ -839,7 +907,7 @@ export class Controller {
     } else if ((e.key === "h" || e.key === "H") && sel && this.state.phase !== "combat") {
       this.issue({ type: "hunker", uid: sel.uid });
     } else if (e.key === "p" || e.key === "P") {
-      this.issue({ type: "pass", player: HUMAN });
+      this.issue({ type: "pass", player: this.me });
     }
   }
 
@@ -873,6 +941,7 @@ export class Controller {
       });
       return false;
     }
+    if (this.net) return this.issueOnline(this.net, cmd);
     const r = applyCommand(this.state, cmd);
     if (!r.ok) {
       this.reject(r.error);
@@ -894,12 +963,12 @@ export class Controller {
       if (gen !== this.generation) return;
       // An ability is a free action inside the unit's activation: keep it selected for its main action.
       const keep = keepUid ? unitById(this.state, keepUid) : undefined;
-      if (keep && eligibleUnits(this.state, HUMAN).includes(keep)) {
+      if (keep && eligibleUnits(this.state, this.me).includes(keep)) {
         this.select(keep, keep.models.some((m) => m.id === keepLeader && m.alive) ? (keepLeader ?? undefined) : undefined);
         return;
       }
       this.refresh();
-      void this.runAi();
+      this.opponent.wake();
     });
     return true;
   }
@@ -911,14 +980,14 @@ export class Controller {
    */
   private async offerReroll(before: GameState, cmd: Command, events: GameEvent[], gen: number): Promise<boolean> {
     if ((cmd.type !== "shoot" && cmd.type !== "fight") || cmd.reroll || !rulesOf(before).reroll) return false;
-    if (before.players[HUMAN].cp < REROLL_CP) return false;
+    if (before.players[this.me].cp < REROLL_CP) return false;
     const a = events.find((e) => e.type === "attack" && e.report.uid === cmd.uid && e.report.target === cmd.target);
     if (a?.type !== "attack" || a.report.unitDestroyed) return false;
     const misses = a.report.hitRolls.filter((x) => x < a.report.hitOn).length;
     if (!misses) return false;
     const again: Command = { ...cmd, reroll: true };
     if (rerollProblem(before, again)) return false; // e.g. a lobbed shell, which only the engine refuses
-    const yes = await this.askReroll(misses, before.players[HUMAN].cp);
+    const yes = await this.askReroll(misses, before.players[this.me].cp);
     if (!yes || gen !== this.generation) return false;
     const choice = this.paymentChoice(before, again);
     if (choice) {
@@ -930,13 +999,13 @@ export class Controller {
     const r = applyCommand(before, again);
     if (!r.ok) return false;
     reseed(r.state);
-    this.log(`↻ You spend ${REROLL_CP} CP to re-roll ${misses} miss${misses === 1 ? "" : "es"}.`, HUMAN);
+    this.log(`↻ You spend ${REROLL_CP} CP to re-roll ${misses} miss${misses === 1 ? "" : "es"}.`, this.me);
     this.state = before;
     this.declareCommand(before, r.state, again);
     void this.present(before, r.state, r.events).then(() => {
       if (gen !== this.generation) return;
       this.refresh();
-      void this.runAi();
+      this.opponent.wake();
     });
     return true;
   }
@@ -957,10 +1026,10 @@ export class Controller {
     else if (cmd.type === "rally") cost = RALLY_CP;
     else if ((cmd.type === "shoot" || cmd.type === "fight") && cmd.reroll) cost = REROLL_CP;
     if (cost <= 0) return null;
-    const options = paymentOptions(s.players[HUMAN], cost);
+    const options = paymentOptions(s.players[this.me], cost);
     if (options.length <= 1) return null;
     if (own?.exhausts && options.some((p) => p.cards.length === 1 && p.cards[0] === own.id)) return null;
-    const first = defaultPayment(s.players[HUMAN], cost, own);
+    const first = defaultPayment(s.players[this.me], cost, own);
     return { cost, options: first ? [first, ...options.filter((p) => p.cards.join() !== first.cards.join())] : options };
   }
 
@@ -1064,7 +1133,8 @@ export class Controller {
 
   /** Take back your last command (and anything the AI did after it). The state keeps the seed it had, so redoing it rolls the same: no re-rolling by undo. */
   private undo(): void {
-    if (!this.humanTurn() || !this.history.length) return;
+    // Off online: your opponent has already seen the move.
+    if (this.net || !this.humanTurn() || !this.history.length) return;
     this.state = this.history.pop()!;
     this.lastEvents = [];
     this.clearSelection();
@@ -1094,7 +1164,7 @@ export class Controller {
       };
     };
     for (const e of events) {
-      const text = describeEvent(this.state, e);
+      const text = describeEvent(this.state, e, this.seats);
       const owner =
         e.type === "attack"
           ? unitById(before, e.report.uid)?.owner
@@ -1123,8 +1193,8 @@ export class Controller {
         const obj = n ? this.state.objectives.find((o) => o.number === Number(n)) : undefined;
         this.renderer.floatText(
           obj ? obj.pos : { x: this.state.board.width / 2, y: this.state.board.height / 2 + 2 },
-          `${e.player === HUMAN ? "You" : "AI"} +${e.vp} VP`,
-          e.player === HUMAN ? 0x2fb5c8 : 0xf0565b,
+          `${who(this.seats, e.player)} +${e.vp} VP`,
+          e.player === 0 ? 0x2fb5c8 : 0xf0565b,
         );
       } else if (e.type === "gameOver") {
         setTimeout(() => this.showGameOver(), 900);
@@ -1177,9 +1247,9 @@ export class Controller {
       // 3. Whose turn it is now.
       const s = this.state;
       if (!s.over && !s.orderChoice && before.activePlayer !== s.activePlayer) {
-        await this.alerts.push(s.activePlayer === HUMAN ? "YOUR TURN!" : "AI'S TURN", {
+        await this.alerts.push(s.activePlayer === this.me ? "YOUR TURN!" : `${who(this.seats, this.them).toUpperCase()}'S TURN`, {
           sub: `${PHASE_NAMES[s.phase]} phase`,
-          tone: s.activePlayer === HUMAN ? "you" : "ai",
+          tone: toneOf(s.activePlayer),
           ms: 1000,
         });
       }
@@ -1235,33 +1305,33 @@ export class Controller {
   /** Call-outs for the end-of-round steps (scores have theirs in `narrate`). */
   private walkthrough(e: GameEvent): void {
     const s = this.state;
-    const who = (p: number) => (p === HUMAN ? "You" : "AI");
-    const tone = (p: number): AlertTone => (p === HUMAN ? "you" : "ai");
+    const whose = (p: number) => who(this.seats, p);
+    const tone = (p: number): AlertTone => toneOf(p);
     if (e.type === "ability" && (e.ability === "regen" || e.ability === "regrow")) {
-      const owner = unitById(s, e.uid)?.owner ?? HUMAN;
+      const owner = unitById(s, e.uid)?.owner ?? this.me;
       void this.alerts.push(e.ability === "regrow" ? "REGROW!" : "REGEN!", { sub: e.text, tone: tone(owner), ms: 1000 });
     } else if (e.type === "rallied" && e.how === "roll") {
-      const owner = unitById(s, e.uid)?.owner ?? HUMAN;
+      const owner = unitById(s, e.uid)?.owner ?? this.me;
       void this.alerts.push("BACK IN THE FIGHT", { sub: `${unitName(s, e.uid)} shakes it off`, tone: tone(owner), ms: 1000 });
     } else if (e.type === "expired") {
       void this.alerts.push("POOF!", { sub: `${unitName(s, e.uid)} is gone`, tone: "neutral", ms: 900 });
     } else if (e.type === "recharged") {
-      void this.alerts.push("SHIELDS UP", { sub: `${who(e.player)}: ${e.models} model${e.models === 1 ? "" : "s"} recharge`, tone: tone(e.player), ms: 900 });
+      void this.alerts.push("SHIELDS UP", { sub: `${whose(e.player)}: ${e.models} model${e.models === 1 ? "" : "s"} recharge`, tone: tone(e.player), ms: 900 });
     } else if (e.type === "upkeep") {
       const bits = [`+${e.resources} ⚙`, e.supply ? `+${e.supply} ◆ supply` : "", e.cp ? `+${e.cp} CP` : ""].filter(Boolean).join(" · ");
-      void this.alerts.push(`${who(e.player).toUpperCase()}: SUPPLIES IN`, { sub: bits, tone: tone(e.player), ms: 1100 });
+      void this.alerts.push(`${whose(e.player).toUpperCase()}: SUPPLIES IN`, { sub: bits, tone: tone(e.player), ms: 1100 });
     } else if (e.type === "roundEnded") {
-      void this.alerts.push(`ROUND ${e.round} DONE`, { sub: `You ${s.players[0].vp} VP · AI ${s.players[1].vp} VP`, tone: "neutral", big: true, ms: 1600 });
+      void this.alerts.push(`ROUND ${e.round} DONE`, { sub: `You ${s.players[this.me].vp} VP · ${whose(this.them)} ${s.players[this.them].vp} VP`, tone: "neutral", big: true, ms: 1600 });
     }
   }
 
   private async runAi(): Promise<void> {
-    if (!this.started || this.aiRunning || this.state.over || this.state.activePlayer !== AI) return;
+    if (!this.started || this.opponentActing || this.state.over || this.state.activePlayer !== this.them) return;
     const gen = this.generation;
-    this.aiRunning = true;
+    this.opponentActing = true;
     this.refresh();
     try {
-      while (!this.state.over && this.state.activePlayer === AI) {
+      while (!this.state.over && this.state.activePlayer === this.them) {
         await this.presenting;
         await sleep(420);
         if (gen !== this.generation) return;
@@ -1270,7 +1340,7 @@ export class Controller {
         let r = applyCommand(this.state, cmd);
         if (!r.ok) {
           console.error("AI command rejected", cmd, r.error);
-          r = applyCommand(this.state, { type: "pass", player: AI });
+          r = applyCommand(this.state, { type: "pass", player: this.them });
           if (!r.ok) break;
         } else this.declareCommand(this.state, r.state, cmd);
         reseed(r.state);
@@ -1284,11 +1354,231 @@ export class Controller {
       }
     } finally {
       if (gen === this.generation) {
-        this.aiRunning = false;
+        this.opponentActing = false;
         this.selected = null;
         this.refresh();
       }
     }
+  }
+
+  // ---------- online play (see opponent.ts and net/session.ts) ----------
+
+  /**
+   * Online: your command goes through the session (which agrees the dice with your opponent) instead
+   * of being applied here, then plays out like any other. An attack you could re-roll is settled
+   * before the game goes on.
+   */
+  private issueOnline(net: NetOpponent, cmd: Command): boolean {
+    const keepUid = cmd.type === "ability" ? cmd.uid : undefined;
+    const keepLeader = this.leader;
+    this.clearSelection();
+    this.sending = true;
+    this.refresh();
+    const gen = this.generation;
+    void (async () => {
+      try {
+        // Your opponent may still be confirming your last move.
+        await this.until(() => net.session.myMove, gen);
+        const a = await net.session.submit(cmd);
+        if (gen !== this.generation) return;
+        this.declareCommand(a.before, a.state, cmd);
+        await this.present(a.before, a.state, a.events);
+        if (gen !== this.generation) return;
+        if (a.open) await this.settleOnline(net.session, a, gen);
+        if (gen !== this.generation) return;
+        // An ability is a free action inside the unit's activation: keep it selected for its main
+        // action (once your opponent has confirmed the ability, so you can give it).
+        if (keepUid) await this.until(() => net.session.myMove || seatToAct(net.session.state!) !== this.me, gen);
+        this.sending = false;
+        const keep = keepUid ? unitById(this.state, keepUid) : undefined;
+        if (keep && this.humanTurn() && eligibleUnits(this.state, this.me).includes(keep)) {
+          this.select(keep, keep.models.some((m) => m.id === keepLeader && m.alive) ? (keepLeader ?? undefined) : undefined);
+        }
+      } catch (err) {
+        if (gen === this.generation) this.reject(err instanceof Error ? err.message : String(err));
+      } finally {
+        if (gen === this.generation) {
+          this.sending = false;
+          this.refresh();
+          this.opponent.wake();
+        }
+      }
+    })();
+    return true;
+  }
+
+  /**
+   * Online: settle your open attack, so the game can go on. With misses to re-roll and CP to pay,
+   * you're asked (and pay) as in a local game; the re-roll's dice are agreed afresh, then shown.
+   */
+  private async settleOnline(session: PvpSession, a: Applied, gen: number): Promise<void> {
+    const cmd = a.cmd;
+    const misses = rerollMisses(a.before, cmd, a.events);
+    let again: Command | undefined;
+    if ((cmd.type === "shoot" || cmd.type === "fight") && misses > 0) {
+      const yes = await this.askReroll(misses, a.before.players[this.me].cp);
+      if (gen !== this.generation) return;
+      if (yes) {
+        const ask: Command = { ...cmd, reroll: true };
+        const choice = this.paymentChoice(a.before, ask);
+        const pay = choice ? await this.askPayment(choice.cost, choice.options) : undefined;
+        if (gen !== this.generation) return;
+        if (pay !== null) again = pay ? ({ ...ask, pay } as Command) : ask;
+      }
+    }
+    this.refresh();
+    // Your opponent must have seen the attack before it can be settled.
+    await this.until(() => session.canSettle, gen);
+    let r: Applied;
+    try {
+      r = await session.finalize(again);
+    } catch (err) {
+      if (!again) throw err;
+      // The re-roll was refused: keep the dice rather than hold up the game.
+      this.flash(`Couldn't re-roll: ${err instanceof Error ? err.message : String(err)}`);
+      await session.finalize();
+      return;
+    }
+    if (!again || gen !== this.generation) return;
+    this.log(`↻ You spend ${REROLL_CP} CP to re-roll ${misses} miss${misses === 1 ? "" : "es"}.`, this.me);
+    this.state = a.before;
+    this.declareCommand(a.before, r.state, again);
+    await this.present(a.before, r.state, r.events);
+  }
+
+  /** Online: show your opponent's moves as they arrive, as the AI's are shown: the marker, the dice, the outcome. */
+  private async runNet(): Promise<void> {
+    const net = this.net;
+    if (!net || !this.started || this.opponentActing) return;
+    const gen = this.generation;
+    this.opponentActing = true;
+    this.refresh();
+    try {
+      for (let m = net.take(); m; m = net.take()) {
+        // Let whatever is playing (your own move, say) finish first.
+        for (let p = this.presenting; ; p = this.presenting) {
+          await p;
+          if (p === this.presenting) break;
+        }
+        if (gen !== this.generation) return;
+        const a = m.applied;
+        if (m.kind === "kept") continue; // they kept their attack's dice: nothing new to show
+        if (m.kind === "rerolled") {
+          // Their re-roll replaces the attack: play it again from before, as your own re-rolls are.
+          const attack = a.events.find((e) => e.type === "attack");
+          const n = attack?.type === "attack" ? (attack.report.rerolledFrom?.length ?? 0) : 0;
+          this.log(`↻ ${whoThe(this.seats, this.them)} spends ${REROLL_CP} CP to re-roll ${n} miss${n === 1 ? "" : "es"}.`, this.them);
+          this.state = a.before;
+        } else if ("uid" in a.cmd) this.selected = a.cmd.uid;
+        this.declareCommand(a.before, a.state, a.cmd);
+        this.refresh();
+        await this.present(a.before, a.state, a.events);
+        if (gen !== this.generation) return;
+        this.selected = null;
+      }
+    } finally {
+      if (gen === this.generation) {
+        this.opponentActing = false;
+        this.selected = null;
+        this.refresh();
+      }
+    }
+  }
+
+  /** Wait (polling) until `cond` holds; throws if the screen moved on or the game stopped. */
+  private async until(cond: () => boolean, gen: number): Promise<void> {
+    while (!cond()) {
+      if (gen !== this.generation) throw new Error("The game was closed");
+      if (this.stopped) throw new Error(this.stopped);
+      await sleep(40);
+    }
+  }
+
+  private listenOnline(net: NetOpponent): void {
+    this.netBanner = document.createElement("div");
+    this.netBanner.className = "net-banner";
+    this.netBanner.setAttribute("role", "status");
+    this.netBanner.hidden = true;
+    this.els.stage.appendChild(this.netBanner);
+    net.listen({
+      moves: () => void this.runNet(),
+      changed: () => this.refresh(),
+      peer: (p) => this.onPeer(p),
+      desync: (d) =>
+        this.netProblem(`Out of step with your opponent at move ${d.n + 1}: your two games no longer match, so what you see may be wrong.`),
+      problem: (text) => this.netProblem(text),
+      ended: (r) => this.onNetEnded(r),
+    });
+  }
+
+  /** A banner across the top of the board (online status and problems); null hides it. */
+  private banner(text: string | null, kind: "wait" | "error" = "wait"): void {
+    const el = this.netBanner;
+    if (!el) return;
+    el.hidden = !text;
+    el.textContent = text ?? "";
+    el.className = `net-banner ${kind}`;
+    el.dataset.kind = text ? kind : "";
+  }
+
+  private onPeer(p: PeerStatus): void {
+    if (p === "silent" && !this.opponentSilent) {
+      this.opponentSilent = true;
+      this.banner("Opponent disconnected — waiting…");
+      this.log("📡 Your opponent has gone quiet. Waiting for them to come back…");
+    } else if (p === "connected" && this.opponentSilent) {
+      this.opponentSilent = false;
+      if (this.netBanner?.dataset.kind === "wait") this.banner(null);
+      this.log("📡 Your opponent is back.");
+    }
+    this.refresh();
+  }
+
+  private netProblem(text: string): void {
+    this.banner(`⚠ ${text}`, "error");
+    this.log(`<span style="color:var(--bad)">⚠ ${esc(text)}</span>`);
+    this.refresh();
+  }
+
+  private onNetEnded(r: EndReason): void {
+    if (r.why === "closed") {
+      this.stopped ??= "The online game was closed";
+      this.refresh();
+      return;
+    }
+    if (this.stopped || this.state.over) return;
+    const mine = r.seat === this.me;
+    this.stopped = mine ? "You resigned" : "Opponent resigned";
+    this.banner(null);
+    this.log(mine ? "<b>⚑ You resigned. Your opponent wins.</b>" : "<b>⚑ Your opponent resigned. You win!</b>");
+    this.refresh();
+    const overlay = document.getElementById("overlay")!;
+    const s = this.state;
+    overlay.innerHTML = `
+      <div class="modal" style="max-width:420px;text-align:center" role="dialog" aria-modal="true" aria-labelledby="go-title">
+        <h1 id="go-title">${mine ? "You resigned" : "Victory!"}</h1>
+        <p class="tagline">${mine ? "Your opponent wins." : "Your opponent resigned."} Score: you ${s.players[this.me].vp}, opponent ${s.players[this.them].vp}</p>
+        <div class="row" style="justify-content:center">
+          <button id="go-again">Leave</button>
+          <button class="secondary" id="go-close">Look at the board</button>
+        </div>
+      </div>`;
+    overlay.classList.add("show");
+    overlay.querySelector("#go-again")!.addEventListener("click", () => this.leaveOnline());
+    overlay.querySelector("#go-close")!.addEventListener("click", () => overlay.classList.remove("show"));
+  }
+
+  /** Online: the top bar's button. Resign (after asking) while the game is on; leave once it's over. */
+  private leaveOnline(): void {
+    const net = this.net;
+    if (!net) return;
+    if (!this.state.over && !this.stopped) {
+      if (confirm("Resign this game? Your opponent wins.")) net.session.resign();
+      return;
+    }
+    document.getElementById("overlay")?.classList.remove("show");
+    net.session.close();
+    this.onNewGame();
   }
 
   // ---------- view ----------
@@ -1346,8 +1636,8 @@ export class Controller {
     const canClaim =
       (s.phase === "movement" || s.phase === "combat") &&
       (s.initiativeClaim ?? null) === null &&
-      !s.players[AI].passed &&
-      eligibleUnits(s, HUMAN).length + (s.phase === "movement" ? reserves(s, HUMAN).length : 0) > 0;
+      !s.players[this.them].passed &&
+      eligibleUnits(s, this.me).length + (s.phase === "movement" ? reserves(s, this.me).length : 0) > 0;
     // Small screens drop the long tail (.pass-more) and touch screens the key hint (see hud.css).
     setHTML(
       this.passBtn,
@@ -1395,7 +1685,7 @@ export class Controller {
     const s = this.state;
     if (hit) {
       const name = profileOf(hit.unit).name;
-      if (hit.unit.owner !== HUMAN) return null; // the unit brief
+      if (hit.unit.owner !== this.me) return null; // the unit brief
       const why = actionProblem(s, hit.unit.uid, { kind: "hold" });
       return why ? bad(`${name}: ${why}`) : info(`${name}: click to activate`, "pointer");
     }
@@ -1411,7 +1701,7 @@ export class Controller {
   /** Units that could deploy at `p` going by zone and cost (cheapest and smallest first). */
   private deployableHere(p: Vec): Unit[] {
     const s = this.state;
-    return deployChoices(s, HUMAN)
+    return deployChoices(s, this.me)
       .filter((u) => deployZones(s, u).some((poly) => pointInZone(p, poly)))
       .sort((a, b) => profileOf(a).models - profileOf(b).models || profileOf(a).cost - profileOf(b).cost);
   }
@@ -1443,19 +1733,19 @@ export class Controller {
     const s = this.state;
     const a = abilityOf(supportId, abilityId)!;
     const need = supportTarget(a);
-    const base = { type: "support" as const, player: HUMAN as 0, support: supportId, ability: abilityId };
+    const base = { type: "support" as const, player: this.me, support: supportId, ability: abilityId };
     const picked = need === "unitPoint" && this.mode.kind === "support" && this.mode.unit ? unitById(s, this.mode.unit) : undefined;
     const hp = this.hover ? snapPoint(this.hover) : null;
-    const why = picked ? canPlaySupport(s, HUMAN, supportId, abilityId) : supportProblem(s, HUMAN, supportId, abilityId);
+    const why = picked ? canPlaySupport(s, this.me, supportId, abilityId) : supportProblem(s, this.me, supportId, abilityId);
     if (why) return bad(`${a.name}: ${why}`);
 
     if (need === "friendlyUnit" || need === "enemyUnit") {
-      const pool = need === "friendlyUnit" ? onBoard(s, HUMAN) : onBoard(s, AI);
+      const pool = need === "friendlyUnit" ? onBoard(s, this.me) : onBoard(s, this.them);
       const checks = checkTargets(s, pool, (t) => ({ ...base, target: t.uid }));
       if (need === "friendlyUnit") view.friendlyMarks = checks.filter((c) => !c.problem).map((c) => c.uid);
       else view.targets = checks.map((c) => ({ uid: c.uid, ok: !c.problem }));
       if (hit) {
-        const mine = hit.unit.owner === HUMAN;
+        const mine = hit.unit.owner === this.me;
         if (mine !== (need === "friendlyUnit")) return bad(`${a.name}: pick ${need === "friendlyUnit" ? "one of your units" : "an enemy unit"}`);
         const p = checks.find((c) => c.uid === hit.unit.uid)?.problem ?? null;
         return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: ${profileOf(hit.unit).name}`, need === "enemyUnit" ? "target" : "go");
@@ -1482,10 +1772,10 @@ export class Controller {
 
     if (need === "reservePoint" && a.effect.kind === "airdrop") {
       // Red rings where it can't land; the spot under the pointer is checked against the real drop.
-      view.noGo = airdropNoGo(s, HUMAN, a.effect);
+      view.noGo = airdropNoGo(s, this.me, a.effect);
       if (!hp) return info(`${a.name} (${a.cp} CP): click a spot, then pick a reserve unit to drop there. Esc cancels.`);
       if (hit) return bad(`${a.name}: that spot is taken`);
-      const spot = airdropSpotProblem(s, HUMAN, a.effect, hp);
+      const spot = airdropSpotProblem(s, this.me, a.effect, hp);
       const r = 1;
       if (spot) {
         view.ghosts = [{ pos: hp, radius: r }];
@@ -1500,10 +1790,10 @@ export class Controller {
 
     if (need === "unitPoint" && a.effect.kind === "teleport") {
       if (!picked) {
-        view.friendlyMarks = onBoard(s, HUMAN).filter((u) => !supportUnitProblem(s, HUMAN, supportId, abilityId, u)).map((u) => u.uid);
+        view.friendlyMarks = onBoard(s, this.me).filter((u) => !supportUnitProblem(s, this.me, supportId, abilityId, u)).map((u) => u.uid);
         if (hit) {
-          if (hit.unit.owner !== HUMAN) return bad(`${a.name}: pick one of your units`);
-          const p = supportUnitProblem(s, HUMAN, supportId, abilityId, hit.unit);
+          if (hit.unit.owner !== this.me) return bad(`${a.name}: pick one of your units`);
+          const p = supportUnitProblem(s, this.me, supportId, abilityId, hit.unit);
           return p ? bad(`${a.name}: ${p}`) : ok(`${a.name}: move ${profileOf(hit.unit).name}`, "pointer");
         }
         return info(`${a.name} (${a.cp} CP): click one of your units, then where it goes. Esc cancels.`);
@@ -1524,9 +1814,9 @@ export class Controller {
   }
 
   /** Can any reserve unit be dropped at `p` by this support? Null if so, else the first reason. Cached per state. */
-  private dropProblem(base: { type: "support"; player: 0; support: string; ability: string }, p: Vec): string | null {
+  private dropProblem(base: { type: "support"; player: PlayerId; support: string; ability: string }, p: Vec): string | null {
     const s = this.state;
-    const units = droppableReserves(s, HUMAN)
+    const units = droppableReserves(s, this.me)
       .filter((u) => canAffordDeploy(s, u) === null)
       .sort((a, b) => profileOf(a).models - profileOf(b).models || profileOf(a).baseRadius - profileOf(b).baseRadius);
     let first: string | null = null;
@@ -1542,15 +1832,15 @@ export class Controller {
     const s = this.state;
     const el = this.els.sidebar.querySelector("#supports");
     if (!el) return;
-    const me = s.players[HUMAN];
-    const ai = s.players[AI];
+    const me = s.players[this.me];
+    const ai = s.players[this.them];
     const bound = cardBound(s);
     const cards = me.supports
       .map((c) => {
         const def = supportOf(c.id);
         const buttons = def.abilities
           .map((a) => {
-            const why = this.humanTurn() ? supportProblem(s, HUMAN, c.id, a.id) : "Wait for your turn";
+            const why = this.humanTurn() ? supportProblem(s, this.me, c.id, a.id) : "Wait for your turn";
             const on =
               this.mode.kind === "support" &&
               this.mode.support === c.id &&
@@ -1573,10 +1863,10 @@ export class Controller {
       )
       .join("");
     const html = `
-      <h3 style="margin:0 0 4px">${factionEmblemSvg(s.factions[HUMAN], 22)} Supports ${bound ? `<span class="chip cp" title="Your CP is the CP on your ready cards. Spending CP burns cards: their abilities are off until the end of the round.">✦ ${me.cp} CP</span> <small class="hint">on ready cards</small>` : `<span class="chip cp">✦ ${me.cp}/${CP_CAP} CP</span> <small class="hint">+${cpPerRound(me.supports)}/round</small>`}</h3>
+      <h3 style="margin:0 0 4px">${factionEmblemSvg(s.factions[this.me], 22)} Supports ${bound ? `<span class="chip cp" title="Your CP is the CP on your ready cards. Spending CP burns cards: their abilities are off until the end of the round.">✦ ${me.cp} CP</span> <small class="hint">on ready cards</small>` : `<span class="chip cp">✦ ${me.cp}/${CP_CAP} CP</span> <small class="hint">+${cpPerRound(me.supports)}/round</small>`}</h3>
       ${cards || `<p class="hint">No supports in this list.</p>`}
       ${armed ? `<div class="tags">Armed: ${armed}</div>` : ""}
-      <p class="hint" style="margin:4px 0 0">AI: ✦ ${ai.cp} CP${ai.armed.length ? ` · ${ai.armed.length} reaction${ai.armed.length > 1 ? "s" : ""} armed` : ""}</p>`;
+      <p class="hint" style="margin:4px 0 0">${who(this.seats, this.them)}: ✦ ${ai.cp} CP${ai.armed.length ? ` · ${ai.armed.length} reaction${ai.armed.length > 1 ? "s" : ""} armed` : ""}</p>`;
     const holder = el as HTMLElement & { __html?: string };
     if (holder.__html === html) return;
     holder.__html = html;
@@ -1587,7 +1877,7 @@ export class Controller {
         const ability = b.dataset.sab!;
         const a = abilityOf(support, ability)!;
         if (supportTarget(a) === "none") {
-          this.issue({ type: "support", player: HUMAN as 0, support, ability });
+          this.issue({ type: "support", player: this.me, support, ability });
           return;
         }
         // Pressing the armed card again puts it away (no Esc key on a touch screen).
@@ -1611,7 +1901,7 @@ export class Controller {
     if (!leader) return null;
     const hp = this.hover ? snapPoint(this.hover) : null;
     // Pointing at your own units: pick a leader, or switch to another unit.
-    const own = hit && hit.unit.owner === HUMAN ? hit.unit : undefined;
+    const own = hit && hit.unit.owner === this.me ? hit.unit : undefined;
     const ownCue = (): Cue | null => {
       if (!own) return null;
       if (own.uid === sel.uid) return info("Click to make this model the leader (★)", "pointer");
@@ -1651,10 +1941,10 @@ export class Controller {
 
     if (mode.kind === "shoot" || mode.kind === "fight") {
       const melee = mode.kind === "fight";
-      const pool = melee ? engagedWith(s, sel) : onBoard(s, AI);
+      const pool = melee ? engagedWith(s, sel) : onBoard(s, this.them);
       for (const e of pool) view.targets.push({ uid: e.uid, ok: typeof this.bestWeapon(sel, e, melee) !== "string" });
       if (own) return ownCue();
-      if (hit && hit.unit.owner !== HUMAN) {
+      if (hit && hit.unit.owner !== this.me) {
         const b = this.bestWeapon(sel, hit.unit, melee);
         if (typeof b === "string") {
           // Still draw the aim lines with the longest-reaching gun, so you can see what's in the way or how far short it falls.
@@ -1709,7 +1999,7 @@ export class Controller {
       view.moveRing = { center: leader.pos, radius: mv + r };
       for (const c of actionTargets(s, sel.uid, { kind: "charge" })) view.targets.push({ uid: c.uid, ok: !c.problem });
       if (own) return ownCue();
-      if (hit && hit.unit.owner !== HUMAN) {
+      if (hit && hit.unit.owner !== this.me) {
         const why = commandProblem(s, { type: "charge", uid: sel.uid, target: hit.unit.uid });
         // In auto mode, a target nobody can shoot or charge: say why it can't be shot as well.
         if (why) return bad(this.mode.kind === "auto" ? `${why} (and ${this.shootReason(sel, hit.unit)})` : why);
@@ -1746,17 +2036,17 @@ export class Controller {
         } else view.friendlyMarks = checks.filter((c) => !c.problem).map((c) => c.uid);
         if (hit) {
           const wantEnemy = def.needs === "enemyUnit";
-          if ((hit.unit.owner !== HUMAN) !== wantEnemy) return bad(`${def.name}: pick ${wantEnemy ? "an enemy unit" : "a friendly unit"}`);
+          if ((hit.unit.owner !== this.me) !== wantEnemy) return bad(`${def.name}: pick ${wantEnemy ? "an enemy unit" : "a friendly unit"}`);
           const p = checks.find((c) => c.uid === hit.unit.uid)?.problem ?? null;
           return p ? bad(`${def.name}: ${p}`) : ok(`${def.name}: ${profileOf(hit.unit).name}`, wantEnemy ? "target" : "go");
         }
         return info(`${def.name}: click ${def.needs === "enemyUnit" ? "a marked enemy" : "a marked friendly unit"}${def.range ? ` within ${def.range}"` : ""}`);
       }
       if (def.needs === "friendlyUnitAndPoint" && !this.abilityTarget) {
-        const friends = onBoard(s, HUMAN).filter((f) => f.uid !== sel.uid);
+        const friends = onBoard(s, this.me).filter((f) => f.uid !== sel.uid);
         view.friendlyMarks = friends.filter((f) => !abilityUnitProblem(s, sel, mode.id, f)).map((f) => f.uid);
         if (hit) {
-          if (hit.unit.owner !== HUMAN) return bad(`${def.name}: pick a friendly unit`);
+          if (hit.unit.owner !== this.me) return bad(`${def.name}: pick a friendly unit`);
           if (hit.unit.uid === sel.uid) return bad(`${def.name}: pick another friendly unit`);
           const p = abilityUnitProblem(s, sel, mode.id, hit.unit);
           return p ? bad(`${def.name}: ${p}`) : ok(`${def.name}: bring ${profileOf(hit.unit).name} over`, "pointer");
@@ -1897,7 +2187,7 @@ export class Controller {
     const ends = arrowEnds(view.from, view.to);
     const at = ends ? { x: (ends.a.x + ends.b.x) / 2, y: (ends.a.y + ends.b.y) / 2 } : centroid(view.to);
     const sp = this.renderer.toScreen(at);
-    const side = (m.owner ?? markSide([this.state, ...m.states], m.uid)) === HUMAN ? "p0" : "p1";
+    const side = sideOf(m.owner ?? markSide([this.state, ...m.states], m.uid) ?? 1);
     const names = m.uid ? `${unitName(this.state, m.uid)} → ${unitName(this.state, m.target)}` : `→ ${unitName(this.state, m.target)}`;
     const html = `<b>${esc(attackLabel(m.kind, m.weapon))}</b><span>${esc(names)}</span>`;
     setHTML(this.markEl, html);
@@ -1915,25 +2205,7 @@ export class Controller {
     const phases = (["movement", "assault", "combat", "scoring"] as const)
       .map((p) => `<span class="phase ${s.phase === p ? "current" : ""}">${PHASE_NAMES[p]}</span>`)
       .join("");
-    const status = s.over
-      ? "Game over"
-      : !this.started
-        ? "Rolling for initiative…"
-      : this.busy
-        ? "Resolving…"
-      : s.orderChoice
-        ? s.orderChoice.player === HUMAN
-          ? "Choose who goes first"
-          : "The AI is choosing who goes first…"
-      : this.rerollOpen
-        ? "Re-roll your misses?"
-      : this.aiRunning || s.activePlayer === AI
-        ? "AI is thinking…"
-        : s.phase === "movement"
-          ? "Your move: deploy, move or hunker"
-          : s.phase === "assault"
-            ? "Your assault: shoot, charge or advance"
-            : "Combat: pick an engaged unit to fight";
+    const status = statusLine(s, this.seats, this.turnFlags());
     const changed = setHTML(
       this.els.topbar,
       `
@@ -1941,8 +2213,8 @@ export class Controller {
       <span class="chip">Round ${s.round}/${s.maxRounds}</span>
       <span class="phases">${phases}</span>
       <span class="score">
-        <span class="chip p0 ${s.activePlayer === HUMAN && !s.over ? "active" : ""}">You ${s.players[0].vp}</span>
-        <span class="chip p1 ${s.activePlayer === AI && !s.over ? "active" : ""}">AI ${s.players[1].vp}</span>
+        <span class="chip p0 ${s.activePlayer === 0 && !s.over ? "active" : ""}">${who(this.seats, 0)} ${s.players[0].vp}</span>
+        <span class="chip p1 ${s.activePlayer === 1 && !s.over ? "active" : ""}">${who(this.seats, 1)} ${s.players[1].vp}</span>
         <small class="mercy" title="A lead of more than ${mercyLead(s)} VP wins the game on the spot">lead by ${mercyLead(s) + 1}+ VP wins</small>
       </span>
       <span class="status">${esc(status)}</span>
@@ -1953,13 +2225,17 @@ export class Controller {
       <span class="spacer"></span>
       <button class="secondary" id="btn-fit" title="Fit the board to the screen (0)">⤢ Fit</button>
       <button class="secondary ${this.mode.kind === "measure" ? "selected" : ""}" id="btn-measure" aria-pressed="${this.mode.kind === "measure"}" title="${this.mode.kind === "measure" ? "Stop measuring (M or Esc)" : "Measure distances and check line of sight (M)"}">📏 Measure</button>
-      <button class="secondary" id="btn-undo" ${this.humanTurn() && this.history.length ? "" : "disabled"} title="Take back your last action (Ctrl+Z)">↶ Undo</button>
+      ${this.net ? "" : `<button class="secondary" id="btn-undo" ${this.humanTurn() && this.history.length ? "" : "disabled"} title="Take back your last action (Ctrl+Z)">↶ Undo</button>`}
       <button class="secondary" id="btn-dice" title="Dice: Throw (you throw your own dice), Auto, Quick or Off">🎲 Dice: ${DICE_SPEED_LABEL[this.tray.speed]}</button>
       <button class="secondary" id="btn-minis" title="Miniatures: Classic, Ink Rig (side-on) or Overhead (from above). New art loads the first time it is shown.">♟ Minis: ${MINI_STYLE_LABEL[miniStyle()]}</button>
       <span id="audio-slot"></span>
       <button class="secondary" id="btn-rules">How to play</button>
       ${
-        this.hooks.campaign
+        this.net
+          ? this.state.over || this.stopped
+            ? `<button id="btn-new" title="Leave this online game">Leave</button>`
+            : `<button class="secondary" id="btn-new" title="Concede this game: your opponent wins">⚑ Resign</button>`
+          : this.hooks.campaign
           ? `<button class="${s.over ? "" : "secondary"}" id="btn-new" title="${s.over ? "Take the result back to the campaign map" : "Leave this battle: it counts as a defeat"}">${s.over ? "⚔ Back to the campaign" : "⚑ Retreat"}</button>`
           : `<button class="secondary" id="btn-new">New game</button>`
       }`,
@@ -1969,12 +2245,14 @@ export class Controller {
     this.els.topbar
       .querySelector("#btn-measure")!
       .addEventListener("click", () => this.toggleMeasure());
-    this.els.topbar.querySelector("#btn-undo")!.addEventListener("click", () => this.undo());
+    this.els.topbar.querySelector("#btn-undo")?.addEventListener("click", () => this.undo());
     this.els.topbar.querySelector("#btn-fit")!.addEventListener("click", () => this.renderer.resetView());
     this.els.topbar.querySelector("#btn-rules")!.addEventListener("click", () => showRules());
     this.els.topbar.querySelector("#btn-dice")!.addEventListener("click", () => this.cycleDice());
     this.els.topbar.querySelector("#btn-minis")!.addEventListener("click", () => this.cycleMinis());
-    this.els.topbar.querySelector("#btn-new")!.addEventListener("click", () => (this.hooks.campaign ? this.leaveCampaignBattle() : this.onNewGame()));
+    this.els.topbar
+      .querySelector("#btn-new")!
+      .addEventListener("click", () => (this.net ? this.leaveOnline() : this.hooks.campaign ? this.leaveCampaignBattle() : this.onNewGame()));
   }
 
   private resultSent = false;
@@ -1985,7 +2263,7 @@ export class Controller {
     if (!c || this.resultSent) return;
     this.resultSent = true;
     const s = this.state;
-    c.onResult({ winner: retreated ? AI : s.winner, vp: [s.players[0].vp, s.players[1].vp], retreated });
+    c.onResult({ winner: retreated ? this.them : s.winner, vp: [s.players[0].vp, s.players[1].vp], retreated });
   }
 
   private leaveCampaignBattle(): void {
@@ -1997,16 +2275,16 @@ export class Controller {
   private renderArmy(): void {
     const s = this.state;
     const el = this.els.sidebar.querySelector("#army")!;
-    const me = s.players[HUMAN];
-    const ai = s.players[AI];
+    const me = s.players[this.me];
+    const ai = s.players[this.them];
     const why = (u: Unit): string | null =>
       this.humanTurn() ? actionProblem(s, u.uid, { kind: "deploy" }) : s.over ? "The game is over" : "Wait for your turn";
-    const rows = reserveRowsHtml(s, HUMAN, why, this.deployUid);
+    const rows = reserveRowsHtml(s, this.me, why, this.deployUid);
     const changed = setHTML(
       el,
       `
-      <div class="army-row"><span class="chip p0">You</span> ⚙ ${me.resources} · ◆ ${supplyUsed(s, HUMAN)}/${me.supplyCap} supply</div>
-      <div class="army-row"><span class="chip p1">AI</span> ⚙ ${ai.resources} · ◆ ${supplyUsed(s, AI)}/${ai.supplyCap} supply · ${aiReserveText(s, AI)}</div>
+      <div class="army-row"><span class="chip ${sideOf(this.me)}">You</span> ⚙ ${me.resources} · ◆ ${supplyUsed(s, this.me)}/${me.supplyCap} supply</div>
+      <div class="army-row"><span class="chip ${sideOf(this.them)}">${who(this.seats, this.them)}</span> ⚙ ${ai.resources} · ◆ ${supplyUsed(s, this.them)}/${ai.supplyCap} supply · ${aiReserveText(s, this.them)}</div>
       ${rows ? `<h3 style="margin-top:6px">${reservesHeading(s)}</h3>${rows}` : `<p class="hint">Everything is deployed.</p>`}`,
     );
     if (!changed) return;
@@ -2044,13 +2322,13 @@ export class Controller {
       u.onBoard && hasAbility(u, "hidden") && !u.status.burrowed && (isHidden(s, u) ? "🌿 hidden" : u.status.revealed ? "🌿 revealed this round" : "🌿 found by a detector"),
       !u.onBoard && "in reserve",
     ].filter(Boolean);
-    const rallyWhy = u.status.shaken && u.owner === HUMAN && this.humanTurn() ? commandProblem(s, { type: "rally", player: HUMAN as 0, target: u.uid }) : "no";
+    const rallyWhy = u.status.shaken && u.owner === this.me && this.humanTurn() ? commandProblem(s, { type: "rally", player: this.me, target: u.uid }) : "no";
     const canRally = rallyWhy === null;
     const fearless = !!p.structure || p.keywords.includes("fearless");
     const changed = setHTML(
       el,
       `
-      <h3>${esc(p.name)} <span class="chip ${u.owner === HUMAN ? "p0" : "p1"}" style="font-size:.75rem">${u.owner === HUMAN ? "You" : "AI"}</span></h3>
+      <h3>${esc(p.name)} <span class="chip ${sideOf(u.owner)}" style="font-size:.75rem">${who(this.seats, u.owner)}</span></h3>
       <p class="sub">${esc(factionOf(p.faction).name)} · ⚙${p.cost} · <span title="Supply: what it counts for on objectives and when disengaging">◆${u.onBoard && currentSupply(u) !== p.supply ? `${currentSupply(u)}/${p.supply}` : p.supply}</span> · ${alive}/${p.models} models · ${fearless ? "fearless" : `nerve ${p.nerve ?? 7}`} · ${esc(p.blurb)}</p>
       <div class="stats">
         <div>${u.onBoard ? effectiveMove(s, u) : p.move}"<small>Move</small></div>
@@ -2068,7 +2346,7 @@ export class Controller {
     );
     if (changed && canRally) {
       el.querySelector("#rally-btn")?.addEventListener("click", () =>
-        this.issue({ type: "rally", player: HUMAN as 0, target: u.uid }),
+        this.issue({ type: "rally", player: this.me, target: u.uid }),
       );
     }
   }
@@ -2077,17 +2355,17 @@ export class Controller {
     const el = this.els.sidebar.querySelector("#actions")!;
     const s = this.state;
     if (!this.humanTurn()) {
-      setHTML(el, `<p class="hint">${s.over ? "The battle is over." : "Waiting for the AI…"}</p>`);
+      setHTML(el, `<p class="hint">${s.over ? "The battle is over." : !this.net ? "Waiting for the AI…" : s.activePlayer === this.them ? "Opponent's turn…" : "Waiting for opponent…"}</p>`);
       return;
     }
     if (!sel) {
-      const n = eligibleUnits(s, HUMAN).length;
+      const n = eligibleUnits(s, this.me).length;
       const hint =
         this.mode.kind === "deploy"
           ? "Move over (or tap) your shaded zone: a green ✓ shows where the unit fits, a red ✕ says why not. Click (or tap again) to place it."
           : n
             ? `${n} unit${n > 1 ? "s" : ""} can still act this phase. Click one to activate it.`
-            : s.phase === "movement" && reserves(s, HUMAN).some((u) => !canAffordDeploy(s, u))
+            : s.phase === "movement" && reserves(s, this.me).some((u) => !canAffordDeploy(s, u))
               ? "Deploy from your reserves, or pass."
               : "Nothing left to activate. Pass to move on.";
       // Picking a spot for a reserve or a support card: a way out without a keyboard.
@@ -2169,7 +2447,7 @@ export class Controller {
     el.querySelectorAll<HTMLButtonElement>("button[data-act]").forEach((b) =>
       b.addEventListener("click", () => {
         const a = b.dataset.act!;
-        if (a === "pass") return void this.issue({ type: "pass", player: HUMAN });
+        if (a === "pass") return void this.issue({ type: "pass", player: this.me });
         if (a === "cancel") {
           this.clearSelection();
           return this.refresh();
@@ -2196,7 +2474,7 @@ export class Controller {
   private unitBrief(u: Unit): string {
     const s = this.state;
     const p = profileOf(u);
-    const bits: string[] = [`${p.name} (${u.owner === HUMAN ? "yours" : "AI"})`];
+    const bits: string[] = [`${p.name} (${u.owner === this.me ? "yours" : who(this.seats, u.owner)})`];
     if (u.onBoard && eligibleUnits(s, u.owner).includes(u)) bits.push("✅ can act");
     else if (u.onBoard) bits.push("💤 done this phase");
     if (u.status.shaken) bits.push("😱 Shaken");
@@ -2265,7 +2543,7 @@ export class Controller {
       );
     }
     if (sel.status.shaken) {
-      const why = commandProblem(s, { type: "rally", player: HUMAN as 0, target: sel.uid });
+      const why = commandProblem(s, { type: "rally", player: this.me, target: sel.uid });
       chips.push(`<button data-co="rally" ${buttonAttrs(why)}>📣 Rally <small>${RALLY_CP} CP</small></button>`);
     }
     if (s.phase !== "combat") chips.push(`<button data-co="hunker" class="secondary" ${buttonAttrs(actionProblem(s, sel.uid, { kind: "hunker" }))}>🧱 Hunker</button>`);
@@ -2291,7 +2569,7 @@ export class Controller {
             this.clearSelection();
             return this.refresh();
           }
-          if (what === "rally") return void this.issue({ type: "rally", player: HUMAN as 0, target: sel.uid });
+          if (what === "rally") return void this.issue({ type: "rally", player: this.me, target: sel.uid });
           if (what === "hunker") return void this.issue({ type: "hunker", uid: sel.uid });
           if (what === "hold") return void this.issue({ type: "hold", uid: sel.uid });
           if (what === "ability") {
@@ -2329,7 +2607,7 @@ export class Controller {
   private renderOrderChoice(): void {
     const s = this.state;
     let el = this.els.stage.querySelector<HTMLDivElement>(".order-choice");
-    const mine = this.started && !s.over && s.orderChoice?.player === HUMAN && !this.aiRunning && !this.busy;
+    const mine = this.started && !s.over && s.orderChoice?.player === this.me && !this.opponentActing && !this.busy && !this.sending && !this.stopped;
     if (!mine) {
       el?.remove();
       return;
@@ -2359,7 +2637,7 @@ export class Controller {
       if (!goFirst) b.className = "secondary";
       b.addEventListener("click", () => {
         el?.remove();
-        this.issue({ type: "chooseOrder", player: HUMAN as 0, goFirst });
+        this.issue({ type: "chooseOrder", player: this.me, goFirst });
       });
       row.appendChild(b);
     }
@@ -2437,14 +2715,14 @@ export class Controller {
     const s = this.state;
     const ownerOf = (uid: string) => unitById(s, uid)?.owner ?? unitById(before, uid)?.owner;
     const toneFor = (owner: number | undefined, goodForMe = true): AlertTone =>
-      owner === undefined ? "neutral" : (owner === HUMAN) === goodForMe ? "you" : "ai";
+      owner === undefined ? "neutral" : toneOf((owner === this.me) === goodForMe ? this.me : this.them);
     for (const e of events) {
       if (e.type === "attack") {
         const r = e.report;
         const a = unitName(s, r.uid);
         const t = unitName(s, r.target);
         if (r.unitDestroyed) {
-          this.alerts.push("WIPED OUT!", { sub: `${a} finishes off ${t}`, tone: ownerOf(r.target) === HUMAN ? "bad" : "good" });
+          this.alerts.push("WIPED OUT!", { sub: `${a} finishes off ${t}`, tone: ownerOf(r.target) === this.me ? "bad" : "good" });
         } else if (r.kind === "impact" && r.damage > 0) {
           this.alerts.push("SLAM!", { sub: `${a} crashes into ${t}: ${r.damage} dmg`, tone: toneFor(ownerOf(r.uid)) });
         } else if (r.damage >= 3) {
@@ -2457,41 +2735,41 @@ export class Controller {
         this.alerts.push("CHARGE!", { sub: `${unitName(s, e.uid)} charges in`, tone: toneFor(ownerOf(e.uid)) });
       } else if (e.type === "moved" && e.kind === "teleport") {
         this.alerts.push("ZAP!", { sub: `${unitName(s, e.uid)} teleports`, tone: toneFor(ownerOf(e.uid)) });
-      } else if (e.type === "deployed" && ownerOf(e.uid) === AI) {
-        this.alerts.push("REINFORCEMENTS!", { sub: `The AI deploys ${unitName(s, e.uid)}`, tone: "ai" });
+      } else if (e.type === "deployed" && ownerOf(e.uid) === this.them) {
+        this.alerts.push("REINFORCEMENTS!", { sub: `${whoThe(this.seats, this.them)} deploys ${unitName(s, e.uid)}`, tone: toneOf(this.them) });
       } else if (e.type === "morale" && e.shaken) {
-        this.alerts.push("SHAKEN!", { sub: `${unitName(s, e.uid)} loses its nerve`, tone: ownerOf(e.uid) === HUMAN ? "bad" : "good" });
+        this.alerts.push("SHAKEN!", { sub: `${unitName(s, e.uid)} loses its nerve`, tone: ownerOf(e.uid) === this.me ? "bad" : "good" });
       } else if (e.type === "rallied" && e.how === "cp") {
         this.alerts.push("RALLY!", { sub: `${unitName(s, e.uid)} steadies up`, tone: toneFor(ownerOf(e.uid)) });
-      } else if (e.type === "support" && e.player === AI) {
-        this.alerts.push("AI SUPPORT!", { sub: e.text, tone: "ai" });
+      } else if (e.type === "support" && e.player === this.them) {
+        this.alerts.push(`${who(this.seats, this.them).toUpperCase()} SUPPORT!`, { sub: e.text, tone: toneOf(this.them) });
       } else if (e.type === "summoned") {
         this.alerts.push("INCOMING!", { sub: `${unitName(s, e.uid)} appears`, tone: toneFor(ownerOf(e.uid)) });
       } else if (e.type === "scored") {
-        this.alerts.push(`+${e.vp} VP`, { sub: `${e.player === HUMAN ? "You" : "AI"}: ${e.reason}`, tone: e.player === HUMAN ? "you" : "ai" });
+        this.alerts.push(`+${e.vp} VP`, { sub: `${who(this.seats, e.player)}: ${e.reason}`, tone: toneOf(e.player) });
       } else if (e.type === "flag") {
         this.alerts.push("SNACK ALERT!", { sub: e.text, tone: "good" });
       } else if (e.type === "phase") {
         // The phase banner (see handleEvents) holds the AI until it has landed.
       } else if (e.type === "rolloff") {
-        this.log(`🎲 Tied on VP: roll-off. You ${e.rolls[e.rolls.length - 1]![0]}, AI ${e.rolls[e.rolls.length - 1]![1]}. ${e.winner === HUMAN ? "You choose" : "The AI chooses"} who goes first.`);
-        this.alerts.push("TIE! ROLL-OFF", { sub: `${e.winner === HUMAN ? "You" : "The AI"} won: choose who goes first`, tone: e.winner === HUMAN ? "you" : "ai" });
+        this.log(`🎲 Tied on VP: roll-off. You ${e.rolls[e.rolls.length - 1]![this.me]}, ${who(this.seats, this.them)} ${e.rolls[e.rolls.length - 1]![this.them]}. ${e.winner === this.me ? "You choose" : `${whoThe(this.seats, this.them)} chooses`} who goes first.`);
+        this.alerts.push("TIE! ROLL-OFF", { sub: `${whoThe(this.seats, e.winner)} won: choose who goes first`, tone: toneOf(e.winner) });
       } else if (e.type === "orderChosen") {
         const first = e.goFirst ? e.player : e.player === 0 ? 1 : 0;
-        const who = e.player === HUMAN ? "You" : "The AI";
-        this.log(`${who} chose to go ${e.goFirst ? "first" : "second"} in round ${e.round}.`);
-        this.alerts.push(first === HUMAN ? "YOU GO FIRST!" : "AI GOES FIRST", {
-          sub: `${who} chose to go ${e.goFirst ? "first" : "second"}`,
-          tone: first === HUMAN ? "you" : "ai",
+        const by = whoThe(this.seats, e.player);
+        this.log(`${by} chose to go ${e.goFirst ? "first" : "second"} in round ${e.round}.`);
+        this.alerts.push(first === this.me ? "YOU GO FIRST!" : `${who(this.seats, this.them).toUpperCase()} GOES FIRST`, {
+          sub: `${by} chose to go ${e.goFirst ? "first" : "second"}`,
+          tone: toneOf(first),
         });
       } else if (e.type === "initiativeClaimed") {
-        const who = e.player === HUMAN ? "You" : "The AI";
+        const by = whoThe(this.seats, e.player);
         const next = e.nextPhase === "assault" ? "the Assault phase" : "next round";
-        this.log(`⚡ ${who} passed early and claimed the initiative for ${next}.`);
-        this.alerts.push("INITIATIVE CLAIMED!", { sub: `${who} will lead ${next}`, tone: e.player === HUMAN ? "you" : "ai" });
+        this.log(`⚡ ${by} passed early and claimed the initiative for ${next}.`);
+        this.alerts.push("INITIATIVE CLAIMED!", { sub: `${by} will lead ${next}`, tone: toneOf(e.player) });
       } else if (e.type === "gameOver") {
-        const word = e.winner === "draw" ? "STALEMATE!" : e.winner === HUMAN ? "VICTORY!" : "DEFEAT!";
-        this.alerts.push(word, { sub: e.reason, big: true, tone: e.winner === HUMAN ? "you" : e.winner === "draw" ? "neutral" : "ai", ms: 3500 });
+        const word = e.winner === "draw" ? "STALEMATE!" : e.winner === this.me ? "VICTORY!" : "DEFEAT!";
+        this.alerts.push(word, { sub: e.reason, big: true, tone: e.winner === "draw" ? "neutral" : toneOf(e.winner), ms: 3500 });
       }
     }
   }
@@ -2504,7 +2782,7 @@ export class Controller {
       el.dataset.faction = factionId;
       el.style.setProperty("--faction-color", `#${factionOf(factionId).color.toString(16).padStart(6, "0")}`);
     };
-    const mine = this.state.factions[HUMAN];
+    const mine = this.state.factions[this.me];
     set("#army", mine);
     set("#supports", mine);
     set("#card", focus ? profileOf(focus).faction : mine);
@@ -2535,13 +2813,13 @@ export class Controller {
   private showGameOver(): void {
     const s = this.state;
     const title =
-      s.winner === "draw" ? "It's a draw!" : s.winner === HUMAN ? "Victory!" : "Defeat!";
+      s.winner === "draw" ? "It's a draw!" : s.winner === this.me ? "Victory!" : "Defeat!";
     const overlay = document.getElementById("overlay")!;
     if (this.hooks.campaign) {
       overlay.innerHTML = `
       <div class="modal" style="max-width:440px;text-align:center" role="dialog" aria-modal="true" aria-labelledby="go-title">
         <h1 id="go-title">${title}</h1>
-        <p class="tagline">${esc(this.hooks.campaign.title)} · Final score: you ${s.players[0].vp}, AI ${s.players[1].vp}</p>
+        <p class="tagline">${esc(this.hooks.campaign.title)} · Final score: you ${s.players[this.me].vp}, ${who(this.seats, this.them)} ${s.players[this.them].vp}</p>
         <div class="row" style="justify-content:center">
           <button id="go-campaign">⚔ Back to the campaign</button>
           <button class="secondary" id="go-close">Look at the board</button>
@@ -2560,14 +2838,14 @@ export class Controller {
     overlay.innerHTML = `
       <div class="modal" style="max-width:420px;text-align:center">
         <h1>${title}</h1>
-        <p class="tagline">Final score: you ${s.players[0].vp}, AI ${s.players[1].vp}</p>
+        <p class="tagline">Final score: you ${s.players[this.me].vp}, ${who(this.seats, this.them)} ${s.players[this.them].vp}</p>
         <div class="row" style="justify-content:center">
-          <button id="go-again">Play again</button>
+          <button id="go-again">${this.net ? "Leave" : "Play again"}</button>
           <button class="secondary" id="go-close">Look at the board</button>
         </div>
       </div>`;
     overlay.classList.add("show");
-    overlay.querySelector("#go-again")!.addEventListener("click", () => this.onNewGame());
+    overlay.querySelector("#go-again")!.addEventListener("click", () => (this.net ? this.leaveOnline() : this.onNewGame()));
     overlay
       .querySelector("#go-close")!
       .addEventListener("click", () => overlay.classList.remove("show"));
