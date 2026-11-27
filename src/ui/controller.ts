@@ -1522,6 +1522,7 @@ export class Controller {
   }
 
   private onPeer(p: PeerStatus): void {
+    if (this.stopped || this.state.over) return; // the game is over: nothing to wait for
     if (p === "silent" && !this.opponentSilent) {
       this.opponentSilent = true;
       this.banner("Opponent disconnected — waiting…");
