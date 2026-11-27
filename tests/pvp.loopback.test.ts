@@ -345,3 +345,68 @@ describe("PvP security fixes", () => {
     expect(new Set(salted.map((r) => r.hitRolls.join(","))).size).toBeGreaterThan(1);
   });
 });
+
+describe("PvP messages that must not get lost", () => {
+  /** A broker that loses every message while `drop.on` is set. */
+  const lossy = () => {
+    const drop = { on: false };
+    return { drop, opts: { loss: 1, random: () => (drop.on ? 0 : 1) } satisfies MemoryHubOptions };
+  };
+
+  it("a resignation is re-sent until the opponent has it", async () => {
+    const { drop, opts } = lossy();
+    const { host, guest } = await startGame(opts);
+    const ends: unknown[] = [];
+    guest.ended.add((r) => ends.push(r));
+    drop.on = true;
+    host.resign();
+    await tick(40); // the first RESIGN (and a re-send or two) are lost
+    expect(ends).toEqual([]);
+    expect(host.resignConfirmed).toBe(false);
+    drop.on = false;
+    await until(() => ends.length > 0 && host.resignConfirmed, 2000, "the resignation to arrive and be confirmed");
+    expect(ends).toEqual([{ why: "resigned", seat: 0 }]);
+    // Nobody moves once someone has resigned, and repeats don't end the game twice.
+    expect(host.myMove || guest.myMove).toBe(false);
+    await tick(60);
+    expect(ends.length).toBe(1);
+  });
+
+  it("lobby data is re-sent until it arrives, and only the newest is seen", async () => {
+    const { drop, opts } = lossy();
+    const hub = memoryHub(opts);
+    const host = session(hub, "host");
+    const guest = session(hub, "guest");
+    const seen: unknown[] = [];
+    guest.lobby.add((d) => seen.push(d));
+    await host.start();
+    await guest.start();
+    void host.sendLobby({ pick: 1 }); // before pairing: sent once paired
+    await until(() => host.isPaired && guest.isPaired);
+    await until(() => seen.length === 1, 2000, "the first lobby data");
+    drop.on = true;
+    await host.sendLobby({ pick: 2 });
+    await host.sendLobby({ pick: 3 });
+    await tick(40);
+    drop.on = false;
+    await until(() => seen.length === 2, 2000, "the newest lobby data");
+    await tick(60);
+    expect(seen).toEqual([{ pick: 1 }, { pick: 3 }]);
+  });
+
+  it("a different version is reported to both players, in words they can act on", async () => {
+    const hub = memoryHub();
+    const host = session(hub, "host", "0.12.1+aaaaaaa");
+    const guest = session(hub, "guest", "0.12.2+bbbbbbb");
+    const said: Record<"host" | "guest", string[]> = { host: [], guest: [] };
+    host.problem.add((p) => said.host.push(p));
+    guest.problem.add((p) => said.guest.push(p));
+    await host.start();
+    await guest.start();
+    await until(() => said.host.length > 0 && said.guest.length > 0, 2000, "both version warnings");
+    expect(said.host[0]).toBe("Your opponent is on a different version (0.12.2+bbbbbbb). Both of you need the same release to play.");
+    expect(said.guest[0]).toMatch(/different version \(0\.12\.1\+aaaaaaa\)/);
+    await tick(60);
+    expect(host.isPaired || guest.isPaired).toBe(false);
+  });
+});

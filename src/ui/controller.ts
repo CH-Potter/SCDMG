@@ -1505,7 +1505,9 @@ export class Controller {
       changed: () => this.refresh(),
       peer: (p) => this.onPeer(p),
       desync: (d) =>
-        this.netProblem(`Out of step with your opponent at move ${d.n + 1}: your two games no longer match, so what you see may be wrong.`),
+        this.netProblem(
+          `Out of step with your opponent ${d.n < 0 ? "from the start" : `at move ${d.n + 1}`}: your two games no longer match, so what you see may be wrong.`,
+        ),
       problem: (text) => this.netProblem(text),
       ended: (r) => this.onNetEnded(r),
     });

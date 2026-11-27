@@ -19,7 +19,8 @@
 //    A's RREVEAL), whose salt the engine stirs in just before the misses are re-rolled. So A can't
 //    know the re-rolled dice when deciding to pay for them. Nobody moves on until it is settled.
 // Every step is re-sent until it is answered (public brokers may drop a message), and answering is
-// idempotent.
+// idempotent: the lobby's messages (LOBBY, answered by LACK) and a resignation (RESIGN, answered by
+// RESIGNED) too.
 
 import { aiCommand } from "../engine/ai";
 import { setupFingerprint, syncHash, withSalt } from "../engine/fingerprint";
@@ -48,7 +49,10 @@ type Msg =
   /** The handshake's confirmation. `paired`: the sender has already paired (so don't answer it). */
   | { k: "ready"; paired?: boolean }
   | { k: "ping" }
-  | { k: "lobby"; data: unknown }
+  /** The UI's lobby data; `seq` counts up, so a late repeat of older data is ignored. */
+  | { k: "lobby"; seq: number; data: unknown }
+  /** Lobby data up to `seq` arrived. */
+  | { k: "lack"; seq: number }
   | { k: "setup"; setup: GameSetup; c: string }
   | { k: "accept"; fp: string; b: string }
   | { k: "seed"; a: string }
@@ -60,7 +64,9 @@ type Msg =
   | { k: "rsalt"; n: number; b: string }
   | { k: "rreveal"; n: number; a: string; hash: string }
   | { k: "ack"; n: number; hash: string; final: boolean }
-  | { k: "resign" };
+  | { k: "resign" }
+  /** The resignation arrived. */
+  | { k: "resigned" };
 
 // ---------------------------------------------------------------- small crypto helpers
 
@@ -200,6 +206,16 @@ export class PvpSession {
   private pingTimer: ReturnType<typeof setInterval> | null = null;
   private lastHeard = 0;
   private outbox: Msg | Hello | null = null;
+  /** Our latest lobby data, re-sent until the opponent confirms it (LACK). */
+  private lobbyOut: Extract<Msg, { k: "lobby" }> | null = null;
+  private lobbySeq = 0;
+  /** The newest lobby data we have from the opponent. */
+  private lobbySeen = 0;
+  /** We resigned: RESIGN is re-sent until the opponent confirms it. */
+  private resigned = false;
+  private resignAcked = false;
+  /** The opponent resigned. */
+  private peerResigned = false;
   private closed = false;
   private inbox: Promise<void> = Promise.resolve();
   private unsubs: (() => void)[] = [];
@@ -235,13 +251,18 @@ export class PvpSession {
    */
   get canSettle(): boolean {
     const e = this.openCommand;
-    return !!e && e.seat === this.seat && !this.pending && this.peerAck.has(e.n) && !this.closed;
+    return !!e && e.seat === this.seat && !this.pending && this.peerAck.has(e.n) && !this.closed && !this.finished;
+  }
+
+  /** Someone resigned: no more moves. */
+  get finished(): boolean {
+    return this.resigned || this.peerResigned;
   }
 
   /** Whether it is this player's move now (game started, not over, nothing in flight). */
   get myMove(): boolean {
     const s = this.state;
-    if (!s || s.over || this.pending || this.closed) return false;
+    if (!s || s.over || this.pending || this.closed || this.finished) return false;
     if (this.openCommand) return false;
     const last = this.log[this.log.length - 1];
     if (last && last.seat === this.seat && !this.peerAck.get(last.n)?.endsWith(":true")) return false; // not confirmed yet
@@ -270,9 +291,15 @@ export class PvpSession {
 
   // ---------------------------------------------------------------- lobby
 
-  /** Send the UI's lobby data (faction picks, list, ready flags...). */
-  sendLobby(data: unknown): void {
-    void this.send({ k: "lobby", data });
+  /**
+   * Send the UI's lobby data (faction picks, list, ready flags...). Each call replaces the last: it is
+   * re-sent until the opponent has it (from pairing on, if called before), and they only ever see
+   * the newest. Resolves once sent the first time.
+   */
+  sendLobby(data: unknown): Promise<void> {
+    if (this.state) return Promise.resolve(); // the game has started: the lobby is over
+    this.lobbyOut = { k: "lobby", seq: ++this.lobbySeq, data };
+    return this.send(this.lobbyOut);
   }
 
   /** Host: propose the game (without a seed). The game starts once the guest accepts. */
@@ -348,10 +375,17 @@ export class PvpSession {
     });
   }
 
-  /** Concede the game. */
+  /** Concede the game. RESIGN is re-sent until the opponent confirms it (or the session closes). */
   resign(): void {
+    if (this.resigned || this.peerResigned || this.closed) return;
+    this.resigned = true;
     void this.send({ k: "resign" });
     this.ended.emit({ why: "resigned", seat: this.seat });
+  }
+
+  /** Our resignation reached the opponent. */
+  get resignConfirmed(): boolean {
+    return this.resignAcked;
   }
 
   /** Leave: stop all timers and close the transport. */
@@ -394,6 +428,8 @@ export class PvpSession {
       return;
     }
     if (this.outbox) await this.sendRaw(this.outbox);
+    if (this.lobbyOut) await this.sendRaw(this.lobbyOut);
+    if (this.resigned && !this.resignAcked) await this.sendRaw({ k: "resign" });
   }
 
   private heartbeat(): void {
@@ -513,9 +549,18 @@ export class PvpSession {
       case "ping":
         return;
       case "lobby":
-        return this.lobby.emit(m.data);
+        return this.onLobby(m);
+      case "lack":
+        if (this.lobbyOut && typeof m.seq === "number" && m.seq >= this.lobbyOut.seq) this.lobbyOut = null;
+        return;
       case "resign":
+        void this.send({ k: "resigned" }); // every time: our last answer may have been lost
+        if (this.peerResigned || this.resigned) return;
+        this.peerResigned = true;
         return this.ended.emit({ why: "resigned", seat: (1 - this.seat) as PlayerId });
+      case "resigned":
+        this.resignAcked = true;
+        return;
       case "setup":
         return this.onSetup(m);
       case "accept":
@@ -539,6 +584,14 @@ export class PvpSession {
       case "ack":
         return this.onAck(m);
     }
+  }
+
+  private onLobby(m: Extract<Msg, { k: "lobby" }>): void {
+    if (typeof m.seq !== "number" || !Number.isSafeInteger(m.seq)) return;
+    void this.send({ k: "lack", seq: m.seq });
+    if (m.seq <= this.lobbySeen || this.state) return; // a repeat, or too late
+    this.lobbySeen = m.seq;
+    this.lobby.emit(m.data);
   }
 
   private onSetup(m: Extract<Msg, { k: "setup" }>): void {
@@ -589,6 +642,7 @@ export class PvpSession {
   }
 
   private async begin(): Promise<void> {
+    this.lobbyOut = null; // the lobby is over
     const seed = await saltOf(this.seedA!, this.seedB!, -1);
     const setup = { ...this.setup!, seed };
     this.state = createGame(setup);
