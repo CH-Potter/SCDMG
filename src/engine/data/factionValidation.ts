@@ -74,6 +74,11 @@ export const FALLBACK_FIZZ: Record<ModeId, number> = { skirmish: 6, assault: 10 
 
 /** Prefix for custom faction ids. */
 export const CUSTOM_PREFIX = "custom-";
+/**
+ * Prefix for a custom faction that came from the other player in an online game: registered for
+ * that game only, never saved, so it can't overwrite one of your own (ui/lobbyData.ts).
+ */
+export const NET_PREFIX = "net-";
 /** Safe id characters: these ids end up in data attributes and storage keys. */
 const ID_RE = /^[a-z0-9][a-z0-9:_-]{0,127}$/i;
 
@@ -256,7 +261,7 @@ export function factionProblems(input: unknown, opts: FactionProblemOptions = {}
   const fid = f.id;
   const fidOk = id("Faction", fid);
   const builtIn = fidOk && (BUILT_IN_FACTION_IDS as readonly string[]).includes(fid);
-  if (fidOk && !builtIn && !fid.startsWith(CUSTOM_PREFIX)) errs.push(`Faction: custom faction ids must start with "${CUSTOM_PREFIX}"`);
+  if (fidOk && !builtIn && !fid.startsWith(CUSTOM_PREFIX) && !fid.startsWith(NET_PREFIX)) errs.push(`Faction: custom faction ids must start with "${CUSTOM_PREFIX}"`);
   if (fidOk && fid.includes(":")) errs.push(`Faction: the id can't contain ":"`);
   if (builtIn && f.custom === true) errs.push(`Faction: "${fid}" is a built-in faction id`);
   name("Faction", f.name);

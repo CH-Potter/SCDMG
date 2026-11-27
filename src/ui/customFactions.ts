@@ -3,7 +3,7 @@ import { deleteListsForFaction } from "./lists";
 // Custom factions are registered with the engine (registerCustomFactions) after every save or delete.
 
 import { BUILT_IN_FACTION_IDS, FACTIONS, isBuiltInFaction, registerCustomFactions } from "../engine/data/factions";
-import { CUSTOM_PREFIX, EFFECT_KINDS, factionProblems, KEYWORDS, LIFETIMES, LOOKS, TARGETS, TIMINGS, TRAITS, EVADE_CONDITIONS } from "../engine/data/factionValidation";
+import { CUSTOM_PREFIX, NET_PREFIX, EFFECT_KINDS, factionProblems, KEYWORDS, LIFETIMES, LOOKS, TARGETS, TIMINGS, TRAITS, EVADE_CONDITIONS } from "../engine/data/factionValidation";
 import { ABILITIES } from "../engine/data/abilities";
 import { cleanArt } from "../engine/data/unitArt";
 import { factionSlots, supportSlots, UNIT_CLASSES, type Slots } from "../engine/data/unitClasses";
@@ -29,7 +29,7 @@ export function listCustomFactions(): Faction[] {
   const out: Faction[] = [];
   for (const raw of storedRaw()) {
     const f = cleanFaction(raw);
-    if (isBuiltInFaction(f.id) || out.some((x) => x.id === f.id)) continue;
+    if (isBuiltInFaction(f.id) || isNetFactionId(f.id) || out.some((x) => x.id === f.id)) continue;
     const others = [...builtIns(), ...out];
     // Costs are recomputed on load (cleanFaction), so a faction saved before computed pricing may now
     // have a starter list over the mode's limit: trim it rather than lose the faction.
@@ -41,10 +41,24 @@ export function listCustomFactions(): Faction[] {
 
 const register = () => registerCustomFactions(listCustomFactions());
 
+/** An opponent's faction in an online game (registered for that game only; see ui/lobbyData.ts). */
+export const isNetFactionId = (id: string): boolean => id.startsWith(NET_PREFIX);
+
+/** Register your own custom factions plus an online game's opponent factions (`net-` ids). */
+export function useNetFactions(net: Faction[]): void {
+  registerCustomFactions([...listCustomFactions(), ...net.filter((f) => isNetFactionId(f.id))]);
+}
+
+/** Forget the online game's factions (back to your own custom ones), if any are registered. */
+export function dropNetFactions(): void {
+  if (Object.keys(FACTIONS).some(isNetFactionId)) register();
+}
+
 /** Insert or replace a custom faction (by id). Returns problems instead of saving if it's invalid. */
 export function saveCustomFaction(f: Faction): string[] {
   const clean = cleanFaction(f);
   if (isBuiltInFaction(clean.id)) return [`"${clean.id}" is a built-in faction and can't be changed. Copy it instead.`];
+  if (isNetFactionId(clean.id)) return ["An online opponent's faction can't be saved as it is. Copy it instead."];
   const others = [...builtIns(), ...listCustomFactions().filter((x) => x.id !== clean.id)];
   const problems = factionProblems(clean, { others });
   if (problems.length) return problems;
