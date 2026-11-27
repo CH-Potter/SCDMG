@@ -60,7 +60,7 @@ async function play(host: PvpSession, guest: PvpSession, maxCmds: number, timeou
   while (host.turn < maxCmds && !host.state!.over) {
     if (Date.now() - start > timeoutMs) throw new Error(`stalled at command ${host.turn}`);
     const mover = [host, guest].find((s) => s.myMove);
-    const settler = [host, guest].find((s) => s.openCommand && s.openCommand.seat === s.seat);
+    const settler = [host, guest].find((s) => s.canSettle);
     if (settler) {
       const e = settler.openCommand!;
       if (++chances % 2 === 1) {
@@ -135,6 +135,25 @@ describe("PvP sessions over an in-memory broker", () => {
     expect(problems).toEqual([]);
     expect(desyncs).toEqual([]);
   }, 150000);
+});
+
+describe("PvP sessions under heavy loss", () => {
+  it("stay in step with re-rolls when a third of all messages are lost", async () => {
+    for (let game = 0; game < 3; game++) {
+      let x = 101 + game * 7919;
+      const random = () => ((x = (x * 1103515245 + 12345) % 2 ** 31) / 2 ** 31);
+      const { host, guest, problems, desyncs } = await startGame(
+        { loss: 0.35, duplicate: 0.2, delay: () => Math.floor(random() * 4), random },
+        { ...SETUP, rules: { reroll: true, cardCp: false } },
+      );
+      await play(host, guest, 80, 120000);
+      expect(syncHash(host.state!)).toBe(syncHash(guest.state!));
+      expect(problems).toEqual([]);
+      expect(desyncs).toEqual([]);
+      host.close();
+      guest.close();
+    }
+  }, 400000);
 });
 
 describe("PvP sessions refuse", () => {

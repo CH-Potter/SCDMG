@@ -2435,7 +2435,10 @@ function withReroll(s: GameState, cmd: Command): Command {
   // Keep a CP for a Rally while anyone is Shaken; otherwise re-roll when about 1.5 hits would come back.
   const shaken = onBoard(s, s.activePlayer).some((u) => u.status.shaken);
   const spare = s.players[s.activePlayer].cp - REROLL_CP >= (shaken ? RALLY_CP : 0);
-  return spare && regained >= 1.5 ? { ...cmd, reroll: true } : cmd;
+  if (!spare || regained < 1.5) return cmd;
+  // Only if the re-roll is allowed: some refusals (a lobbed shell) only show when it's applied.
+  const again: Command = { ...cmd, reroll: true };
+  return applyCommand(structuredClone(s), again).ok ? again : cmd;
 }
 
 /** Apply one AI activation (used by tests and AI-vs-AI simulation). */

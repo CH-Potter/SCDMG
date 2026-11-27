@@ -25,10 +25,12 @@ import { aiCommand } from "../engine/ai";
 import { setupFingerprint, syncHash, withSalt } from "../engine/fingerprint";
 import { applyCommand, createGame, type GameSetup } from "../engine/game";
 import { commandProblem } from "../engine/legality";
-import { REROLL_CP, rulesOf } from "../engine/houseRules";
+import { rerollMisses, rerollProblem } from "../engine/reroll";
 import type { Command, GameEvent, GameState, PlayerId } from "../engine/types";
 import { SecureChannel, deriveRoom, type Room } from "./crypto";
 import { Listeners, type LinkStatus, type Transport } from "./transport";
+
+export { rerollMisses, rerollProblem };
 
 /** Bump when the wire messages change: both players must speak the same version. */
 export const PROTOCOL = 1;
@@ -39,25 +41,12 @@ export const seatOf = (role: Role): PlayerId => (role === "host" ? 0 : 1);
 /** Whose command comes next: the seat choosing turn order if there is a choice to make, else the active player. */
 export const seatToAct = (s: GameState): PlayerId => s.orderChoice?.player ?? s.activePlayer;
 
-/**
- * How many misses this attack could re-roll (Command re-roll house rule), or 0 if it can't be.
- * Both players work it out the same way, so both know when a command stays open for FINAL.
- */
-export function rerollMisses(before: GameState, cmd: Command, events: GameEvent[]): number {
-  if ((cmd.type !== "shoot" && cmd.type !== "fight") || cmd.reroll || !rulesOf(before).reroll) return 0;
-  if (before.players[before.activePlayer].cp < REROLL_CP) return 0;
-  const a = events.find((e) => e.type === "attack" && e.report.uid === cmd.uid && e.report.target === cmd.target);
-  if (a?.type !== "attack" || a.report.unitDestroyed) return 0;
-  const misses = a.report.hitRolls.filter((x) => x < a.report.hitOn).length;
-  if (!misses) return 0;
-  return commandProblem(before, { ...cmd, reroll: true }) ? 0 : misses;
-}
-
 // ---------------------------------------------------------------- wire messages
 
 type Hello = { k: "hello"; v: number; build: string; role: Role; nonce: string; epk: string };
 type Msg =
-  | { k: "ready" }
+  /** The handshake's confirmation. `paired`: the sender has already paired (so don't answer it). */
+  | { k: "ready"; paired?: boolean }
   | { k: "ping" }
   | { k: "lobby"; data: unknown }
   | { k: "setup"; setup: GameSetup; c: string }
@@ -156,6 +145,9 @@ interface Candidate {
   timer: ReturnType<typeof setTimeout>;
 }
 
+/** Messages only sent once the game has started. */
+const GAME_MESSAGES = new Set<Msg["k"]>(["cmd", "salt", "reveal", "ack", "final", "reroll", "rsalt", "rreveal"]);
+
 /** At most this many unconfirmed hellos at once; more are ignored until one expires. */
 const MAX_CANDIDATES = 8;
 /** Hellos stamped further than this from our clock are ignored (old recordings replayed). */
@@ -192,6 +184,8 @@ export class PvpSession {
   private keys: CryptoKeyPair | null = null;
   private epk = "";
   private readonly candidates = new Map<string, Candidate>();
+  /** The opponent's hello nonce, once paired (to answer their repeats if our confirmation got lost). */
+  private pairedNonce: string | null = null;
   // lobby and seed
   private setup: GameSetup | null = null;
   private seedA: string | null = null;
@@ -231,6 +225,15 @@ export class PvpSession {
   get openCommand(): LogEntry | null {
     const last = this.log[this.log.length - 1];
     return last?.open ? last : null;
+  }
+
+  /**
+   * Whether this player can settle their open attack now (re-roll or keep): the opponent has
+   * acknowledged the attack itself, so settling can't overwrite a message they never got.
+   */
+  get canSettle(): boolean {
+    const e = this.openCommand;
+    return !!e && e.seat === this.seat && !this.pending && this.peerAck.has(e.n) && !this.closed;
   }
 
   /** Whether it is this player's move now (game started, not over, nothing in flight). */
@@ -320,6 +323,7 @@ export class PvpSession {
   async finalize(reroll?: Command): Promise<Applied> {
     const e = this.openCommand;
     if (!e || e.seat !== this.seat || this.pending) throw new Error("Nothing to settle");
+    if (!this.canSettle) throw new Error("Waiting for your opponent to see the attack");
     if (!reroll) {
       this.log[e.n] = { ...e, open: false };
       const msg: Msg = { k: "final", n: e.n, hash: e.hash };
@@ -330,7 +334,7 @@ export class PvpSession {
       return out;
     }
     if (!sameAttack(e.cmd, reroll) || "rerollSalt" in reroll) throw new Error("A re-roll must repeat the same attack");
-    const problem = commandProblem(e.before, reroll);
+    const problem = rerollProblem(e.before, reroll);
     if (problem) throw new Error(problem);
     const a = randomHex(16);
     const c = await sha256Hex(a);
@@ -424,7 +428,15 @@ export class PvpSession {
   }
 
   private async onHello(m: Hello, sentAt: number): Promise<void> {
-    if (m?.k !== "hello" || this.isPaired) return;
+    if (m?.k !== "hello") return;
+    if (this.isPaired) {
+      // Our opponent is still saying hello: our confirmation was lost. Say it again.
+      if (m.nonce === this.pairedNonce) {
+        await this.sendRaw(this.hello());
+        await this.send({ k: "ready", paired: true });
+      }
+      return;
+    }
     if (!isHex(m.nonce, 16) || !isHex(m.epk, 65) || (m.role !== "host" && m.role !== "guest")) return;
     if (m.role === this.role) return; // another tab with the same role, or our own echo
     if (!(Math.abs(Date.now() - sentAt) <= HELLO_WINDOW_MS)) return; // a stale recording
@@ -467,11 +479,12 @@ export class PvpSession {
   private confirm(nonce: string, c: Candidate): void {
     if (this.isPaired || !this.candidates.has(nonce)) return;
     this.sessionChannel = c.channel;
+    this.pairedNonce = nonce;
     this.dropCandidates();
     this.isPaired = true;
     this.lastHeard = Date.now();
     this.outbox = null;
-    void this.send({ k: "ready" });
+    void this.send({ k: "ready", paired: true });
     this.setPeer("connected");
     this.paired.emit({ peerBuild: c.build });
   }
@@ -485,8 +498,16 @@ export class PvpSession {
     if (!m || typeof m !== "object") return;
     this.lastHeard = Date.now();
     this.setPeer("connected");
+    if (this.role === "host" && this.state && !this.peerAck.has(-1) && GAME_MESSAGES.has(m.k) && !(m.k === "ack" && m.n === -1)) {
+      // The guest is playing, so it has the game: its start confirmation must have been lost.
+      this.peerAck.set(-1, "implied:true");
+      if (this.outbox?.k === "seed") this.outbox = null;
+    }
     switch (m.k) {
       case "ready":
+        // They haven't seen our confirmation yet: send it again (a confirmed ready isn't answered).
+        if (!m.paired) void this.send({ k: "ready", paired: true });
+        return;
       case "ping":
         return;
       case "lobby":
@@ -681,7 +702,7 @@ export class PvpSession {
     }
     if (m.n !== this.log.length - 1 || this.pending) return;
     if (!sameAttack(e.cmd, m.cmd) || "rerollSalt" in m.cmd) return this.problem.emit("Your opponent's re-roll didn't match their attack.");
-    const problem = commandProblem(e.before, m.cmd);
+    const problem = rerollProblem(e.before, m.cmd);
     if (problem) return this.problem.emit(`Your opponent's re-roll isn't allowed (${problem}).`);
     const b = randomHex(16);
     this.pending = { role: "B2", n: m.n, cmd: m.cmd, c: m.c, b };

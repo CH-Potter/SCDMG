@@ -1,3 +1,4 @@
+import { rerollProblem } from "../engine/reroll";
 import { reseed } from "./entropy";
 import { cardBound, defaultPayment, paymentOptions, type OwnCard, type Payment } from "../engine/cp";
 import { factionEmblemSvg, wordmarkSvg } from "./art/emblems";
@@ -916,7 +917,7 @@ export class Controller {
     const misses = a.report.hitRolls.filter((x) => x < a.report.hitOn).length;
     if (!misses) return false;
     const again: Command = { ...cmd, reroll: true };
-    if (commandProblem(before, again)) return false;
+    if (rerollProblem(before, again)) return false; // e.g. a lobbed shell, which only the engine refuses
     const yes = await this.askReroll(misses, before.players[HUMAN].cp);
     if (!yes || gen !== this.generation) return false;
     const choice = this.paymentChoice(before, again);
