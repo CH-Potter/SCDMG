@@ -111,10 +111,11 @@ describe("PvP sessions over an in-memory broker", () => {
   }, 150000);
 
   it("stay in step through re-rolls (Command re-roll house rule)", async () => {
-    // A chance comes up a few times a game (CP is scarce), so play games until one does.
+    // Banked CP (not card-bound) leaves the AI CP to spare, so every game offers a chance or more;
+    // play games until one is taken.
     let rerolls = 0;
     for (let game = 0; game < 5 && rerolls === 0; game++) {
-      const { host, guest, problems, desyncs } = await startGame({}, { ...SETUP, rules: { reroll: true } });
+      const { host, guest, problems, desyncs } = await startGame({}, { ...SETUP, rules: { reroll: true, cardCp: false } });
       rerolls += (await play(host, guest, 400, 120000)).rerolls;
       expect(problems).toEqual([]);
       expect(desyncs).toEqual([]);
