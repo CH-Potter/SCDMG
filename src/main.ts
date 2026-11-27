@@ -12,6 +12,9 @@ import "./ui/menu.css";
 import { loadArt, miniStyle } from "./ui/minis";
 import { BoardRenderer } from "./ui/renderer";
 import { audio } from "./audio"; // [audio]
+import type { GameSetup } from "./engine/game";
+import type { PvpSession } from "./net/session";
+import type { NetOpponent } from "./ui/opponent";
 
 audio.init(); // [audio] starts on the first click or key press (autoplay policy)
 
@@ -102,6 +105,28 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
 /** Bumped by each start, so a slow art load never starts a battle the player has moved on from. */
 let starting = 0;
 
+/**
+ * An online game's screen, once its session has started (the lobby will call this; for now the dev
+ * page below). `net` was made when the game started, so moves made while the art loads are kept.
+ */
+function startOnline(session: PvpSession, setup: GameSetup, net: NetOpponent): void {
+  overlay.classList.remove("show");
+  overlay.innerHTML = "";
+  controller?.destroy();
+  renderer.reset();
+  const leave = () => {
+    if (location.hash.startsWith("#pvp-dev=")) history.replaceState(null, "", location.pathname + location.search);
+    showMenu();
+  };
+  const start = () => (controller = Controller.online(renderer, els, leave, session, setup, net));
+  if (miniStyle() === "classic") start();
+  else {
+    const mine = ++starting;
+    const go = () => void (mine === starting && start());
+    void loadArt(setup.factions.flatMap((f) => FACTIONS[f]?.profiles ?? [])).then(go, go);
+  }
+}
+
 // Custom factions from the Faction Forge join the built-ins.
 registerCustomFactions(listCustomFactions());
 
@@ -110,5 +135,14 @@ registerCustomFactions(listCustomFactions());
 void loadArt(Object.values(FACTIONS).flatMap((f) => f.profiles)).catch((e) => console.warn("Couldn't load miniature art:", e));
 
 await renderer.init(els.stage);
-showMenu();
+if (import.meta.env.DEV && /^#pvp-dev=(host|guest)$/.test(location.hash)) {
+  // Dev server only: an online game between two tabs of this browser (see ui/pvpDev.ts).
+  const role = location.hash.endsWith("guest") ? "guest" : "host";
+  void import("./ui/pvpDev")
+    .then((m) => m.startPvpDev(role, { overlay, onStart: startOnline }))
+    .catch((err) => {
+      console.warn("Couldn't start the PvP dev game:", err);
+      showMenu();
+    });
+} else showMenu();
 // The intros never play by themselves (the menu's Intro button and each lore page play them).
