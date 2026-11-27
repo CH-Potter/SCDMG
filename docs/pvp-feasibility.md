@@ -204,7 +204,7 @@ Anything that relays messages must live elsewhere. The page only needs an outgoi
 | --- | --- | --- | --- | --- | --- |
 | **EMQX public broker** `wss://broker.emqx.io:8084/mqtt` | Yes, tested | None | "Prototype, learn, and test MQTT". No SLA. "All messages are visible to other users". | Worked in spike: connect 1.1 s, RTT ~354 ms | Best public option. |
 | **HiveMQ public broker** `wss://broker.hivemq.com:8884/mqtt` | Yes, tested | None | **"Must not be used in Production, Dev, Staging or UAT environments"**. The AUP limits free services to evaluation and personal use. | Worked: connect ~4 s, RTT ~344 ms | Not allowed for a released feature. |
-| **test.mosquitto.org** `wss://…:8081` | **Failed today** (WS handshake refused on 8081 and 8091) | None | "Free to use it for any application, but please do not abuse or rely upon it". Runs experimental code. | Its published config has the 8081 listener commented out | Not usable. |
+| **test.mosquitto.org** `wss://test.mosquitto.org:8081/mqtt` | Yes, re-tested 2026-11-27 (it refused WebSocket handshakes on the first test day) | None | "Free to use it for any application, but please do not abuse or rely upon it". Runs experimental code. | Worked on re-test: connect 0.8 s, RTT ~337 ms, Let's Encrypt certificate | **The MVP's primary broker**, with EMQX alongside (`src/net/mqtt.ts`). |
 | **mqtt.eclipseprojects.io** `wss://…:443/mqtt` | **Failed today** (timeout) | None | Evaluation sandbox; data public | Down or moved | Not usable. |
 | EMQX Serverless (free tier) | Yes | Signup. 1M session-minutes, 1 GB/month. Spend limit 0 stays free. | Fine | Managed | Credentials would sit in public JS; anyone could use up the quota. |
 | HiveMQ Cloud Serverless (free) | — | — | **Retiring 2026-12-31**; no new clusters | — | Ruled out. |
@@ -655,6 +655,7 @@ Run 2026-11-19 from the test machine:
 | EMQX `broker.emqx.io:8084/mqtt` | OK | 1.1 s | 352 / 354 / 364 / 365 ms |
 | HiveMQ `broker.hivemq.com:8884/mqtt` | OK | 4.0 s | 343 / 344 / 347 / 365 ms |
 | test.mosquitto.org `:8081` | WebSocket handshake refused (8081 and 8091 too) | — | — |
+| test.mosquitto.org `:8081` (re-test, 2026-11-27) | OK | 0.8 s | 336 / 337 / 339 / 344 ms |
 | mqtt.eclipseprojects.io `:443/mqtt` | Connect timeout | — | — |
 
 What the spike showed:
