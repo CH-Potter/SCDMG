@@ -6,9 +6,10 @@ import { FACTIONS, isBuiltInFaction, listCost, factionOf, supportsCost } from ".
 import type { MapDef } from "../engine/data/maps";
 import { economyOf, missionMapProblem, MISSIONS, swapMapSides, swapMissionSides, type MissionDef } from "../engine/data/missions";
 import { MODES, type ModeId } from "../engine/data/modes";
-import { cleanRules, HOUSE_RULES, isCoreRule, isStandard, rulesSummary, STANDARD_RULES, type HouseRules } from "../engine/houseRules";
+import { cleanRules, HOUSE_RULES, isCoreRule, isStandard, rulesSummary, STANDARD_RULES, type HouseRuleId, type HouseRules } from "../engine/houseRules";
 import type { StartBonus } from "../engine/game";
-import type { FactionId, ListEntry } from "../engine/types";
+import type { Faction, FactionId, ListEntry } from "../engine/types";
+import { isNetFactionId } from "./customFactions";
 import { mapsForMode } from "./customMaps";
 import { loadHouseRules, saveHouseRules } from "./houseRulesStore";
 import { esc } from "./describe";
@@ -39,6 +40,8 @@ export interface MenuOptions {
   onFactionForge: () => void;
   onRules: () => void;
   onCampaign: () => void;
+  /** "Play a friend online" (left out where online play isn't available, such as the desktop build). */
+  onOnline?: () => void;
 }
 
 interface Prefs {
@@ -119,6 +122,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
           </div>
           <div class="row">
             <button id="m-campaign" title="The Dustline War: a campaign of linked battles for one side">⚔ Campaign</button>
+            ${opts.onOnline ? `<button id="m-online" title="Play against a friend over the internet, with an invite code">🌐 Play a friend online</button>` : ""}
             <button class="secondary" id="m-lists">📜 List builder</button>
             <button class="secondary" id="m-maps">🗺 Map builder</button>
             <button class="secondary" id="m-forge">🧬 Faction forge</button>
@@ -223,29 +227,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
     bind(mission, map, side);
   };
 
-  const houseRulesPanel = () => {
-    const box = (group: "core" | "optional") =>
-      HOUSE_RULES.filter((r) => isCoreRule(r.id) === (group === "core"))
-        .map(
-          (r) => `<label class="house-rule">
-            <input type="checkbox" data-house="${r.id}" ${house[r.id] ? "checked" : ""}>
-            <span><b>${esc(r.name)}</b>${house[r.id] !== STANDARD_RULES[r.id] ? ` <span class="tag">changed</span>` : ""}<br><small>${esc(r.text)}</small></span>
-          </label>`,
-        )
-        .join("");
-    const changed = rulesSummary(house);
-    return `<details class="house-rules panel" ${changed.length ? "open" : ""}>
-        <summary>${changed.length ? `<b>${changed.length} house rule${changed.length === 1 ? "" : "s"}:</b> ${esc(changed.join(", "))}` : "<b>Standard rules.</b> Open to switch mechanics off, or tabletop staples on."}</summary>
-        <div class="house-grid">
-          <fieldset><legend>Core rules: untick to switch off</legend>${box("core")}</fieldset>
-          <fieldset><legend>Optional rules: tick to switch on</legend>${box("optional")}</fieldset>
-        </div>
-        <div class="row">
-          <button type="button" class="mini secondary" id="m-house-reset" ${changed.length ? "" : "disabled"}>Back to standard rules</button>
-          <span class="hint">House rules apply to every battle, the campaign's too, and the AI plays by them. The game was balanced with the standard rules.</span>
-        </div>
-      </details>`;
-  };
+  const houseRulesPanel = () => houseRulesPanelHtml(house);
 
   /** Both chosen lists are playable under the current house rules (open roster has no lists). */
   const armiesOk = (): boolean => {
@@ -264,12 +246,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
     return `
       <div class="army panel" data-faction="${esc(fid)}" style="--faction-color:${hex(factionOf(fid).color)}">
         <h3>${p === 0 ? "You" : "AI opponent"}</h3>
-        <div class="faction-row">${Object.values(FACTIONS)
-          .map(
-            (f) => `<button class="faction-chip ${f.id === fid ? "selected" : ""}" data-faction-pick="${p}:${esc(f.id)}" data-faction="${esc(f.id)}" style="--faction-color:${hex(f.color)}" title="${esc(f.blurb)}">
-              ${factionEmblemSvg(f.id, 28)}${esc(f.name)}</button>`,
-          )
-          .join("")}</div>
+        <div class="faction-row">${factionChipsHtml(fid, (f) => `data-faction-pick="${p}:${esc(f.id)}"`)}</div>
         <p class="hint">${esc(factionOf(fid).blurb)}${isBuiltInFaction(fid) ? ` <button type="button" class="linkish" data-lore="${esc(fid)}">Read their story ›</button>` : ""}</p>
         ${
           prefs.army === "open"
@@ -286,6 +263,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
   const bind = (mission: MissionDef, map: MapDef | undefined, side: 0 | 1) => {
     const $ = (sel: string) => host.querySelector(sel)!;
     $("#m-campaign").addEventListener("click", () => opts.onCampaign());
+    host.querySelector("#m-online")?.addEventListener("click", () => opts.onOnline?.());
     $("#m-lists").addEventListener("click", () => opts.onListBuilder(prefs.faction[0], prefs.mode));
     $("#m-maps").addEventListener("click", () => opts.onMapBuilder());
     $("#m-forge").addEventListener("click", () => opts.onFactionForge());
@@ -356,7 +334,7 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
     host.querySelectorAll<HTMLInputElement>("[data-house]").forEach((box) =>
       box.addEventListener("change", () => {
         const id = box.dataset.house as keyof HouseRules;
-        house = cleanRules({ ...house, ...Object.fromEntries((box.checked ? (HOUSE_RULES.find((r) => r.id === id)?.excludes ?? []) : []).map((x) => [x, false])), [id]: box.checked });
+        house = toggleHouseRule(house, id, box.checked);
         saveHouse();
         render();
         host.querySelector<HTMLElement>(`[data-house="${id}"]`)?.focus({ preventScroll: true });
@@ -387,4 +365,50 @@ export function openMenu(host: HTMLElement, opts: MenuOptions): void {
   };
 
   render();
+}
+
+// ---------- pickers shared with the online lobby (lobby.ts) ----------
+
+/** The house rules panel: every rule as a checkbox (`data-house`), and a reset button (`#m-house-reset`). */
+export function houseRulesPanelHtml(
+  house: HouseRules,
+  note = "House rules apply to every battle, the campaign's too, and the AI plays by them. The game was balanced with the standard rules.",
+): string {
+  const box = (group: "core" | "optional") =>
+    HOUSE_RULES.filter((r) => isCoreRule(r.id) === (group === "core"))
+      .map(
+        (r) => `<label class="house-rule">
+            <input type="checkbox" data-house="${r.id}" ${house[r.id] ? "checked" : ""}>
+            <span><b>${esc(r.name)}</b>${house[r.id] !== STANDARD_RULES[r.id] ? ` <span class="tag">changed</span>` : ""}<br><small>${esc(r.text)}</small></span>
+          </label>`,
+      )
+      .join("");
+  const changed = rulesSummary(house);
+  return `<details class="house-rules panel" ${changed.length ? "open" : ""}>
+        <summary>${changed.length ? `<b>${changed.length} house rule${changed.length === 1 ? "" : "s"}:</b> ${esc(changed.join(", "))}` : "<b>Standard rules.</b> Open to switch mechanics off, or tabletop staples on."}</summary>
+        <div class="house-grid">
+          <fieldset><legend>Core rules: untick to switch off</legend>${box("core")}</fieldset>
+          <fieldset><legend>Optional rules: tick to switch on</legend>${box("optional")}</fieldset>
+        </div>
+        <div class="row">
+          <button type="button" class="mini secondary" id="m-house-reset" ${changed.length ? "" : "disabled"}>Back to standard rules</button>
+          <span class="hint">${esc(note)}</span>
+        </div>
+      </details>`;
+}
+
+/** The rules after ticking or unticking one (rules that can't both be on are unticked). */
+export function toggleHouseRule(house: HouseRules, id: HouseRuleId, on: boolean): HouseRules {
+  return cleanRules({ ...house, ...Object.fromEntries((on ? (HOUSE_RULES.find((r) => r.id === id)?.excludes ?? []) : []).map((x) => [x, false])), [id]: on });
+}
+
+/** A chip per faction you can play (built-in and your own custom ones); `attrs` adds each chip's data attribute. */
+export function factionChipsHtml(selected: FactionId, attrs: (f: Faction) => string): string {
+  return Object.values(FACTIONS)
+    .filter((f) => !isNetFactionId(f.id))
+    .map(
+      (f) => `<button class="faction-chip ${f.id === selected ? "selected" : ""}" ${attrs(f)} data-faction="${esc(f.id)}" style="--faction-color:${hex(f.color)}" title="${esc(f.blurb)}">
+              ${factionEmblemSvg(f.id, 28)}${esc(f.name)}</button>`,
+    )
+    .join("");
 }

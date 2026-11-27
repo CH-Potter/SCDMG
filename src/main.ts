@@ -3,7 +3,7 @@ import { freshSeed } from "./ui/entropy";
 import { FACTIONS, registerCustomFactions } from "./engine/data/factions";
 import { openMapBuilder } from "./editor/index";
 import { openFactionForge } from "./forge/index";
-import { listCustomFactions } from "./ui/customFactions";
+import { dropNetFactions, listCustomFactions } from "./ui/customFactions";
 import { Controller, showRules, type ControllerHooks } from "./ui/controller";
 import type { CampaignReturn } from "./ui/campaign/index";
 import { openListBuilder } from "./ui/listbuilder";
@@ -29,7 +29,10 @@ let controller: Controller | null = null;
 
 function showMenu(): void {
   audio.setMood("menu"); // [audio]
+  dropNetFactions(); // an online game's opponent factions were for that game only
   openMenu(overlay, {
+    // The desktop build is offline by design (electron/main.cjs blocks the network), so no online play there.
+    onOnline: import.meta.env.MODE === "desktop" ? undefined : () => showLobby(),
     onStart: startGame,
     onListBuilder: (faction, mode, listId) => openListBuilder(overlay, { faction, mode, listId, onClose: showMenu }),
     onMapBuilder: () =>
@@ -51,6 +54,20 @@ function showMenu(): void {
     onRules: () => showRules(),
     onCampaign: () => showCampaign(),
   });
+}
+
+/**
+ * "Play a friend online" (loaded on first use, with the session and transports, so none of it is in
+ * the main bundle). `joinLink`: opened from a join link (its `#join=…` fragment).
+ */
+function showLobby(joinLink?: string): void {
+  audio.setMood("menu"); // [audio]
+  void import("./ui/lobby")
+    .then((m) => m.openLobby(overlay, { onStart: startOnline, onExit: showMenu, joinLink }))
+    .catch((err) => {
+      console.warn("Couldn't open the online lobby:", err);
+      showMenu();
+    });
 }
 
 /** The campaign screen (loaded on first use). `result` is the battle you just came back from, if any. */
@@ -106,8 +123,8 @@ function startGame(choice: MenuChoice, hooks: ControllerHooks = {}): void {
 let starting = 0;
 
 /**
- * An online game's screen, once its session has started (the lobby will call this; for now the dev
- * page below). `net` was made when the game started, so moves made while the art loads are kept.
+ * An online game's screen, once its session has started (from the lobby, or the dev page below).
+ * `net` was made when the game started, so moves made while the art loads are kept.
  */
 function startOnline(session: PvpSession, setup: GameSetup, net: NetOpponent): void {
   overlay.classList.remove("show");
@@ -144,5 +161,11 @@ if (import.meta.env.DEV && /^#pvp-dev=(host|guest)$/.test(location.hash)) {
       console.warn("Couldn't start the PvP dev game:", err);
       showMenu();
     });
+} else if (import.meta.env.MODE !== "desktop" && /(?:^#|&)join=/.test(location.hash)) {
+  // A join link from a friend: straight to the lobby's join screen. The code is read, then dropped
+  // from the address bar (so a reload doesn't join again).
+  const link = location.hash;
+  history.replaceState(null, "", location.pathname + location.search);
+  showLobby(link);
 } else showMenu();
 // The intros never play by themselves (the menu's Intro button and each lore page play them).
